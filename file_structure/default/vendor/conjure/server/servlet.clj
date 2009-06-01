@@ -15,6 +15,6 @@
 ;; implementation of an HttpServlet, overriding just on function:
 ;;   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 (defn make-servlet []
-     (proxy [HttpServlet] []
-       (doGet [#^HttpServletRequest req #^HttpServletResponse resp]
-         (process req resp))))
+  (proxy [HttpServlet] []
+    (doGet [#^HttpServletRequest req #^HttpServletResponse resp]
+      (process req resp))))
