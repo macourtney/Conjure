@@ -1,0 +1,1 @@
+View clj files should be placed in subdirectories by their controller.
