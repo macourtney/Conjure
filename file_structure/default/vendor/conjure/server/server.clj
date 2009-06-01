@@ -3,14 +3,25 @@
         [db-config]
         [conjure.server.jdbc-connector :as jdbc-connector]
         [conjure.util.loading-utils :as loading-utils]
-        [clojure.contrib.str-utils :as str-utils]))
+        [clojure.contrib.str-utils :as str-utils]
+        [routes :as routes]))
 
+;; Gets a route map for use by conjure to call the correct methods.
+(defn create-route-map [path]
+  (let [routes-vector (routes/draw)]
+    (loop [index 0] 
+      (let [route-fn (nth routes-vector index)
+           output (route-fn path)]
+           
+        (if output
+          output
+          (recur (inc index) ))))))
 
-(defn controller-file-name [controller]
-  (str controller "_controller.clj"))
+(defn controller-file-name [route-map]
+  (str (:controller route-map) "_controller.clj"))
   
-(defn fully-qualified-action [controller action]
-  (str "(controllers." (str-utils/re-gsub (re-pattern "_") "-" controller) "-controller/" action ")"))
+(defn fully-qualified-action [route-map]
+  (str "(controllers." (str-utils/re-gsub (re-pattern "_") "-" (:controller route-map)) "-controller/" (:action route-map) ")"))
 
 (defn load-controller [filename]
   (loading-utils/load-resource "controllers" filename))
