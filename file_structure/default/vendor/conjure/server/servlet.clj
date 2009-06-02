@@ -4,6 +4,7 @@
 
 ;; the method which produces the page for the test servlet.
 (defn process [#^HttpServletRequest req #^HttpServletResponse resp]
+
   (let [out (. resp (getOutputStream))
         route-map (server/create-route-map (. req getPathInfo))]
 
