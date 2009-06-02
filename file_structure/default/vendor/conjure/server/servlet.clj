@@ -4,11 +4,8 @@
 
 ;; the method which produces the page for the test servlet.
 (defn process [#^HttpServletRequest req #^HttpServletResponse resp]
-  (let [out (. resp (getOutputStream))
-        route-map (server/create-route-map (. req getPathInfo))]
-
-    (load-controller (server/controller-file-name route-map))
-    (. out (println (load-string (server/fully-qualified-action route-map))))))
+  (let [out (. resp (getOutputStream))]
+    (. out (println (server/process-request (. req getPathInfo))))))
 
 ;; implementation of an HttpServlet, overriding just on function:
 ;;   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
