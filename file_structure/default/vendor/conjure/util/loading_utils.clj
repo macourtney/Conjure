@@ -8,8 +8,11 @@
 
 ;; Loads a given director and filename using the system class loader and returns the reader for it.
 (defn resource-reader [directory filename]
-  (new java.io.InputStreamReader 
-    (. (system-class-loader) getResourceAsStream (str directory "/" filename))))
+  (let [full-file-path (str directory "/" filename)
+        resource (. (system-class-loader) getResourceAsStream full-file-path)]
+    (if resource
+      (new java.io.InputStreamReader resource)
+      (throw (new RuntimeException (str "Cannot find file named: " full-file-path))))))
 
 ;; Loads a resource from the class path. Simply pass in the directory and the filename to load.
 (defn load-resource [directory filename]

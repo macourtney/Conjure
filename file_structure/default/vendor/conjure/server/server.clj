@@ -36,10 +36,13 @@
 (defn load-view [filename]
   (loading-utils/load-resource-as-string "views" filename))
 
+(defn view-file-path [params]
+  (str (:controller params) "/" (:action params) ".clj"))
+
 ;; A macro for simplifying the loading of views
 (defmacro render-view 
-  [view expr]
-  `(let [execute# (load-string (str "(fn " '~expr " " (load-view (str ~view ".clj")) ")" ))]
+  [params expr]
+  `(let [execute# (load-string (str "(fn " '~expr " " (load-view (str (view-file-path ~params))) ")" ))]
       (execute# ~@expr)))
 
 ;; Gets the user configured http properties.
