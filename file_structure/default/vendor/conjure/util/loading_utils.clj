@@ -1,6 +1,8 @@
 (ns conjure.util.loading-utils
   (:use [clojure.contrib.classpath :as classpath]
-        [clojure.contrib.seq-utils :as seq-utils]))
+        [clojure.contrib.seq-utils :as seq-utils]
+        [conjure.util.string-utils :as string-utils]
+        [clojure.contrib.str-utils :as clojure-str-utils]))
 
 ;; Gets the system class loader
 (defn system-class-loader []
@@ -32,3 +34,19 @@
 (defn get-classpath-dir-ending-with [ending]
   (seq-utils/find-first (fn [directory] (. (. directory getPath) endsWith ending))
     (classpath/classpath-directories)))
+    
+(defn
+#^{:doc "Converts all underscores to dashes in string."}
+  underscores-to-dashes [string]
+  (re-gsub #"_" "-" string))
+  
+(defn
+#^{:doc "Converts all slashes to periods in string."}
+  slashes-to-dots [string]
+  (re-gsub #"/|\\" "." string))
+
+(defn
+#^{:doc "Returns a string for the namespace of the given file in the given directory."}
+  namespace-string-for-file [directory file-name]
+  (let [no-extension (string-utils/strip-ending file-name ".clj")]
+    (str (slashes-to-dots (underscores-to-dashes directory)) "." (underscores-to-dashes no-extension))))

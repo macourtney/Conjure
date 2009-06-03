@@ -16,5 +16,6 @@
       (let [db-directory (find-db-directory)]
         (if db-directory
           (let [migrate-directory (migration/find-or-create-migrate-directory db-directory)] 
-            (migration/create-migration-file migrate-directory (first params)))))
+            (migration/create-migration-file migrate-directory (first params)))
+          (println "Could not find db directory.")))
       (migration-usage))))

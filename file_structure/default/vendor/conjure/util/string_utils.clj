@@ -21,3 +21,21 @@
       (map
         (fn [index] fill-char) 
         (range (- total-length (. string length))))) string)))
+        
+(defn
+#^{:doc "Converts a keyword to it's string value. Basically, it just removes the ':' fromt the beginning."}
+  str-keyword [keyword]
+  (if (keyword? keyword)
+    (. (str keyword) substring 1)
+    (str keyword)))
+    
+(defn
+#^{:doc "If string ends with the string ending, then remove ending and return the result. Otherwise, return string."}
+  strip-ending [string ending]
+  (if (> (. string length) (. ending length))
+    (let [ending-index (- (. string length) (. ending length))
+          string-end (. string substring ending-index)]
+      (if (. string-end equals ending)
+        (. string substring 0 ending-index)
+        string))
+    string))
