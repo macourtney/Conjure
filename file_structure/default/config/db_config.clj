@@ -11,7 +11,7 @@
         driver "org.apache.derby.jdbc.EmbeddedDriver"
 
         ;; The name of the database to use.
-        db-name "conjureTest"
+        db-name "conjure_test"
 
         ;; The connection url to pass to the jdbc driver.
         connection-url (str "jdbc:derby:" db-name ";create=true")]

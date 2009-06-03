@@ -2,7 +2,7 @@
   (:use [generators.migration-generator :as migration-generator]))
 
 (defn print-usage []
-  (println "Usage: ./run.sh script/Generate.clj <generate type> <generate params>*"))
+  (println "Usage: ./run.sh script/generate.clj <generate type> <generate params>*"))
 
 (defn print-unknown-command [command]
   (println (str "Unknown command: " command))
