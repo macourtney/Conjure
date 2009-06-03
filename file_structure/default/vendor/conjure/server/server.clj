@@ -6,8 +6,9 @@
         [clojure.contrib.str-utils :as str-utils]
         [routes :as routes]))
 
+
 ;; Gets a route map for use by conjure to call the correct methods.
-(defn create-route-map [path]
+(defn create-request-map [path]
   (let [routes-vector (routes/draw)]
     (loop [index 0] 
       (let [route-fn (nth routes-vector index)
@@ -17,15 +18,21 @@
           output
           (recur (inc index) ))))))
 
-(defn controller-file-name [route-map]
-  (str (:controller route-map) "_controller.clj"))
+(defn controller-file-name [request-map]
+  (str (:controller request-map) "_controller.clj"))
   
-(defn fully-qualified-action [route-map]
-  (str "(controllers." (str-utils/re-gsub (re-pattern "_") "-" (:controller route-map)) "-controller/" (:action route-map) ")"))
+(defn fully-qualified-action [request-map]
+  (str "controllers." (str-utils/re-gsub (re-pattern "_") "-" (:controller request-map)) "-controller/" (:action request-map)))
 
 (defn load-controller [filename]
   (loading-utils/load-resource "controllers" filename))
 
+;; Takes the given path and calls the correct controller and action for it.
+(defn process-request [path]
+  (let [request-map (create-request-map path)]
+    (load-controller (controller-file-name request-map))
+    ((load-string (fully-qualified-action request-map)) request-map)))
+    
 (defn load-view [filename]
   (loading-utils/load-resource-as-string "views" filename))
 
