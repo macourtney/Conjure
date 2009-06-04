@@ -114,8 +114,9 @@
               (jdbc-connector/insert-one-into schema-info-table '("version") '(0))
               0))))
       (do
-        (println schema-info-table "does not exist")
+        (println schema-info-table "does not exist. Creating table...")
         (jdbc-connector/create-table schema-info-table {:version "INT NOT NULL"})
+        (println "Setting the initial version to 0.")
         (jdbc-connector/insert-one-into schema-info-table '("version") '(0))
         0))))
         

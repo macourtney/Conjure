@@ -10,7 +10,11 @@
 (defn
 #^{:doc "Returns a connection to the database."}
   connect []
-  (. DriverManager getConnection (:connection-url (get-db-config))))
+  (let [db-config-map (get-db-config)
+        connection-url (:connection-url db-config-map)
+        user-name (:user-name db-config-map)
+        password (:password db-config-map)]
+    (. DriverManager getConnection connection-url user-name password)))
 
 (defn
 #^{:doc "Executes the given sql string and returns the results as a ResultSet."}

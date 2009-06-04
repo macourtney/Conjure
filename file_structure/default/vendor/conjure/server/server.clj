@@ -13,7 +13,6 @@
     (loop [index 0] 
       (let [route-fn (nth routes-vector index)
            output (route-fn path)]
-           
         (if output
           output
           (recur (inc index) ))))))
@@ -22,7 +21,7 @@
   (str (:controller request-map) "_controller.clj"))
   
 (defn fully-qualified-action [request-map]
-  (str "controllers." (str-utils/re-gsub (re-pattern "_") "-" (:controller request-map)) "-controller/" (:action request-map)))
+  (str "controllers." (loading-utils/underscores-to-dashes (:controller request-map)) "-controller/" (:action request-map)))
 
 (defn load-controller [filename]
   (loading-utils/load-resource "controllers" filename))

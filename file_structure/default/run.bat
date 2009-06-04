@@ -3,15 +3,7 @@
 set HOME_DIR=.
 set LIB_DIR=%HOME_DIR%\lib
 
-set CLOJURE_JAR=%LIB_DIR%\clojure-1.0.0.jar
-set CLOJURE_CONTRIB_JAR=%LIB_DIR%\clojure-contrib.jar
-set DERBY_JAR=%LIB_DIR%\derby.jar
-set HTML_PARSER_JAR=%LIB_DIR%\htmlparser.jar
-set JETTY_JAR=%LIB_DIR%\jetty-6.1.18.jar
-set JETTY_UTIL_JAR=%LIB_DIR%\jetty-util-6.1.18.jar
-set SERVLET_API_JAR=%LIB_DIR%\servlet-api-2.5-20081211.jar
-
-set JARS_PATH=%CLOJURE_JAR%;%CLOJURE_CONTRIB_JAR%;%DERBY_JAR%;%HTML_PARSER_JAR%;%JETTY_JAR%;%JETTY_UTIL_JAR%;%SERVLET_API_JAR%
+set JARS_PATH=%LIB_DIR%\*
 
 set VENDOR_DIR=%HOME_DIR%\vendor
 set APP_DIR=%HOME_DIR%\app
