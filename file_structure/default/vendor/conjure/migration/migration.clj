@@ -5,6 +5,9 @@
         [conjure.util.loading-utils :as loading-utils]
         [clojure.contrib.str-utils :as clojure-str-utils]))
 
+(def schema_info_table "schema_info")
+(def version_column "version")
+
 (defn 
 #^{:doc "Finds the db directory which contains all of the files for updating the schema for the database."}
   find-db-directory []
@@ -140,34 +143,69 @@
   (if (seq migration-files)
     (let [migration-file (first migration-files)]
       (run-migrate-up migration-file)
-      (migrate-up-all (rest migration-files)))))
-      
+      (let [output (migrate-up-all (rest migration-files))]
+        (if output 
+          output 
+          (migration-number-from-file migration-file))))))
+
+(defn
+#^{:doc "Finds the number of the migration file before the given number"}
+  migration-number-before 
+    ([migration-number] (migration-number-before migration-number (all-migration-files (find-migrate-directory))))
+    ([migration-number migration-files]
+      (let [migration-file (first migration-files)
+            migration-file-number (migration-number-from-file migration-file)]
+        (if (< migration-file-number migration-number)
+          (let [next-migration-number (migration-number-before migration-number (rest migration-files))]
+            (if (not (== next-migration-number 0))
+              next-migration-number
+              migration-number))
+          0))))
+
 (defn
 #^{:doc "Runs the up function on all of the given migration files."}
   migrate-down-all [migration-files]
   (if (seq migration-files)
     (let [migration-file (first migration-files)]
       (run-migrate-down migration-file)
-      (migrate-down-all (rest migration-files)))))
-        
+      (let [output (migrate-down-all (rest migration-files))]
+        (if output 
+          output 
+          (migration-number-before (migration-number-from-file migration-file)))))))
+
+(defn
+#^{:doc "Updates the version number saved in the schema table in the database."}
+  update-db-version [new-version]
+  (jdbc-connector/execute-update 
+    (str "UPDATE " schema_info_table " SET " version_column " = " new-version)))
+
 (defn
 #^{:doc "Migrates the database up from from-version to to-version."}
   migrate-up [from-version to-version]
-  (println "Migrate the db up.")
-  (migrate-up-all (migration-files-in-range from-version to-version)))
+  (let [new-version (migrate-up-all (migration-files-in-range from-version to-version))]
+    (if new-version
+      (do
+        (println "Migrated to version:" new-version)
+        (update-db-version new-version))
+      (println "No changes were made to the database."))))
   
 (defn
 #^{:doc "Migrates the database down from from-version to to-version."}
   migrate-down [from-version to-version]
-  (println "Migrate the db down.")
-  (migrate-down-all (reverse (migration-files-in-range from-version to-version))))
+  (let [new-version (migrate-down-all (reverse (migration-files-in-range to-version from-version)))]
+    (if new-version
+      (do
+        (println "Migrated to version:" new-version)
+        (update-db-version new-version))
+      (println "No changes were made to the database."))))
 
 (defn 
 #^{:doc "Updates the database to the given version number. If the version number is less than the current database version number, then this function causes a roll back."}
   update-to-version [version-number]
   (let [db-version (current-db-version)]
-    (println "Updating to version:" version-number)
     (println "Current database version: " (str db-version))
-    (if (< db-version version-number)
-      (migrate-up db-version version-number)
-      (migrate-down db-version version-number))))
+    (let [version-number-min (min (max version-number 0) (max-migration-number (find-migrate-directory)))]
+      (println "Updating to version:" version-number-min)
+      (if (< db-version version-number-min)
+        (migrate-up (+ db-version 1) version-number-min)
+        (migrate-down db-version (+ version-number-min 1))))))

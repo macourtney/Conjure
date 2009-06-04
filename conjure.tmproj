@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>file_structure/default/vendor/conjure/server/servlet.clj</string>
+	<string>file_structure/default/script/migrate.clj</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -21,12 +21,68 @@
 	<integer>200</integer>
 	<key>metaData</key>
 	<dict>
-		<key>file_structure/default/vendor/conjure/server/servlet.clj</key>
+		<key>file_structure/default/script/generators/migration_generator.clj</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>26</integer>
+				<key>line</key>
+				<integer>19</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>file_structure/default/script/migrate.clj</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>26</integer>
+				<key>line</key>
+				<integer>25</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>file_structure/default/vendor/conjure/migration/migration.clj</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>8</integer>
+				<key>line</key>
+				<integer>69</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>23</integer>
+		</dict>
+		<key>file_structure/default/vendor/conjure/server/jdbc_connector.clj</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>67</integer>
+				<key>line</key>
+				<integer>12</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>target/hello_world/db/migrate/001_create_messages.clj</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>26</integer>
 				<key>line</key>
 				<integer>6</integer>
 			</dict>
@@ -38,7 +94,11 @@
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>file_structure/default/vendor/conjure/server/servlet.clj</string>
+		<string>target/hello_world/db/migrate/001_create_messages.clj</string>
+		<string>file_structure/default/script/migrate.clj</string>
+		<string>file_structure/default/script/generators/migration_generator.clj</string>
+		<string>file_structure/default/vendor/conjure/migration/migration.clj</string>
+		<string>file_structure/default/vendor/conjure/server/jdbc_connector.clj</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
