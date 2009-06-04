@@ -5,12 +5,13 @@
 (defn
 #^{:doc "Executes an sql string and returns the results as a ResultSet."}
   execute-query [connection sql-string]
+  ;;(println sql-string)
   (. (. connection createStatement) executeQuery sql-string))
   
 (defn
 #^{:doc "Executes an update sql string which does not return results."}
   execute-update [connection sql-string]
-  (println sql-string)
+  ;;(println sql-string)
   (. (. connection createStatement) executeUpdate sql-string))
 
 (defn
@@ -62,6 +63,14 @@
     (str "INSERT INTO " table-name " (" 
       (str-utils/str-join ", " columns) ") VALUES (" 
       (values-as-string values) ")")))
+      
+(defn
+#^{:doc "Runs an update statement. Set-map is a map containing the parts of the update statement. The supported keys are :set and :where which map to set and where clause strings."}
+  update [connection table-name set-map]
+  (execute-update
+    connection
+    (let [where-clause (:where set-map)]
+      (str "UPDATE " table-name " SET " (:set set-map) (if where-clause (str " WHERE " where-clause))))))
 
 (defn
 #^{:doc "Returns a database flavor for a derby database."}
@@ -69,4 +78,5 @@
   {:table-exists table-exists
    :sql-find sql-find
    :create-table create-table
-   :insert-into insert-into})
+   :insert-into insert-into
+   :update update})

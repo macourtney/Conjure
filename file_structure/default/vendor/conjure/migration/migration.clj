@@ -96,7 +96,8 @@
         migration-file-name (str (string-utils/prefill (str next-migrate-number) 3 "0") "_" (clojure-str-utils/re-gsub #"-" "_" migration-name) ".clj")
         migration-file (new File migrate-directory  migration-file-name)]
     (println "Creating migration file" migration-file-name "...")
-    (. migration-file createNewFile)))
+    (. migration-file createNewFile)
+    migration-file))
 
 (defn 
 #^{:doc "Gets the current db version number. If the schema info table doesn't exist this function creates it. If the schema info table is empty, then it adds a row and sets the version to 0."}
@@ -176,8 +177,7 @@
 (defn
 #^{:doc "Updates the version number saved in the schema table in the database."}
   update-db-version [new-version]
-  (jdbc-connector/execute-update 
-    (str "UPDATE " schema_info_table " SET " version_column " = " new-version)))
+  (jdbc-connector/update  schema_info_table {:set (str version_column " = " new-version)}))
 
 (defn
 #^{:doc "Migrates the database up from from-version to to-version."}

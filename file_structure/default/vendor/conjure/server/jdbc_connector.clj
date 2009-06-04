@@ -61,3 +61,8 @@
 #^{:doc "Creates a table with the given name and with columns from the given schema-map."}
   create-table [table-name schema-map]
   ((:create-table (db-flavor)) (connect) table-name schema-map))
+  
+(defn
+#^{:doc "Updates a table with the given set map. The keys to set map are defined by the flavor, but are likely :set and :where which are the set clause and where clause respectively."}
+  update [table-name set-map]
+  ((:update (db-flavor)) (connect) table-name set-map))
