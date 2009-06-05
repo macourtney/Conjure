@@ -1,5 +1,6 @@
 (ns generate 
-  (:use [generators.migration-generator :as migration-generator]))
+  (:require [generators.migration-generator :as migration-generator]
+        [generators.view-generator :as view-generator]))
 
 (defn print-usage []
   (println "Usage: ./run.sh script/generate.clj <generate type> <generate params>*"))
@@ -9,9 +10,15 @@
   (print-usage))
 
 (defn generate [command params]
-  (if (. command equals "migration")
-    (migration-generator/generate-migration params)
-    (print-unknown-command command)))
+  (cond 
+    (. command equals "migration")
+      (migration-generator/generate-migration params)
+      
+    (. command equals "view")
+      (view-generator/generate-view params)
+      
+    true ; Default condition.
+      (print-unknown-command command)))
 
 (let [command (first *command-line-args*)
       generate-args (rest *command-line-args*)]

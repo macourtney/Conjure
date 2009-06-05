@@ -42,6 +42,11 @@
     (classpath/classpath-directories)))
     
 (defn
+#^{:doc "Converts all dashes to underscores in string."}
+  dashes-to-underscores [string]
+  (re-gsub #"-" "_" string))
+    
+(defn
 #^{:doc "Converts all underscores to dashes in string."}
   underscores-to-dashes [string]
   (re-gsub #"_" "-" string))
@@ -52,7 +57,11 @@
   (re-gsub #"/|\\" "." string))
 
 (defn
+#^{:doc "Converts the given clj file name to a symbol string. For example: \"loading_utils.clj\" would get converted into \"loading-utils\""}
+  clj-file-to-symbol-string [file-name]
+  (underscores-to-dashes (string-utils/strip-ending file-name ".clj")))
+
+(defn
 #^{:doc "Returns a string for the namespace of the given file in the given directory."}
   namespace-string-for-file [directory file-name]
-  (let [no-extension (string-utils/strip-ending file-name ".clj")]
-    (str (slashes-to-dots (underscores-to-dashes directory)) "." (underscores-to-dashes no-extension))))
+  (str (slashes-to-dots (underscores-to-dashes directory)) "." (clj-file-to-symbol-string file-name)))
