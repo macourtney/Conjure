@@ -1,4 +1,4 @@
-(ns flavors.derby
+(ns flavors.h2
   (:use [clojure.contrib.str-utils :as str-utils]
         [conjure.util.string-utils :as conjure-string-utils]))
   
@@ -18,7 +18,7 @@
 #^{:doc "Returns true if the table with the given name exists."}
   table-exists [connection table-name]
   (try
-    (let [results (execute-query connection (str "SELECT * FROM " table-name " FETCH FIRST ROW ONLY"))]
+    (let [results (execute-query connection (str "SELECT * FROM " table-name " LIMIT 1"))]
       true)
     (catch Exception e false)))
     
