@@ -7,15 +7,17 @@
         [routes :as routes]))
 
 
-;; Gets a route map for use by conjure to call the correct methods.
-(defn create-request-map [path]
+(defn
+#^{:doc "Gets a route map for use by conjure to call the correct methods."}
+  create-request-map [path]
   (let [routes-vector (routes/draw)]
-    (loop [index 0] 
-      (let [route-fn (nth routes-vector index)
-           output (route-fn path)]
-        (if output
-          output
-          (recur (inc index) ))))))
+    (loop [current-routes routes-vector]
+      (if (seq current-routes)
+        (let [route-fn (first current-routes)
+             output (route-fn path)]
+          (if output
+            output
+            (recur (rest current-routes))))))))
 
 (defn controller-file-name [request-map]
   (str (:controller request-map) "_controller.clj"))
@@ -26,11 +28,13 @@
 (defn load-controller [filename]
   (loading-utils/load-resource "controllers" filename))
 
-;; Takes the given path and calls the correct controller and action for it.
-(defn process-request [path]
+(defn
+#^{:doc "Takes the given path and calls the correct controller and action for it."}
+  process-request [path]
   (let [request-map (create-request-map path)]
-    (load-controller (controller-file-name request-map))
-    ((load-string (fully-qualified-action request-map)) request-map)))
+    (when request-map
+      (load-controller (controller-file-name request-map))
+      ((load-string (fully-qualified-action request-map)) request-map))))
     
 (defn load-view [filename]
   (loading-utils/load-resource-as-string "views" filename))
@@ -38,20 +42,23 @@
 (defn view-file-path [params]
   (str (:controller params) "/" (:action params) ".clj"))
 
-;; A macro for simplifying the loading of views
-(defmacro render-view 
+(defmacro
+#^{:doc "A macro for simplifying the loading of views."}
+  render-view 
   [params expr]
   `(let [execute# (load-string (str "(fn " '~expr " " (load-view (str (view-file-path ~params))) ")" ))]
       (execute# ~@expr)))
 
-;; Gets the user configured http properties.
-(defn http-config []
+(defn
+#^{:doc "Gets the user configured http properties."}
+  http-config []
   (http-config/get-http-config))
 
 (defn db-config []
   (db-config/get-db-config))
 
-;; This is the first method called when the server is started.
-(defn config-server []
+(defn
+#^{:doc "This is the first method called when the server is started."}
+  config-server []
   (http-config)
   (jdbc-connector/init))

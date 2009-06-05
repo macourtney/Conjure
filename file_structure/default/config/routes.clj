@@ -6,9 +6,11 @@
 (defn draw []
   [(fn [path] 
      (let [path_tokens (tokenize path "/")
-           controller (nth path_tokens 0 nil)
-           action (nth path_tokens 1 nil)
-           id (nth path_tokens 2 nil)]
+           controller (first path_tokens)
+           path_tokens_2 (rest path_tokens)
+           action (first path_tokens_2)
+           path_tokens_3 (rest path_tokens_2)
+           id (first path_tokens_3)]
 
        (if (and controller action)
          {:controller controller
