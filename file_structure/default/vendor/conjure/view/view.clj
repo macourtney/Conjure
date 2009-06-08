@@ -2,7 +2,8 @@
   (:import [java.io File])
   (:use [conjure.util.loading-utils :as loading-utils]
         [clojure.contrib.seq-utils :as seq-utils]
-        [conjure.util.string-utils :as string-utils]))
+        [conjure.util.string-utils :as string-utils]
+        [conjure.util.file-utils :as file-utils]))
 
 (defn 
 #^{:doc "Finds the views directory which contains all of the files which describe the html pages of the app."}
@@ -10,11 +11,16 @@
   (seq-utils/find-first (fn [directory] (. (. directory getPath) endsWith "views"))
     (. (loading-utils/get-classpath-dir-ending-with "app") listFiles)))
   
+(defn
+#^{:doc "Finds a controller directory for the given controller in the given view directory."}
+  find-controller-directory [view-directory controller]
+  (file-utils/find-directory view-directory controller))
+    
 (defn 
 #^{:doc "Finds or creates if missing, a controller directory for the given controller in the given view directory."}
   find-or-create-controller-directory [view-directory controller]
-  (let [controller-directory (new File (. view-directory getPath) controller)]
-    (if (. controller-directory exists)
+  (let [controller-directory (find-controller-directory view-directory controller)]
+    (if controller-directory
       (do
         (println (. controller-directory getPath) "directory already exists.")
         controller-directory)
@@ -23,6 +29,11 @@
         (. controller-directory mkdirs)
         controller-directory))))
         
+(defn
+#^{:doc "Finds a view file with the given controller-directory and action."}
+  find-view-file [controller-directory action]
+  (file-utils/find-file controller-directory (str action ".clj")))
+      
 (defn
 #^{:doc "Creates a new view file from the given migration name."}
   create-view-file [controller-directory action]

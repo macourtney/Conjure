@@ -3,7 +3,9 @@
   (:use [conjure.server.jdbc-connector :as jdbc-connector]
         [conjure.util.string-utils :as string-utils]
         [conjure.util.loading-utils :as loading-utils]
-        [clojure.contrib.str-utils :as clojure-str-utils]))
+        [conjure.util.file-utils :as file-utils]
+        [clojure.contrib.str-utils :as clojure-str-utils]
+        [clojure.contrib.seq-utils :as seq-utils]))
 
 (def schema_info_table "schema_info")
 (def version_column "version")
@@ -16,10 +18,7 @@
 (defn
 #^{:doc "Finds the migrate directory."}
   find-migrate-directory []
-  (let [migrate-directory (new File (. (find-db-directory) getPath) "migrate")]
-    (if (. migrate-directory exists)
-      migrate-directory
-      nil)))
+  (file-utils/find-directory (find-db-directory) "migrate"))
 
 (defn 
 #^{:doc "Finds or creates if missing, the migrate directory in the given db directory."}
@@ -88,6 +87,19 @@
 #^{:doc "Returns the next number to use for a migration file."}
   find-next-migrate-number [migrate-directory]
   (+ (max-migration-number migrate-directory) 1))
+  
+(defn
+#^{:doc "The migration file with the given migration name."}
+  find-migration-file 
+    ([migration-name] (find-migration-file (find-migrate-directory) migration-name))
+    ([migrate-directory migration-name]
+      (let [migration-file-name-to-find (str (loading-utils/dashes-to-underscores migration-name) ".clj")]
+        (seq-utils/find-first 
+          (fn [migration-file] 
+            (re-find 
+              (re-pattern (str "[0-9]+_" migration-file-name-to-find))
+              (. migration-file getName)))
+          (all-migration-files migrate-directory)))))
 
 (defn
 #^{:doc "Creates a new migration file from the given migration name."}

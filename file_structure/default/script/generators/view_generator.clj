@@ -3,13 +3,13 @@
   (:use [conjure.view.view :as view]))
 
 (defn
-#^{:doc "Prints out how to use the generate migration command."}
+#^{:doc "Prints out how to use the generate view command."}
   view-usage []
   (println "You must supply a controller and action name (Like hello-world).")
   (println "Usage: ./run.sh script/generate.clj view <controller> <action>"))
   
 (defn
-#^{:doc "Generates the migration content and saves it into the given migration file."}
+#^{:doc "Generates the view content and saves it into the given view file."}
   generate-file-content
     ([view-file controller] (generate-file-content view-file controller nil))
     ([view-file controller content]
@@ -22,7 +22,7 @@
       (. view-file-writer close))))
 
 (defn
-#^{:doc "Creates the migration file from the given migration-name."}
+#^{:doc "Creates the view file associated with the given controller and action."}
   generate-view-file
     ([controller action] (generate-view-file controller action nil))
     ([controller action content]
@@ -37,7 +37,7 @@
               (println "Could not find views directory.")
               (println view-directory))))
         (view-usage))))
-
+        
 (defn 
 #^{:doc "Generates a migration file for the migration name given in params."}
   generate-view [params]
