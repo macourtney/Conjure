@@ -26,13 +26,14 @@
         controller-directory)
       (do
         (println "Creating controller directory in views...")
-        (. controller-directory mkdirs)
-        controller-directory))))
+        (let [new-controller-directory (new File view-directory (dashes-to-underscores controller))]
+          (. new-controller-directory mkdirs)
+          new-controller-directory)))))
         
 (defn
 #^{:doc "Finds a view file with the given controller-directory and action."}
   find-view-file [controller-directory action]
-  (file-utils/find-file controller-directory (str action ".clj")))
+  (file-utils/find-file controller-directory (symbol-string-to-clj-file action)))
       
 (defn
 #^{:doc "Creates a new view file from the given migration name."}

@@ -60,6 +60,11 @@
 #^{:doc "Converts the given clj file name to a symbol string. For example: \"loading_utils.clj\" would get converted into \"loading-utils\""}
   clj-file-to-symbol-string [file-name]
   (underscores-to-dashes (string-utils/strip-ending file-name ".clj")))
+  
+(defn
+#^{:doc "Converts the given symbol string to a clj file name. For example: \"loading-utils\" would get converted into \"loading_utils.clj\""}
+  symbol-string-to-clj-file [symbol-name]
+  (str (dashes-to-underscores symbol-name) ".clj"))
 
 (defn
 #^{:doc "Returns a string for the namespace of the given file in the given directory."}

@@ -1,6 +1,7 @@
 (ns generate 
   (:require [generators.migration-generator :as migration-generator]
-        [generators.view-generator :as view-generator]))
+            [generators.view-generator :as view-generator]
+            [generators.controller-generator :as controller-generator]))
 
 (defn print-usage []
   (println "Usage: ./run.sh script/generate.clj <generate type> <generate params>*"))
@@ -16,6 +17,9 @@
       
     (. command equals "view")
       (view-generator/generate-view params)
+      
+    (. command equals "controller")
+      (controller-generator/generate-controller params)
       
     true ; Default condition.
       (print-unknown-command command)))

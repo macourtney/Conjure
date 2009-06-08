@@ -1,6 +1,7 @@
 (ns generators.view-generator
-  (:import [java.io File FileWriter])
-  (:use [conjure.view.view :as view]))
+  (:import [java.io File])
+  (:use [conjure.view.view :as view]
+        [conjure.util.file-utils :as file-utils]))
 
 (defn
 #^{:doc "Prints out how to use the generate view command."}
@@ -14,12 +15,8 @@
     ([view-file controller] (generate-file-content view-file controller nil))
     ([view-file controller content]
       (let [view-namespace (view/view-namespace controller view-file)
-            content (str "(ns " view-namespace ")
-;; Enter your view code here. The form in this file should return a string which is the content of your html file.")
-          view-file-writer (new FileWriter view-file)]
-      (. view-file-writer write content 0 (. content length))
-      (. view-file-writer flush)
-      (. view-file-writer close))))
+            view-content (str "(ns " view-namespace ")\n\n" (if content content ";; Enter your view code here. The form in this file should return a string which is the content of your html file."))]
+        (file-utils/write-file-content view-file view-content))))
 
 (defn
 #^{:doc "Creates the view file associated with the given controller and action."}
