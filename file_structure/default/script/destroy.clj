@@ -1,7 +1,8 @@
 (ns generate 
   (:require [destroyers.migration-destroyer :as migration-destroyer]
             [destroyers.view-destroyer :as view-destroyer]
-            [destroyers.controller-destroyer :as controller-destroyer]))
+            [destroyers.controller-destroyer :as controller-destroyer]
+            [destroyers.model-destroyer :as model-destroyer]))
 
 (defn
 #^{:doc "Prints the usage information to standard out."}
@@ -26,6 +27,9 @@
       
     (. command equals "controller")
       (controller-destroyer/destroy-controller params)
+      
+    (. command equals "model")
+      (model-destroyer/destroy-model params)
       
     true ; Default condition.
       (print-unknown-command command)))

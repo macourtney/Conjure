@@ -10,7 +10,7 @@
 (defn
 #^{:doc "Destroys the controller file from the given controller."}
   destroy-controller-file [controller]
-  (if (and controller)
+  (if controller
     (let [controllers-directory (controller/find-controllers-directory)]
       (if controllers-directory
         (let [controller-file (controller/find-controller-file controllers-directory controller)]

@@ -1,5 +1,5 @@
 (ns destroyers.migration-destroyer
-  (:use [conjure.migration.migration :as migration]))
+  (:require [conjure.migration.migration :as migration]))
 
 (defn
 #^{:doc "Prints out how to use the destroy migration command."}

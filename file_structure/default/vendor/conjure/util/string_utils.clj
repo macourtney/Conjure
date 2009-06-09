@@ -39,3 +39,8 @@
         (. string substring 0 ending-index)
         string))
     string))
+    
+(defn
+#^{:doc "Pluralizes the given word. The current version of this function just adds an 's' to the end of the string. Eventually, this method should become more robust."}
+  pluralize [string]
+  (str string "s"))
