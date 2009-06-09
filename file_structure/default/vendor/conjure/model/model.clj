@@ -1,10 +1,10 @@
 (ns conjure.model.model
   (:import [java.io File])
   (:require [conjure.util.loading-utils :as loading-utils]
-            [clojure.contrib.seq-utils :as seq-utils]
             [conjure.util.string-utils :as string-utils]
             [conjure.util.file-utils :as file-utils]
-            [conjure.server.jdbc-connector :as jdbc-connector]))
+            [conjure.server.jdbc-connector :as jdbc-connector]
+            [clojure.contrib.seq-utils :as seq-utils]))
 
 (defn
 #^{:doc "Returns the model name for the given model file."}
@@ -46,13 +46,51 @@
 (defn
 #^{:doc "Returns the table name for the given model."}
   model-to-table-name [model]
-  (loading-utils/dashes-to-underscores model))
+  (string-utils/pluralize (loading-utils/dashes-to-underscores model)))
   
 (defn
 #^{:doc "Finds a model file with the given model name."}
   find-model-file [models-directory model-name]
   (file-utils/find-file models-directory (model-file-name-string model-name)))
-  
+
+(defn
+#^{:doc "Returns a list of column names from the given result set."}
+  results-columns [results]
+  (let [meta-data (. results getMetaData)]
+      (map (fn [index] (. meta-data getColumnName (inc index))) (range (. meta-data getColumnCount)))))
+
+(defn
+#^{:doc "Returns a map of column names to values of the given result set."}
+  results-row-map [results]
+  (let [columns (results-columns results)]
+    (loop [column-name (first columns)
+           other-columns (rest columns)
+           row-map { }]
+      (if (empty? other-columns)
+        (assoc row-map (keyword (. column-name toLowerCase)) (. results getString column-name))
+        (recur 
+          (first other-columns)
+          (rest other-columns)
+          (assoc row-map
+            (keyword (. column-name toLowerCase))
+            (. results getString column-name)))))))
+
+(defn
+#^{:doc "Converts a result set into a map of row functions."}
+  model-row [results]
+  (if (. results isLast)
+    ()
+    (do
+      (. results next)
+      (let [row-map (results-row-map results)]
+        (println "row-map:" row-map)
+        (cons
+          (fn [op & args]
+            (cond
+              (get row-map op false) (get row-map op)
+              true (throw (new RuntimeException (str "Unknown operator: " op)))))
+          (model-row results))))))
+
 (defn
 #^{:doc "Creates a connection to the database and returns a function which can be used to query that databse."}
   model-connect [model]
@@ -64,5 +102,6 @@
       (cond
         (= op :execute-query) ((:execute-query db-flavor) jdbc-connection args)
         (= op :execute-update) ((:execute-update db-flavor) jdbc-connection args)
-        (= op :find) ((:sql-find db-flavor) jdbc-connection table args)
+        (= op :find) (model-row ((:sql-find db-flavor) jdbc-connection table args))
         (= op :close) (. jdbc-connection close)))))
+
