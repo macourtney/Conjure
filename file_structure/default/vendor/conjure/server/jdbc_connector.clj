@@ -49,7 +49,7 @@
 (defn
 #^{:doc "Runs a select sql statement based on the values in select-map, and returns the results in a ResultSet."}
   sql-find [select-map]
-  ((:sql-find (db-flavor)) (connect) select-map))
+  ((:sql-find (db-flavor)) (connect) (:table select-map) select-map))
   
 (defn
 #^{:doc "Inserts the given values (a sequence of sequences) with the given columns (a sequence) into the table with the given name."}
@@ -65,6 +65,11 @@
 #^{:doc "Creates a table with the given name and with columns from the given schema-map."}
   create-table [table-name schema-map]
   ((:create-table (db-flavor)) (connect) table-name schema-map))
+  
+(defn
+#^{:doc "Deletes a table with the given name."}
+  drop-table [table-name]
+  ((:drop-table (db-flavor)) (connect) table-name))
   
 (defn
 #^{:doc "Updates a table with the given set map. The keys to set map are defined by the flavor, but are likely :set and :where which are the set clause and where clause respectively."}

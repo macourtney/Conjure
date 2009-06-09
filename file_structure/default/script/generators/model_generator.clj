@@ -9,12 +9,26 @@
   model-usage []
   (println "You must supply a model name (Like hello-world).")
   (println "Usage: ./run.sh script/generate.clj model <model>"))
+
+(defn
+#^{:doc "Returns the content for the up function of the create migration for the given model."}
+  create-migration-up-content [model]
+  (str "(jdbc-connector/create-table \"" (model/model-to-table-name model) "\" 
+    { :id \"INT PRIMARY KEY\" })"))
+    
+(defn
+#^{:doc "Returns the content for the down function of the create migration for the given model."}
+  create-migration-down-content [model]
+  (str "(drop-table \"" (model/model-to-table-name model) "\")"))
   
 (defn
 #^{:doc "Generates the migration file for the model."}
   generate-migration-file [model]
-  (migration-generator/generate-migration-file (model/migration-for-model model)))
-  
+  (migration-generator/generate-migration-file 
+    (model/migration-for-model model) 
+    (create-migration-up-content model) 
+    (create-migration-down-content model)))
+
 (defn
 #^{:doc "Generates the model content and saves it into the given model file."}
   generate-file-content [model-file]

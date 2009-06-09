@@ -169,11 +169,12 @@
     ([migration-number migration-files]
       (let [migration-file (first migration-files)
             migration-file-number (migration-number-from-file migration-file)]
+        (println "migration-file-number:" migration-file-number)
         (if (< migration-file-number migration-number)
           (let [next-migration-number (migration-number-before migration-number (rest migration-files))]
             (if (not (== next-migration-number 0))
-              next-migration-number
-              migration-number))
+                next-migration-number
+                migration-file-number))
           0))))
 
 (defn
