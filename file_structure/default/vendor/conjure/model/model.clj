@@ -1,5 +1,6 @@
 (ns conjure.model.model
-  (:import [java.io File])
+  (:import [java.io File]
+           [java.sql ResultSet])
   (:require [conjure.util.loading-utils :as loading-utils]
             [conjure.util.string-utils :as string-utils]
             [conjure.util.file-utils :as file-utils]
@@ -74,34 +75,49 @@
           (assoc row-map
             (keyword (. column-name toLowerCase))
             (. results getString column-name)))))))
+            
+(defn
+#^{:doc "Converts a single row from the given results into a row function from the given row-generator."}
+  single-results [row-generator results]
+  (row-generator (results-row-map results)))
 
 (defn
-#^{:doc "Converts a result set into a map of row functions."}
-  model-row [results]
+#^{:doc "Converts a result set into a list of row functions."}
+  read-results [row-generator results]
   (if (. results isLast)
     ()
     (do
       (. results next)
-      (let [row-map (results-row-map results)]
-        (println "row-map:" row-map)
-        (cons
-          (fn [op & args]
-            (cond
-              (get row-map op false) (get row-map op)
-              true (throw (new RuntimeException (str "Unknown operator: " op)))))
-          (model-row results))))))
+      (cons
+        (single-results row-generator results)
+        (read-results row-generator results)))))
+
+(defn
+#^{:doc "If results is a ResultSet then this method converts the result set into a list of row functions. Otherwise, this method just returns results."}
+  convert-results [row-generator results]
+  (if (instance? ResultSet results) 
+    (read-results row-generator results)
+    results))
+
+(defn
+  model-row [row-map]
+  (fn [op & args]
+    (cond
+      (get row-map op false) (get row-map op)
+      true (throw (new RuntimeException (str "Unknown row operator: " op))))))
 
 (defn
 #^{:doc "Creates a connection to the database and returns a function which can be used to query that databse."}
-  model-connect [model]
+  model-connect [model row-generator]
   (let
     [jdbc-connection (jdbc-connector/connect)
      db-flavor (jdbc-connector/db-flavor)
      table (model-to-table-name model)]
     (fn [op & args]
       (cond
-        (= op :execute-query) ((:execute-query db-flavor) jdbc-connection args)
+        (= op :execute-query) (convert-results row-generator ((:execute-query db-flavor) jdbc-connection args))
         (= op :execute-update) ((:execute-update db-flavor) jdbc-connection args)
-        (= op :find) (model-row ((:sql-find db-flavor) jdbc-connection table args))
-        (= op :close) (. jdbc-connection close)))))
+        (= op :find) (convert-results row-generator ((:sql-find db-flavor) jdbc-connection table args))
+        (= op :close) (. jdbc-connection close)
+        true (throw (new RuntimeException (str "Unknown model operator: " op)))))))
 
