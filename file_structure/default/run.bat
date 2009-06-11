@@ -20,7 +20,7 @@ set CLASS_PATH=%JARS_PATH%;%DIRS_PATH%
 @echo off
 
 IF (%1)==() (
-    java -cp %CLASS_PATH% jline.ConsoleRunner clojure.lang.Repl
+    java -cp %CLASS_PATH% clojure.lang.Repl
 ) ELSE (
     java -cp %CLASS_PATH% clojure.lang.Script %1 -- %*
 )

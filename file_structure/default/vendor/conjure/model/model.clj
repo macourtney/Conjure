@@ -121,3 +121,23 @@
         (= op :close) (. jdbc-connection close)
         true (throw (new RuntimeException (str "Unknown model operator: " op)))))))
 
+(defmacro
+#^{:doc "A macro for defining a model."}
+  defmodel
+  [model-name model-conditions row-conditions]
+  `(do 
+    (defn create-row# [row-map#] 
+      (fn this# [op# & args#] 
+        (let [row# (model-row row-map#)
+              action# (get ~row-conditions op#)] 
+          (cond
+            action# (action# this#)
+            true (row# op# args#)))))
+    
+    (defn ~model-name []
+      (let [model# (model-connect ~(str model-name) create-row#)]
+        (fn this# [op# & args#]
+          (let [action# (get ~model-conditions op#)]
+            (if action# 
+              (action# this#)
+              (model# op# args#))))))))
