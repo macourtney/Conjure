@@ -122,22 +122,29 @@
         true (throw (new RuntimeException (str "Unknown model operator: " op)))))))
 
 (defmacro
+#^{:doc "A macro for the create row function in a model."}
+  def-create-row [create-row operation this row-conditions]
+  `(defn ~create-row [row-map#] 
+      (fn ~this [~operation & args#] 
+        (let [row# (model-row row-map#)] 
+          (cond
+            ~@row-conditions
+            true (row# ~operation args#))))))
+
+(defmacro
+#^{:doc "A macro for the create row function in a model."}
+  def-model-function [model-name create-row-function operation this model-conditions]
+  `(defn ~model-name []
+      (let [model# (model-connect ~(str model-name) create-row#)]
+        (fn ~this [~operation & args#]
+            (cond 
+              ~@model-conditions
+              true (model# ~operation args#))))))
+(defmacro
 #^{:doc "A macro for defining a model."}
   defmodel
-  [model-name model-conditions row-conditions]
+  [model-name operation this model-conditions row-conditions]
   `(do 
-    (defn create-row# [row-map#] 
-      (fn this# [op# & args#] 
-        (let [row# (model-row row-map#)
-              action# (get ~row-conditions op#)] 
-          (cond
-            action# (action# this#)
-            true (row# op# args#)))))
+    (def-create-row create-row# ~operation ~this ~row-conditions)
     
-    (defn ~model-name []
-      (let [model# (model-connect ~(str model-name) create-row#)]
-        (fn this# [op# & args#]
-          (let [action# (get ~model-conditions op#)]
-            (if action# 
-              (action# this#)
-              (model# op# args#))))))))
+    (def-model-function ~model-name create-row# ~operation ~this ~model-conditions)))
