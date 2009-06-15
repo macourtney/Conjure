@@ -6,7 +6,7 @@
 #^{:doc "Processes the request by parsing the associated path..."}
   process [#^HttpServletRequest req #^HttpServletResponse resp]
   (let [out (. resp (getOutputStream))]
-    (. out (println (server/process-request (. req getPathInfo))))))
+    (. out (println (server/process-request (. req getPathInfo) {})))))
 
 ;; implementation of an HttpServlet, overriding just on function:
 ;;   protected void doGet(HttpServletRequest req, HttpServletResponse resp)

@@ -5,9 +5,10 @@
            [org.mortbay.jetty.handler HandlerCollection ContextHandlerCollection RequestLogHandler AbstractHandler]
            [org.mortbay.jetty.nio BlockingChannelConnector]
            [org.mortbay.jetty.servlet Context DefaultServlet ServletHolder SessionHandler])
-  (:use [conjure.util string-utils]
-        [conjure.server.server :as server]
-        [conjure.server.servlet :as servlet]))
+  (:require [conjure.util string-utils]
+            [conjure.server.server :as server]
+            [conjure.server.servlet :as servlet]
+            [clojure.contrib.str-utils :as str-utils]))
 
 (defn
 #^{:doc "Create a connector on the specified port."}
@@ -21,17 +22,49 @@
   configure-context-handlers [contexts]
   (let [context (new Context contexts "/" (. Context NO_SESSIONS))]
     (. context (setWelcomeFiles (into-array ["index.html"])))
-    (. context (setResourceBase (. (new File (:static-dir (http-config))) (getPath))))
+    (. context (setResourceBase (. (new File (:static-dir (server/http-config))) (getPath))))
     (. context (setSessionHandler (new SessionHandler)))
     (. context (addServlet (new ServletHolder (new DefaultServlet)) "/*"))
     context))
+    
+(defn
+#^{:doc "Returns a map of parameters pulled from the query string of the given request."}
+  load-query-params [request]
+  (let [request-query (. request getQueryString)]
+    (loop [query-tokens (str-utils/re-split #"&" request-query)
+           output {}]
+      (let [query-token (first query-tokens)]
+        (if query-token
+          (let [query-key-value (str-utils/re-split #"=" query-token)]
+            (recur (rest query-tokens) 
+                   (assoc output (first query-key-value) (second query-key-value))))
+          output)))))
+    
+(defn
+#^{:doc "Returns a map of parameters pulled from the given request."}
+  load-params [request]
+  (let [jetty-params (. request getParameters)]
+    (if jetty-params
+      (let [jetty-param-names (. jetty-params keySet)]
+        (loop [current-param (first jetty-param-names)
+               params-rest (rest jetty-param-names)
+               curent-values (. jetty-params getValues current-param)
+               output { current-param (seq curent-values) }]
+          (println "current-param:" current-param)
+          (if (not-empty params-rest)
+            (recur (first params-rest) 
+                   (rest params-rest) 
+                   (. jetty-params getValues current-param)
+                   (assoc output current-param (seq curent-values)))
+            (merge output (load-query-params request)))))
+      (load-query-params request))))
 
 (defn
 #^{:doc "Creates a handler for conjure requests."}
   create-conjure-handler []
   (proxy [AbstractHandler] []
     (handle [target #^HttpServletRequest request #^HttpServletResponse response dispatch]
-      (let [output (server/process-request (. request getPathInfo))]
+      (let [output (server/process-request (. request getPathInfo) (load-params request))]
         (if output
           (do
             (. response setContentType "text/html")
@@ -44,7 +77,7 @@
   make-handlers [contexts]
   (let [handlers (new HandlerCollection)
         logger (new RequestLogHandler)
-        http-config-map (http-config)
+        http-config-map (server/http-config)
         logfile (new File (:log-dir http-config-map) (:log-pattern http-config-map))]
 
     (. logger (setRequestLog (new NCSARequestLog (. logfile (getPath)))))
@@ -61,10 +94,10 @@
 (defn
 #^{:doc "Makes an instance of the http server."}
   make-server
-  ([] (make-server (:port (http-config))))
+  ([] (make-server (:port (server/http-config))))
   ([port]
     (do
-      (config-server)
+      (server/config-server)
       (let [contexts (make-contexts)
             connectors (make-connectors port)
             handlers (make-handlers contexts)

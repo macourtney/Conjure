@@ -6,17 +6,19 @@
         [clojure.contrib.str-utils :as str-utils]
         [routes :as routes]))
 
-
 (defn
 #^{:doc "Gets a route map for use by conjure to call the correct methods."}
-  create-request-map [path]
+  create-request-map [path params]
   (let [routes-vector (routes/draw)]
     (loop [current-routes routes-vector]
       (if (seq current-routes)
         (let [route-fn (first current-routes)
              output (route-fn path)]
           (if output
-            output
+            (let [output-params (output :params)]
+              (if output-params
+                  (assoc output :params (merge output-params params))
+                  output))
             (recur (rest current-routes))))))))
 
 (defn controller-file-name [request-map]
@@ -30,8 +32,8 @@
 
 (defn
 #^{:doc "Takes the given path and calls the correct controller and action for it."}
-  process-request [path]
-  (let [request-map (create-request-map path)]
+  process-request [path params]
+  (let [request-map (create-request-map path params)]
     (when request-map
       (load-controller (controller-file-name request-map))
       ((load-string (fully-qualified-action request-map)) request-map))))

@@ -118,6 +118,7 @@
         (= op :execute-query) (convert-results row-generator ((:execute-query db-flavor) jdbc-connection args))
         (= op :execute-update) ((:execute-update db-flavor) jdbc-connection args)
         (= op :find) (convert-results row-generator ((:sql-find db-flavor) jdbc-connection table args))
+        (= op :get) (first (convert-results row-generator ((:sql-find db-flavor) jdbc-connection table {:where (str "id = '" (ffirst args) "'") :limit 1})))
         (= op :close) (. jdbc-connection close)
         true (throw (new RuntimeException (str "Unknown model operator: " op)))))))
 

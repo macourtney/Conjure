@@ -1,11 +1,11 @@
 ;; This file is used to route requests to the appropriate controller and action.
 
 (ns routes
-  (:use [conjure.util string-utils]))
+  (:require [conjure.util.string-utils :as string-utils]))
 
 (defn draw []
   [(fn [path] 
-     (let [path_tokens (tokenize path "/")
+     (let [path_tokens (string-utils/tokenize path "/")
            controller (first path_tokens)
            path_tokens_2 (rest path_tokens)
            action (first path_tokens_2)
@@ -15,5 +15,5 @@
        (if (and controller action)
          {:controller controller
          :action action
-         :id id}
+         :params {:id id}}
          nil)))])
