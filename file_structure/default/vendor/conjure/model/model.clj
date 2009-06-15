@@ -123,8 +123,8 @@
 
 (defmacro
 #^{:doc "A macro for the create row function in a model."}
-  def-create-row [create-row operation this row-conditions]
-  `(defn ~create-row [row-map#] 
+  def-create-row [create-model-row operation this row-conditions]
+  `(defn ~create-model-row [row-map#] 
       (fn ~this [~operation & args#] 
         (let [row# (model-row row-map#)] 
           (cond
@@ -135,7 +135,7 @@
 #^{:doc "A macro for the create row function in a model."}
   def-model-function [model-name create-row-function operation this model-conditions]
   `(defn ~model-name []
-      (let [model# (model-connect ~(str model-name) create-row#)]
+      (let [model# (model-connect ~(str model-name) ~create-row-function)]
         (fn ~this [~operation & args#]
             (cond 
               ~@model-conditions
