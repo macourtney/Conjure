@@ -15,7 +15,7 @@
     ([view-file controller] (generate-file-content view-file controller nil))
     ([view-file controller content]
       (let [view-namespace (view/view-namespace controller view-file)
-            view-content (str "(ns " view-namespace ")\n\n" (if content content ";; Enter your view code here. The form in this file should return a string which is the content of your html file."))]
+            view-content (str (if content content ";; Enter your view code here. The form in this file should return a string which is the content of your html file."))]
         (file-utils/write-file-content view-file view-content))))
 
 (defn

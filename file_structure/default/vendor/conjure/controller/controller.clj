@@ -20,7 +20,6 @@
 #^{:doc "Returns the controller name for the given controller file."}
   controler-from-file [controller-file]
   (let [file-to-symbol (loading-utils/clj-file-to-symbol-string (. controller-file getName))]
-    (println "file-to-symbol:" file-to-symbol)
     (string-utils/strip-ending file-to-symbol "-controller")))
 
 (defn

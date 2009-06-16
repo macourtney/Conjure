@@ -36,7 +36,6 @@
   (:use [conjure.server.server]))
 
 " (generate-all-action-functions actions))]
-        (println "controller:" controller)
         (file-utils/write-file-content controller-file content)
         (doall (map (fn [action] (generate-view-file controller action)) actions))))
 

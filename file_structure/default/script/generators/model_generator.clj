@@ -34,7 +34,18 @@
   generate-file-content [model-file]
       (let [model (model/model-from-file model-file)
             model-namespace (model/model-namespace model)
-            content (str "(ns " model-namespace ")")]
+            content (str "(ns " model-namespace "
+  (:require [conjure.model.model :as model]))
+
+(model/defmodel " model " operation this
+
+  ; Model Conditions
+  ; Example: ((= operation :first) (first (this :find { :limit 1 })))
+  ()
+
+  ; Row Conditions
+  ; Example: ((= operation :id-and-text) (str (this :id) \" \" (this :text)))
+  ())")]
         (file-utils/write-file-content model-file content)
         (generate-migration-file model)))
 

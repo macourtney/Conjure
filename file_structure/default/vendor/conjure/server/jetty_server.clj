@@ -31,14 +31,16 @@
 #^{:doc "Returns a map of parameters pulled from the query string of the given request."}
   load-query-params [request]
   (let [request-query (. request getQueryString)]
-    (loop [query-tokens (str-utils/re-split #"&" request-query)
-           output {}]
-      (let [query-token (first query-tokens)]
-        (if query-token
-          (let [query-key-value (str-utils/re-split #"=" query-token)]
-            (recur (rest query-tokens) 
-                   (assoc output (first query-key-value) (second query-key-value))))
-          output)))))
+    (if request-query
+      (loop [query-tokens (str-utils/re-split #"&" request-query)
+             output {}]
+        (let [query-token (first query-tokens)]
+          (if query-token
+            (let [query-key-value (str-utils/re-split #"=" query-token)]
+              (recur (rest query-tokens) 
+                     (assoc output (first query-key-value) (second query-key-value))))
+            output)))
+      {})))
     
 (defn
 #^{:doc "Returns a map of parameters pulled from the given request."}
