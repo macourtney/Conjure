@@ -1,6 +1,6 @@
 (ns server
-  (:require [ring.jetty :as ring_jetty]
-            [conjure.server.server :as conjure_server]
-            [conjure.server.ring_adapter :as ring_adapter]))
+  (:require [ring.jetty :as ring-jetty]
+            [conjure.server.server :as conjure-server]
+            [conjure.server.ring_adapter :as ring-adapter]))
 
-(ring_jetty/run (conjure_server/http-config) ring_adapter/conjure)
+(ring-jetty/run (conjure-server/http-config) ring-adapter/conjure)
