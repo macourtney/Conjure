@@ -7,6 +7,20 @@
         [routes :as routes]))
 
 (defn
+#^{:doc "Parses the parameters in the given query-string into a parameter map."}
+  parse-query-params [query-string]
+  (if query-string
+      (loop [query-tokens (str-utils/re-split #"&" query-string)
+             output {}]
+        (let [query-token (first query-tokens)]
+          (if query-token
+            (let [query-key-value (str-utils/re-split #"=" query-token)]
+              (recur (rest query-tokens) 
+                     (assoc output (first query-key-value) (second query-key-value))))
+            output)))
+      {}))
+
+(defn
 #^{:doc "Gets a route map for use by conjure to call the correct methods."}
   create-request-map [path params]
   (let [routes-vector (routes/draw)]
