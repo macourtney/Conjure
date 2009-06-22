@@ -2,8 +2,9 @@
   (:import [java.io File])
   (:require [conjure.util.loading-utils :as loading-utils]
             [conjure.util.file-utils :as file-utils]
-            [clojure.contrib.seq-utils :as seq-utils]
-            [conjure.util.string-utils :as string-utils]))
+            [conjure.util.string-utils :as string-utils]
+            [conjure.view.view :as view]
+            [clojure.contrib.seq-utils :as seq-utils]))
 
 (defn 
 #^{:doc "Finds the controller directory."}
@@ -42,3 +43,11 @@
 #^{:doc "Returns the controller namespace for the given controller."}
   controller-namespace [controller]
   (str "controllers." controller "-controller"))
+  
+(defn
+#^{:doc "Renders the view given in the request-map."}
+  render-view [request-map & params]
+  (view/load-view request-map)
+  (apply
+    (eval (read-string (str (view/request-view-namespace request-map) "/render-view")))
+    request-map params))

@@ -7,7 +7,6 @@
 #^{:doc "The ring function which actually calls the conjure server and returns a properly formatted 
 request map."}
   call-server [req]
-  (println "conjure ring function called")
   {:status  200
    :headers {"Content-Type" "text/html"}
    :body    (server/process-request (:uri req) (server/parse-query-params (:query-string req)))})

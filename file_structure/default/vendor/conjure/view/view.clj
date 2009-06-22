@@ -46,8 +46,28 @@
         (println "Creating view file" view-file-name "...")
         (. view-file createNewFile)
         view-file))))
-    
+  
+(defn
+#^{:doc "Loads the view corresponding to the values in the given request map."}
+  load-view [request-map]
+  (loading-utils/load-resource (str "views/" (:controller request-map)) (str (:action request-map) ".clj")))
+
+(defn
+#^{:doc "Returns the view namespace request map."}
+  request-view-namespace [request-map]
+  (str "views." (:controller request-map) "." (:action request-map)))
+  
 (defn
 #^{:doc "Returns the view namespace for the given view file."}
   view-namespace [controller view-file]
-  (str "views." controller "." (loading-utils/clj-file-to-symbol-string (. view-file getName))))
+  (request-view-namespace 
+    { :controller controller 
+      :action (loading-utils/clj-file-to-symbol-string (. view-file getName)) }))
+ 
+(defmacro
+#^{:doc "Defines a view. This macro should be used in a view file to define the parameters used in the view."}
+  defview [params & body]
+  (let [render-view "render-view"
+        request-map "request-map"]
+    `(defn ~'render-view [~'request-map ~@params]
+      ~@body)))
