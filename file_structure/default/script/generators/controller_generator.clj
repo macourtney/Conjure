@@ -15,7 +15,7 @@
 #^{:doc "Generates the action function for the given action."}
   generate-action-function [action]
   (str "(defn " action " [request-map]
-  (render-view request-map []))"))
+  (render-view request-map))"))
   
 (defn
 #^{:doc "Generates the action functions block for a controller file."}
@@ -25,7 +25,7 @@
 (defn
 #^{:doc "Generates the view file for the given action."}
   generate-view-file [controller action]
-  (view-generator/generate-view-file controller action (str "(str \"You can change this text in app/views/" (loading-utils/dashes-to-underscores controller) "/" (loading-utils/symbol-string-to-clj-file action) " \")")))
+  (view-generator/generate-view-file controller action))
   
 (defn
 #^{:doc "Generates the controller content and saves it into the given controller file."}
@@ -33,7 +33,7 @@
       (let [controller (controller/controler-from-file controller-file)
             controller-namespace (controller/controller-namespace controller)
             content (str "(ns " controller-namespace "
-  (:use [conjure.server.server]))
+  (:use [conjure.controller.controller]))
 
 " (generate-all-action-functions actions))]
         (file-utils/write-file-content controller-file content)

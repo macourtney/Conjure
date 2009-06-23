@@ -1,7 +1,8 @@
 (ns generators.view-generator
   (:import [java.io File])
   (:use [conjure.view.view :as view]
-        [conjure.util.file-utils :as file-utils]))
+        [conjure.util.file-utils :as file-utils]
+        [conjure.util.loading-utils :as loading-utils]))
 
 (defn
 #^{:doc "Prints out how to use the generate view command."}
@@ -10,12 +11,27 @@
   (println "Usage: ./run.sh script/generate.clj view <controller> <action>"))
   
 (defn
+#^{:doc "Returns view content which sets up the standard view namespace and defines a view. The given inner-content is 
+added to the body of the view code."}
+  generate-standard-content [view-namespace inner-content]
+  (str "(ns " view-namespace "
+  (:use conjure.view.view)
+  (:require [clj-html.core :as html]))
+
+(defview []
+  (html/html 
+    [:html
+      [:body
+        " inner-content "]]))"))
+  
+(defn
 #^{:doc "Generates the view content and saves it into the given view file."}
   generate-file-content
     ([view-file controller] (generate-file-content view-file controller nil))
     ([view-file controller content]
       (let [view-namespace (view/view-namespace controller view-file)
-            view-content (str (if content content ";; Enter your view code here. The form in this file should return a string which is the content of your html file."))]
+            view-content (str (if content content 
+(generate-standard-content view-namespace (str "[:p \"You can change this text in app/views/" (loading-utils/dashes-to-underscores controller) "/" (. view-file getName) "\"]"))))]
         (file-utils/write-file-content view-file view-content))))
 
 (defn

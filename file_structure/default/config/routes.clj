@@ -1,7 +1,8 @@
 ;; This file is used to route requests to the appropriate controller and action.
 
 (ns routes
-  (:require [conjure.util.string-utils :as string-utils]))
+  (:require [conjure.util.string-utils :as string-utils]
+            [conjure.util.loading-utils :as loading-utils]))
 
 (defn draw []
   [(fn [path] 
@@ -13,7 +14,7 @@
            id (first path_tokens_3)]
 
        (if (and controller action)
-         {:controller controller
-         :action action
+         {:controller (loading-utils/underscores-to-dashes controller)
+         :action (loading-utils/underscores-to-dashes action)
          :params {:id id}}
          nil)))])

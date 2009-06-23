@@ -14,7 +14,7 @@
 (defn
 #^{:doc "Finds a controller directory for the given controller in the given view directory."}
   find-controller-directory [view-directory controller]
-  (file-utils/find-directory view-directory controller))
+  (file-utils/find-directory view-directory (loading-utils/dashes-to-underscores controller)))
     
 (defn 
 #^{:doc "Finds or creates if missing, a controller directory for the given controller in the given view directory."}
@@ -50,7 +50,9 @@
 (defn
 #^{:doc "Loads the view corresponding to the values in the given request map."}
   load-view [request-map]
-  (loading-utils/load-resource (str "views/" (:controller request-map)) (str (:action request-map) ".clj")))
+  (loading-utils/load-resource 
+    (str "views/" (loading-utils/dashes-to-underscores (:controller request-map))) 
+    (str (loading-utils/dashes-to-underscores (:action request-map)) ".clj")))
 
 (defn
 #^{:doc "Returns the view namespace request map."}
