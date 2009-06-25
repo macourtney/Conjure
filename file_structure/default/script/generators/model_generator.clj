@@ -13,13 +13,13 @@
 (defn
 #^{:doc "Returns the content for the up function of the create migration for the given model."}
   create-migration-up-content [model]
-  (str "(jdbc-connector/create-table \"" (model/model-to-table-name model) "\" 
-    { :id \"INT PRIMARY KEY\" })"))
+  (str "(database/create-table \"" (model/model-to-table-name model) "\" 
+    (database/id))"))
     
 (defn
 #^{:doc "Returns the content for the down function of the create migration for the given model."}
   create-migration-down-content [model]
-  (str "(drop-table \"" (model/model-to-table-name model) "\")"))
+  (str "(database/drop-table \"" (model/model-to-table-name model) "\")"))
   
 (defn
 #^{:doc "Generates the migration file for the model."}
@@ -35,17 +35,12 @@
       (let [model (model/model-from-file model-file)
             model-namespace (model/model-namespace model)
             content (str "(ns " model-namespace "
-  (:require [conjure.model.model :as model]))
+  (:require clj-record.boot
+            [conjure.model.model :as model]))
 
-(model/defmodel " model " operation this
+(def db model/db)
 
-  ; Model Conditions
-  ; Example: ((= operation :first) (first (this :find { :limit 1 })))
-  ()
-
-  ; Row Conditions
-  ; Example: ((= operation :id-and-text) (str (this :id) \" \" (this :text)))
-  ())")]
+(clj-record.core/init-model)")]
         (file-utils/write-file-content model-file content)
         (generate-migration-file model)))
 

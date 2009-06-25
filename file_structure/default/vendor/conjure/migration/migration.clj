@@ -1,14 +1,15 @@
 (ns conjure.migration.migration
   (:import [java.io File])
-  (:use [conjure.server.jdbc-connector :as jdbc-connector]
+  (:require ;[conjure.server.jdbc-connector :as jdbc-connector]
+        [conjure.model.database :as database]
         [conjure.util.string-utils :as string-utils]
         [conjure.util.loading-utils :as loading-utils]
         [conjure.util.file-utils :as file-utils]
         [clojure.contrib.str-utils :as clojure-str-utils]
         [clojure.contrib.seq-utils :as seq-utils]))
 
-(def schema_info_table "schema_info")
-(def version_column "version")
+(def schema-info-table "schema_info")
+(def version-column :version)
 
 (defn 
 #^{:doc "Finds the db directory which contains all of the files for updating the schema for the database."}
@@ -114,23 +115,24 @@
 (defn 
 #^{:doc "Gets the current db version number. If the schema info table doesn't exist this function creates it. If the schema info table is empty, then it adds a row and sets the version to 0."}
   current-db-version []
-  (let [schema-info-table "schema_info"]
-    (if (jdbc-connector/table-exists? schema-info-table)
+    (if (database/table-exists? schema-info-table)
       (do
         (println schema-info-table "exists")
-        (let [version-results (jdbc-connector/sql-find {:table schema-info-table})]
-          (if (. version-results next)
-            (. version-results getInt 1)
+        (let [version-results (database/sql-find { :table schema-info-table :limit 1 })
+              version-result-map (first version-results)]
+          (if version-result-map
+            (get version-result-map version-column)
             (do
               (println schema-info-table "is empty.")
-              (jdbc-connector/insert-one-into schema-info-table '("version") '(0))
+              (database/insert-into schema-info-table { version-column 0 })
               0))))
       (do
         (println schema-info-table "does not exist. Creating table...")
-        (jdbc-connector/create-table schema-info-table {:version "INT NOT NULL"})
+        (database/create-table schema-info-table 
+          (database/integer "version" { :not-null true }))
         (println "Setting the initial version to 0.")
-        (jdbc-connector/insert-one-into schema-info-table '("version") '(0))
-        0))))
+        (database/insert-into schema-info-table {version-column 0})
+        0)))
         
 (defn
 #^{:doc "Returns the migration namespace for the given migration file."}
@@ -191,7 +193,7 @@
 (defn
 #^{:doc "Updates the version number saved in the schema table in the database."}
   update-db-version [new-version]
-  (jdbc-connector/update  schema_info_table {:set (str version_column " = " new-version)}))
+  (database/update schema-info-table ["true"] { version-column new-version }))
 
 (defn
 #^{:doc "Migrates the database up from from-version to to-version."}

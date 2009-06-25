@@ -1,6 +1,6 @@
 (ns migrate
   (:use [conjure.migration.migration :as migration]
-        [conjure.server.jdbc-connector :as jdbc-connector]))
+        [conjure.model.model :as model]))
 
 (defn 
 #^{:doc "Prints out how to use the migration command."}
@@ -23,6 +23,6 @@
       version (version-number (second *command-line-args*))]
   (if version
     (do
-      (jdbc-connector/init)
+      (model/sql-init)
       (migration/update-to-version version))
     (print-usage)))

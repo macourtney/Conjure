@@ -17,7 +17,7 @@
            (if migration-file
              (do
                (. migration-file delete)
-               (println (. migration-file getName) "deleted."))
+               (println "File" (. migration-file getPath) "deleted."))
              (println "Could not find migration file for" migration-name)))
         (println "Could not find db directory.")))
     (migration-usage)))

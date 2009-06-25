@@ -23,7 +23,7 @@
           (if model-file
             (do 
               (. model-file delete)
-              (println "File" (. model-file getPath) "destroyed.")
+              (println "File" (. model-file getPath) "deleted.")
               (destroy-migration-for-model model))
             (println "Model file not found. Doing nothing.")))
         (do

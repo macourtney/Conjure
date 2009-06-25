@@ -1,9 +1,10 @@
 (ns conjure.server.server
   (:require [http-config :as http-config]
-            [db-config :as db-config]
             [routes :as routes]
             [conjure.server.jdbc-connector :as jdbc-connector]
             [conjure.util.loading-utils :as loading-utils]
+            [conjure.model.model :as model]
+            [conjure.model.database :as database]
             [conjure.controller.controller :as controller]
             [conjure.view.view :as view]
             [clojure.contrib.str-utils :as str-utils]))
@@ -70,11 +71,13 @@
   http-config []
   (http-config/get-http-config))
 
-(defn db-config []
-  (db-config/get-db-config))
+(defn
+#^{:doc "Gets the user configured database properties."}
+  db-config []
+  (database/conjure-db))
 
 (defn
 #^{:doc "This is the first method called when the server is started."}
   config-server []
   (http-config)
-  (jdbc-connector/init))
+  (model/sql-init))
