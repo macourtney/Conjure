@@ -1,5 +1,5 @@
 (ns destroyers.model-destroyer
-  (:require [conjure.model.model :as model]
+  (:require [conjure.model.util :as util]
             [destroyers.migration-destroyer :as migration-destroyer]))
 
 (defn
@@ -11,15 +11,15 @@
 (defn
 #^{:doc "Destroys the create migration file associated with the given model."}
   destroy-migration-for-model [model]
-  (migration-destroyer/destroy-migration-file (model/migration-for-model model)))
+  (migration-destroyer/destroy-migration-file (util/migration-for-model model)))
 
 (defn
 #^{:doc "Destroys the model file from the given model."}
   destroy-model-file [model]
   (if model
-    (let [models-directory (model/find-models-directory)]
+    (let [models-directory (util/find-models-directory)]
       (if models-directory
-        (let [model-file (model/find-model-file models-directory model)]
+        (let [model-file (util/find-model-file models-directory model)]
           (if model-file
             (do 
               (. model-file delete)

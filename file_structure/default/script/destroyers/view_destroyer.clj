@@ -1,5 +1,5 @@
 (ns destroyers.view-destroyer
-  (:use [conjure.view.view :as view]))
+  (:require [conjure.view.util :as util]))
 
 (defn
 #^{:doc "Prints out how to use the destroy view command."}
@@ -11,11 +11,11 @@
 #^{:doc "Destroys the view file from the given controller and action."}
   destroy-view-file [controller action]
   (if (and controller action)
-    (let [view-directory (view/find-views-directory)]
+    (let [view-directory (util/find-views-directory)]
       (if view-directory
-        (let [controller-directory (view/find-controller-directory view-directory controller)]
+        (let [controller-directory (util/find-controller-directory view-directory controller)]
           (if controller-directory
-            (let [view-file (view/find-view-file controller-directory action)]
+            (let [view-file (util/find-view-file controller-directory action)]
               (if view-file
                 (do 
                   (. view-file delete)

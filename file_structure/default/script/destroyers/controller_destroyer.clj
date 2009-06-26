@@ -1,5 +1,5 @@
 (ns destroyers.controller-destroyer
-  (:use [conjure.controller.controller :as controller]))
+  (:require [conjure.controller.util :as util]))
 
 (defn
 #^{:doc "Prints out how to use the destroy controller command."}
@@ -11,9 +11,9 @@
 #^{:doc "Destroys the controller file from the given controller."}
   destroy-controller-file [controller]
   (if controller
-    (let [controllers-directory (controller/find-controllers-directory)]
+    (let [controllers-directory (util/find-controllers-directory)]
       (if controllers-directory
-        (let [controller-file (controller/find-controller-file controllers-directory controller)]
+        (let [controller-file (util/find-controller-file controllers-directory controller)]
           (if controller-file
             (do 
               (. controller-file delete)

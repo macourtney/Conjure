@@ -3,10 +3,10 @@
             [routes :as routes]
             [conjure.server.jdbc-connector :as jdbc-connector]
             [conjure.util.loading-utils :as loading-utils]
-            [conjure.model.model :as model]
+            [conjure.model.base :as model-base]
             [conjure.model.database :as database]
-            [conjure.controller.controller :as controller]
-            [conjure.view.view :as view]
+            [conjure.controller.util :as controller-util]
+            [conjure.view.util :as view-util]
             [clojure.contrib.str-utils :as str-utils]))
 
 (defn
@@ -41,12 +41,12 @@
 (defn
 #^{:doc "Returns the controller file name generated from the given request map."}
   controller-file-name [request-map]
-  (controller/controler-file-name-string (:controller request-map)))
+  (controller-util/controller-file-name-string (:controller request-map)))
   
 (defn
 #^{:doc "Returns fully qualified action generated from the given request map."}
   fully-qualified-action [request-map]
-  (str "controllers." (:controller request-map) "-controller/" (:action request-map)))
+  (str (controller-util/controller-namespace (:controller request-map)) "/" (:action request-map)))
 
 (defn
 #^{:doc "Loads the given controller file."}
@@ -63,7 +63,7 @@
 (defn
 #^{:doc "A function for simplifying the loading of views."}
   render-view [request-map & params]
-  (view/load-view request-map)
+  (view-util/load-view request-map)
   (apply (read-string (fully-qualified-action request-map)) request-map params))
 
 (defn
@@ -80,4 +80,4 @@
 #^{:doc "This is the first method called when the server is started."}
   config-server []
   (http-config)
-  (model/sql-init))
+  (model-base/sql-init))

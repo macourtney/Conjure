@@ -1,5 +1,6 @@
 (ns generators.controller-generator
-  (:require [conjure.controller.controller :as controller]
+  (:require [conjure.controller.builder :as builder]
+            [conjure.controller.util :as util]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.loading-utils :as loading-utils]
             [clojure.contrib.str-utils :as str-utils]
@@ -30,10 +31,10 @@
 (defn
 #^{:doc "Generates the controller content and saves it into the given controller file."}
   generate-file-content [controller-file actions]
-      (let [controller (controller/controler-from-file controller-file)
-            controller-namespace (controller/controller-namespace controller)
+      (let [controller (util/controller-from-file controller-file)
+            controller-namespace (util/controller-namespace controller)
             content (str "(ns " controller-namespace "
-  (:use [conjure.controller.controller]))
+  (:use [conjure.controller.base]))
 
 " (generate-all-action-functions actions))]
         (file-utils/write-file-content controller-file content)
@@ -44,9 +45,9 @@
   generate-controller-file
     ([controller actions]
       (if (and controller actions)
-        (let [controllers-directory (controller/find-controllers-directory)]
+        (let [controllers-directory (util/find-controllers-directory)]
           (if controllers-directory
-            (let [controller-file (controller/create-controller-file controllers-directory controller)]
+            (let [controller-file (builder/create-controller-file controllers-directory controller)]
                 (if controller-file
                   (generate-file-content controller-file actions)))
             (do

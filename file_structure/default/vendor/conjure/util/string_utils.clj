@@ -1,5 +1,6 @@
 (ns conjure.util.string-utils
-  (:use [clojure.contrib.str-utils :as str-utils]))
+  (:require [clojure.contrib.str-utils :as str-utils]
+            [clj-record.util :as clj-record-util]))
 
 (defn 
 #^{:doc "Chops the given string into smaller strings based on the delimiter and returns the result in a sequence."}
@@ -43,4 +44,4 @@
 (defn
 #^{:doc "Pluralizes the given word. The current version of this function just adds an 's' to the end of the string. Eventually, this method should become more robust."}
   pluralize [string]
-  (str string "s"))
+  (clj-record-util/pluralize string))

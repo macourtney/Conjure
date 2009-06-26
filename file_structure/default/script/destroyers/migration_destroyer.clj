@@ -1,5 +1,5 @@
 (ns destroyers.migration-destroyer
-  (:require [conjure.migration.migration :as migration]))
+  (:require [conjure.migration.util :as util]))
 
 (defn
 #^{:doc "Prints out how to use the destroy migration command."}
@@ -11,9 +11,9 @@
 #^{:doc "Creates the migration file from the given migration-name."}
   destroy-migration-file [migration-name]
   (if migration-name
-    (let [migrate-directory (migration/find-migrate-directory)]
+    (let [migrate-directory (util/find-migrate-directory)]
       (if migrate-directory
-        (let [migration-file (migration/find-migration-file migrate-directory migration-name)]
+        (let [migration-file (util/find-migration-file migrate-directory migration-name)]
            (if migration-file
              (do
                (. migration-file delete)

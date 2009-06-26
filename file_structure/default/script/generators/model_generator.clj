@@ -1,6 +1,7 @@
 (ns generators.model-generator
   (:require [generators.migration-generator :as migration-generator]
-            [conjure.model.model :as model]
+            [conjure.model.builder :as builder]
+            [conjure.model.util :as util]
             [conjure.util.string-utils :as string-utils]
             [conjure.util.file-utils :as file-utils]))
 
@@ -13,30 +14,30 @@
 (defn
 #^{:doc "Returns the content for the up function of the create migration for the given model."}
   create-migration-up-content [model]
-  (str "(database/create-table \"" (model/model-to-table-name model) "\" 
+  (str "(database/create-table \"" (util/model-to-table-name model) "\" 
     (database/id))"))
     
 (defn
 #^{:doc "Returns the content for the down function of the create migration for the given model."}
   create-migration-down-content [model]
-  (str "(database/drop-table \"" (model/model-to-table-name model) "\")"))
+  (str "(database/drop-table \"" (util/model-to-table-name model) "\")"))
   
 (defn
 #^{:doc "Generates the migration file for the model."}
   generate-migration-file [model]
   (migration-generator/generate-migration-file 
-    (model/migration-for-model model) 
+    (util/migration-for-model model) 
     (create-migration-up-content model) 
     (create-migration-down-content model)))
 
 (defn
 #^{:doc "Generates the model content and saves it into the given model file."}
   generate-file-content [model-file]
-      (let [model (model/model-from-file model-file)
-            model-namespace (model/model-namespace model)
+      (let [model (util/model-from-file model-file)
+            model-namespace (util/model-namespace model)
             content (str "(ns " model-namespace "
   (:require clj-record.boot
-            [conjure.model.model :as model]))
+            [conjure.model.base :as base]))
 
 (def db model/db)
 
@@ -49,9 +50,9 @@
   generate-model-file
     ([model]
       (if model
-        (let [models-directory (model/find-models-directory)]
+        (let [models-directory (util/find-models-directory)]
           (if models-directory
-            (let [model-file (model/create-model-file models-directory model)]
+            (let [model-file (builder/create-model-file models-directory model)]
                 (if model-file
                   (generate-file-content model-file)))
             (do

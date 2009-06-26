@@ -1,8 +1,9 @@
 (ns generators.view-generator
   (:import [java.io File])
-  (:use [conjure.view.view :as view]
-        [conjure.util.file-utils :as file-utils]
-        [conjure.util.loading-utils :as loading-utils]))
+  (:require [conjure.view.builder :as builder]
+            [conjure.view.util :as util]
+            [conjure.util.file-utils :as file-utils]
+            [conjure.util.loading-utils :as loading-utils]))
 
 (defn
 #^{:doc "Prints out how to use the generate view command."}
@@ -15,7 +16,7 @@
 added to the body of the view code."}
   generate-standard-content [view-namespace inner-content]
   (str "(ns " view-namespace "
-  (:use conjure.view.view)
+  (:use conjure.view.base)
   (:require [clj-html.core :as html]))
 
 (defview []
@@ -29,7 +30,7 @@ added to the body of the view code."}
   generate-file-content
     ([view-file controller] (generate-file-content view-file controller nil))
     ([view-file controller content]
-      (let [view-namespace (view/view-namespace controller view-file)
+      (let [view-namespace (util/view-namespace controller view-file)
             view-content (str (if content content 
 (generate-standard-content view-namespace (str "[:p \"You can change this text in app/views/" (loading-utils/dashes-to-underscores controller) "/" (. view-file getName) "\"]"))))]
         (file-utils/write-file-content view-file view-content))))
@@ -40,10 +41,10 @@ added to the body of the view code."}
     ([controller action] (generate-view-file controller action nil))
     ([controller action content]
       (if (and controller action)
-        (let [view-directory (view/find-views-directory)]
+        (let [view-directory (util/find-views-directory)]
           (if view-directory
-            (let [controller-directory (view/find-or-create-controller-directory view-directory controller)
-                  view-file (view/create-view-file controller-directory action)]
+            (let [controller-directory (builder/find-or-create-controller-directory view-directory controller)
+                  view-file (builder/create-view-file controller-directory action)]
                 (if view-file
                   (generate-file-content view-file controller content)))
             (do
