@@ -1,5 +1,6 @@
 (ns conjure.model.database
-  (:require [db-config :as db-config]))
+  (:require [db-config :as db-config]
+            [conjure.util.string-utils :as string-utils]))
   
 (def conjure-db (db-config/get-db-config))
 
@@ -43,13 +44,47 @@ that key in the db-flavor"}
   create-table [table-name & specs]
   (apply (db-flavor :create-table) db table-name specs))
   
-(defn
-  integer [column & mods]
-  (apply (db-flavor :integer) column mods))
+(defmacro
+  def-column-spec [type-key]
+  (let [spec-name (string-utils/str-keyword type-key)]
+    `(defn ~(symbol spec-name)
+      ([column#] ((db-flavor ~type-key) column#))
+      ([column# mods#] ((db-flavor ~type-key) column# mods#)))))
+
+(def-column-spec :integer)
+
+(def-column-spec :string)
+
+(def-column-spec :text)
+
+(def-column-spec :belongs-to)
+
+;(defn
+;#^{:doc "Returns a new spec describing an integer with the given column and spec mods map. Use this method with the 
+;create-table method. See your database flavor for valid mods."}
+;  integer [column & mods]
+;  (apply column-spec :integer column mods))
   
 (defn
+#^{:doc "Returns a new spec describing the id for a table. Use this method with the create-table method."}
   id []
   ((db-flavor :id)))
+  
+;(defn
+;#^{:doc "Returns a new spec describing a string with the given column and spec mods map. Use this method with the create-table method.
+; See your database flavor for valid mods."}
+;  string
+;  ([column] ((db-flavor :string) column))
+;  ([column mods]
+;    ((db-flavor :string) column mods)))
+    
+;(defn
+;#^{:doc "Returns a new spec describing a string with the given column and spec mods map. Use this method with the create-table method.
+; See your database flavor for valid mods."}
+;  string
+;  ([column] ((db-flavor :string) column))
+;  ([column mods]
+;    ((db-flavor :string) column mods)))
   
 (defn
 #^{:doc "Deletes a table with the given name."}

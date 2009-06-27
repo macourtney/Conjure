@@ -35,72 +35,42 @@
 			<key>firstVisibleLine</key>
 			<integer>4</integer>
 		</dict>
-		<key>file_structure/default/script/generators/model_generator.clj</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>38</integer>
-				<key>line</key>
-				<integer>21</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
 		<key>file_structure/default/vendor/conjure/model/model.clj</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>59</integer>
+				<integer>84</integer>
 				<key>line</key>
-				<integer>69</integer>
+				<integer>149</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>54</integer>
+			<integer>96</integer>
 		</dict>
-		<key>file_structure/default/vendor/conjure/server/jdbc_connector.clj</key>
+		<key>file_structure/default/vendor/conjure/server/server.clj</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>17</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>60</integer>
+				<integer>0</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>2</integer>
-				<key>line</key>
-				<integer>60</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>17</integer>
-				<key>line</key>
-				<integer>60</integer>
-			</dict>
 		</dict>
 		<key>target/hello_world/app/controllers/hello_controller.clj</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>12</integer>
+				<integer>24</integer>
 				<key>line</key>
-				<integer>2</integer>
+				<integer>4</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -112,58 +82,42 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>20</integer>
-				<key>line</key>
-				<integer>14</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
-		<key>target/hello_world/app/views/hello/show.clj</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>12</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
-		<key>target/hello_world/db/migrate/003_create_messages.clj</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>92</integer>
+				<integer>65</integer>
 				<key>line</key>
 				<integer>9</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>65</integer>
+				<key>line</key>
+				<integer>9</integer>
+			</dict>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>file_structure/default/vendor/conjure/model/model.clj</string>
-		<string>file_structure/default/script/generators/model_generator.clj</string>
-		<string>file_structure/default/db/flavors/h2.clj</string>
 		<string>target/hello_world/app/controllers/hello_controller.clj</string>
+		<string>file_structure/default/vendor/conjure/model/model.clj</string>
+		<string>file_structure/default/vendor/conjure/server/server.clj</string>
 		<string>target/hello_world/app/models/message.clj</string>
-		<string>target/hello_world/db/migrate/003_create_messages.clj</string>
-		<string>file_structure/default/vendor/conjure/server/jdbc_connector.clj</string>
-		<string>target/hello_world/app/views/hello/show.clj</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{976, 11}, {945, 1167}}</string>
+	<string>{{975, 11}, {945, 1167}}</string>
 </dict>
 </plist>

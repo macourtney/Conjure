@@ -44,17 +44,23 @@
 (defn
 #^{:doc "Converts all dashes to underscores in string."}
   dashes-to-underscores [string]
-  (re-gsub #"-" "_" string))
+  (if string
+    (re-gsub #"-" "_" string)
+    string))
     
 (defn
 #^{:doc "Converts all underscores to dashes in string."}
   underscores-to-dashes [string]
-  (re-gsub #"_" "-" string))
+  (if string
+    (re-gsub #"_" "-" string)
+    string))
   
 (defn
 #^{:doc "Converts all slashes to periods in string."}
   slashes-to-dots [string]
-  (re-gsub #"/|\\" "." string))
+  (if string
+    (re-gsub #"/|\\" "." string)
+    string))
 
 (defn
 #^{:doc "Converts the given clj file name to a symbol string. For example: \"loading_utils.clj\" would get converted into \"loading-utils\""}

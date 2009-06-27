@@ -94,12 +94,12 @@
   migration-number-before 
     ([migration-number] (migration-number-before migration-number (all-migration-files (find-migrate-directory))))
     ([migration-number migration-files]
-      (let [migration-file (first migration-files)
-            migration-file-number (migration-number-from-file migration-file)]
-        (println "migration-file-number:" migration-file-number)
-        (if (< migration-file-number migration-number)
-          (let [next-migration-number (migration-number-before migration-number (rest migration-files))]
-            (if (not (== next-migration-number 0))
-                next-migration-number
-                migration-file-number))
-          0))))
+      (loop [files migration-files
+             previous-file-number 0]
+        (if (not-empty migration-files)
+          (let [migration-file (first files)
+                migration-file-number (migration-number-from-file migration-file)]
+            (if (< migration-file-number migration-number)
+              (recur (rest files) migration-file-number)
+              previous-file-number))
+          previous-file-number))))

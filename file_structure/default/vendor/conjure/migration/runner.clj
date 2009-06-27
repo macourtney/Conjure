@@ -26,54 +26,58 @@ schema info table is empty, then it adds a row and sets the version to 0."}
         0)))
 
 (defn
+#^{:doc "Updates the version number saved in the schema table in the database."}
+  update-db-version [new-version]
+  (database/update util/schema-info-table ["true"] { util/version-column new-version }))
+
+(defn
 #^{:doc "Runs the up function in the given migration file."}
   run-migrate-up [migration-file]
   (println "Running" (. migration-file getName) "up...")
   (load-file (. migration-file getAbsolutePath))
-  (load-string (str "(" (util/migration-namespace migration-file) "/up)")))
+  (load-string (str "(" (util/migration-namespace migration-file) "/up)"))
+  (let [new-version (util/migration-number-from-file migration-file)]
+    (update-db-version new-version)
+    new-version))
   
 (defn
 #^{:doc "Runs the down function in the given migration file."}
   run-migrate-down [migration-file]
   (println "Running" (. migration-file getName) "down...")
   (load-file (. migration-file getAbsolutePath))
-  (load-string (str "(" (util/migration-namespace migration-file) "/down)")))
+  (load-string (str "(" (util/migration-namespace migration-file) "/down)"))
+  (let [new-version (util/migration-number-before (util/migration-number-from-file migration-file))]
+    (update-db-version new-version)
+    new-version))
         
 (defn
 #^{:doc "Runs the up function on all of the given migration files."}
   migrate-up-all [migration-files]
-  (if (seq migration-files)
-    (let [migration-file (first migration-files)]
-      (run-migrate-up migration-file)
-      (let [output (migrate-up-all (rest migration-files))]
-        (if output 
-          output 
-          (util/migration-number-from-file migration-file))))))
+  (loop [other-migrations migration-files
+         output nil]
+    (if (not-empty other-migrations)
+      (recur
+        (rest other-migrations)
+        (run-migrate-up (first other-migrations)))
+      output)))
 
 (defn
 #^{:doc "Runs the up function on all of the given migration files."}
   migrate-down-all [migration-files]
-  (if (seq migration-files)
-    (let [migration-file (first migration-files)]
-      (run-migrate-down migration-file)
-      (let [output (migrate-down-all (rest migration-files))]
-        (if output 
-          output 
-          (util/migration-number-before (util/migration-number-from-file migration-file)))))))
-
-(defn
-#^{:doc "Updates the version number saved in the schema table in the database."}
-  update-db-version [new-version]
-  (database/update util/schema-info-table ["true"] { util/version-column new-version }))
+  (loop [other-migrations migration-files
+         output nil]
+    (if (not-empty other-migrations)
+      (recur
+        (rest other-migrations)
+        (run-migrate-down (first other-migrations)))
+      output)))
 
 (defn
 #^{:doc "Migrates the database up from from-version to to-version."}
   migrate-up [from-version to-version]
   (let [new-version (migrate-up-all (util/migration-files-in-range from-version to-version))]
     (if new-version
-      (do
-        (println "Migrated to version:" new-version)
-        (update-db-version new-version))
+      (println "Migrated to version:" new-version)
       (println "No changes were made to the database."))))
   
 (defn
@@ -81,9 +85,7 @@ schema info table is empty, then it adds a row and sets the version to 0."}
   migrate-down [from-version to-version]
   (let [new-version (migrate-down-all (reverse (util/migration-files-in-range to-version from-version)))]
     (if new-version
-      (do
-        (println "Migrated to version:" new-version)
-        (update-db-version new-version))
+      (println "Migrated to version:" new-version)
       (println "No changes were made to the database."))))
 
 (defn 

@@ -1,7 +1,6 @@
 (ns conjure.server.server
   (:require [http-config :as http-config]
             [routes :as routes]
-            [conjure.server.jdbc-connector :as jdbc-connector]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.model.base :as model-base]
             [conjure.model.database :as database]
