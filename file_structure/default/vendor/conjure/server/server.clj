@@ -1,8 +1,8 @@
 (ns conjure.server.server
   (:require [http-config :as http-config]
+            [environment :as environment]
             [routes :as routes]
             [conjure.util.loading-utils :as loading-utils]
-            [conjure.model.base :as model-base]
             [conjure.model.database :as database]
             [conjure.controller.util :as controller-util]
             [conjure.view.util :as view-util]
@@ -74,9 +74,9 @@
 #^{:doc "Gets the user configured database properties."}
   db-config []
   (database/conjure-db))
-
+  
 (defn
-#^{:doc "This is the first method called when the server is started."}
-  config-server []
-  (http-config)
-  (model-base/sql-init))
+#^{:doc "Initializes the conjure server."}
+  init []
+  (environment/init)
+  (database/init-sql))

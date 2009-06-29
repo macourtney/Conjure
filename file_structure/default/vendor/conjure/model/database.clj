@@ -1,15 +1,15 @@
 (ns conjure.model.database
   (:require [db-config :as db-config]
             [conjure.util.string-utils :as string-utils]))
-  
-(def conjure-db (db-config/get-db-config))
 
 (defn
-#^{:doc "Sets up clojure.contrib.sql"}
-  sql-init []
-  (let [sql-db-map { :datasource (:datasource conjure-db)
-                     :username (:username conjure-db)
-                     :password (:password conjure-db)}]
+#^{:doc "Initializes the database config information."}
+  init-sql []
+  (let [new-db-config (db-config/load-config)
+        sql-db-map { :datasource (:datasource new-db-config)
+                     :username (:username new-db-config)
+                     :password (:password new-db-config)}]
+    (def conjure-db new-db-config)
     (def db sql-db-map)))
     
 (defn
@@ -18,38 +18,34 @@ that key in the db-flavor"}
   db-flavor 
   ([] (:flavor conjure-db))
   ([flavor-key] (get (db-flavor) flavor-key)))
-    
- (defn
-#^{:doc "Returns true if the given table exists in the database."}
-  table-exists? [table-name]
-  ((db-flavor :table-exists) db table-name))
-  
-(defn
-#^{:doc "Runs a select sql statement based on the values in select-map, and returns the results as a vector of maps."}
-  sql-find [select-map]
-  ((db-flavor :sql-find) db select-map))
-  
-(defn
-#^{:doc "Inserts the given records (a map from column names to values) the table with the given name."}
-  insert-into [table-name & records]
-  (apply (db-flavor :execute-insert) db table-name records))
-  
-(defn
-#^{:doc "Updates all of the rows which satisfy the given where-params to the values of the given record."}
-  update [table-name where-params record]
-  ((db-flavor :execute-update) db table-name where-params record))
-  
-(defn
-#^{:doc "Creates a table with the given name and with columns from the given schema-map."}
-  create-table [table-name & specs]
-  (apply (db-flavor :create-table) db table-name specs))
   
 (defmacro
+#^{:doc "Given the type-key of a function in the database flavor, define a function named type-key which calls the 
+database flavor function with the current db spec and any arguments"}
+  def-db-fn [type-key]
+  (let [spec-name (string-utils/str-keyword type-key)]
+    `(defn ~(symbol spec-name)
+      ([& args#] (apply (db-flavor ~type-key) db args#)))))
+    
+(def-db-fn :table-exists?)
+
+(def-db-fn :sql-find)
+
+(def-db-fn :insert-into)
+
+(def-db-fn :update)
+
+(def-db-fn :create-table)
+
+(def-db-fn :drop-table)
+   
+(defmacro
+#^{:doc "Given the type-key of a function in the database flavor, define a function named type-key which calls the 
+database flavor function passing any arguments."}
   def-column-spec [type-key]
   (let [spec-name (string-utils/str-keyword type-key)]
     `(defn ~(symbol spec-name)
-      ([column#] ((db-flavor ~type-key) column#))
-      ([column# mods#] ((db-flavor ~type-key) column# mods#)))))
+      ([& args#] (apply (db-flavor ~type-key) args#)))))
 
 (def-column-spec :integer)
 
@@ -59,34 +55,4 @@ that key in the db-flavor"}
 
 (def-column-spec :belongs-to)
 
-;(defn
-;#^{:doc "Returns a new spec describing an integer with the given column and spec mods map. Use this method with the 
-;create-table method. See your database flavor for valid mods."}
-;  integer [column & mods]
-;  (apply column-spec :integer column mods))
-  
-(defn
-#^{:doc "Returns a new spec describing the id for a table. Use this method with the create-table method."}
-  id []
-  ((db-flavor :id)))
-  
-;(defn
-;#^{:doc "Returns a new spec describing a string with the given column and spec mods map. Use this method with the create-table method.
-; See your database flavor for valid mods."}
-;  string
-;  ([column] ((db-flavor :string) column))
-;  ([column mods]
-;    ((db-flavor :string) column mods)))
-    
-;(defn
-;#^{:doc "Returns a new spec describing a string with the given column and spec mods map. Use this method with the create-table method.
-; See your database flavor for valid mods."}
-;  string
-;  ([column] ((db-flavor :string) column))
-;  ([column mods]
-;    ((db-flavor :string) column mods)))
-  
-(defn
-#^{:doc "Deletes a table with the given name."}
-  drop-table [table-name]
-  ((db-flavor :drop-table) db table-name))
+(def-column-spec :id)

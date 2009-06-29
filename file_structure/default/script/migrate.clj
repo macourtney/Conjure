@@ -1,6 +1,6 @@
 (ns migrate
   (:require [conjure.migration.runner :as runner]
-            [conjure.model.base :as base]))
+            [conjure.server.server :as server]))
 
 (defn 
 #^{:doc "Prints out how to use the migration command."}
@@ -23,6 +23,6 @@
       version (version-number (second *command-line-args*))]
   (if version
     (do
-      (base/sql-init)
+      (server/init)
       (runner/update-to-version version))
     (print-usage)))
