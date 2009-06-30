@@ -75,4 +75,8 @@
 (defn
 #^{:doc "Returns a string for the namespace of the given file in the given directory."}
   namespace-string-for-file [directory file-name]
-  (str (slashes-to-dots (underscores-to-dashes directory)) "." (clj-file-to-symbol-string file-name)))
+  (if (and directory (> (. (. directory trim) length) 0))
+    (let [trimmed-directory (. directory trim)
+          slash-trimmed-directory (if (or (. trimmed-directory startsWith "/") (. trimmed-directory startsWith "\\")) (. trimmed-directory substring 1) trimmed-directory)]
+      (str (slashes-to-dots (underscores-to-dashes slash-trimmed-directory)) "." (clj-file-to-symbol-string file-name)))
+    (clj-file-to-symbol-string file-name)))
