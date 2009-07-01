@@ -52,14 +52,14 @@
   	<java classname="clojure.lang.Script" dir="${test_app}">
       <arg value="test/run_tests.clj"/>
       <classpath>
-      	<fileset dir="${test_app}/lib">
-          <include name="**/*.jar"/>
-        </fileset>
       	<pathelement path="${test_app}/vendor"/>
       	<pathelement path="${test_app}/app"/>
       	<pathelement path="${test_app}/config"/>
       	<pathelement path="${test_app}/script"/>
       	<pathelement path="${test_app}/db"/>
+      	<fileset dir="${test_app}/lib">
+          <include name="**/*.jar"/>
+        </fileset>
       </classpath>
   	</java>
   </target>

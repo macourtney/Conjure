@@ -70,13 +70,18 @@
 (defn
 #^{:doc "Converts the given symbol string to a clj file name. For example: \"loading-utils\" would get converted into \"loading_utils.clj\""}
   symbol-string-to-clj-file [symbol-name]
-  (str (dashes-to-underscores symbol-name) ".clj"))
+  (let [dashed-name (dashes-to-underscores symbol-name)]
+    (if (and dashed-name (> (. dashed-name length) 0))
+      (str (dashes-to-underscores symbol-name) ".clj")
+      dashed-name)))
 
 (defn
 #^{:doc "Returns a string for the namespace of the given file in the given directory."}
   namespace-string-for-file [directory file-name]
-  (if (and directory (> (. (. directory trim) length) 0))
-    (let [trimmed-directory (. directory trim)
-          slash-trimmed-directory (if (or (. trimmed-directory startsWith "/") (. trimmed-directory startsWith "\\")) (. trimmed-directory substring 1) trimmed-directory)]
-      (str (slashes-to-dots (underscores-to-dashes slash-trimmed-directory)) "." (clj-file-to-symbol-string file-name)))
-    (clj-file-to-symbol-string file-name)))
+  (if file-name
+    (if (and directory (> (. (. directory trim) length) 0))
+      (let [trimmed-directory (. directory trim)
+            slash-trimmed-directory (if (or (. trimmed-directory startsWith "/") (. trimmed-directory startsWith "\\")) (. trimmed-directory substring 1) trimmed-directory)]
+        (str (slashes-to-dots (underscores-to-dashes slash-trimmed-directory)) "." (clj-file-to-symbol-string file-name)))
+      (clj-file-to-symbol-string file-name))
+    file-name))
