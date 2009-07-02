@@ -3,8 +3,14 @@
   (:use clojure.contrib.test-is
         conjure.util.file-utils))
         
+(deftest test-user-directory
+  (let [user-dir (user-directory)]
+    (is (not (nil? user-dir)))
+    (is (instance? File user-dir))
+    (is (= (. user-dir getName) "test_app"))))
+        
 (deftest test-find-file
-  (let [parent-dir (new File "./target/test_app/test/util")]
+  (let [parent-dir (new File (user-directory) "test/util")]
     (let [test-file-utils-file (find-file parent-dir "test_file_utils.clj")]
       (is (not (nil? test-file-utils-file)))
       (is (instance? File test-file-utils-file))
@@ -15,7 +21,7 @@
     (is (thrown? NullPointerException (find-file nil "test_file_utils.clj")))))
     
 (deftest test-find-directory
-  (let [parent-dir (new File "./target/test_app/test/")]
+  (let [parent-dir (new File (user-directory) "test")]
     (let [test-dir (find-directory parent-dir "util")]
       (is (not (nil? test-dir)))
       (is (instance? File test-dir))
@@ -27,7 +33,7 @@
     
 (deftest test-write-file-content
   (let [test-content "Test content."
-        test-file (new File "./target/test_app/test/util/test.txt")]
+        test-file (new File (user-directory) "test/util/test.txt")]
     (write-file-content test-file test-content)
     (let [test-file-reader (new FileReader test-file)
           test-file-content (make-array (. Character TYPE) 20)

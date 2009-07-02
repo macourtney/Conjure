@@ -1,8 +1,9 @@
 (ns conjure.util.loading-utils
-  (:use [clojure.contrib.classpath :as classpath]
-        [clojure.contrib.seq-utils :as seq-utils]
-        [conjure.util.string-utils :as string-utils]
-        [clojure.contrib.str-utils :as clojure-str-utils]))
+  (:import [java.io File])
+  (:require [clojure.contrib.classpath :as classpath]
+            [clojure.contrib.seq-utils :as seq-utils]
+            [conjure.util.string-utils :as string-utils]
+            [clojure.contrib.str-utils :as clojure-str-utils]))
 
 (defn
 #^{:doc "Gets the system class loader"}
@@ -38,28 +39,29 @@
 (defn 
 #^{:doc "Gets the dir from the class path which ends with the given ending"}
   get-classpath-dir-ending-with [ending]
-  (seq-utils/find-first (fn [directory] (. (. directory getPath) endsWith ending))
+  (seq-utils/find-first 
+    (fn [directory] (. (. directory getPath) endsWith ending))
     (classpath/classpath-directories)))
     
 (defn
 #^{:doc "Converts all dashes to underscores in string."}
   dashes-to-underscores [string]
   (if string
-    (re-gsub #"-" "_" string)
+    (clojure-str-utils/re-gsub #"-" "_" string)
     string))
     
 (defn
 #^{:doc "Converts all underscores to dashes in string."}
   underscores-to-dashes [string]
   (if string
-    (re-gsub #"_" "-" string)
+    (clojure-str-utils/re-gsub #"_" "-" string)
     string))
   
 (defn
 #^{:doc "Converts all slashes to periods in string."}
   slashes-to-dots [string]
   (if string
-    (re-gsub #"/|\\" "." string)
+    (clojure-str-utils/re-gsub #"/|\\" "." string)
     string))
 
 (defn

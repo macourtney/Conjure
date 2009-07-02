@@ -56,8 +56,12 @@
 #^{:doc "Takes the given path and calls the correct controller and action for it."}
   process-request [request-map]
   (when request-map
-    (load-controller (controller-file-name request-map))
-    ((load-string (fully-qualified-action request-map)) request-map)))
+    (let [controller-file (controller-file-name request-map)]
+      (if controller-file
+        (do
+          (load-controller controller-file)
+          ((load-string (fully-qualified-action request-map)) request-map))
+        nil))))
 
 (defn
 #^{:doc "A function for simplifying the loading of views."}

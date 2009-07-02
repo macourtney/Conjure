@@ -5,18 +5,17 @@
             [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.classpath :as classpath]))
 
+
+  
 (defn
 #^{:doc "Returns a File object for the test_app directory."}
   create-test-app-directory-file []
-  (let [conjure-directory (first (classpath/classpath-directories))
-        target-directory (new File conjure-directory "target")]
-    (new File target-directory "test_app")))
-   
+  (new File (. (System/getProperties) getProperty "user.dir")))
+  
 (defn
 #^{:doc "Returns a File object for the test directory."}
   create-test-directory-file []
-  (let [test-app-directory (create-test-app-directory-file)]
-    (new File test-app-directory "test")))
+  (new File (create-test-app-directory-file) "test"))
    
 (defn
 #^{:doc "Returns a sequence of all the files found in every directory under the test directory."}
