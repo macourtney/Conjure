@@ -56,8 +56,3 @@ database flavor function passing any arguments."}
 (def-column-spec :belongs-to)
 
 (def-column-spec :id)
-  
-(defn
-#^{:doc "Deletes a table with the given name."}
-  drop-table [table-name]
-  ((db-flavor :drop-table) db table-name))
