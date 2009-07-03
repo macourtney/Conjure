@@ -59,32 +59,10 @@ that key in the db-flavor"}
 
 (def-column-spec :belongs-to)
 
-;(defn
-;#^{:doc "Returns a new spec describing an integer with the given column and spec mods map. Use this method with the 
-;create-table method. See your database flavor for valid mods."}
-;  integer [column & mods]
-;  (apply column-spec :integer column mods))
-  
 (defn
 #^{:doc "Returns a new spec describing the id for a table. Use this method with the create-table method."}
   id []
   ((db-flavor :id)))
-  
-;(defn
-;#^{:doc "Returns a new spec describing a string with the given column and spec mods map. Use this method with the create-table method.
-; See your database flavor for valid mods."}
-;  string
-;  ([column] ((db-flavor :string) column))
-;  ([column mods]
-;    ((db-flavor :string) column mods)))
-    
-;(defn
-;#^{:doc "Returns a new spec describing a string with the given column and spec mods map. Use this method with the create-table method.
-; See your database flavor for valid mods."}
-;  string
-;  ([column] ((db-flavor :string) column))
-;  ([column mods]
-;    ((db-flavor :string) column mods)))
   
 (defn
 #^{:doc "Deletes a table with the given name."}
