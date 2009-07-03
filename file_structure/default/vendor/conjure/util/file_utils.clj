@@ -2,6 +2,11 @@
   (:import [java.io File FileWriter]))
 
 (defn
+#^{:doc "Returns the directory where Conjure is running from."}
+  user-directory []
+  (new File (. (System/getProperties) getProperty "user.dir")))
+
+(defn
 #^{:doc "Returns the file object if the given file is in the given directory, nil otherwise."}
   find-file [directory file-name]
   (let [file (new File (. directory getPath) file-name)]

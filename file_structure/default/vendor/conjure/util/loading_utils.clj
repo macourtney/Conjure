@@ -1,8 +1,9 @@
 (ns conjure.util.loading-utils
-  (:use [clojure.contrib.classpath :as classpath]
-        [clojure.contrib.seq-utils :as seq-utils]
-        [conjure.util.string-utils :as string-utils]
-        [clojure.contrib.str-utils :as clojure-str-utils]))
+  (:import [java.io File])
+  (:require [clojure.contrib.classpath :as classpath]
+            [clojure.contrib.seq-utils :as seq-utils]
+            [conjure.util.string-utils :as string-utils]
+            [clojure.contrib.str-utils :as clojure-str-utils]))
 
 (defn
 #^{:doc "Gets the system class loader"}
@@ -38,28 +39,29 @@
 (defn 
 #^{:doc "Gets the dir from the class path which ends with the given ending"}
   get-classpath-dir-ending-with [ending]
-  (seq-utils/find-first (fn [directory] (. (. directory getPath) endsWith ending))
+  (seq-utils/find-first 
+    (fn [directory] (. (. directory getPath) endsWith ending))
     (classpath/classpath-directories)))
     
 (defn
 #^{:doc "Converts all dashes to underscores in string."}
   dashes-to-underscores [string]
   (if string
-    (re-gsub #"-" "_" string)
+    (clojure-str-utils/re-gsub #"-" "_" string)
     string))
     
 (defn
 #^{:doc "Converts all underscores to dashes in string."}
   underscores-to-dashes [string]
   (if string
-    (re-gsub #"_" "-" string)
+    (clojure-str-utils/re-gsub #"_" "-" string)
     string))
   
 (defn
 #^{:doc "Converts all slashes to periods in string."}
   slashes-to-dots [string]
   (if string
-    (re-gsub #"/|\\" "." string)
+    (clojure-str-utils/re-gsub #"/|\\" "." string)
     string))
 
 (defn
@@ -70,9 +72,18 @@
 (defn
 #^{:doc "Converts the given symbol string to a clj file name. For example: \"loading-utils\" would get converted into \"loading_utils.clj\""}
   symbol-string-to-clj-file [symbol-name]
-  (str (dashes-to-underscores symbol-name) ".clj"))
+  (let [dashed-name (dashes-to-underscores symbol-name)]
+    (if (and dashed-name (> (. dashed-name length) 0))
+      (str (dashes-to-underscores symbol-name) ".clj")
+      dashed-name)))
 
 (defn
 #^{:doc "Returns a string for the namespace of the given file in the given directory."}
   namespace-string-for-file [directory file-name]
-  (str (slashes-to-dots (underscores-to-dashes directory)) "." (clj-file-to-symbol-string file-name)))
+  (if file-name
+    (if (and directory (> (. (. directory trim) length) 0))
+      (let [trimmed-directory (. directory trim)
+            slash-trimmed-directory (if (or (. trimmed-directory startsWith "/") (. trimmed-directory startsWith "\\")) (. trimmed-directory substring 1) trimmed-directory)]
+        (str (slashes-to-dots (underscores-to-dashes slash-trimmed-directory)) "." (clj-file-to-symbol-string file-name)))
+      (clj-file-to-symbol-string file-name))
+    file-name))

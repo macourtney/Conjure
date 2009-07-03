@@ -19,8 +19,11 @@
       
 (defn 
 #^{:doc "Returns a map for use in db-config."}
-  db-map [dbname]
+  db-map [db-config]
   (let [
+        ;; The name of the production database to use.
+        dbname (:dbname db-config)
+  
         ;; The name of the JDBC driver to use.
         classname "org.h2.Driver"
         
@@ -33,10 +36,11 @@
         ;; A datasource for the database.
         datasource (create-datasource (format "jdbc:%s:%s" subprotocol subname))]
 
-  { :classname classname
+  (merge db-config {
+    :classname classname
     :subprotocol subprotocol
     :subname subname 
-    :datasource datasource}))
+    :datasource datasource })))
   
 (defn
 #^{:doc "Executes an sql string and returns the results as a sequence of maps."}
@@ -58,7 +62,7 @@ any keyword into a string, and replaces dashes with underscores."}
   table - The name of the table to update.
   where-params - The parameters to test for.
   record - A map from strings or keywords (identifying columns) to updated values."}
-  execute-update [db-spec table where-params record]
+  update [db-spec table where-params record]
   ;;(println sql-string)
   (sql/with-connection db-spec
     (sql/update-values (table-name table) where-params record)))
@@ -68,7 +72,7 @@ any keyword into a string, and replaces dashes with underscores."}
 
   table - The name of the table to update.
   records - A map from strings or keywords (identifying columns) to updated values."}
-  execute-insert [db-spec table & records]
+  insert-into [db-spec table & records]
   ;;(println sql-string)
   (sql/with-connection db-spec
     (apply sql/insert-records (table-name table) records)))
@@ -76,7 +80,7 @@ any keyword into a string, and replaces dashes with underscores."}
 
 (defn
 #^{:doc "Returns true if the table with the given name exists."}
-  table-exists [db-spec table]
+  table-exists? [db-spec table]
   (try
     (let [results (execute-query db-spec [(str "SELECT * FROM " (table-name table) " LIMIT 1")])]
       true)
@@ -175,17 +179,17 @@ create-table method.
 (defn
 #^{:doc "Returns a database flavor for a derby database."}
   flavor []
-  {:db-map db-map
-   :execute-query execute-query
-   :execute-update execute-update
-   :execute-insert execute-insert
-   :table-exists table-exists
-   :sql-find sql-find
-   :create-table create-table
-   :drop-table drop-table
-   :integer integer
-   :id id
-   :string string
-   :text text
-   :belongs-to belongs-to
+  { :db-map db-map
+    :execute-query execute-query
+    :update update
+    :insert-into insert-into
+    :table-exists? table-exists?
+    :sql-find sql-find
+    :create-table create-table
+    :drop-table drop-table
+    :integer integer
+    :id id
+    :string string
+    :text text
+    :belongs-to belongs-to
   })

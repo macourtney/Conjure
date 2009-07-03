@@ -1,8 +1,8 @@
 (ns conjure.server.server
   (:require [http-config :as http-config]
+            [environment :as environment]
             [routes :as routes]
             [conjure.util.loading-utils :as loading-utils]
-            [conjure.model.base :as model-base]
             [conjure.model.database :as database]
             [conjure.controller.util :as controller-util]
             [conjure.view.util :as view-util]
@@ -56,8 +56,12 @@
 #^{:doc "Takes the given path and calls the correct controller and action for it."}
   process-request [request-map]
   (when request-map
-    (load-controller (controller-file-name request-map))
-    ((load-string (fully-qualified-action request-map)) request-map)))
+    (let [controller-file (controller-file-name request-map)]
+      (if controller-file
+        (do
+          (load-controller controller-file)
+          ((load-string (fully-qualified-action request-map)) request-map))
+        nil))))
 
 (defn
 #^{:doc "A function for simplifying the loading of views."}
@@ -74,9 +78,9 @@
 #^{:doc "Gets the user configured database properties."}
   db-config []
   (database/conjure-db))
-
+  
 (defn
-#^{:doc "This is the first method called when the server is started."}
-  config-server []
-  (http-config)
-  (model-base/sql-init))
+#^{:doc "Initializes the conjure server."}
+  init []
+  (environment/init)
+  (database/init-sql))
