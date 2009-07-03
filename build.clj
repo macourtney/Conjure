@@ -42,17 +42,17 @@
   (java { :classname "clojure.lang.Script"
           :dir test-app
           :fork "true"
-          :args "test/run_tests.clj" 
-          :classpath 
-            (ant-classpath {}
-              (pathelement { :path (str test-app "/vendor") })
-              (pathelement { :path (str test-app "/app") })
-              (pathelement { :path (str test-app "/config") })
-              (pathelement { :path (str test-app "/script") })
-              (pathelement { :path (str test-app "/db") })
-              (pathelement { :path (str test-app "/test") })
-              (fileset { :dir (str test-app "/lib")
-                         :includes "**/*.jar" })) }))
+          :args "test/run_tests.clj" }
+    [:classpath 
+      (ant-classpath 
+        (pathelement { :path (str test-app "/vendor") })
+        (pathelement { :path (str test-app "/app") })
+        (pathelement { :path (str test-app "/config") })
+        (pathelement { :path (str test-app "/script") })
+        (pathelement { :path (str test-app "/db") })
+        (pathelement { :path (str test-app "/test") })
+        (fileset { :dir (str test-app "/lib")
+                   :includes "**/*.jar" }))]))
 
 (deftarget all "Builds all of conjure."
   (jar-conjure)

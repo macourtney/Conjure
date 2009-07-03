@@ -59,15 +59,35 @@
 (defn set-properties! [inst prop-map]
   (doseq [[k v] prop-map] (set-property! inst (name k) v)))
   
+(defn update-property [property args add-subproperty]
+  (let [property-map (if (map? (first args)) (first args) nil)
+        sub-properties (if property-map (rest args) args)]
+    (if property-map (set-properties! property property-map))
+    (when (property-descriptor property "project")
+      (set-property! property "project" ant-project))
+    (doseq [sub-property sub-properties]
+      (add-subproperty property sub-property))))
+  
 (defn add-subproperty [task property]
-  (try
-    (let [add-method (str "add" (.. property getClass getName))]
-      (. task (symbol add-method) property ))
-    (catch Exception ex
+  (if (vector? property)
+    (let [property-name (. (str (first property)) substring 1)
+          creator-method-name (str "create" (. (. property-name substring 0 1) toUpperCase) (. property-name substring 1))]
       (try
-        (.add task property)
-        (catch Exception ex
-          (println "Could not find adder for" (. property getClass) "on task" (. task getClass)))))))
+        (let [task-class (. task getClass)
+              creator-method (. task-class getMethod creator-method-name (into-array Class []))
+              new-property (. creator-method invoke task (into-array Class []))
+              new-property-args (rest property)]
+          (update-property new-property new-property-args add-subproperty))
+        (catch java.lang.IllegalArgumentException ex
+          (throw (new RuntimeException (str "Could not find creator (" creator-method-name ") for " property-name " on task " (.. task getClass getName)) ex)))))
+    (try
+      (let [add-method (str "add" (.. property getClass getName))]
+        (. task (symbol add-method) property ))
+      (catch java.lang.IllegalArgumentException ex
+        (try
+          (.add task property)
+          (catch java.lang.IllegalArgumentException ex
+            (throw (new RuntimeException (str "Could not find adder for" (. property getClass) "on task" (. task getClass)) ex))))))))
 
 (defn instantiate-task [project name props & filesets]
   (let [task (.createTask project name)]
@@ -121,13 +141,9 @@
        task#)))
 
 (defmacro define-ant-type [clj-name ant-name & constructor-args]
-  `(defn ~clj-name [props# & sub-types#]
+  `(defn ~clj-name [& args#]
      (let [bean# (new ~ant-name ~@constructor-args)]
-       (set-properties! bean# props#)
-       (when (property-descriptor bean# "project")
-	       (set-property! bean# "project" ant-project))
-	     (doseq [sub-property# sub-types#]
-	       (add-subproperty bean# sub-property#))
+       (update-property bean# args# add-subproperty)
 	     bean#)))
 
 (defn task-names [] (map symbol (seq (.. ant-project getTaskDefinitions keySet))))
