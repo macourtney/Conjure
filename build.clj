@@ -34,15 +34,15 @@
   (jar-conjure)
   (java { :jar (str target "/conjure.jar")
           :fork "true"
-          :dir target
-          :args "test_app" })
+          :dir target }
+    [:arg { :value "test_app" }])
   (copy { :todir (str test-app "/test") }
     (fileset { :dir test-dir }))
   (echo { :message "\nRunning Tests...\n\n"})
   (java { :classname "clojure.lang.Script"
           :dir test-app
-          :fork "true"
-          :args "test/run_tests.clj" }
+          :fork "true" }
+    [:arg { :value "test/run_tests.clj" }]
     [:classpath 
       (ant-classpath 
         (pathelement { :path (str test-app "/vendor") })
