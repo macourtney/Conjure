@@ -7,9 +7,10 @@
 
 
 (defn setup-all [function]
-  (controller-generator/generate-controller-file "test" [])
-  (function)
-  (controller-destroyer/destroy-controller-file "test"))
+  (let [controller-name "test"]
+    (controller-generator/generate-controller-file controller-name [])
+    (function)
+    (controller-destroyer/destroy-controller-file controller-name)))
         
 (use-fixtures :once setup-all)
   
@@ -17,3 +18,46 @@
   (let [controllers-directory (find-controllers-directory)]
     (is (not (nil? controllers-directory)))
     (is (instance? File controllers-directory))))
+    
+(deftest test-controller-file-name-string
+  (let [controller-file-name (controller-file-name-string "test")]
+    (is (not (nil? controller-file-name)))
+    (is (= "test_controller.clj" controller-file-name)))
+  (let [controller-file-name (controller-file-name-string "test-name")]
+    (is (not (nil? controller-file-name)))
+    (is (= "test_name_controller.clj" controller-file-name)))
+  (is (nil? (controller-file-name-string nil))))
+  
+(deftest test-controller-from-file
+  (let [controller-file (new File "test_controller.clj")
+        controller-name (controller-from-file controller-file)]
+    (is (not (nil? controller-name)))
+    (is (= "test" controller-name)))
+  (let [controller-file (new File "test_name_controller.clj")
+        controller-name (controller-from-file controller-file)]
+    (is (not (nil? controller-name)))
+    (is (= "test-name" controller-name)))
+  (is (nil? (controller-from-file nil))))
+  
+(deftest test-find-controller-file
+  (let [controllers-directory (find-controllers-directory)]
+    (let [controller-file (find-controller-file controllers-directory "test")]
+      (is (not (nil? controller-file))))
+    (let [controller-file (find-controller-file controllers-directory "fail")]
+      (is (nil? controller-file)))
+    (let [controller-file (find-controller-file controllers-directory nil)]
+      (is (nil? controller-file)))
+  (let [controller-file (find-controller-file "test")]
+    (is (not (nil? controller-file))))))
+    
+(deftest test-controller-namespace
+  (let [controller-ns (controller-namespace "test")]
+    (is (not (nil? controller-ns)))
+    (is (= "controllers.test-controller" controller-ns)))
+  (let [controller-ns (controller-namespace "test-name")]
+    (is (not (nil? controller-ns)))
+    (is (= "controllers.test-name-controller" controller-ns)))
+  (let [controller-ns (controller-namespace "test_name")]
+    (is (not (nil? controller-ns)))
+    (is (= "controllers.test-name-controller" controller-ns)))
+  (is (nil? (controller-namespace nil))))

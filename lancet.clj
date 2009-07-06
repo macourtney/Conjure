@@ -151,9 +151,6 @@
 (defn safe-ant-name [n]
   (if (ns-resolve 'clojure.core n) (symbol (str "ant-" n)) n))
 
-;(defmacro define-all-ant-tasks []
-;  `(do ~@(map (fn [n] `(define-ant-task ~n ~n)) (task-names))))
-
 (defmacro define-all-ant-tasks []
   `(do ~@(map (fn [n] `(define-ant-task ~(safe-ant-name n) ~n)) (task-names))))
 

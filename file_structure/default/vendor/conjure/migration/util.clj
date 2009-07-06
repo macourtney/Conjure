@@ -18,18 +18,24 @@
   
 (defn 
 #^{:doc "Returns all of the migration files as a collection."}
-  all-migration-files [migrate-directory]
-  (filter 
-    (fn [migrate-file] 
-      (re-find #"^[0-9]+_.+\.clj" (. migrate-file getName))) 
-    (. migrate-directory listFiles)))
+  all-migration-files
+  ([] (all-migration-files (find-migrate-directory)))
+  ([migrate-directory]
+    (if migrate-directory
+      (filter 
+        (fn [migrate-file] 
+          (re-find #"^[0-9]+_.+\.clj" (. migrate-file getName))) 
+        (. migrate-directory listFiles)))))
 
 (defn 
 #^{:doc "Returns all of the migration file names as a collection."}
-  all-migration-file-names [migrate-directory]
-  (map 
-    (fn [migration-file] (. migration-file getName))
-    (all-migration-files migrate-directory)))
+  all-migration-file-names 
+  ([] (all-migration-file-names (find-migrate-directory)))
+  ([migrate-directory]
+    (if migrate-directory
+      (map 
+        (fn [migration-file] (. migration-file getName))
+        (all-migration-files migrate-directory)))))
     
 (defn
 #^{:doc "Returns the migration number from the given migration file name."}
@@ -39,7 +45,8 @@
 (defn
 #^{:doc "Returns the migration number from the given migration file."}
   migration-number-from-file [migration-file]
-  (migration-number-from-name (. migration-file getName)))
+  (if migration-file
+    (migration-number-from-name (. migration-file getName))))
     
 (defn
 #^{:doc "Returns all of the migration file names with numbers between low-number and high-number inclusive."}
@@ -53,23 +60,32 @@
 
 (defn 
 #^{:doc "Returns all of the numbers prepended to the migration files."}
-  all-migration-numbers [migrate-directory]
-  (map 
-    (fn [migration-file-name] (migration-number-from-name migration-file-name)) 
-    (all-migration-file-names migrate-directory)))
+  all-migration-numbers
+  ([] (all-migration-numbers (find-migrate-directory)))
+  ([migrate-directory]
+    (if migrate-directory
+      (map
+        (fn [migration-file-name] (migration-number-from-name migration-file-name)) 
+        (all-migration-file-names migrate-directory)))))
 
 (defn
 #^{:doc "Returns the maximum number of all migration files."}
-  max-migration-number [migrate-directory]
-  (let [migration-numbers (all-migration-numbers migrate-directory)]
-    (if (> (count migration-numbers) 0) 
-      (eval (cons max migration-numbers))
-      0)))
+  max-migration-number
+  ([] (max-migration-number (find-migrate-directory)))
+  ([migrate-directory]
+    (if migrate-directory
+      (let [migration-numbers (all-migration-numbers migrate-directory)]
+        (if (> (count migration-numbers) 0) 
+          (eval (cons max migration-numbers))
+          0)))))
 
 (defn 
 #^{:doc "Returns the next number to use for a migration file."}
-  find-next-migrate-number [migrate-directory]
-  (+ (max-migration-number migrate-directory) 1))
+  find-next-migrate-number
+  ([] (find-next-migrate-number (find-migrate-directory))) 
+  ([migrate-directory]
+    (if migrate-directory
+      (+ (max-migration-number migrate-directory) 1))))
   
 (defn
 #^{:doc "The migration file with the given migration name."}
@@ -87,19 +103,23 @@
  (defn
 #^{:doc "Returns the migration namespace for the given migration file."}
   migration-namespace [migration-file]
-  (loading-utils/namespace-string-for-file "migrate" (. migration-file getName)))
+  (if migration-file
+    (loading-utils/namespace-string-for-file "migrate" (. migration-file getName))))
   
 (defn
 #^{:doc "Finds the number of the migration file before the given number"}
   migration-number-before 
-    ([migration-number] (migration-number-before migration-number (all-migration-files (find-migrate-directory))))
+    ([migration-number] 
+      (if migration-number 
+        (migration-number-before migration-number (all-migration-files))))
     ([migration-number migration-files]
-      (loop [files migration-files
-             previous-file-number 0]
-        (if (not-empty migration-files)
-          (let [migration-file (first files)
-                migration-file-number (migration-number-from-file migration-file)]
-            (if (< migration-file-number migration-number)
-              (recur (rest files) migration-file-number)
-              previous-file-number))
-          previous-file-number))))
+      (if migration-number
+        (loop [files migration-files
+               previous-file-number 0]
+          (if (not-empty migration-files)
+            (let [migration-file (first files)
+                  migration-file-number (migration-number-from-file migration-file)]
+              (if (< migration-file-number migration-number)
+                (recur (rest files) migration-file-number)
+                previous-file-number))
+            previous-file-number)))))

@@ -1,4 +1,5 @@
 (ns build
+  (:import [org.apache.tools.ant.taskdefs Manifest])
   (:use lancet))
 
 (def src "src")
@@ -10,9 +11,6 @@
 (def test-app (str target "/test_app"))
 (def file-structure "file_structure")
 (def default (str file-structure "/default"))
-
-(define-ant-type ant-classpath org.apache.tools.ant.types.Path ant-project)
-(define-ant-type pathelement org.apache.tools.ant.types.Path ant-project)
 
 (deftarget compile-conjure "Compile Conjure sources."
   (mkdir { :dir classes })
@@ -43,16 +41,15 @@
           :dir test-app
           :fork "true" }
     [:arg { :value "test/run_tests.clj" }]
-    [:classpath 
-      (ant-classpath 
-        (pathelement { :path (str test-app "/vendor") })
-        (pathelement { :path (str test-app "/app") })
-        (pathelement { :path (str test-app "/config") })
-        (pathelement { :path (str test-app "/script") })
-        (pathelement { :path (str test-app "/db") })
-        (pathelement { :path (str test-app "/test") })
-        (fileset { :dir (str test-app "/lib")
-                   :includes "**/*.jar" }))]))
+    [:classpath  
+      [:pathElement { :path (str test-app "/vendor") }]
+      [:pathElement { :path (str test-app "/app") }]
+      [:pathElement { :path (str test-app "/config") }]
+      [:pathElement { :path (str test-app "/script") }]
+      [:pathElement { :path (str test-app "/db") }]
+      [:pathElement { :path (str test-app "/test") }]
+      (fileset { :dir (str test-app "/lib")
+                 :includes "**/*.jar" })]))
 
 (deftarget all "Builds all of conjure."
   (jar-conjure)
@@ -60,8 +57,6 @@
   
 (deftarget default "Executing default target."
   (all))
-
-;(doall (map println (sort (seq (.. ant-project getTaskDefinitions keySet)))))
 
 (if (not-empty *command-line-args*)
   (apply -main *command-line-args*)
