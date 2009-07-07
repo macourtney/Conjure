@@ -7,12 +7,13 @@
 (defn
 #^{:doc "Returns the model name for the given model file."}
   model-from-file [model-file]
-  (loading-utils/clj-file-to-symbol-string (. model-file getName)))
+  (if model-file
+    (loading-utils/clj-file-to-symbol-string (. model-file getName))))
   
 (defn
 #^{:doc "Returns the model namespace for the given model."}
   model-namespace [model]
-  (str "models." model))
+  (if model (str "models." model)))
   
 (defn 
 #^{:doc "Finds the models directory."}
@@ -23,19 +24,22 @@
 (defn
 #^{:doc "Returns the model file name for the given model name."}
   model-file-name-string [model-name]
-  (str (loading-utils/dashes-to-underscores model-name) ".clj"))
+  (if model-name (str (loading-utils/dashes-to-underscores model-name) ".clj")))
   
 (defn
 #^{:doc "Returns the name of the migration associated with the given model."}
   migration-for-model [model]
-  (str "create-" (string-utils/pluralize model)))
+  (if model (str "create-" (string-utils/pluralize model))))
   
 (defn
 #^{:doc "Returns the table name for the given model."}
   model-to-table-name [model]
-  (string-utils/pluralize (loading-utils/dashes-to-underscores model)))
+  (if model (string-utils/pluralize (loading-utils/dashes-to-underscores model))))
 
 (defn
 #^{:doc "Finds a model file with the given model name."}
-  find-model-file [models-directory model-name]
-  (file-utils/find-file models-directory (model-file-name-string model-name)))
+  find-model-file
+  ([model-name] (find-model-file (find-models-directory) model-name)) 
+  ([models-directory model-name]
+    (if (and models-directory model-name)
+      (file-utils/find-file models-directory (model-file-name-string model-name)))))
