@@ -18,12 +18,20 @@
   (new File (create-test-app-directory-file) "test"))
    
 (defn
+#^{:doc "Returns true if the given file is a valid test file."}
+  is-valid-test [test-file]
+  (and
+    (. (. test-file getPath) endsWith ".clj")
+    (not (= (. test-file getName) "run_tests.clj"))
+    (not (= (. test-file getName) "test_helper.clj"))))
+   
+(defn
 #^{:doc "Returns a sequence of all the files found in every directory under the test directory."}
   test-files []
   (let [test-directory (create-test-directory-file)]
     (if test-directory
       (filter 
-        (fn [file] (. (. file getPath) endsWith ".clj"))
+        is-valid-test
         (seq-utils/flatten (file-seq test-directory)))
       (do
         (println "test-directory is null")
