@@ -1,9 +1,12 @@
 (ns test.run-tests
   (:import [java.io File])
   (:use clojure.contrib.test-is)
-  (:require [conjure.util.loading-utils :as loading-utils]
-            [clojure.contrib.seq-utils :as seq-utils]
-            [clojure.contrib.classpath :as classpath]))
+  (:require environment
+            [conjure.server.server :as conjure-server]
+            [conjure.util.loading-utils :as loading-utils]
+            [clojure.contrib.classpath :as classpath]
+            [clojure.contrib.java-utils :as java-utils]
+            [clojure.contrib.seq-utils :as seq-utils]))
 
 
   
@@ -44,8 +47,15 @@
         file-parent-path (. file getParent)]
     (symbol (loading-utils/namespace-string-for-file (. file-parent-path substring (. test-app-path length)) (. file getName)))))
 
+(defn
+#^{:doc "Initializes Conjure for testing."}
+  init []
+  (let [initial-value (java-utils/get-system-property environment/conjure-environment-property nil)]
+    (if (not initial-value)
+      (java-utils/set-system-properties { environment/conjure-environment-property "test" })))
+  (conjure-server/init))
 
-
+(init)
 (let [all-test-files (test-files)]
   (doall (map (fn [file] (if (not (= (. file getName) "run_tests.clj")) (load-file (. file getPath)))) all-test-files))
   (apply run-tests 

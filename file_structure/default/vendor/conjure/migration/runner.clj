@@ -1,4 +1,5 @@
 (ns conjure.migration.runner
+  (:import [java.io File])
   (:require [conjure.migration.util :as util]
             [conjure.model.database :as database]))
 
@@ -33,69 +34,85 @@ schema info table is empty, then it adds a row and sets the version to 0."}
 (defn
 #^{:doc "Runs the up function in the given migration file."}
   run-migrate-up [migration-file]
-  (println "Running" (. migration-file getName) "up...")
-  (load-file (. migration-file getAbsolutePath))
-  (load-string (str "(" (util/migration-namespace migration-file) "/up)"))
-  (let [new-version (util/migration-number-from-file migration-file)]
-    (update-db-version new-version)
-    new-version))
+  (if (and migration-file (instance? File migration-file))
+    (do
+      (println "Running" (. migration-file getName) "up...")
+      (load-file (. migration-file getAbsolutePath))
+      (load-string (str "(" (util/migration-namespace migration-file) "/up)"))
+      (let [new-version (util/migration-number-from-file migration-file)]
+        (update-db-version new-version)
+        new-version))
+    (println "Invalid migration-file:" migration-file "No changes were made to the database.")))
   
 (defn
 #^{:doc "Runs the down function in the given migration file."}
   run-migrate-down [migration-file]
-  (println "Running" (. migration-file getName) "down...")
-  (load-file (. migration-file getAbsolutePath))
-  (load-string (str "(" (util/migration-namespace migration-file) "/down)"))
-  (let [new-version (util/migration-number-before (util/migration-number-from-file migration-file))]
-    (update-db-version new-version)
-    new-version))
+  (if (and migration-file (instance? File migration-file))
+    (do
+      (println "Running" (. migration-file getName) "down...")
+      (load-file (. migration-file getAbsolutePath))
+      (load-string (str "(" (util/migration-namespace migration-file) "/down)"))
+      (let [new-version (util/migration-number-before (util/migration-number-from-file migration-file))]
+        (update-db-version new-version)
+        new-version))
+    (println "Invalid migration-file:" migration-file "No changes were made to the database.")))
         
 (defn
 #^{:doc "Runs the up function on all of the given migration files."}
-  migrate-up-all [migration-files]
-  (loop [other-migrations migration-files
-         output nil]
-    (if (not-empty other-migrations)
-      (recur
-        (rest other-migrations)
-        (run-migrate-up (first other-migrations)))
-      output)))
+  migrate-up-all
+  ([] (migrate-up-all (util/all-migration-files)))
+  ([migration-files]
+    (loop [other-migrations migration-files
+           output nil]
+      (if (not-empty other-migrations)
+        (recur
+          (rest other-migrations)
+          (run-migrate-up (first other-migrations)))
+        output))))
 
 (defn
 #^{:doc "Runs the up function on all of the given migration files."}
-  migrate-down-all [migration-files]
-  (loop [other-migrations migration-files
-         output nil]
-    (if (not-empty other-migrations)
-      (recur
-        (rest other-migrations)
-        (run-migrate-down (first other-migrations)))
-      output)))
+  migrate-down-all
+  ([] (migrate-down-all (reverse (util/all-migration-files))))
+  ([migration-files]
+    (loop [other-migrations migration-files
+           output nil]
+      (if (not-empty other-migrations)
+        (recur
+          (rest other-migrations)
+          (run-migrate-down (first other-migrations)))
+        output))))
 
 (defn
 #^{:doc "Migrates the database up from from-version to to-version."}
   migrate-up [from-version to-version]
-  (let [new-version (migrate-up-all (util/migration-files-in-range from-version to-version))]
-    (if new-version
-      (println "Migrated to version:" new-version)
-      (println "No changes were made to the database."))))
+  (if (and from-version to-version)
+    (let [new-version (migrate-up-all (util/migration-files-in-range from-version to-version))]
+      (if new-version
+        (println "Migrated to version:" new-version)
+        (println "No changes were made to the database.")))
+    (println "Invalid version number:" from-version "or" to-version "No changes were made to the database.")))
   
 (defn
 #^{:doc "Migrates the database down from from-version to to-version."}
   migrate-down [from-version to-version]
-  (let [new-version (migrate-down-all (reverse (util/migration-files-in-range to-version from-version)))]
-    (if new-version
-      (println "Migrated to version:" new-version)
-      (println "No changes were made to the database."))))
+  (if (and from-version to-version)
+    (let [new-version (migrate-down-all (reverse (util/migration-files-in-range to-version from-version)))]
+      (if new-version
+        (println "Migrated to version:" new-version)
+        (println "No changes were made to the database.")))
+    (println "Invalid version number:" from-version "or" to-version "No changes were made to the database.")))
 
 (defn 
 #^{:doc "Updates the database to the given version number. If the version number is less than the current database 
 version number, then this function causes a roll back."}
   update-to-version [version-number]
-  (let [db-version (current-db-version)]
-    (println "Current database version: " (str db-version))
-    (let [version-number-min (min (max version-number 0) (util/max-migration-number (util/find-migrate-directory)))]
-      (println "Updating to version:" version-number-min)
-      (if (< db-version version-number-min)
-        (migrate-up (+ db-version 1) version-number-min)
-        (migrate-down db-version (+ version-number-min 1))))))
+  (if version-number
+    (let [db-version (current-db-version)]
+      (println "Current database version:" (str db-version))
+      (let [version-number-min (min (max version-number 0) (util/max-migration-number (util/find-migrate-directory)))]
+        (println "Updating to version:" version-number-min)
+        (if (< db-version version-number-min)
+          (migrate-up (+ db-version 1) version-number-min)
+          (migrate-down db-version (+ version-number-min 1)))))
+    (println "Invalid version-number:" version-number)))
