@@ -2,8 +2,9 @@
   (:import [java.io File])
   (:require [clojure.contrib.classpath :as classpath]
             [clojure.contrib.seq-utils :as seq-utils]
-            [conjure.util.string-utils :as string-utils]
-            [clojure.contrib.str-utils :as clojure-str-utils]))
+            [clojure.contrib.str-utils :as clojure-str-utils]
+            [clojure.contrib.java-utils :as java-utils]
+            [conjure.util.string-utils :as string-utils]))
 
 (defn
 #^{:doc "Gets the system class loader"}
@@ -58,23 +59,35 @@
     string))
   
 (defn
+#^{:doc "Returns the file separator used on this system."}
+  file-separator []
+  (java-utils/get-system-property "file.separator"))
+  
+(defn
 #^{:doc "Converts all slashes to periods in string."}
   slashes-to-dots [string]
   (if string
-    (clojure-str-utils/re-gsub #"/|\\" "." string)
+    (clojure-str-utils/re-gsub #"/|\\" "." string) ; "\" Fixing a bug with syntax highlighting
+    string))
+    
+(defn
+#^{:doc "Converts all periods to slashes in string."}
+  dots-to-slashes [string]
+  (if string
+    (. string replace "." (file-separator))
     string))
 
 (defn
 #^{:doc "Converts the given clj file name to a symbol string. For example: \"loading_utils.clj\" would get converted into \"loading-utils\""}
   clj-file-to-symbol-string [file-name]
-  (underscores-to-dashes (string-utils/strip-ending file-name ".clj")))
+  (slashes-to-dots (underscores-to-dashes (string-utils/strip-ending file-name ".clj"))))
   
 (defn
 #^{:doc "Converts the given symbol string to a clj file name. For example: \"loading-utils\" would get converted into \"loading_utils.clj\""}
   symbol-string-to-clj-file [symbol-name]
   (let [dashed-name (dashes-to-underscores symbol-name)]
     (if (and dashed-name (> (. dashed-name length) 0))
-      (str (dashes-to-underscores symbol-name) ".clj")
+      (str (dots-to-slashes dashed-name) ".clj")
       dashed-name)))
 
 (defn

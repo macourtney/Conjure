@@ -5,16 +5,18 @@
             [conjure.util.loading-utils :as loading-utils]))
 
 (defn draw []
-  [(fn [path] 
-     (let [path_tokens (string-utils/tokenize path "/")
-           controller (first path_tokens)
-           path_tokens_2 (rest path_tokens)
-           action (first path_tokens_2)
-           path_tokens_3 (rest path_tokens_2)
-           id (first path_tokens_3)]
+  [(fn [path]
+     (if path
+       (let [path_tokens (string-utils/tokenize path "/")
+             controller (first path_tokens)
+             path_tokens_2 (rest path_tokens)
+             action (first path_tokens_2)
+             path_tokens_3 (rest path_tokens_2)
+             id (first path_tokens_3)]
 
-       (if (and controller action)
-         {:controller (loading-utils/underscores-to-dashes controller)
-         :action (loading-utils/underscores-to-dashes action)
-         :params {:id id}}
-         nil)))])
+         (if (and controller action)
+           { :controller (loading-utils/underscores-to-dashes controller)
+             :action (loading-utils/underscores-to-dashes action)
+             :params (if id {:id id} {}) }
+           nil))
+       nil))])

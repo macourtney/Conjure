@@ -13,7 +13,7 @@
 (defn
 #^{:doc "Returns the controller file name for the given controller name."}
   controller-file-name-string [controller-name]
-  (if controller-name
+  (if (and controller-name (> (. controller-name length) 0))
     (str (loading-utils/dashes-to-underscores controller-name) "_controller.clj")))
   
 (defn

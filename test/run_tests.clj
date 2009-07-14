@@ -8,8 +8,6 @@
             [clojure.contrib.java-utils :as java-utils]
             [clojure.contrib.seq-utils :as seq-utils]))
 
-
-  
 (defn
 #^{:doc "Returns a File object for the test_app directory."}
   create-test-app-directory-file []
@@ -44,8 +42,9 @@
 #^{:doc "Returns the namespace as a symbol for the given file which must be found in the test directory."}
   namespace-symbol-for-file [file]
   (let [test-app-path (. (create-test-app-directory-file) getPath)
-        file-parent-path (. file getParent)]
-    (symbol (loading-utils/namespace-string-for-file (. file-parent-path substring (. test-app-path length)) (. file getName)))))
+        file-parent-path (. file getParent)
+        namespace-string (loading-utils/namespace-string-for-file (. file-parent-path substring (. test-app-path length)) (. file getName))]
+    (symbol namespace-string)))
 
 (defn
 #^{:doc "Initializes Conjure for testing."}
@@ -56,7 +55,16 @@
   (conjure-server/init))
 
 (init)
-(let [all-test-files (test-files)]
-  (doall (map (fn [file] (if (not (= (. file getName) "run_tests.clj")) (load-file (. file getPath)))) all-test-files))
-  (apply run-tests 
-    (map namespace-symbol-for-file all-test-files)))
+
+(if (not-empty *command-line-args*)
+  (do
+    (println "Running scripts:" *command-line-args*)
+    (doall (map 
+      (fn [namespace-str] 
+        (load-file (str "./" (loading-utils/symbol-string-to-clj-file namespace-str)))) 
+      *command-line-args*))
+    (apply run-tests (map symbol *command-line-args*)))
+  (let [all-test-files (test-files)]
+    (doall (map (fn [file] (if (not (= (. file getName) "run_tests.clj")) (load-file (. file getPath)))) all-test-files))
+    (apply run-tests 
+      (map namespace-symbol-for-file all-test-files))))

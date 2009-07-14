@@ -26,7 +26,8 @@
   (let [controller-file-name (controller-file-name-string "test-name")]
     (is (not (nil? controller-file-name)))
     (is (= "test_name_controller.clj" controller-file-name)))
-  (is (nil? (controller-file-name-string nil))))
+  (is (nil? (controller-file-name-string nil)))
+  (is (nil? (controller-file-name-string ""))))
   
 (deftest test-controller-from-file
   (let [controller-file (new File "test_controller.clj")

@@ -15,7 +15,7 @@
       (loop [query-tokens (str-utils/re-split #"&" query-string)
              output {}]
         (let [query-token (first query-tokens)]
-          (if query-token
+          (if (and query-token (> (. query-token length) 0))
             (let [query-key-value (str-utils/re-split #"=" query-token)]
               (recur (rest query-tokens) 
                      (assoc output (first query-key-value) (second query-key-value))))
@@ -35,7 +35,8 @@
               (if output-params
                   (assoc output :params (merge output-params params))
                   output))
-            (recur (rest current-routes))))))))
+            (recur (rest current-routes))))
+        { :params params }))))
 
 (defn
 #^{:doc "Returns the controller file name generated from the given request map."}
@@ -45,7 +46,11 @@
 (defn
 #^{:doc "Returns fully qualified action generated from the given request map."}
   fully-qualified-action [request-map]
-  (str (controller-util/controller-namespace (:controller request-map)) "/" (:action request-map)))
+  (if request-map
+    (let [controller (:controller request-map)
+          action (:action request-map)]
+      (if (and controller action)
+        (str (controller-util/controller-namespace controller) "/" action)))))
 
 (defn
 #^{:doc "Loads the given controller file."}
@@ -77,7 +82,7 @@
 (defn
 #^{:doc "Gets the user configured database properties."}
   db-config []
-  (database/conjure-db))
+  database/conjure-db)
   
 (defn
 #^{:doc "Initializes the conjure server."}

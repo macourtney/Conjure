@@ -7,19 +7,6 @@
   (let [test-class-loader (system-class-loader)]
     (is (not (nil? test-class-loader)))
     (is (instance? ClassLoader test-class-loader))))
-    
-;(deftest test-resource-reader
-;  (let [parent-directory "conjure/util"
-;        file-name "loading_utils.clj"
-;        reader (resource-reader parent-directory file-name)]
-;    (is (not (nil? reader)))
-;    (is (instance? Reader reader))
-;    (is (thrown? RuntimeException (resource-reader parent-directory "fail.txt")))))
-
-;(deftest test-get-classpath-dir-ending-with
-;  (let [vendor-directory (get-classpath-dir-ending-with "vendor")]
-;    (is (not (nil? vendor-directory)))
-;    (is (instance? File vendor-directory))))
 
 (deftest test-dashes-to-underscores
   (is (= (dashes-to-underscores "test") "test"))
@@ -53,6 +40,7 @@
   (is (= (clj-file-to-symbol-string "test_this_now.clj") "test-this-now"))
   (is (= (clj-file-to-symbol-string "test-this.clj") "test-this"))
   (is (= (clj-file-to-symbol-string "test_this") "test-this"))
+  (is (= (clj-file-to-symbol-string (str "parent" (file-separator) "test_this")) "parent.test-this"))
   (is (= (clj-file-to-symbol-string "") ""))
   (is (= (clj-file-to-symbol-string nil) nil)))
   
@@ -61,6 +49,7 @@
   (is (= (symbol-string-to-clj-file "test-this") "test_this.clj"))
   (is (= (symbol-string-to-clj-file "test-this-now") "test_this_now.clj"))
   (is (= (symbol-string-to-clj-file "test_this") "test_this.clj"))
+  (is (= (symbol-string-to-clj-file "parent.test-this") (str "parent" (file-separator) "test_this.clj")))
   (is (= (symbol-string-to-clj-file "") ""))
   (is (= (symbol-string-to-clj-file nil) nil)))
   
@@ -68,3 +57,11 @@
   (is (= (namespace-string-for-file "test/util" "test_loading_utils.clj") "test.util.test-loading-utils"))
   (is (= (namespace-string-for-file nil "test_loading_utils.clj") "test-loading-utils"))
   (is (= (namespace-string-for-file "test/util" nil) nil)))
+  
+(deftest test-dots-to-slashes
+  (let [separator (file-separator)]
+    (is (= (dots-to-slashes "foo.bar") (str "foo" separator "bar")))
+    (is (= (dots-to-slashes "foo.bar.bat") (str "foo" separator "bar" separator "bat"))))
+  (is (= (dots-to-slashes "foo") "foo"))
+  (is (= (dots-to-slashes "") ""))
+  (is (= (dots-to-slashes nil) nil)))

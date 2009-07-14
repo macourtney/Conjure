@@ -10,7 +10,7 @@
     (if (and controllers-directory controller-name)
       (let [controller-file (new File controllers-directory (util/controller-file-name-string controller-name))]
         (if (. controller-file exists)
-          (println (. controller-file getName) "already exits. Doing nothing.")
+          (println (. controller-file getName) "already exists. Doing nothing.")
           (do
             (println "Creating controller file" (. controller-file getName) "...")
             (. controller-file createNewFile)
