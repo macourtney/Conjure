@@ -2,7 +2,7 @@
   (:require [clojure.contrib.seq-utils :as seq-utils]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.file-utils :as file-utils]
-            [conjure.util.string-utils :as string-utils]))
+            [clj-record.util :as clj-record-util]))
 
 (defn
 #^{:doc "Returns the model name for the given model file."}
@@ -29,12 +29,12 @@
 (defn
 #^{:doc "Returns the name of the migration associated with the given model."}
   migration-for-model [model]
-  (if model (str "create-" (string-utils/pluralize model))))
+  (if model (str "create-" (clj-record-util/pluralize model))))
   
 (defn
 #^{:doc "Returns the table name for the given model."}
   model-to-table-name [model]
-  (if model (string-utils/pluralize (loading-utils/dashes-to-underscores model))))
+  (if model (clj-record-util/pluralize (loading-utils/dashes-to-underscores model))))
 
 (defn
 #^{:doc "Finds a model file with the given model name."}

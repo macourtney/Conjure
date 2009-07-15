@@ -1,4 +1,4 @@
-(ns conjure.server.ring_adapter
+(ns conjure.server.ring-adapter
   (:import [java.io File])
   (:require [conjure.server.server :as server]
             [ring.file :as ring-file]))

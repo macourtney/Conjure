@@ -1,13 +1,13 @@
 ;; This file is used to route requests to the appropriate controller and action.
 
 (ns routes
-  (:require [conjure.util.string-utils :as string-utils]
-            [conjure.util.loading-utils :as loading-utils]))
+  (:require [conjure.util.loading-utils :as loading-utils]
+            [clojure.contrib.str-utils :as contrib-str-utils]))
 
 (defn draw []
   [(fn [path]
      (if path
-       (let [path_tokens (string-utils/tokenize path "/")
+       (let [path_tokens (contrib-str-utils/re-split #"/" path)
              controller (first path_tokens)
              path_tokens_2 (rest path_tokens)
              action (first path_tokens_2)

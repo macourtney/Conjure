@@ -26,8 +26,3 @@
    (is (= (strip-ending "" "Blah") ""))
    (is (= (strip-ending nil "Blah") nil))
    (is (= (strip-ending nil nil) nil)))
-   
-(deftest test-pluralize
-   ; This should probably be an error, but it's an issue with clj-record.
-   (is (= (pluralize "Blah") "blahs"))
-   (is (= (pluralize "pony") "ponies")))

@@ -2,17 +2,6 @@
   (:require [clojure.contrib.str-utils :as str-utils]
             [clj-record.util :as clj-record-util]))
 
-(defn 
-#^{:doc "Chops the given string into smaller strings based on the delimiter and returns the result in a sequence."}
-  tokenize [string delimiter]
-  (let [tokenizer (new java.util.StringTokenizer string delimiter)]
-    (if (. tokenizer hasMoreTokens)
-      (loop [out (cons (. tokenizer nextToken) ())]
-        (if (. tokenizer hasMoreTokens)
-          (recur (cons (. tokenizer nextToken) out))
-          (reverse out)))
-      nil)))
-      
 (defn
 #^{:doc "If the string's length does not equal total-length then this method returns a new string with length 
 total-length by adding fill-char multiple times to the beginning of string. If string's length is already total-length,
@@ -41,8 +30,3 @@ then this method simply returns it."}
     (let [ending-index (- (. string length) (. ending length))]
       (. string substring 0 ending-index))
     string))
-    
-(defn
-#^{:doc "Pluralizes the given word. The current version of this function just adds an 's' to the end of the string. Eventually, this method should become more robust."}
-  pluralize [string]
-  (clj-record-util/pluralize string))

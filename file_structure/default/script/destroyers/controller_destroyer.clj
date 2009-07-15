@@ -15,9 +15,8 @@
       (if controllers-directory
         (let [controller-file (util/find-controller-file controllers-directory controller)]
           (if controller-file
-            (do 
-              (. controller-file delete)
-              (println "File" (. controller-file getPath) "destroyed."))
+            (let [is-deleted (. controller-file delete)] 
+              (println "File" (. controller-file getName) (if is-deleted "destroyed." "not destroyed.")))
             (println "Controller file not found. Doing nothing.")))
         (do
           (println "Could not find controllers directory.")

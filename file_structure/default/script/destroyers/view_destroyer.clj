@@ -17,9 +17,8 @@
           (if controller-directory
             (let [view-file (util/find-view-file controller-directory action)]
               (if view-file
-                (do 
-                  (. view-file delete)
-                  (println "File" (. view-file getPath) "destroyed."))
+                (let [is-deleted (. view-file delete)] 
+                  (println "File" (. view-file getName) (if is-deleted "destroyed." "not destroyed.")))
                 (println "View file not found. Doing nothing.")))
             (println "The directory for controller" controller "was not found. Doing nothing.")))
         (do

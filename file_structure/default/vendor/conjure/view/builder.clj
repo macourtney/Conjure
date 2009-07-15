@@ -28,7 +28,7 @@
         view-file (new File controller-directory  view-file-name)]
     (if (. view-file exists)
       (do
-        (println (. view-file getName) "already exits. Doing nothing.")
+        (println (. view-file getName) "already exists. Doing nothing.")
         view-file)
       (do
         (println "Creating view file" view-file-name "...")
