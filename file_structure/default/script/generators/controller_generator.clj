@@ -2,9 +2,9 @@
   (:require [conjure.controller.builder :as builder]
             [conjure.controller.util :as util]
             [conjure.util.file-utils :as file-utils]
-            [conjure.util.loading-utils :as loading-utils]
             [clojure.contrib.str-utils :as str-utils]
-            [generators.view-generator :as view-generator]))
+            [generators.view-generator :as view-generator]
+            [generators.controller-test-generator :as controller-test-generator]))
 
 (defn
 #^{:doc "Prints out how to use the generate controller command."}
@@ -47,9 +47,11 @@
       (if (and controller actions)
         (let [controllers-directory (util/find-controllers-directory)]
           (if controllers-directory
-            (let [controller-file (builder/create-controller-file controllers-directory controller)]
+            (do
+              (let [controller-file (builder/create-controller-file controller controllers-directory)]
                 (if controller-file
                   (generate-file-content controller-file actions)))
+              (controller-test-generator/generate-functional-test controller actions))
             (do
               (println "Could not find controllers directory.")
               (println controllers-directory))))

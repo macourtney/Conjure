@@ -12,8 +12,7 @@
 (defn setup-all [function]
     (controller-generator/generate-controller-file controller-name [ action-name ])
     (function)
-    (controller-destroyer/destroy-controller-file controller-name)
-    (view-destroyer/destroy-view-file controller-name action-name))
+    (controller-destroyer/destroy-all-dependencies controller-name [ action-name ]))
         
 (use-fixtures :once setup-all)
 

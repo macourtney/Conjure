@@ -2,6 +2,7 @@
   (:require [destroyers.migration-destroyer :as migration-destroyer]
             [destroyers.view-destroyer :as view-destroyer]
             [destroyers.controller-destroyer :as controller-destroyer]
+            [destroyers.controller-test-destroyer :as controller-test-destroyer]
             [destroyers.model-destroyer :as model-destroyer]))
 
 (defn
@@ -28,22 +29,17 @@
     (. command equals "controller")
       (controller-destroyer/destroy-controller params)
       
+    (. command equals "controller-test")
+      (controller-test-destroyer/destroy-controller-test params)
+      
     (. command equals "model")
       (model-destroyer/destroy-model params)
       
     true ; Default condition.
       (print-unknown-command command)))
 
-
-(let [command (first *command-line-args*)
-      destroy-args (rest *command-line-args*)]
-  (if command
-    (let [destroy-command (first destroy-args)
-          destroy-type-params (rest destroy-args)]
-      (if destroy-command
-        (destroy destroy-command destroy-type-params)
-        (print-usage)))
-
-    (do
-      (println "Nil command, cannot continue.")
-      (print-usage))))
+(let [destroy-command (first *command-line-args*)
+      destroy-type-params (rest *command-line-args*)]
+  (if destroy-command
+    (destroy destroy-command destroy-type-params)
+    (print-usage)))

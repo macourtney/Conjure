@@ -10,8 +10,9 @@ set APP_DIR=%HOME_DIR%\app
 set CONFIG_DIR=%HOME_DIR%\config
 set SCRIPT_DIR=%HOME_DIR%\script
 set DB_DIR=%HOME_DIR%\db
+set TEST_DIR=%HOME_DIR%\test
 
-set DIRS_PATH=%VENDOR_DIR%;%APP_DIR%;%CONFIG_DIR%;%SCRIPT_DIR%;%DB_DIR%
+set DIRS_PATH=%VENDOR_DIR%;%APP_DIR%;%CONFIG_DIR%;%SCRIPT_DIR%;%DB_DIR%;%TEST_DIR%
 
 set CLASS_PATH=%JARS_PATH%;%DIRS_PATH%
 
@@ -22,5 +23,5 @@ set CLASS_PATH=%JARS_PATH%;%DIRS_PATH%
 IF (%1)==() (
     java -cp %CLASS_PATH% clojure.lang.Repl
 ) ELSE (
-    java -cp %CLASS_PATH% clojure.lang.Script %1 -- %*
+    java -cp %CLASS_PATH% clojure.main %*
 )

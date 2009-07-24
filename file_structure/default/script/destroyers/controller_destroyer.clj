@@ -1,5 +1,7 @@
 (ns destroyers.controller-destroyer
-  (:require [conjure.controller.util :as util]))
+  (:require [conjure.controller.util :as util]
+            [destroyers.controller-test-destroyer :as controller-test-destroyer]
+            [destroyers.view-destroyer :as view-destroyer]))
 
 (defn
 #^{:doc "Prints out how to use the destroy controller command."}
@@ -28,3 +30,12 @@
 #^{:doc "Destroys a controller file for the controller name given in params."}
   destroy-controller [params]
   (destroy-controller-file (first params)))
+
+(defn
+#^{:doc "Destroys all of the files created by the controller_generator."}
+  destroy-all-dependencies
+  ([controller] (destroy-all-dependencies controller ())) 
+  ([controller actions]
+    (destroy-controller-file controller)
+    (doall (map #(view-destroyer/destroy-view-file controller %) actions))
+    (controller-test-destroyer/destroy-all-dependencies controller)))

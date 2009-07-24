@@ -14,7 +14,8 @@
 
 (deftarget compile-conjure "Compile Conjure sources."
   (mkdir { :dir classes })
-  (javac { :srcdir src
+  (javac { :fork "true"
+           :srcdir src
            :destdir classes
            :debug "on" }))
            
@@ -59,5 +60,5 @@
   (all))
 
 (if (not-empty *command-line-args*)
-  (apply -main *command-line-args*)
+  (apply run-targets *command-line-args*)
   (default))

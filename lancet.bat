@@ -11,4 +11,4 @@ REM @echo on
 REM @echo %CLASS_PATH%
 REM @echo off
 
-java -cp %CLASS_PATH% clojure.lang.Script build.clj
+java -cp %CLASS_PATH% clojure.main build.clj %*

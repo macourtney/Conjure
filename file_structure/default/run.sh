@@ -11,16 +11,16 @@ APP_DIR=$HOME_DIR/app
 CONFIG_DIR=$HOME_DIR/config
 SCRIPT_DIR=$HOME_DIR/script
 DB_DIR=$HOME_DIR/db
+TEST_DIR=$HOME_DIR/test
 
-DIRS_PATH=$VENDOR_DIR:$APP_DIR:$CONFIG_DIR:$SCRIPT_DIR:$DB_DIR
+DIRS_PATH=$VENDOR_DIR:$APP_DIR:$CONFIG_DIR:$SCRIPT_DIR:$DB_DIR:$TEST_DIR
 
 CLASSPATH=$JARS_PATH:$DIRS_PATH
 
 if [ -z "$1" ]; then
     COMMAND="java -cp $CLASSPATH clojure.lang.Repl"
 else
-    scriptname=$1
-    COMMAND="java -cp $CLASSPATH clojure.lang.Script $scriptname -- $*"
+    COMMAND="java -cp $CLASSPATH clojure.main $*"
 fi
 
 echo $COMMAND

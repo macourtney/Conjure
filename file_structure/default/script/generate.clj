@@ -2,6 +2,7 @@
   (:require [generators.migration-generator :as migration-generator]
             [generators.view-generator :as view-generator]
             [generators.controller-generator :as controller-generator]
+            [generators.controller-test-generator :as controller-test-generator]
             [generators.model-generator :as model-generator]))
 
 (defn print-usage []
@@ -22,22 +23,17 @@
     (. command equals "controller")
       (controller-generator/generate-controller params)
       
+    (. command equals "controller-test")
+      (controller-test-generator/generate-controller-test params)
+      
     (. command equals "model")
       (model-generator/generate-model params)
       
     true ; Default condition.
       (print-unknown-command command)))
 
-(let [command (first *command-line-args*)
-      generate-args (rest *command-line-args*)]
-  (if command
-    (let [generate-command (first generate-args)
-          generate-type-params (rest generate-args)]
-      (if generate-command
-        (generate generate-command generate-type-params)
-
-        (print-usage)))
-
-    (do
-      (println "Nil command, cannot continue.")
-      (print-usage))))
+(let [generate-command (first *command-line-args*)
+      generate-type-params (rest *command-line-args*)]
+  (if generate-command
+    (generate generate-command generate-type-params)
+    (print-usage)))

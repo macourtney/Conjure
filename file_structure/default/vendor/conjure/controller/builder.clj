@@ -5,8 +5,8 @@
 (defn
 #^{:doc "Creates a new controller file from the given controller name."}
   create-controller-file 
-  ([controller-name] (create-controller-file (util/find-controllers-directory) controller-name))
-  ([controllers-directory controller-name]
+  ([controller-name] (create-controller-file controller-name (util/find-controllers-directory)))
+  ([controller-name controllers-directory]
     (if (and controllers-directory controller-name)
       (let [controller-file (new File controllers-directory (util/controller-file-name-string controller-name))]
         (if (. controller-file exists)

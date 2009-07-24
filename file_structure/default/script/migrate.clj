@@ -19,8 +19,7 @@
           nil)))
     (. Integer MAX_VALUE)))
 
-(let [command (first *command-line-args*)
-      version (version-number (second *command-line-args*))]
+(let [version (first *command-line-args*)]
   (if version
     (do
       (server/init)

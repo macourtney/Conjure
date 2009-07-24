@@ -6,7 +6,7 @@
         
 (deftest test-create-controller-file
   (let [controller-directory (util/find-controllers-directory)
-        controller-file (create-controller-file controller-directory "test")]
+        controller-file (create-controller-file "test" controller-directory)]
     (test-file controller-file "test_controller.clj")
     (. controller-file delete))
   (let [controller-file (create-controller-file "test")]

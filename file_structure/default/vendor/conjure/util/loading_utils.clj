@@ -23,7 +23,9 @@
 (defn
 #^{:doc "Loads a resource from the class path. Simply pass in the directory and the filename to load."}
   load-resource [directory filename]
-  (load-reader (resource-reader directory filename)))
+  (let [reader (resource-reader directory filename)]
+    (load-reader reader)
+    (. reader close)))
 
 (defn 
 #^{:doc "Loads a resource into a string and returns it."}

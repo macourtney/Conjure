@@ -16,7 +16,7 @@
         (let [migration-file (util/find-migration-file migrate-directory migration-name)]
            (if migration-file
              (let [is-deleted (. migration-file delete)]
-               (println "File" (. migration-file getPath) (if (not is-deleted) "not") "deleted."))
+               (println "File" (. migration-file getPath) (if is-deleted "deleted." "not deleted.") ))
              (println "Could not find migration file for" migration-name)))
         (println "Could not find db directory.")))
     (migration-usage)))

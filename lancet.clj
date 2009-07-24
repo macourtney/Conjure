@@ -158,12 +158,13 @@
 
 (define-ant-type files org.apache.tools.ant.types.resources.Files)
 (define-ant-type fileset org.apache.tools.ant.types.FileSet)
-	   
-(defn -main [& targs]
-  (load-file "build.clj")
+
+(defn run-targets [& targs]
   (if targs
     (doseq [targ (map symbol targs)]
       (eval (list targ)))
     (println "Available targets: " @targets)))
 
-
+(defn -main [& targs]
+  (load-file "build.clj")
+  (apply run-targets targs))

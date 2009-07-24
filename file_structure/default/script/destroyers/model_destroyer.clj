@@ -22,7 +22,7 @@
         (let [model-file (util/find-model-file models-directory model)]
           (if model-file
             (let [is-deleted (. model-file delete)] 
-              (println "File" (. model-file getPath) (if (not is-deleted) "not") "deleted.")
+              (println "File" (. model-file getPath) (if is-deleted "deleted." "not deleted.") )
               (if is-deleted (destroy-migration-for-model model)))
             (println "Model file not found. Doing nothing.")))
         (do
