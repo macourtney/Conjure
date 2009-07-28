@@ -25,3 +25,51 @@
     (. file-writer write content 0 (. content length))
     (. file-writer flush)
     (. file-writer close)))
+
+(defn
+#^{:doc "Creates a new child directory under the given base-dir if the child dir does not already exist."}
+  create-dir [base-dir child-dir-name]
+  (let [child-directory (find-directory base-dir child-dir-name)]
+    (if child-directory
+      (do
+        (println (. child-directory getPath) "directory already exists.")
+        child-directory)
+      (do
+        (println "Creating " child-dir-name " directory in " (. base-dir getName) "...")
+        (let [child-directory (new File base-dir child-dir-name)]
+          (. child-directory mkdirs)
+          child-directory)))))
+
+(defn
+#^{:doc "Recursively creates the given child-dirs under the given base-dir.
+
+For example: (create-dirs (new File \"foo\") \"bar\" \"baz\") creates the directory /foo/bar/baz
+
+Note: this method prints a bunch of stuff to standard out."}
+  create-dirs [base-dir & child-dirs]
+    (if base-dir
+      (reduce create-dir base-dir child-dirs)
+      (println "You must pass in a base directory.")))
+
+(defn
+#^{:doc "Creates and returns the given file if it does not already exist. If it does exist, the method simply prints to
+standard out and returns nil"}
+  create-file [file]
+  (if (. file exists)
+    (println (. file getName) "already exists. Doing nothing.")
+    (do
+      (println "Creating file" (. file getName) "...")
+      (. file createNewFile)
+      file)))
+
+(defn
+#^{:doc "Deletes the given directory if it contains no files or subdirectories."}
+  delete-if-empty [directory]
+  (when-not (empty? (file-seq directory))
+    (. directory delete)
+    true))
+
+(defn
+#^{:doc "Deletes if empty all of the given directories in order."}
+  delete-all-if-empty [& directories]
+  (reduce (fn [deleted directory] (if deleted (delete-if-empty directory))) true directories))

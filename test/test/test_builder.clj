@@ -6,9 +6,37 @@
 
 (deftest test-find-or-create-functional-test-directory
   (is (nil? (util/find-functional-test-directory)))
-  (test-helper/test-directory (find-or-create-functional-test-directory) "functional")
-  (test-helper/test-directory (find-or-create-functional-test-directory) "functional")
+  (test-helper/test-directory (find-or-create-functional-test-directory) util/functional-dir-name)
+  (test-helper/test-directory (find-or-create-functional-test-directory) util/functional-dir-name)
   (is (. (util/find-functional-test-directory) delete)))
+
+(deftest test-find-or-create-unit-test-directory
+  (is (nil? (util/find-unit-test-directory)))
+  (test-helper/test-directory (find-or-create-unit-test-directory) util/unit-dir-name)
+  (test-helper/test-directory (find-or-create-unit-test-directory) util/unit-dir-name)
+  (is (. (util/find-unit-test-directory) delete)))
+
+(deftest test-find-or-create-controller-view-unit-test-directory
+  (let [controller "test"]
+    (is (nil? (util/find-controller-view-unit-test-directory controller)))
+    (test-helper/test-directory (find-or-create-controller-view-unit-test-directory controller) controller)
+    (test-helper/test-directory (find-or-create-controller-view-unit-test-directory controller) controller)
+    (is (. (util/find-controller-view-unit-test-directory controller) delete))
+    (is (. (util/find-view-unit-test-directory) delete))
+    (is (. (util/find-unit-test-directory) delete))))
+
+(defn test-unit-test [controller action]
+  (is (not (. (util/view-unit-test-file controller action) exists)))
+  (is (test-helper/test-file (create-view-unit-test controller action) (util/view-unit-test-file-name action)))
+  (is (nil? (create-view-unit-test controller action)))
+  (is (. (util/find-unit-test-directory) delete)))
+
+(deftest test-create-functional-test
+  (let [controller "test"
+        controller-test-directory (find-or-create-controller-view-unit-test-directory controller)]
+    (test-unit-test controller "show")
+    (test-unit-test controller "foo-bar")
+    (is (. (util/find-unit-test-directory) delete))))
 
 (defn test-functional-test [controller]
   (is (not (. (util/functional-test-file controller) exists)))

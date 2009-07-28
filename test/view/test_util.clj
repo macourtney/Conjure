@@ -12,7 +12,7 @@
 (defn setup-all [function]
   (view-generator/generate-view-file controller-name action-name)
   (function)
-  (view-destroyer/destroy-view-file controller-name action-name))
+  (view-destroyer/destroy-all-dependencies controller-name action-name))
         
 (use-fixtures :once setup-all)
 

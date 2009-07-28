@@ -37,5 +37,5 @@
   ([controller] (destroy-all-dependencies controller ())) 
   ([controller actions]
     (destroy-controller-file controller)
-    (doall (map #(view-destroyer/destroy-view-file controller %) actions))
+    (doall (map #(view-destroyer/destroy-all-dependencies controller %) actions))
     (controller-test-destroyer/destroy-all-dependencies controller)))

@@ -4,7 +4,8 @@
   (:require [generators.controller-generator :as controller-generator]
             [destroyers.controller-destroyer :as controller-destroyer]
             [destroyers.view-destroyer :as view-destroyer]
-            [conjure.controller.util :as controller-util]))
+            [conjure.controller.util :as controller-util]
+            [conjure.test.util :as test-util]))
 
 (def controller-name "test")
 (def action-name "show")

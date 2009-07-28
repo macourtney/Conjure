@@ -36,11 +36,17 @@
   (if request-map
     (str "views." (loading-utils/underscores-to-dashes (:controller request-map)) "." 
       (loading-utils/underscores-to-dashes (:action request-map)))))
-  
+
+(defn
+#^{:doc "Returns the view namespace for the given controller and action."}
+  view-namespace-by-action [controller action]
+  (if (and controller action)
+    (request-view-namespace 
+      { :controller controller 
+        :action action })))
+
 (defn
 #^{:doc "Returns the view namespace for the given view file."}
   view-namespace [controller view-file]
   (if (and controller view-file)
-    (request-view-namespace 
-      { :controller controller 
-        :action (loading-utils/clj-file-to-symbol-string (. view-file getName)) })))
+    (view-namespace-by-action controller (loading-utils/clj-file-to-symbol-string (. view-file getName)))))

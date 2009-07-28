@@ -1,6 +1,8 @@
 (ns conjure.test.builder
   (:import [java.io File])
-  (:require [conjure.test.util :as util]))
+  (:require [conjure.test.util :as util]
+            [conjure.util.file-utils :as file-utils]
+            [conjure.util.loading-utils :as loading-utils]))
 
 (defn
 #^{:doc "Finds (or creates if not found) the functional test directory."}
@@ -8,16 +10,34 @@
   ([] (find-or-create-functional-test-directory (util/find-test-directory)))
   ([test-directory]
     (if test-directory
-      (let [functional-directory (util/find-functional-test-directory test-directory)]
-        (if functional-directory
-          (do
-            (println (. functional-directory getPath) "directory already exists.")
-            functional-directory)
-          (do
-            (println "Creating functional directory in test...")
-            (let [new-functional-directory (new File test-directory "functional")]
-              (. new-functional-directory mkdirs)
-              new-functional-directory))))
+      (file-utils/create-dirs test-directory "functional")
+      (println "You must pass in a test directory."))))
+
+(defn
+#^{:doc "Finds (or creates if not found) the unit test directory."}
+  find-or-create-unit-test-directory
+  ([] (find-or-create-unit-test-directory (util/find-test-directory)))
+  ([test-directory]
+    (if test-directory
+      (file-utils/create-dirs test-directory "unit")
+      (println "You must pass in a test directory."))))
+
+(defn
+#^{:doc "Finds (or creates if not found) the unit test directory."}
+  find-or-create-view-unit-test-directory
+  ([] (find-or-create-view-unit-test-directory (util/find-test-directory)))
+  ([test-directory]
+    (if test-directory
+      (file-utils/create-dirs test-directory util/unit-dir-name util/unit-view-dir-name)
+      (println "You must pass in a test directory."))))
+
+(defn
+#^{:doc "Finds (or creates if not found) the unit test directory."}
+  find-or-create-controller-view-unit-test-directory
+  ([controller] (find-or-create-controller-view-unit-test-directory controller (util/find-test-directory)))
+  ([controller test-directory]
+    (if test-directory
+      (file-utils/create-dirs test-directory util/unit-dir-name util/unit-view-dir-name (loading-utils/dashes-to-underscores controller))
       (println "You must pass in a test directory."))))
 
 (defn
@@ -26,10 +46,12 @@
   ([controller-name] (create-functional-test controller-name (find-or-create-functional-test-directory)))
   ([controller-name functional-test-directory]
     (if (and controller-name functional-test-directory)
-      (let [functional-test-file (util/functional-test-file controller-name functional-test-directory)]
-        (if (. functional-test-file exists)
-          (println (. functional-test-file getName) "already exists. Doing nothing.")
-          (do
-            (println "Creating functional test file" (. functional-test-file getName) "...")
-            (. functional-test-file createNewFile)
-            functional-test-file))))))
+      (file-utils/create-file (util/functional-test-file controller-name functional-test-directory)))))
+
+(defn
+#^{:doc "Creates a new view unit test file from the given controller name and action."}
+  create-view-unit-test
+  ([controller action] (create-view-unit-test controller action (find-or-create-controller-view-unit-test-directory controller)))
+  ([controller action controller-view-unit-test-directory]
+    (if (and controller action controller-view-unit-test-directory)
+      (file-utils/create-file (util/view-unit-test-file controller action controller-view-unit-test-directory)))))

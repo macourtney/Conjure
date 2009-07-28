@@ -3,7 +3,8 @@
   (:require [conjure.view.builder :as builder]
             [conjure.view.util :as util]
             [conjure.util.file-utils :as file-utils]
-            [conjure.util.loading-utils :as loading-utils]))
+            [conjure.util.loading-utils :as loading-utils]
+            [generators.view-test-generator :as view-test-generator]))
 
 (defn
 #^{:doc "Prints out how to use the generate view command."}
@@ -43,10 +44,12 @@ added to the body of the view code."}
       (if (and controller action)
         (let [view-directory (util/find-views-directory)]
           (if view-directory
-            (let [controller-directory (builder/find-or-create-controller-directory view-directory controller)
-                  view-file (builder/create-view-file controller-directory action)]
+            (do 
+              (let [controller-directory (builder/find-or-create-controller-directory view-directory controller)
+                    view-file (builder/create-view-file controller-directory action)]
                 (if view-file
                   (generate-file-content view-file controller content)))
+              (view-test-generator/generate-unit-test controller action))
             (do
               (println "Could not find views directory.")
               (println view-directory))))

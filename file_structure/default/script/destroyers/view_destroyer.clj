@@ -1,5 +1,6 @@
 (ns destroyers.view-destroyer
-  (:require [conjure.view.util :as util]))
+  (:require [conjure.view.util :as util]
+            [destroyers.view-test-destroyer :as view-test-destroyer]))
 
 (defn
 #^{:doc "Prints out how to use the destroy view command."}
@@ -31,3 +32,10 @@
 #^{:doc "Destroys a view file for the view name given in params."}
   destroy-view [params]
   (destroy-view-file (first params) (second params)))
+
+(defn
+#^{:doc "Destroys all of the files created by the view_generator."}
+  destroy-all-dependencies
+  ([controller action]
+    (destroy-view-file controller action)
+    (view-test-destroyer/destroy-all-dependencies controller action)))
