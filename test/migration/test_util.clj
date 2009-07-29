@@ -10,7 +10,7 @@
 (defn setup-all [function]
   (migration-generator/generate-migration-file migration-name)
   (function)
-  (migration-destroyer/destroy-migration-file migration-name))
+  (migration-destroyer/destroy-all-dependencies migration-name))
         
 (use-fixtures :once setup-all)
         

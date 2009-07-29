@@ -13,8 +13,8 @@
   (migration-generator/generate-migration-file first-migration "" "")
   (migration-generator/generate-migration-file second-migration "" "")
   (function)
-  (migration-destroyer/destroy-migration-file second-migration)
-  (migration-destroyer/destroy-migration-file first-migration))
+  (migration-destroyer/destroy-all-dependencies second-migration)
+  (migration-destroyer/destroy-all-dependencies first-migration))
         
 (use-fixtures :once setup-all)
 

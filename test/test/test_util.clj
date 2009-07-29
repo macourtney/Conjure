@@ -18,7 +18,6 @@
 
 (defn
   find-directory-test [dir-name find-function parent-directory-function create-directory-function dirs-to-delete]
-  (println "dirs-to-delete:" dirs-to-delete)
   (create-directory-function)
   (let [found-directory (find-function (parent-directory-function))]
     (test-helper/test-directory found-directory dir-name)
@@ -63,6 +62,14 @@
       (partial builder/find-or-create-controller-view-unit-test-directory controller)
       [find-view-unit-test-directory find-unit-test-directory])))
 
+(deftest test-find-model-unit-test-directory
+  (find-directory-test 
+    unit-model-dir-name 
+    find-model-unit-test-directory 
+    find-unit-test-directory
+    builder/find-or-create-model-unit-test-directory
+    [find-unit-test-directory]))
+
 (deftest test-functional-test-file-name
   (is (= (functional-test-file-name "test") "test_controller_test.clj"))
   (is (= (functional-test-file-name "foo-bar") "foo_bar_controller_test.clj"))
@@ -76,6 +83,13 @@
   (is (= (view-unit-test-file-name "foo_bar") "foo_bar_view_test.clj"))
   (is (nil? (view-unit-test-file-name nil)))
   (is (nil? (view-unit-test-file-name ""))))
+
+(deftest test-model-unit-test-file-name
+  (is (= (model-unit-test-file-name "test") "test_model_test.clj"))
+  (is (= (model-unit-test-file-name "foo-bar") "foo_bar_model_test.clj"))
+  (is (= (model-unit-test-file-name "foo_bar") "foo_bar_model_test.clj"))
+  (is (nil? (model-unit-test-file-name nil)))
+  (is (nil? (model-unit-test-file-name ""))))
 
 (deftest test-functional-test-file
   (builder/find-or-create-functional-test-directory)
@@ -111,3 +125,10 @@
   (is (nil? (view-unit-test-namespace nil "show")))
   (is (nil? (view-unit-test-namespace "test" "")))
   (is (nil? (view-unit-test-namespace "" "show"))))
+
+(deftest test-model-unit-test-namespace
+  (is (= (model-unit-test-namespace "test") "test.unit.model.test-model-test"))
+  (is (= (model-unit-test-namespace "foo-bar") "test.unit.model.foo-bar-model-test"))
+  (is (= (model-unit-test-namespace "foo_bar") "test.unit.model.foo-bar-model-test"))
+  (is (nil? (model-unit-test-namespace nil)))
+  (is (nil? (model-unit-test-namespace ""))))

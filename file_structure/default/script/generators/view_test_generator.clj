@@ -1,11 +1,11 @@
 (ns generators.view-test-generator
   (:require [conjure.test.builder :as test-builder]
             [conjure.test.util :as test-util]
-            [conjure.view.util :as util]
-            [conjure.util.file-utils :as file-utils]))
+            [conjure.util.file-utils :as file-utils]
+            [conjure.view.util :as util]))
 
 (defn
-#^{:doc "Prints out how to use the generate test controller command."}
+#^{:doc "Prints out how to use the generate test view command."}
   usage []
   (println "You must supply a controller and view name (Like hello-world show).")
   (println "Usage: ./run.sh script/generate.clj view-test <controller> <action>"))

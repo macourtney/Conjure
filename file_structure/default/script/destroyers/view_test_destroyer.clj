@@ -4,7 +4,7 @@
             [conjure.util.loading-utils :as loading-utils]))
 
 (defn
-#^{:doc "Prints out how to use the destroy controller test command."}
+#^{:doc "Prints out how to use the destroy view test command."}
   usage []
   (println "You must supply a controller and action (Like hello-world show).")
   (println "Usage: ./run.sh script/destroy.clj view-test <controller> <action>"))

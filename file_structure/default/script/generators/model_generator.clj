@@ -1,9 +1,10 @@
 (ns generators.model-generator
-  (:require [generators.migration-generator :as migration-generator]
-            [conjure.model.builder :as builder]
+  (:require [conjure.model.builder :as builder]
             [conjure.model.util :as util]
             [conjure.util.string-utils :as string-utils]
-            [conjure.util.file-utils :as file-utils]))
+            [conjure.util.file-utils :as file-utils]
+            [generators.migration-generator :as migration-generator]
+            [generators.model-test-generator :as model-test-generator]))
 
 (defn
 #^{:doc "Prints out how to use the generate model command."}
@@ -41,7 +42,8 @@
 
 (init-model)")]
         (file-utils/write-file-content model-file content)
-        (generate-migration-file model)))
+        (generate-migration-file model)
+        (model-test-generator/generate-unit-test model)))
 
 (defn
 #^{:doc "Creates the model file associated with the given model."}
@@ -51,8 +53,8 @@
         (let [models-directory (util/find-models-directory)]
           (if models-directory
             (let [model-file (builder/create-model-file models-directory model)]
-                (if model-file
-                  (generate-file-content model-file)))
+              (if model-file
+                (generate-file-content model-file)))
             (do
               (println "Could not find models directory.")
               (println models-directory))))

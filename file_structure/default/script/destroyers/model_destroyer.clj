@@ -1,6 +1,7 @@
 (ns destroyers.model-destroyer
   (:require [conjure.model.util :as util]
-            [destroyers.migration-destroyer :as migration-destroyer]))
+            [destroyers.migration-destroyer :as migration-destroyer]
+            [destroyers.model-test-destroyer :as model-test-destroyer]))
 
 (defn
 #^{:doc "Prints out how to use the destroy model command."}
@@ -11,7 +12,7 @@
 (defn
 #^{:doc "Destroys the create migration file associated with the given model."}
   destroy-migration-for-model [model]
-  (migration-destroyer/destroy-migration-file (util/migration-for-model model)))
+  (migration-destroyer/destroy-all-dependencies (util/migration-for-model model)))
 
 (defn
 #^{:doc "Destroys the model file from the given model."}
@@ -22,8 +23,7 @@
         (let [model-file (util/find-model-file models-directory model)]
           (if model-file
             (let [is-deleted (. model-file delete)] 
-              (println "File" (. model-file getPath) (if is-deleted "deleted." "not deleted.") )
-              (if is-deleted (destroy-migration-for-model model)))
+              (println "File" (. model-file getPath) (if is-deleted "deleted." "not deleted.") ))
             (println "Model file not found. Doing nothing.")))
         (do
           (println "Could not find models directory.")
@@ -35,3 +35,11 @@
 #^{:doc "Destroys a model file for the model name given in params."}
   destroy-model [params]
   (destroy-model-file (first params)))
+
+(defn
+#^{:doc "Destroys all of the files created by the model_generator."}
+  destroy-all-dependencies
+  ([model]
+    (destroy-model-file model)
+    (destroy-migration-for-model model)
+    (model-test-destroyer/destroy-all-dependencies model)))

@@ -25,3 +25,9 @@
 #^{:doc "Destroys a migration file for the migration name given in params."}
   destroy-migration [params]
   (destroy-migration-file (first params)))
+
+(defn
+#^{:doc "Destroys all of the files created by the migration_generator."}
+  destroy-all-dependencies
+  ([migration-name]
+    (destroy-migration-file migration-name)))

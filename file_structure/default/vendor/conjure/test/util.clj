@@ -32,7 +32,7 @@
      (file-utils/find-directory test-directory unit-dir-name))))
 
 (defn
-#^{:doc "Finds the functional test directory."}
+#^{:doc "Finds the view test directory."}
  find-view-unit-test-directory 
  ([] (find-view-unit-test-directory (find-unit-test-directory)))
  ([unit-test-directory]
@@ -40,11 +40,20 @@
      (file-utils/find-directory unit-test-directory unit-view-dir-name))))
 
 (defn
+#^{:doc "Finds the view controller test directory."}
   find-controller-view-unit-test-directory
   ([controller] (find-controller-view-unit-test-directory controller (find-view-unit-test-directory)))
   ([controller view-unit-test-directory]
    (if (and controller view-unit-test-directory)
      (file-utils/find-directory view-unit-test-directory (loading-utils/dashes-to-underscores controller)))))
+
+(defn
+#^{:doc "Finds the model test directory."}
+ find-model-unit-test-directory 
+ ([] (find-model-unit-test-directory (find-unit-test-directory)))
+ ([unit-test-directory]
+   (if unit-test-directory
+     (file-utils/find-directory unit-test-directory unit-model-dir-name))))
 
 (defn
 #^{:doc "Returns the functional test file name for the given controller name."}
@@ -53,10 +62,16 @@
     (str (loading-utils/dashes-to-underscores controller) "_controller_test.clj")))
 
 (defn
-#^{:doc "Returns the functional test file name for the given controller name."}
+#^{:doc "Returns the view test file name for the given action name."}
   view-unit-test-file-name [action]
   (if (and action (> (. action length) 0))
     (str (loading-utils/dashes-to-underscores action) "_view_test.clj")))
+
+(defn
+#^{:doc "Returns the model test file name for the given model name."}
+  model-unit-test-file-name [model]
+  (if (and model (> (. model length) 0))
+    (str (loading-utils/dashes-to-underscores model) "_model_test.clj")))
     
 (defn
 #^{:doc "Returns the functional test file for the given controller name."}
@@ -75,13 +90,27 @@
       (new File controller-view-unit-test-dir (view-unit-test-file-name action)))))
 
 (defn
+#^{:doc "Returns the functional test file for the given controller name."}
+  model-unit-test-file
+  ([model] (model-unit-test-file model (find-model-unit-test-directory)))
+  ([model model-unit-test-dir]
+    (if (and model (> (. model length) 0) model-unit-test-dir)
+      (new File model-unit-test-dir (model-unit-test-file-name model)))))
+
+(defn
 #^{:doc "Returns the functional test namespace for the given controller."}
   functional-test-namespace [controller]
   (if (and controller (> (. controller length) 0))
     (str "test.functional." (loading-utils/underscores-to-dashes controller) "-controller-test")))
 
 (defn
-#^{:doc "Returns the functional test namespace for the given controller."}
+#^{:doc "Returns the view test namespace for the given controller and action."}
   view-unit-test-namespace [controller action]
   (if (and controller (> (. controller length) 0) action (> (. action length) 0))
     (str "test.unit.view." (loading-utils/underscores-to-dashes controller) "." (loading-utils/underscores-to-dashes action) "-view-test")))
+
+(defn
+#^{:doc "Returns the model test namespace for the given model."}
+  model-unit-test-namespace [model]
+  (if (and model (> (. model length) 0))
+    (str "test.unit.model." (loading-utils/underscores-to-dashes model) "-model-test")))

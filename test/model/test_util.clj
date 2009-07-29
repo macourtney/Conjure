@@ -10,7 +10,7 @@
 (defn setup-all [function]
   (model-generator/generate-model-file model-name)
   (function)
-  (model-destroyer/destroy-model-file model-name))
+  (model-destroyer/destroy-all-dependencies model-name))
         
 (use-fixtures :once setup-all)
 
