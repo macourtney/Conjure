@@ -56,6 +56,14 @@
      (file-utils/find-directory unit-test-directory unit-model-dir-name))))
 
 (defn
+#^{:doc "Finds the fixture directory."}
+ find-fixture-directory 
+ ([] (find-fixture-directory (find-test-directory)))
+ ([test-directory]
+   (if test-directory
+     (file-utils/find-directory test-directory fixture-dir-name))))
+
+(defn
 #^{:doc "Returns the functional test file name for the given controller name."}
   functional-test-file-name [controller]
   (if (and controller (> (. controller length) 0))
@@ -72,6 +80,12 @@
   model-unit-test-file-name [model]
   (if (and model (> (. model length) 0))
     (str (loading-utils/dashes-to-underscores model) "_model_test.clj")))
+
+(defn
+#^{:doc "Returns the fixture file name for the given model name."}
+  fixture-file-name [model]
+  (if (and model (> (. model length) 0))
+    (str (loading-utils/dashes-to-underscores model) ".clj")))
     
 (defn
 #^{:doc "Returns the functional test file for the given controller name."}
@@ -98,6 +112,14 @@
       (new File model-unit-test-dir (model-unit-test-file-name model)))))
 
 (defn
+#^{:doc "Returns the fixture file for the given model name."}
+  fixture-file
+  ([model] (fixture-file model (find-fixture-directory)))
+  ([model fixture-directory]
+    (if (and model (> (. model length) 0) fixture-directory)
+      (new File fixture-directory (fixture-file-name model)))))
+
+(defn
 #^{:doc "Returns the functional test namespace for the given controller."}
   functional-test-namespace [controller]
   (if (and controller (> (. controller length) 0))
@@ -114,3 +136,9 @@
   model-unit-test-namespace [model]
   (if (and model (> (. model length) 0))
     (str "test.unit.model." (loading-utils/underscores-to-dashes model) "-model-test")))
+
+(defn
+#^{:doc "Returns the fixture namespace for the given model."}
+  fixture-namespace [model]
+  (if (and model (> (. model length) 0))
+    (str "test.fixture." (loading-utils/underscores-to-dashes model))))

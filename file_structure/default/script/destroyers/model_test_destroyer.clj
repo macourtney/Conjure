@@ -1,6 +1,7 @@
 (ns destroyers.model-test-destroyer
   (:require [conjure.test.util :as util]
-            [conjure.util.file-utils :as file-utils]))
+            [conjure.util.file-utils :as file-utils]
+            [destroyers.fixture-destroyer :as fixture-destroyer]))
 
 (defn
 #^{:doc "Prints out how to use the destroy model test command."}
@@ -9,7 +10,7 @@
   (println "Usage: ./run.sh script/destroy.clj model-test <model>"))
 
 (defn
-#^{:doc "Destroys the controller file from the given controller."}
+#^{:doc "Destroys the model test file from the given model."}
   destroy-model-test-file [model]
   (if model
     (let [model-unit-test-dir (util/find-model-unit-test-directory)]
@@ -26,11 +27,12 @@
     (usage)))
 
 (defn
-#^{:doc "Destroys a controller test file for the controller name given in params."}
+#^{:doc "Destroys a model test file for the model name given in params."}
   destroy-model-test [params]
   (destroy-model-test-file (first params)))
 
 (defn
 #^{:doc "Destroys all of the files created by the model_test_generator."}
   destroy-all-dependencies [model]
-    (destroy-model-test-file model))
+    (destroy-model-test-file model)
+    (fixture-destroyer/destroy-all-dependencies model))

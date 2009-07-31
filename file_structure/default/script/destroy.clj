@@ -3,7 +3,9 @@
             [destroyers.view-destroyer :as view-destroyer]
             [destroyers.controller-destroyer :as controller-destroyer]
             [destroyers.controller-test-destroyer :as controller-test-destroyer]
-            [destroyers.model-destroyer :as model-destroyer]))
+            [destroyers.model-destroyer :as model-destroyer]
+            [destroyers.model-test-destroyer :as model-test-destroyer]
+            [destroyers.view-test-destroyer :as view-test-destroyer]))
 
 (defn
 #^{:doc "Prints the usage information to standard out."}
@@ -25,6 +27,9 @@
       
     (. command equals "view")
       (view-destroyer/destroy-view params)
+
+    (. command equals "view-test")
+      (view-test-destroyer/destroy-view-test params)
       
     (. command equals "controller")
       (controller-destroyer/destroy-controller params)
@@ -34,6 +39,9 @@
       
     (. command equals "model")
       (model-destroyer/destroy-model params)
+
+    (. command equals "model-test")
+      (model-test-destroyer/destroy-model-test params)
       
     true ; Default condition.
       (print-unknown-command command)))

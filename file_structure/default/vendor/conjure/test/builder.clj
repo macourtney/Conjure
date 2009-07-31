@@ -10,7 +10,7 @@
   ([] (find-or-create-functional-test-directory (util/find-test-directory)))
   ([test-directory]
     (if test-directory
-      (file-utils/create-dirs test-directory "functional")
+      (file-utils/create-dirs test-directory util/functional-dir-name)
       (println "You must pass in a test directory."))))
 
 (defn
@@ -19,7 +19,7 @@
   ([] (find-or-create-unit-test-directory (util/find-test-directory)))
   ([test-directory]
     (if test-directory
-      (file-utils/create-dirs test-directory "unit")
+      (file-utils/create-dirs test-directory util/unit-dir-name)
       (println "You must pass in a test directory."))))
 
 (defn
@@ -48,6 +48,15 @@
     (if test-directory
       (file-utils/create-dirs test-directory util/unit-dir-name util/unit-model-dir-name)
       (println "You must pass in a test directory."))))
+      
+(defn
+#^{:doc "Finds (or creates if not found) the fixture directory."}
+  find-or-create-fixture-directory
+  ([] (find-or-create-fixture-directory (util/find-test-directory)))
+  ([test-directory]
+    (if test-directory
+      (file-utils/create-dirs test-directory util/fixture-dir-name)
+      (println "You must pass in a test directory."))))
 
 (defn
 #^{:doc "Creates a new functional test file from the given controller name."}
@@ -72,3 +81,11 @@
   ([model model-unit-test-directory]
     (if (and model model-unit-test-directory)
       (file-utils/create-file (util/model-unit-test-file model model-unit-test-directory)))))
+
+(defn
+#^{:doc "Creates a new fixture file from the given model."}
+  create-fixture
+  ([model] (create-fixture model (find-or-create-fixture-directory)))
+  ([model fixture-directory]
+    (if (and model fixture-directory)
+      (file-utils/create-file (util/fixture-file model fixture-directory)))))

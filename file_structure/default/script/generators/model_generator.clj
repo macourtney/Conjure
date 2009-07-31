@@ -36,12 +36,12 @@
   generate-file-content [model-file]
       (let [model (util/model-from-file model-file)
             model-namespace (util/model-namespace model)
-            content (str "(ns " model-namespace "
+            model-content (str "(ns " model-namespace "
   (:use conjure.model.base
         clj-record.boot))
 
 (init-model)")]
-        (file-utils/write-file-content model-file content)
+        (file-utils/write-file-content model-file model-content)
         (generate-migration-file model)
         (model-test-generator/generate-unit-test model)))
 

@@ -2,7 +2,8 @@
   (:require [conjure.model.util :as util]
             [conjure.test.builder :as test-builder]
             [conjure.test.util :as test-util]
-            [conjure.util.file-utils :as file-utils]))
+            [conjure.util.file-utils :as file-utils]
+            [generators.fixture-generator :as fixture-generator]))
 
 (defn
 #^{:doc "Prints out how to use the generate model test command."}
@@ -11,23 +12,28 @@
   (println "Usage: ./run.sh script/generate.clj model-test <model>"))
 
 (defn
-#^{:doc "Generates the functional test file for the given controller and actions."}
+#^{:doc "Generates the unit test file for the given model."}
   generate-unit-test [model]
   (let [unit-test-file (test-builder/create-model-unit-test model)]
     (if unit-test-file
       (let [test-namespace (test-util/model-unit-test-namespace model)
             model-namespace (util/model-namespace model)
+            fixture-namespace (test-util/fixture-namespace model)
             test-content (str "(ns " test-namespace "
   (:use clojure.contrib.test-is
-        " model-namespace "))
+        " model-namespace "
+        " fixture-namespace "))
 
 (def model \"" model "\")
 
-(deftest test-truth
-  (is true))")]
-        (file-utils/write-file-content unit-test-file test-content)))))
+(use-fixtures :once " model "-fixture)
+
+(deftest test-first-record
+  (is (get-record 1)))")]
+        (file-utils/write-file-content unit-test-file test-content)
+        (fixture-generator/generate-fixture-file model)))))
 
 (defn 
-#^{:doc "Generates a controller file for the controller name and actions in params."}
+#^{:doc "Generates a model test file for the model name in params."}
   generate-model-test [params]
   (generate-unit-test (first params)))

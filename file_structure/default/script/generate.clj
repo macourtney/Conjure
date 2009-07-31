@@ -3,7 +3,9 @@
             [generators.view-generator :as view-generator]
             [generators.controller-generator :as controller-generator]
             [generators.controller-test-generator :as controller-test-generator]
-            [generators.model-generator :as model-generator]))
+            [generators.model-generator :as model-generator]
+            [generators.model-test-generator :as model-test-generator]
+            [generators.view-test-generator :as view-test-generator]))
 
 (defn print-usage []
   (println "Usage: ./run.sh script/generate.clj <generate type> <generate params>*"))
@@ -20,6 +22,9 @@
     (. command equals "view")
       (view-generator/generate-view params)
       
+    (. command equals "view-test")
+      (view-test-generator/generate-view-test params)
+      
     (. command equals "controller")
       (controller-generator/generate-controller params)
       
@@ -28,6 +33,9 @@
       
     (. command equals "model")
       (model-generator/generate-model params)
+
+    (. command equals "model-test")
+      (model-test-generator/generate-model-test params)
       
     true ; Default condition.
       (print-unknown-command command)))

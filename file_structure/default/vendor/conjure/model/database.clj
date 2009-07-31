@@ -38,6 +38,8 @@ database flavor function with the current db spec and any arguments"}
 (def-db-fn :create-table)
 
 (def-db-fn :drop-table)
+
+(def-db-fn :delete)
    
 (defmacro
 #^{:doc "Given the type-key of a function in the database flavor, define a function named type-key which calls the 

@@ -175,6 +175,12 @@ create-table method.
   drop-table [db-spec table]
   (sql/with-connection db-spec
     (sql/drop-table (table-name table))))
+
+(defn
+#^{:doc "Deletes the table with the given name."}
+  delete [db-spec table where]
+  (sql/with-connection db-spec
+    (sql/drop-table (table-name table))))
   
 (defn
 #^{:doc "Returns a database flavor for a derby database."}
@@ -187,6 +193,7 @@ create-table method.
     :sql-find sql-find
     :create-table create-table
     :drop-table drop-table
+    :delete delete
     :integer integer
     :id id
     :string string

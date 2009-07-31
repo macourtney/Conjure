@@ -3,18 +3,12 @@
   (:use clojure.contrib.test-is
         conjure.test.util)
   (:require [conjure.test.builder :as builder]
+            [conjure.util.file-utils :as file-utils]
             [test-helper :as test-helper]))
 
 (deftest test-find-test-directory
   (let [test-directory (find-test-directory)]
     (test-helper/test-directory test-directory test-dir-name)))
-
-(defn delete-dir [dir]
-  (println "Deleting dir:" (. dir getName))
-  (is (. dir delete)))
-  
-(defn delete-dirs [& dirs]
-  (doall (map #(delete-dir %) dirs)))
 
 (defn
   find-directory-test [dir-name find-function parent-directory-function create-directory-function dirs-to-delete]
@@ -22,12 +16,12 @@
   (let [found-directory (find-function (parent-directory-function))]
     (test-helper/test-directory found-directory dir-name)
     (is (. found-directory delete))
-    (doall (map #(delete-dir (%)) dirs-to-delete)))
+    (is (apply file-utils/delete-all-if-empty (map #(%) dirs-to-delete))))
   (create-directory-function)
   (let [found-directory (find-function)]
     (test-helper/test-directory found-directory dir-name)
     (is (. found-directory delete))
-    (doall (map #(delete-dir (%)) dirs-to-delete))))
+    (is (apply file-utils/delete-all-if-empty (map #(%) dirs-to-delete)))))
 
 (deftest test-find-functional-test-directory
   (find-directory-test
@@ -70,6 +64,14 @@
     builder/find-or-create-model-unit-test-directory
     [find-unit-test-directory]))
 
+(deftest test-find-fixture-directory
+  (find-directory-test 
+    fixture-dir-name 
+    find-fixture-directory 
+    find-test-directory
+    builder/find-or-create-fixture-directory
+    []))
+
 (deftest test-functional-test-file-name
   (is (= (functional-test-file-name "test") "test_controller_test.clj"))
   (is (= (functional-test-file-name "foo-bar") "foo_bar_controller_test.clj"))
@@ -91,13 +93,20 @@
   (is (nil? (model-unit-test-file-name nil)))
   (is (nil? (model-unit-test-file-name ""))))
 
+(deftest test-fixture-file-name
+  (is (= (fixture-file-name "test") "test.clj"))
+  (is (= (fixture-file-name "foo-bar") "foo_bar.clj"))
+  (is (= (fixture-file-name "foo_bar") "foo_bar.clj"))
+  (is (nil? (fixture-file-name nil)))
+  (is (nil? (fixture-file-name ""))))
+
 (deftest test-functional-test-file
   (builder/find-or-create-functional-test-directory)
   (test-helper/test-file (functional-test-file "test") "test_controller_test.clj")
   (test-helper/test-file (functional-test-file "foo-bar" (find-functional-test-directory)) "foo_bar_controller_test.clj")
   (is (nil? (functional-test-file nil)))
   (is (nil? (functional-test-file "")))
-  (delete-dirs (find-functional-test-directory)))
+  (is (file-utils/delete-all-if-empty (find-functional-test-directory))))
 
 (deftest test-view-unit-test-file
   (let [controller "test"]
@@ -108,7 +117,23 @@
     (is (nil? (view-unit-test-file nil "show")))
     (is (nil? (view-unit-test-file controller "")))
     (is (nil? (view-unit-test-file "" "show")))
-    (delete-dirs (find-controller-view-unit-test-directory controller) (find-view-unit-test-directory) (find-unit-test-directory))))
+    (is (file-utils/delete-all-if-empty (find-controller-view-unit-test-directory controller) (find-view-unit-test-directory) (find-unit-test-directory)))))
+
+(deftest test-model-unit-test-file
+  (builder/find-or-create-model-unit-test-directory)
+  (test-helper/test-file (model-unit-test-file "test") "test_model_test.clj")
+  (test-helper/test-file (model-unit-test-file "foo-bar" (find-model-unit-test-directory)) "foo_bar_model_test.clj")
+  (is (nil? (model-unit-test-file nil)))
+  (is (nil? (model-unit-test-file "")))
+  (is (file-utils/delete-all-if-empty (find-model-unit-test-directory) (find-unit-test-directory))))
+
+(deftest test-fixture-file
+  (builder/find-or-create-fixture-directory)
+  (test-helper/test-file (fixture-file "test") "test.clj")
+  (test-helper/test-file (fixture-file "foo-bar" (find-fixture-directory)) "foo_bar.clj")
+  (is (nil? (fixture-file nil)))
+  (is (nil? (fixture-file "")))
+  (is (file-utils/delete-all-if-empty (find-fixture-directory))))
 
 (deftest test-functional-test-namespace
   (is (= (functional-test-namespace "test") "test.functional.test-controller-test"))
@@ -132,3 +157,10 @@
   (is (= (model-unit-test-namespace "foo_bar") "test.unit.model.foo-bar-model-test"))
   (is (nil? (model-unit-test-namespace nil)))
   (is (nil? (model-unit-test-namespace ""))))
+
+(deftest test-model-unit-test-namespace
+  (is (= (fixture-namespace "test") "test.fixture.test"))
+  (is (= (fixture-namespace "foo-bar") "test.fixture.foo-bar"))
+  (is (= (fixture-namespace "foo_bar") "test.fixture.foo-bar"))
+  (is (nil? (fixture-namespace nil)))
+  (is (nil? (fixture-namespace ""))))
