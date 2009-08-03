@@ -35,7 +35,7 @@
         (println (. child-directory getPath) "directory already exists.")
         child-directory)
       (do
-        (println "Creating " child-dir-name " directory in " (. base-dir getName) "...")
+        (println "Creating" child-dir-name "directory in" (. base-dir getName) "...")
         (let [child-directory (new File base-dir child-dir-name)]
           (. child-directory mkdirs)
           child-directory)))))

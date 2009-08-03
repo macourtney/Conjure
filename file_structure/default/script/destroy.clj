@@ -1,5 +1,6 @@
 (ns generate 
-  (:require [destroyers.migration-destroyer :as migration-destroyer]
+  (:require [destroyers.fixture-destroyer :as fixture-destroyer]
+            [destroyers.migration-destroyer :as migration-destroyer]
             [destroyers.view-destroyer :as view-destroyer]
             [destroyers.controller-destroyer :as controller-destroyer]
             [destroyers.controller-test-destroyer :as controller-test-destroyer]
@@ -42,6 +43,9 @@
 
     (. command equals "model-test")
       (model-test-destroyer/destroy-model-test params)
+
+    (. command equals "fixture")
+      (fixture-destroyer/destroy-fixture params)
       
     true ; Default condition.
       (print-unknown-command command)))

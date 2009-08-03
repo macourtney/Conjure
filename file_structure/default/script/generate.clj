@@ -1,5 +1,6 @@
 (ns generate 
-  (:require [generators.migration-generator :as migration-generator]
+  (:require [generators.fixture-generator :as fixture-generator]
+            [generators.migration-generator :as migration-generator]
             [generators.view-generator :as view-generator]
             [generators.controller-generator :as controller-generator]
             [generators.controller-test-generator :as controller-test-generator]
@@ -36,6 +37,9 @@
 
     (. command equals "model-test")
       (model-test-generator/generate-model-test params)
+      
+    (. command equals "fixture")
+      (fixture-generator/generate-fixture params)
       
     true ; Default condition.
       (print-unknown-command command)))
