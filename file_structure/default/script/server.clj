@@ -1,7 +1,7 @@
 (ns server
   (:require [ring.jetty :as ring-jetty]
             [conjure.server.server :as conjure-server]
-            [conjure.server.ring_adapter :as ring-adapter]))
+            [conjure.server.ring-adapter :as ring-adapter]))
 
 
 (conjure-server/init)

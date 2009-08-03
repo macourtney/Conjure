@@ -7,12 +7,10 @@
 (defn draw []
   [(fn [path]
      (if path
-       (let [path_tokens (contrib-str-utils/re-split #"/" path)
-             controller (first path_tokens)
-             path_tokens_2 (rest path_tokens)
-             action (first path_tokens_2)
-             path_tokens_3 (rest path_tokens_2)
-             id (first path_tokens_3)]
+       (let [path-tokens (contrib-str-utils/re-split #"/" path)
+             controller (nth path-tokens 1 nil)
+             action (nth path-tokens 2 nil)
+             id (nth path-tokens 3 nil)]
 
          (if (and controller action)
            { :controller (loading-utils/underscores-to-dashes controller)
