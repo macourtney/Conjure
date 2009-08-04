@@ -7,7 +7,7 @@
 #^{:doc "The ring function which actually calls the conjure server and returns a properly formatted 
 request map."}
   call-server [req]
-  (let [response (server/process-request (merge req (server/create-request-map (:uri req) (server/parse-query-params (:query-string req)))))]
+  (let [response (server/process-request req)]
     (if (map? response)
       response
       {:status  200

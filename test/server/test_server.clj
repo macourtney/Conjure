@@ -18,19 +18,22 @@
 (use-fixtures :once setup-all)
 
 (deftest test-parse-query-params
-  (is (= { "foo" "bar" } (parse-query-params "foo=bar")))
-  (is (= { "foo" "bar", "baz" "biz" } (parse-query-params "foo=bar&baz=biz")))
+  (is (= { :foo "bar" } (parse-query-params "foo=bar")))
+  (is (= { :foo "bar", :baz "biz" } (parse-query-params "foo=bar&baz=biz")))
   (is (= {} (parse-query-params "")))
   (is (= {} (parse-query-params nil))))
   
 (deftest test-create-request-map
-  (is (= { :controller controller-name, :action action-name, :params { :id "1" }} (create-request-map (str "/" controller-name "/" action-name "/1") {})))
-  (is (= { :controller controller-name, :action action-name, :params {}} (create-request-map (str "/" controller-name "/" action-name) {})))
-  (is (= { :params {} } (create-request-map controller-name {})))
-  (is (= { :params {} } (create-request-map "" {})))
-  (is (= { :params {} } (create-request-map nil {})))
-  (is (= { :params { :foo "bar" } } (create-request-map "" { :foo "bar" })))
-  (is (= { :controller controller-name, :action action-name, :params { :id "1", :foo "bar" } } (create-request-map (str "/" controller-name "/" action-name "/1") { :foo "bar" }))))
+  (let [uri (str "/" controller-name "/" action-name "/1")]
+    (is (= { :controller controller-name, :action action-name, :params { :id "1" } :uri uri } (update-request-map { :uri uri }))))
+  (let [uri (str "/" controller-name "/" action-name)]
+    (is (= { :controller controller-name, :action action-name, :params {} :uri uri } (update-request-map { :uri uri }))))
+  (is (= { :params {} :uri "test" } (update-request-map { :uri controller-name })))
+  (is (= { :params {} :uri ""} (update-request-map { :uri "" })))
+  (is (= { :params {} } (update-request-map nil)))
+  (is (= { :params { :foo "bar" } :uri "" :query-string "foo=bar" } (update-request-map { :uri "" :query-string "foo=bar" })))
+  (let [uri (str "/" controller-name "/" action-name "/1")]
+    (is (= { :controller controller-name, :action action-name, :params { :id "1", :foo "bar" }, :uri uri, :query-string "foo=bar" } (update-request-map { :uri uri, :query-string "foo=bar" })))))
   
 (deftest test-controller-file-name
   (is (= (str controller-name "_controller.clj") (controller-file-name { :controller controller-name })))

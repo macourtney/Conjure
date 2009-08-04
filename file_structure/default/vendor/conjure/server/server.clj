@@ -9,34 +9,35 @@
             [clojure.contrib.str-utils :as str-utils]))
 
 (defn
+#^{:doc "Adds the given query-key-value sequence as a key value pair to the map params."}
+  add-param [params query-key-value]
+  (assoc params (keyword (first query-key-value)) (second query-key-value)))
+
+(defn
 #^{:doc "Parses the parameters in the given query-string into a parameter map."}
   parse-query-params [query-string]
   (if query-string
-      (loop [query-tokens (str-utils/re-split #"&" query-string)
-             output {}]
-        (let [query-token (first query-tokens)]
-          (if (and query-token (> (. query-token length) 0))
-            (let [query-key-value (str-utils/re-split #"=" query-token)]
-              (recur (rest query-tokens) 
-                     (assoc output (first query-key-value) (second query-key-value))))
-            output)))
-      {}))
+    (reduce add-param {} (filter second (map #(str-utils/re-split #"=" %) (str-utils/re-split #"&" query-string))))
+    {}))
+
+(defn
+#^{:doc "Merges the params value of the given request-map with params"}
+  augment-params [request-map params]
+  (if request-map
+    (let [output-params (request-map :params)]
+      (if (and output-params params (not-empty params))
+        (assoc request-map :params (merge output-params params))
+        request-map))))
 
 (defn
 #^{:doc "Gets a route map for use by conjure to call the correct methods."}
-  create-request-map [path params]
-  (let [routes-vector (routes/draw)]
-    (loop [current-routes routes-vector]
-      (if (seq current-routes)
-        (let [route-fn (first current-routes)
-             output (route-fn path)]
-          (if output
-            (let [output-params (output :params)]
-              (if output-params
-                  (assoc output :params (merge output-params params))
-                  output))
-            (recur (rest current-routes))))
-        { :params params }))))
+  update-request-map [request-map]
+  (let [path (:uri request-map)
+        params (parse-query-params (:query-string request-map))
+        output (augment-params (some identity (map #(% path) (routes/draw))) params)]
+    (if output
+      (merge request-map output)
+      (assoc request-map :params params )))) 
 
 (defn
 #^{:doc "Returns the controller file name generated from the given request map."}
@@ -61,11 +62,12 @@
 #^{:doc "Takes the given path and calls the correct controller and action for it."}
   process-request [request-map]
   (when request-map
-    (let [controller-file (controller-file-name request-map)]
+    (let [generated-request-map (update-request-map request-map)
+          controller-file (controller-file-name generated-request-map)]
       (if controller-file
         (do
           (load-controller controller-file)
-          ((load-string (fully-qualified-action request-map)) request-map))
+          ((load-string (fully-qualified-action generated-request-map)) generated-request-map))
         nil))))
 
 (defn
