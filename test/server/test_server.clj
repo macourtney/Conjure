@@ -1,4 +1,5 @@
 (ns test.server.test-server
+  (:import [java.io ByteArrayInputStream])
   (:use clojure.contrib.test-is
         conjure.server.server)
   (:require [generators.controller-generator :as controller-generator]
@@ -17,13 +18,30 @@
         
 (use-fixtures :once setup-all)
 
-(deftest test-parse-query-params
-  (is (= { :foo "bar" } (parse-query-params "foo=bar")))
-  (is (= { :foo "bar", :baz "biz" } (parse-query-params "foo=bar&baz=biz")))
-  (is (= {} (parse-query-params "")))
-  (is (= {} (parse-query-params nil))))
-  
-(deftest test-create-request-map
+(deftest test-augment-params
+  (is (= {:params { :foo "bar" } } (augment-params { :params {} } { :foo "bar" })))
+  (is (= {:params { :foo "bar", :biz "baz" } } (augment-params { :params { :biz "baz" } } { :foo "bar" })))
+  (is (= {:params { :foo "bar" } } (augment-params { :params { :foo "bar" } } {})))
+  (is (= {:params { :foo "bar" } } (augment-params { :params { :foo "bar" } } nil)))
+  (is (nil? (augment-params nil { :foo "bar" } ))))
+
+(defn
+#^{ :doc "Converts the given string into an input stream. Assumes the character incoding is UTF-8." }
+  string-as-input-stream [string]
+  (new ByteArrayInputStream (. string getBytes "UTF-8")))
+
+(deftest test-parse-post-params
+  (is (= { :foo "bar" } (parse-post-params { :request-method :post, :content-length 7, :body (string-as-input-stream "foo=bar") })))
+  (is (= { :foo "bar", :biz "baz" } (parse-post-params { :request-method :post, :content-length 15, :body (string-as-input-stream "foo=bar&biz=baz") })))
+  (is (= {} (parse-post-params { :request-method :get, :content-length 7, :body (string-as-input-stream "foo=bar") }))))
+
+(deftest test-parse-params
+  (is (= { :foo "bar", :biz "baz" } (parse-params { :request-method :post, :content-length 7, :body (string-as-input-stream "foo=bar"), :query-string "biz=baz" } )))
+  (is (= { :biz "baz" } (parse-params { :query-string "biz=baz" } )))
+  (is (= { :foo "bar" } (parse-params { :request-method :post, :content-length 7, :body (string-as-input-stream "foo=bar") } )))
+  (is (= {} (parse-params {} ))))
+
+(deftest test-update-request-map
   (let [uri (str "/" controller-name "/" action-name "/1")]
     (is (= { :controller controller-name, :action action-name, :params { :id "1" } :uri uri } (update-request-map { :uri uri }))))
   (let [uri (str "/" controller-name "/" action-name)]

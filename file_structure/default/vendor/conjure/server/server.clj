@@ -6,19 +6,8 @@
             [conjure.model.database :as database]
             [conjure.controller.util :as controller-util]
             [conjure.view.util :as view-util]
+            [conjure.util.html-utils :as html-utils]
             [clojure.contrib.str-utils :as str-utils]))
-
-(defn
-#^{:doc "Adds the given query-key-value sequence as a key value pair to the map params."}
-  add-param [params query-key-value]
-  (assoc params (keyword (first query-key-value)) (second query-key-value)))
-
-(defn
-#^{:doc "Parses the parameters in the given query-string into a parameter map."}
-  parse-query-params [query-string]
-  (if query-string
-    (reduce add-param {} (filter second (map #(str-utils/re-split #"=" %) (str-utils/re-split #"&" query-string))))
-    {}))
 
 (defn
 #^{:doc "Merges the params value of the given request-map with params"}
@@ -30,10 +19,23 @@
         request-map))))
 
 (defn
+#^{:doc "Returns a parameter map generated from the post content."}
+  parse-post-params [request-map]
+  (if (= (:request-method request-map) :post)
+    (html-utils/parse-query-params 
+      (loading-utils/string-input-stream (:body request-map) (:content-length request-map)))
+    {}))
+
+(defn
+#^{:doc "Parses all of the params from the given request map."}
+  parse-params [request-map]
+  (merge (parse-post-params request-map) (html-utils/parse-query-params (:query-string request-map))))
+
+(defn
 #^{:doc "Gets a route map for use by conjure to call the correct methods."}
   update-request-map [request-map]
   (let [path (:uri request-map)
-        params (parse-query-params (:query-string request-map))
+        params (parse-params request-map)
         output (augment-params (some identity (map #(% path) (routes/draw))) params)]
     (if output
       (merge request-map output)

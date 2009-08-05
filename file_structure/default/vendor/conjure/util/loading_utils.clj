@@ -39,6 +39,24 @@
           (. output append (char current-char))
           (recur (. reader read)))))))
 
+(defn
+#^{:doc "Converts the given input stream into a lazy sequence of bytes."}
+  seq-input-stream
+  ([input-stream] (map byte (take-while #(>= % 0) (repeatedly #(. input-stream read)))))
+  ([input-stream length] (map byte (take length (repeatedly #(. input-stream read))))))
+
+(defn
+#^{:doc "Converts an input stream to a byte array."}
+  byte-array-input-stream 
+  ([input-stream] (into-array Byte/TYPE (seq-input-stream input-stream)))
+  ([input-stream length] (into-array Byte/TYPE (seq-input-stream input-stream length))))
+
+(defn
+#^{:doc "Converts an input stream to a string."}
+  string-input-stream 
+  ([input-stream] (new String (byte-array-input-stream input-stream)))
+  ([input-stream length] (new String (byte-array-input-stream input-stream length))))
+
 (defn 
 #^{:doc "Gets the dir from the class path which ends with the given ending"}
   get-classpath-dir-ending-with [ending]
