@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.StringTokenizer;
 
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -57,12 +58,35 @@ public class Main {
             fileInputStream.close();
         }
     }
+    
+    /**
+     * @return The conjure jar file from the class path.
+     * @throws IOException 
+     */
+    public JarFile findConjureJarFile() throws IOException {
+    	
+    	for (StringTokenizer classPathTokens = new StringTokenizer(
+    			System.getProperty("java.class.path"), 
+    			System.getProperty("path.separator")); 
+    	        classPathTokens.hasMoreTokens(); ) {
+    		
+    		String classPath = classPathTokens.nextToken();
+    		System.out.println("classPath: " + classPath);
+    		
+    		if (classPath.endsWith(CONJURE_JAR_NAME)) {
+    			System.out.println("classPath ends with conjure.jar.");
+    			return new JarFile(classPath);
+    		}
+    	}
+    	
+    	return null;
+    }
 
     public void extractAll() throws IOException {
         File projectDir = new File(this.projectName);
         projectDir.mkdir();
 
-        JarFile conjureJar = new JarFile(CONJURE_JAR_NAME);
+        JarFile conjureJar = findConjureJarFile();
 
         for (Enumeration<? extends ZipEntry> zipEntryEnumeration = conjureJar.entries(); zipEntryEnumeration.hasMoreElements(); ) {
             ZipEntry entry = zipEntryEnumeration.nextElement();
