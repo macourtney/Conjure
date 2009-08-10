@@ -22,9 +22,7 @@ added to the body of the view code."}
 
 (defview []
   (html/html 
-    [:html
-      [:body
-        " inner-content "]]))"))
+    " inner-content "))"))
   
 (defn
 #^{:doc "Generates the view content and saves it into the given view file."}

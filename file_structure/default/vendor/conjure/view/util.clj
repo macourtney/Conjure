@@ -50,3 +50,18 @@
   view-namespace [controller view-file]
   (if (and controller view-file)
     (view-namespace-by-action controller (loading-utils/clj-file-to-symbol-string (. view-file getName)))))
+
+(defn
+#^{:doc "Returns the rendered view from the given request-map."}
+  render-view [request-map & params]
+  (load-view request-map)
+  (apply
+    (eval (read-string (str (request-view-namespace request-map) "/render-view")))
+    request-map params))
+
+(defn
+#^{:doc "Returns the rendered layout for the given layout name."}
+  render-layout [layout-name request-map body]
+  (let [layouts-request-map (assoc request-map :controller "layouts")
+        application-request-map (assoc layouts-request-map :action (if layout-name layout-name "application"))]
+    (render-view application-request-map body)))
