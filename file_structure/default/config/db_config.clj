@@ -41,9 +41,8 @@
             
 (defn
   load-config []
-  (let [environment (java-utils/get-system-property environment/conjure-environment-property)
+  (let [environment (environment/environment-name)
         base-config (create-db-config (keyword environment))]
-    (println "Loading environment: " environment)
     (if base-config
       (((:flavor base-config) :db-map) base-config)
       (throw (new RuntimeException (str "Unknown environment: " environment ". Please check your conjure.environment system property."))))))

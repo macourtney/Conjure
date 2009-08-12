@@ -2,21 +2,39 @@
   (:require [db-config :as db-config]
             [conjure.util.string-utils :as string-utils]))
 
+(def conjure-db (ref nil))
+
+;(defn
+;#^{:doc "Initializes the database config information."}
+;  init-sql []
+;  (let [new-db-config (db-config/load-config)
+;        sql-db-map { :datasource (:datasource new-db-config)
+;                     :username (:username new-db-config)
+;                     :password (:password new-db-config)}]
+;    (def conjure-db new-db-config)
+;    (def db sql-db-map)))
+
 (defn
-#^{:doc "Initializes the database config information."}
-  init-sql []
-  (let [new-db-config (db-config/load-config)
-        sql-db-map { :datasource (:datasource new-db-config)
-                     :username (:username new-db-config)
-                     :password (:password new-db-config)}]
-    (def conjure-db new-db-config)
-    (def db sql-db-map)))
+  create-db-map []
+  { :datasource (:datasource @conjure-db)
+    :username (:username @conjure-db)
+    :password (:password @conjure-db)})
+    
+(defn
+#^{:doc "Ensures the conjure-db ref is set before returning it's value."}
+  ensure-conjure-db []
+  (if @conjure-db
+    @conjure-db
+    (do
+      (dosync (alter conjure-db (fn [_] (db-config/load-config))))
+      (def db (create-db-map))
+      @conjure-db)))
     
 (defn
 #^{:doc "Returns the db-flavor from the conjure-db map. If a key is pressent, then this method returns the value of 
 that key in the db-flavor"}
   db-flavor 
-  ([] (:flavor conjure-db))
+  ([] (:flavor (ensure-conjure-db)))
   ([flavor-key] (get (db-flavor) flavor-key)))
   
 (defmacro

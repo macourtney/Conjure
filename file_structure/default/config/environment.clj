@@ -9,3 +9,10 @@
   (let [initial-value (java-utils/get-system-property conjure-environment-property nil)]
     (if (not initial-value)
       (java-utils/set-system-properties { conjure-environment-property "development" }))))
+
+(defn
+#^{:doc "Returns the name of the environment."}
+  environment-name []
+  (do
+    (init)
+    (java-utils/get-system-property conjure-environment-property nil)))

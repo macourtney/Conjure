@@ -61,9 +61,15 @@
   (loading-utils/load-resource "controllers" controller-filename))
 
 (defn
+#^{:doc "Initializes the conjure server."}
+  init []
+  (database/ensure-conjure-db))
+
+(defn
 #^{:doc "Takes the given path and calls the correct controller and action for it."}
   process-request [request-map]
   (when request-map
+    (init)
     (let [generated-request-map (update-request-map request-map)
           controller-file (controller-file-name generated-request-map)]
       (if controller-file
@@ -87,9 +93,3 @@
 #^{:doc "Gets the user configured database properties."}
   db-config []
   database/conjure-db)
-  
-(defn
-#^{:doc "Initializes the conjure server."}
-  init []
-  (environment/init)
-  (database/init-sql))
