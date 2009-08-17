@@ -4,16 +4,6 @@
 
 (def conjure-db (ref nil))
 
-;(defn
-;#^{:doc "Initializes the database config information."}
-;  init-sql []
-;  (let [new-db-config (db-config/load-config)
-;        sql-db-map { :datasource (:datasource new-db-config)
-;                     :username (:username new-db-config)
-;                     :password (:password new-db-config)}]
-;    (def conjure-db new-db-config)
-;    (def db sql-db-map)))
-
 (defn
   create-db-map []
   { :datasource (:datasource @conjure-db)
