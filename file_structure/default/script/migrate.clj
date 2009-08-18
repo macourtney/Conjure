@@ -20,8 +20,6 @@
     (. Integer MAX_VALUE)))
 
 (let [version (first *command-line-args*)]
-  (if version
-    (do
-      (server/init)
-      (runner/update-to-version version))
-    (print-usage)))
+  (do
+    (server/init)
+    (runner/update-to-version (version-number version))))
