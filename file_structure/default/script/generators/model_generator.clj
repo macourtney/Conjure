@@ -40,7 +40,7 @@
   (:use conjure.model.base
         clj-record.boot))
 
-(init-model)")]
+(clj-record.core/init-model)")]
         (file-utils/write-file-content model-file model-content)
         (generate-migration-file model)
         (model-test-generator/generate-unit-test model)))
