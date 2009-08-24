@@ -1,0 +1,6 @@
+Steps for creating a new release of Conjure.
+
+1. Create a branch on github
+2. Update the version number in Main.java
+3. Build conjure using the lancet.bat script.
+4. Post the newly created jar file to the github downloads page.
