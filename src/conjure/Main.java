@@ -18,6 +18,8 @@ import java.util.zip.ZipEntry;
 public class Main {
     private static final String CONJURE_JAR_NAME = "conjure.jar";
     private static final String DEFAULT_DIR = "default";
+    
+    private static final String CONJURE_VERSION = "0.2";
 
     private String projectName;
 
@@ -109,15 +111,21 @@ public class Main {
             System.out.println("Usage: java -jar conjure.jar <project name>");
 
         } else {
-
-            Main main = new Main(args[0]);
-
-            try {
-                main.extractAll();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        	String firstArg = args[0].trim();
+        	
+        	if (firstArg.equalsIgnoreCase("-v") || firstArg.equalsIgnoreCase("--version")) {
+        		System.out.println("Conjure version: " + CONJURE_VERSION);
+        		
+        	} else {
+	            Main main = new Main(firstArg);
+	
+	            try {
+	                main.extractAll();
+	
+	            } catch (IOException e) {
+	                e.printStackTrace();
+	            }
+        	}
         }
     }
 
