@@ -113,6 +113,11 @@ any keyword into a string, and replaces dashes with underscores."}
 #^{:doc "Returns the primary key spec vector from the given mods map."}
   primary-key-mod [mods]
   (if (:primary-key mods) ["PRIMARY KEY"] []))
+  
+(defn
+#^{:doc "Returns the primary key spec vector from the given mods map."}
+  auto-increment-mod [mods]
+  (if (:auto-increment mods) ["AUTO_INCREMENT"] []))
 
 (defn
 #^{:doc "Returns the given key or string as valid column name. Basically turns 
@@ -130,12 +135,12 @@ create-table method.
   integer
   ([column] (integer column {})) 
   ([column mods]
-      (concat [(column-name column) "INT"] (not-null-mod mods) (primary-key-mod mods))))
+      (concat [(column-name column) "INT"] (not-null-mod mods) (auto-increment-mod mods) (primary-key-mod mods))))
     
 (defn
 #^{:doc "Returns a new spec describing the id for a table. Use this method with the create-table method."}
   id []
-  (integer "id" {:not-null true :primary-key true}))
+  (integer "id" { :not-null true, :primary-key true, :auto-increment true }))
   
 (defn
 #^{:doc "Returns a new spec describing a text with the given column and spec mods map. Use this method with the create-table method.
