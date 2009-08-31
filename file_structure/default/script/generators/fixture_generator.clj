@@ -20,12 +20,13 @@
             fixture-content (str "(ns " fixture-namespace "
   (:use conjure.model.database))
 
-(def " model "-fixture [function]
-  (insert-into " table-name "
-    ; Add your test data here.
-    { :id 1 })
-  (function)
-  (delete " table-name " \"true\"))")]
+(defn " model "-fixture [function]
+  (do
+    (insert-into :" table-name "
+      ; Add your test data here.
+      { :id 1 })
+    (function)
+    (delete :" table-name " [ \"true\" ])))")]
         (file-utils/write-file-content fixture-file fixture-content)))))
 
 (defn 

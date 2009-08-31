@@ -23,8 +23,8 @@
 
 (def controller-name \"" controller "\")
 (def view-name \"" action "\")
-(def request-map { :controller \"" controller "\"
-                   :action \"" action "\" } )
+(def request-map { :controller controller-name
+                   :action view-name } )
 
 (deftest test-view
   (render-view request-map))")]

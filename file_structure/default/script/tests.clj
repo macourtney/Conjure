@@ -4,6 +4,7 @@
   (:require environment
             [conjure.server.server :as conjure-server]
             [conjure.util.loading-utils :as loading-utils]
+            [conjure.migration.runner :as runner]
             [clojure.contrib.classpath :as classpath]
             [clojure.contrib.java-utils :as java-utils]
             [clojure.contrib.seq-utils :as seq-utils]))
@@ -17,14 +18,22 @@
 #^{:doc "Returns a File object for the test directory."}
   create-test-directory-file []
   (new File (create-test-app-directory-file) "test"))
+  
+(defn
+#^{:doc "Returns a File object for the fixture directory."}
+  fixture-directory-file []
+  (new File (create-test-directory-file) "fixture"))
    
 (defn
 #^{:doc "Returns true if the given file is a valid test file."}
   is-valid-test [test-file]
-  (and
-    (. (. test-file getPath) endsWith ".clj")
-    (not (= (. test-file getName) "run_tests.clj"))
-    (not (= (. test-file getName) "test_helper.clj"))))
+  (let [test-file-path (. test-file getPath)
+        test-file-name (. test-file getName)]
+    (and
+      (. test-file-path endsWith ".clj")
+      (not (= test-file-name "run_tests.clj"))
+      (not (= test-file-name "test_helper.clj"))
+      (not (. (. test-file getParentFile) equals (fixture-directory-file))))))
    
 (defn
 #^{:doc "Returns a sequence of all the files found in every directory under the test directory."}
@@ -52,7 +61,8 @@
   (let [initial-value (java-utils/get-system-property environment/conjure-environment-property nil)]
     (if (not initial-value)
       (java-utils/set-system-properties { environment/conjure-environment-property "test" })))
-  (conjure-server/init))
+  (conjure-server/init)
+  (runner/update-to-version (. Integer MAX_VALUE)))
 
 (init)
 
@@ -65,6 +75,6 @@
       *command-line-args*))
     (apply run-tests (map symbol *command-line-args*)))
   (let [all-test-files (test-files)]
-    (doall (map (fn [file] (if (not (= (. file getName) "run_tests.clj")) (load-file (. file getPath)))) all-test-files))
+    (doall (map (fn [file] (load-file (. file getPath))) all-test-files))
     (apply run-tests 
       (map namespace-symbol-for-file all-test-files))))

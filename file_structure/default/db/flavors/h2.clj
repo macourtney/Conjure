@@ -182,10 +182,10 @@ create-table method.
     (sql/drop-table (table-name table))))
 
 (defn
-#^{:doc "Deletes the table with the given name."}
+#^{:doc "Deletes rows from the table with the given name."}
   delete [db-spec table where]
   (sql/with-connection db-spec
-    (sql/drop-table (table-name table))))
+    (sql/delete-rows (table-name table) where)))
   
 (defn
 #^{:doc "Returns a database flavor for a derby database."}
