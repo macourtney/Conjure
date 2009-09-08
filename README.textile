@@ -1,0 +1,12 @@
+h2. Conjure
+
+Conjure is a Rails like framework for the Clojure programming language. The goal of Conjure is to simplify the development of database backed web applications. To do this Conjure relies heavily on third party libraries including:
+
+* "ring":http://github.com/mmcgrana/ring/tree
+* "clj-record":http://github.com/duelinmarkers/clj-record/tree
+* "clj-html":http://github.com/mmcgrana/clj-html/tree
+* and more..
+
+To get started with Conjure, see the [[Getting Started]] wiki page.
+
+For a tutorial on Conjure, see the [[Hello World tutorial]].
