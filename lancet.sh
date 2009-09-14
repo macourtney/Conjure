@@ -8,7 +8,7 @@ JARS_PATH=`echo $LIB_DIR/*.jar | sed 's/ /:/g'`
 
 CLASSPATH=.:$JARS_PATH
 
-COMMAND="java -cp $CLASSPATH clojure.lang.Script build.clj
+COMMAND="java -cp $CLASSPATH clojure.lang.Script build.clj"
 
 echo $COMMAND
 echo
