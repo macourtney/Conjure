@@ -1,16 +1,12 @@
 package conjure;
 
 import java.io.BufferedInputStream;
-import java.io.FileOutputStream;
 import java.io.File;
-import java.io.InputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-
+import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.List;
-import java.util.LinkedList;
 import java.util.StringTokenizer;
-
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
@@ -19,7 +15,7 @@ public class Main {
     private static final String CONJURE_JAR_NAME = "conjure.jar";
     private static final String DEFAULT_DIR = "default";
     
-    private static final String CONJURE_VERSION = "0.2";
+    private static final String CONJURE_VERSION = "0.3";
 
     private String projectName;
 
