@@ -24,7 +24,7 @@
     (if migrate-directory
       (filter 
         (fn [migrate-file] 
-          (re-find #"^[0-9]+_.+\.clj" (. migrate-file getName))) 
+          (re-find #"^[0-9]+_.+\.clj$" (. migrate-file getName))) 
         (. migrate-directory listFiles)))))
 
 (defn 
