@@ -8,7 +8,8 @@
   create-db-map []
   { :datasource (:datasource @conjure-db)
     :username (:username @conjure-db)
-    :password (:password @conjure-db)})
+    :password (:password @conjure-db)
+    :subprotocol (:subprotocol @conjure-db) })
     
 (defn
 #^{:doc "Ensures the conjure-db ref is set before returning it's value."}
