@@ -1,6 +1,5 @@
 (ns conjure.util.string-utils
-  (:require [clojure.contrib.str-utils :as str-utils]
-            [clj-record.util :as clj-record-util]))
+  (:require [clojure.contrib.str-utils :as str-utils]))
 
 (defn
 #^{:doc "If the string's length does not equal total-length then this method returns a new string with length 
