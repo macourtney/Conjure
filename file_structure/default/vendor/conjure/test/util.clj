@@ -141,4 +141,4 @@
 #^{:doc "Returns the fixture namespace for the given model."}
   fixture-namespace [model]
   (if (and model (> (. model length) 0))
-    (str "test.fixture." (loading-utils/underscores-to-dashes model))))
+    (str "fixture." (loading-utils/underscores-to-dashes model))))
