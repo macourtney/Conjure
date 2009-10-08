@@ -24,7 +24,25 @@ to it."}
   anchor-from [params]
   (let [anchor (:anchor params)]
     (if anchor
-      (str "#" anchor))))  
+      (str "#" anchor))))
+      
+(defn-
+#^{:doc "Returns the params merged with the request-map. Only including the keys from request-map used by url-for"}
+  merge-url-for-params [request-map params]
+  (merge (select-keys request-map [:controller :action :scheme :request-method :server-name :server-port ]) params))
+
+(defn-
+#^{:doc "Returns the full host string from the given params. Used by url-for." }
+  full-host [params]
+  (if (not (:only-path params))
+    (str (conjure-str-utils/str-keyword 
+      (:scheme params)) "://" 
+      (if (and (:user params) (:password params)) (str (:user params) ":" (:password params) "@")) 
+      (:server-name params) 
+      (if (:port params) 
+        (str ":" (:port params))
+        (if (not (= (:server-port params) 80)) 
+          (str ":" (:server-port params)))))))
 
 (defn
 #^{:doc 
@@ -33,14 +51,20 @@ to it."}
      :action - The name of the action to link to.
      :controller - The name of the controller to link to.
      :id - The id to pass, or if id links to a map, then the value of :id in that map is used. (Optional)
-     :anchor - Specifies the anchor name to be appended to the path."}
+     :anchor - Specifies the anchor name to be appended to the path.
+     :user - Inline HTTP authentication (only used if :password is also present)
+     :password - Inline HTTP authentication (only use if :user is also present)
+     :scheme - Overrides the default scheme. Example values: :http, :ftp
+     :server-name - Overrides the default server name.
+     :port - Overrides the default server port."}
   url-for
-  ([request-map params] (url-for (merge (select-keys request-map [:controller :action]) params))) 
+  ([request-map params] (url-for (merge-url-for-params request-map params))) 
   ([params]
   (let [controller (conjure-str-utils/str-keyword (:controller params))
         action (conjure-str-utils/str-keyword (:action params))]
     (if (and controller action)
       (apply str 
+        (full-host params) 
         (interleave 
           (repeat "/") 
           (filter #(not (nil? %))
@@ -51,6 +75,6 @@ to it."}
 #^{:doc 
 "Returns a link for the given text and parameters using url-for."}
   link-to
-    ([text request-map params] (link-to text (merge (select-keys request-map [:controller :action]) params)))
+    ([text request-map params] (link-to text (merge-url-for-params request-map params)))
     ([text params]
       (str "<a href=\"" (url-for params) "\">" text "</a>")))
