@@ -34,15 +34,21 @@ to it."}
 (defn-
 #^{:doc "Returns the full host string from the given params. Used by url-for." }
   full-host [params]
-  (if (not (:only-path params))
-    (str (conjure-str-utils/str-keyword 
-      (:scheme params)) "://" 
-      (if (and (:user params) (:password params)) (str (:user params) ":" (:password params) "@")) 
-      (:server-name params) 
-      (if (:port params) 
-        (str ":" (:port params))
-        (if (not (= (:server-port params) 80)) 
-          (str ":" (:server-port params)))))))
+  (let [server-name (:server-name params)
+        scheme (:scheme params)
+        user (:user params)
+        password (:password params)
+        port (:port params)
+        server-port (:server-port params)]
+    (if (and server-name (not (:only-path params)))
+      (str 
+        (if scheme (conjure-str-utils/str-keyword scheme) "http") "://" 
+        (if (and user password) (str user ":" password "@")) 
+        server-name 
+        (if port 
+          (str ":" port)
+          (if (and server-port (not (= server-port 80))) 
+            (str ":" server-port)))))))
 
 (defn
 #^{:doc 
@@ -71,10 +77,59 @@ to it."}
             [controller action (id-from params) (anchor-from params)])))
       (throw (new RuntimeException (str "You must pass a controller and action to url-for. " params)))))))
 
+(defn-
+#^{:doc "Generates the html attributes for the given options."}
+  generate-html-options [html-options]
+  (apply str 
+    (interleave
+      (repeat " ")
+      (map 
+        #(str (conjure-str-utils/str-keyword  %) "=\"" (conjure-str-utils/str-keyword (get html-options %)) "\"") 
+        (keys html-options)))))
+        
+(defn- #^{:doc "If function is a function, then this method evaluates it with the given args. Otherwise, it just returns
+function." }
+  evaluate-if-fn [function & args]
+  (if (fn? function)
+    (apply function args)
+    function))
+
 (defn
 #^{:doc 
-"Returns a link for the given text and parameters using url-for."}
+"Returns a link for the given text and parameters using url-for. Params has the same valid parameters as url-for, plus:
+
+     :html-options - a map of html attributes to add to the anchor tag.
+     
+If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
+and params, text is called with request-map and params merged (not all keys used from request-map)."}
   link-to
     ([text request-map params] (link-to text (merge-url-for-params request-map params)))
     ([text params]
-      (str "<a href=\"" (url-for params) "\">" text "</a>")))
+      (let [html-options (if (:html-options params) (:html-options params) {})]
+        (str "<a" (generate-html-options (assoc html-options :href (url-for params))) ">" (evaluate-if-fn text params) "</a>"))))
+
+(defn
+#^{:doc "If condition is true, then call link-to with the given text, request-map and params. If condition is false, 
+then just return text. If condition is a function, it is evaluated with params merged with request-map. If text is a 
+function, it is evaluated with params merged with request-map (just like link-to)." }
+  link-to-if
+    ([condition text request-map params] (link-to-if condition text (merge-url-for-params request-map params)))
+    ([condition text params]
+      (if (evaluate-if-fn condition params)
+        (link-to text params)
+        (evaluate-if-fn text params))))
+
+(defn-
+#^{:doc "Inverses the results of condition. If condition is a function, then this method creates a new function which 
+wraps condition, forwarding any parameters to it, but inversing the result." }
+  inverse-condition [condition]
+  (if (fn? condition)
+    (fn [& args] (not (apply condition args)))
+    (not condition)))
+
+(defn
+#^{:doc "Simply calls link-to-if with the inverse of condition. If condition is a function then a new function is 
+created to wrap it, and simply inverse the result of condition." }
+  link-to-unless
+    ([condition text request-map params] (link-to-if (inverse-condition condition) text request-map params))
+    ([condition text params] (link-to-if (inverse-condition condition) text params)))
