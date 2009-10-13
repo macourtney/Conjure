@@ -42,3 +42,8 @@
   (is (= "show" (link-to-unless true #(:action %) { :controller "hello" :action "show" })))
   (is (= "view" (link-to-unless #(= (:action %) "show") "view" { :controller "hello" :action "show" })))
   (is (= "<a href=\"/hello/show\">view</a>" (link-to-unless #(= (:action %) "add") "view" { :controller "hello" :action "show" }))))
+
+(deftest test-form-for
+  (is (= "<form name=\"create\" action=\"/hello/create\" method=\"put\">Blah</form>" (form-for { :name "create", :url { :controller "hello", :action "create" } } "Blah")))
+  (is (= "<form name=\"hello\" action=\"/hello/create\" method=\"put\">Blah</form>" (form-for { :url { :controller "hello", :action "create" } } "Blah")))
+  (is (= "<form name=\"create\" action=\"/hello/create\" method=\"put\">create</form>" (form-for { :name "create", :url { :controller "hello", :action "create" } } #(:action %)))))

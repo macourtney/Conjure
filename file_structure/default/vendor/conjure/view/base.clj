@@ -133,3 +133,31 @@ created to wrap it, and simply inverse the result of condition." }
   link-to-unless
     ([condition text request-map params] (link-to-if (inverse-condition condition) text request-map params))
     ([condition text params] (link-to-if (inverse-condition condition) text params)))
+
+(defn
+#^{:doc 
+"Creates a form tag block from the given options and with the given body. If the request-map is given, it is merged into
+the url options map.
+
+If body is a function, it is passed the url options after being merged with the given request-map.
+
+Valid options:    
+    :name - The key for the params map passed to the target url. If name is not given, then the value of :controller in
+        the url map is used. If :controller is not given in the url map, then \"record\" is used. 
+    :url - A map for the target url of the form. Uses the same options as url-for.
+    :html - The html attributes for the form tag." }
+  form-for 
+  ([request-map options body] (form-for (assoc options :url (merge-url-for-params request-map (:url options))) body))
+  ([options body]
+    (let [html-options (:html options)
+          url-options (:url options)]
+      (str "<form" 
+        (generate-html-options 
+          (merge 
+            html-options
+            { :method (or (:method html-options) "put"), 
+              :action (url-for url-options),
+              :name (or (:name options) (:controller url-options) "record") })) 
+        ">"
+        (evaluate-if-fn body url-options)
+        "</form>"))))
