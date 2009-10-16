@@ -160,3 +160,63 @@ Valid options:
               :action (url-for url-options),
               :name (or (:name options) (:controller url-options) "record") })
           (evaluate-if-fn body url-options)]))))
+
+(defn-
+#^{:doc "Returns the id value for the given record name and key name. Note, both record-name-str and key-name-str must 
+be strings." }
+  id-value [record-name-str key-name-str]
+  (str record-name-str "-" key-name-str))
+  
+(defn-
+#^{:doc "Returns the name value for the given record name and key name. Note, both record-name-str and key-name-str must 
+be strings." }
+  name-value [record-name-str key-name-str]
+  (str record-name-str "[" key-name-str "]"))
+
+(defn
+#^{:doc "Creates an input tag of the given type for a field of name key-name in record of the given name. You can pass along
+an optional option map for the html options." }
+  input [input-type record-name key-name record html-options]
+    (let [record-name-str (conjure-str-utils/str-keyword record-name)
+          key-name-str (conjure-str-utils/str-keyword key-name)]
+      (htmli 
+        [:input 
+          (merge 
+            html-options
+            { :type (conjure-str-utils/str-keyword input-type),
+              :id (id-value record-name-str key-name-str), 
+              :name (name-value record-name-str key-name-str)
+              :value (get record key-name) })])))
+
+(defn
+#^{:doc "Creates an input tag of type text for a field of name key-name in record of the given name. You can pass along
+an optional option map for the html options." }
+  text-field
+  ([record-name key-name record] (text-field record-name key-name record {})) 
+  ([record-name key-name record html-options]
+    (input :text record-name key-name record html-options)))
+            
+(defn
+#^{:doc "Creates a text area tag for a field of name key-name in record of the given name. You can pass along
+an optional option map for the html options." }
+  text-area 
+  ([record-name key-name record] (text-area record-name key-name record {}))
+  ([record-name key-name record html-options]
+    (let [record-name-str (conjure-str-utils/str-keyword record-name)
+          key-name-str (conjure-str-utils/str-keyword key-name)]
+      (htmli 
+        [:textarea 
+          (merge
+            { :rows 40, :cols 20 }
+            html-options
+            { :id (id-value record-name-str key-name-str),
+              :name (name-value record-name-str key-name-str) })
+          (get record key-name) ]))))
+
+(defn
+#^{:doc "Creates an input tag of type \"hidden\" for a field of name key-name in record of the given name. You can pass along
+an optional option map for the html options." }
+  hidden-field 
+  ([record-name key-name record] (hidden-field record-name key-name record {}))
+  ([record-name key-name record html-options]
+    (input :hidden record-name key-name record html-options)))

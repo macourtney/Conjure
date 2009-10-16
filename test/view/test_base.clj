@@ -47,3 +47,15 @@
   (is (= "<form action=\"/hello/create\" method=\"put\" name=\"create\">Blah</form>" (form-for { :name "create", :url { :controller "hello", :action "create" } } "Blah")))
   (is (= "<form action=\"/hello/create\" method=\"put\" name=\"hello\">Blah</form>" (form-for { :url { :controller "hello", :action "create" } } "Blah")))
   (is (= "<form action=\"/hello/create\" method=\"put\" name=\"create\">create</form>" (form-for { :name "create", :url { :controller "hello", :action "create" } } #(:action %)))))
+
+(deftest test-text-field
+  (is (= "<input id=\"message-text\" name=\"message[text]\" type=\"text\" value=\"Blah\" />" (text-field :message :text { :text "Blah" } )))
+  (is (= "<input id=\"message-text\" name=\"message[text]\" size=\"20\" type=\"text\" value=\"Blah\" />" (text-field :message :text { :text "Blah" } { :size 20 } ))))
+  
+(deftest test-text-area
+  (is (= "<textarea cols=\"20\" id=\"message-text\" name=\"message[text]\" rows=\"40\">Blah</textarea>" (text-area :message :text { :text "Blah" } )))
+  (is (= "<textarea cols=\"40\" id=\"message-text\" name=\"message[text]\" rows=\"60\">Blah</textarea>" (text-area :message :text { :text "Blah" } { :rows 60, :cols 40 } ))))
+
+(deftest test-hidden-field
+  (is (= "<input id=\"message-text\" name=\"message[text]\" type=\"hidden\" value=\"Blah\" />" (hidden-field :message :text { :text "Blah" } )))
+  (is (= "<input class=\"hidden-message\" id=\"message-text\" name=\"message[text]\" type=\"hidden\" value=\"Blah\" />" (hidden-field :message :text { :text "Blah" } { :class "hidden-message" } ))))
