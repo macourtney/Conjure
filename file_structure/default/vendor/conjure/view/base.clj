@@ -1,4 +1,5 @@
 (ns conjure.view.base
+  (:use clj-html.core)
   (:require [clojure.contrib.str-utils :as str-utils]
             [conjure.util.string-utils :as conjure-str-utils]))
 
@@ -77,15 +78,15 @@ to it."}
             [controller action (id-from params) (anchor-from params)])))
       (throw (new RuntimeException (str "You must pass a controller and action to url-for. " params)))))))
 
-(defn-
-#^{:doc "Generates the html attributes for the given options."}
-  generate-html-options [html-options]
-  (apply str 
-    (interleave
-      (repeat " ")
-      (map 
-        #(str (conjure-str-utils/str-keyword  %) "=\"" (conjure-str-utils/str-keyword (get html-options %)) "\"") 
-        (keys html-options)))))
+;(defn-
+;#^{:doc "Generates the html attributes for the given options."}
+;  generate-html-options [html-options]
+;  (apply str 
+;    (interleave
+;      (repeat " ")
+;      (map 
+;        #(str (conjure-str-utils/str-keyword  %) "=\"" (conjure-str-utils/str-keyword (get html-options %)) "\"") 
+;        (keys html-options)))))
         
 (defn- #^{:doc "If function is a function, then this method evaluates it with the given args. Otherwise, it just returns
 function." }
@@ -106,7 +107,7 @@ and params, text is called with request-map and params merged (not all keys used
     ([text request-map params] (link-to text (merge-url-for-params request-map params)))
     ([text params]
       (let [html-options (if (:html-options params) (:html-options params) {})]
-        (str "<a" (generate-html-options (assoc html-options :href (url-for params))) ">" (evaluate-if-fn text params) "</a>"))))
+        (htmli [:a (assoc html-options :href (url-for params)) (evaluate-if-fn text params)]))))
 
 (defn
 #^{:doc "If condition is true, then call link-to with the given text, request-map and params. If condition is false, 
@@ -151,13 +152,11 @@ Valid options:
   ([options body]
     (let [html-options (:html options)
           url-options (:url options)]
-      (str "<form" 
-        (generate-html-options 
+      (htmli 
+        [:form 
           (merge 
             html-options
             { :method (or (:method html-options) "put"), 
               :action (url-for url-options),
-              :name (or (:name options) (:controller url-options) "record") })) 
-        ">"
-        (evaluate-if-fn body url-options)
-        "</form>"))))
+              :name (or (:name options) (:controller url-options) "record") })
+          (evaluate-if-fn body url-options)]))))

@@ -26,7 +26,7 @@
 (deftest test-link-to
   (is (= "<a href=\"/hello/show\">view</a>" (link-to "view" { :controller "hello" :action "show" })))
   (is (= "<a href=\"/hello/show\">view</a>" (link-to "view" { :controller "hello" :action "add" } { :action "show" })))
-  (is (= "<a href=\"/hello/show\" id=\"foo\" class=\"bar\">view</a>" (link-to "view" { :controller "hello" :action "show" :html-options { :id "foo" :class "bar" } })))
+  (is (= "<a class=\"bar\" href=\"/hello/show\" id=\"foo\">view</a>" (link-to "view" { :controller "hello" :action "show" :html-options { :id "foo" :class "bar" } })))
   (is (= "<a href=\"/hello/show\">show</a>" (link-to #(:action %) { :controller "hello" :action "show" }))))
 
 (deftest test-link-to-if
@@ -44,6 +44,6 @@
   (is (= "<a href=\"/hello/show\">view</a>" (link-to-unless #(= (:action %) "add") "view" { :controller "hello" :action "show" }))))
 
 (deftest test-form-for
-  (is (= "<form name=\"create\" action=\"/hello/create\" method=\"put\">Blah</form>" (form-for { :name "create", :url { :controller "hello", :action "create" } } "Blah")))
-  (is (= "<form name=\"hello\" action=\"/hello/create\" method=\"put\">Blah</form>" (form-for { :url { :controller "hello", :action "create" } } "Blah")))
-  (is (= "<form name=\"create\" action=\"/hello/create\" method=\"put\">create</form>" (form-for { :name "create", :url { :controller "hello", :action "create" } } #(:action %)))))
+  (is (= "<form action=\"/hello/create\" method=\"put\" name=\"create\">Blah</form>" (form-for { :name "create", :url { :controller "hello", :action "create" } } "Blah")))
+  (is (= "<form action=\"/hello/create\" method=\"put\" name=\"hello\">Blah</form>" (form-for { :url { :controller "hello", :action "create" } } "Blah")))
+  (is (= "<form action=\"/hello/create\" method=\"put\" name=\"create\">create</form>" (form-for { :name "create", :url { :controller "hello", :action "create" } } #(:action %)))))
