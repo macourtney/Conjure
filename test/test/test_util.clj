@@ -136,31 +136,31 @@
   (is (file-utils/delete-all-if-empty (find-fixture-directory))))
 
 (deftest test-functional-test-namespace
-  (is (= (functional-test-namespace "test") "test.functional.test-controller-test"))
-  (is (= (functional-test-namespace "foo-bar") "test.functional.foo-bar-controller-test"))
-  (is (= (functional-test-namespace "foo_bar") "test.functional.foo-bar-controller-test"))
+  (is (= (functional-test-namespace "test") "functional.test-controller-test"))
+  (is (= (functional-test-namespace "foo-bar") "functional.foo-bar-controller-test"))
+  (is (= (functional-test-namespace "foo_bar") "functional.foo-bar-controller-test"))
   (is (nil? (functional-test-namespace nil)))
   (is (nil? (functional-test-namespace ""))))
 
 (deftest test-view-unit-test-namespace
-  (is (= (view-unit-test-namespace "test" "show") "test.unit.view.test.show-view-test"))
-  (is (= (view-unit-test-namespace "foo-bar" "show-biz") "test.unit.view.foo-bar.show-biz-view-test"))
-  (is (= (view-unit-test-namespace "foo_bar" "show_biz") "test.unit.view.foo-bar.show-biz-view-test"))
+  (is (= (view-unit-test-namespace "test" "show") "unit.view.test.show-view-test"))
+  (is (= (view-unit-test-namespace "foo-bar" "show-biz") "unit.view.foo-bar.show-biz-view-test"))
+  (is (= (view-unit-test-namespace "foo_bar" "show_biz") "unit.view.foo-bar.show-biz-view-test"))
   (is (nil? (view-unit-test-namespace "test" nil)))
   (is (nil? (view-unit-test-namespace nil "show")))
   (is (nil? (view-unit-test-namespace "test" "")))
   (is (nil? (view-unit-test-namespace "" "show"))))
 
 (deftest test-model-unit-test-namespace
-  (is (= (model-unit-test-namespace "test") "test.unit.model.test-model-test"))
-  (is (= (model-unit-test-namespace "foo-bar") "test.unit.model.foo-bar-model-test"))
-  (is (= (model-unit-test-namespace "foo_bar") "test.unit.model.foo-bar-model-test"))
+  (is (= (model-unit-test-namespace "test") "unit.model.test-model-test"))
+  (is (= (model-unit-test-namespace "foo-bar") "unit.model.foo-bar-model-test"))
+  (is (= (model-unit-test-namespace "foo_bar") "unit.model.foo-bar-model-test"))
   (is (nil? (model-unit-test-namespace nil)))
   (is (nil? (model-unit-test-namespace ""))))
 
-(deftest test-model-unit-test-namespace
-  (is (= (fixture-namespace "test") "test.fixture.test"))
-  (is (= (fixture-namespace "foo-bar") "test.fixture.foo-bar"))
-  (is (= (fixture-namespace "foo_bar") "test.fixture.foo-bar"))
+(deftest test-fixture-unit-test-namespace
+  (is (= (fixture-namespace "test") "fixture.test"))
+  (is (= (fixture-namespace "foo-bar") "fixture.foo-bar"))
+  (is (= (fixture-namespace "foo_bar") "fixture.foo-bar"))
   (is (nil? (fixture-namespace nil)))
   (is (nil? (fixture-namespace ""))))

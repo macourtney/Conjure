@@ -50,7 +50,7 @@
 (defn
 #^{:doc "Returns the namespace as a symbol for the given file which must be found in the test directory."}
   namespace-symbol-for-file [file]
-  (let [test-app-path (. (create-test-app-directory-file) getPath)
+  (let [test-app-path (. (create-test-directory-file) getPath)
         file-parent-path (. file getParent)
         namespace-string (loading-utils/namespace-string-for-file (. file-parent-path substring (. test-app-path length)) (. file getName))]
     (symbol namespace-string)))
@@ -71,7 +71,7 @@
     (println "Running scripts:" *command-line-args*)
     (doall (map 
       (fn [namespace-str] 
-        (load-file (str "./" (loading-utils/symbol-string-to-clj-file namespace-str)))) 
+        (load-file (str "./test/" (loading-utils/symbol-string-to-clj-file namespace-str)))) 
       *command-line-args*))
     (apply run-tests (map symbol *command-line-args*)))
   (let [all-test-files (test-files)]

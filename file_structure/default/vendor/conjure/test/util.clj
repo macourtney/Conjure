@@ -123,19 +123,19 @@
 #^{:doc "Returns the functional test namespace for the given controller."}
   functional-test-namespace [controller]
   (if (and controller (> (. controller length) 0))
-    (str "test.functional." (loading-utils/underscores-to-dashes controller) "-controller-test")))
+    (str "functional." (loading-utils/underscores-to-dashes controller) "-controller-test")))
 
 (defn
 #^{:doc "Returns the view test namespace for the given controller and action."}
   view-unit-test-namespace [controller action]
   (if (and controller (> (. controller length) 0) action (> (. action length) 0))
-    (str "test.unit.view." (loading-utils/underscores-to-dashes controller) "." (loading-utils/underscores-to-dashes action) "-view-test")))
+    (str "unit.view." (loading-utils/underscores-to-dashes controller) "." (loading-utils/underscores-to-dashes action) "-view-test")))
 
 (defn
 #^{:doc "Returns the model test namespace for the given model."}
   model-unit-test-namespace [model]
   (if (and model (> (. model length) 0))
-    (str "test.unit.model." (loading-utils/underscores-to-dashes model) "-model-test")))
+    (str "unit.model." (loading-utils/underscores-to-dashes model) "-model-test")))
 
 (defn
 #^{:doc "Returns the fixture namespace for the given model."}
