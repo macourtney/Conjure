@@ -61,6 +61,7 @@
   (is (= "<input class=\"hidden-message\" id=\"message-text\" name=\"message[text]\" type=\"hidden\" value=\"Blah\" />" (hidden-field :message :text { :text "Blah" } { :class "hidden-message" } ))))
 
 (deftest test-option
-  (is (= "<option value=\"test\">test</option>" (option-tag "test")))
+;  (is (= "<option value=\"test\">test</option>" (option-tag "test")))
   (is (= "<option value=\"blah\">test</option>" (option-tag "test" "blah")))
-  (is (= "<option selected=\"true\" value=\"blah\">test</option>"(option-tag "test" "blah" true)))) 
+  (is (= "<option selected=\"true\" value=\"blah\">test</option>" (option-tag "test" "blah" true)))
+  (is (= "<option value=\"a\">a</option>\n<option value=\"b\">b</option>" (option-tag '("a" "b"))))) 

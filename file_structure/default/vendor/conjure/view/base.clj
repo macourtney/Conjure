@@ -227,5 +227,5 @@ option-tag
 ([option-name value-name selected] 
    (htmli [:option (merge {:value value-name} 
 			  (if selected {:selected "true"} {})) option-name]))
-([name] (option-tag name name))
+([name-seq] (str-utils/str-join "\n" (map option-tag name-seq name-seq)))
 ([name value](option-tag name value false)))
