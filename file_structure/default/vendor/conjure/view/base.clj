@@ -220,3 +220,12 @@ an optional option map for the html options." }
   ([record-name key-name record] (hidden-field record-name key-name record {}))
   ([record-name key-name record html-options]
     (input :hidden record-name key-name record html-options)))
+
+(defn
+#^{:doc "Creates a set of select option tags"}
+option-tag
+([option-name value-name selected] 
+   (htmli [:option (merge {:value value-name} 
+			  (if selected {:selected "true"} {})) option-name]))
+([name] (option-tag name name))
+([name value](option-tag name value false)))
