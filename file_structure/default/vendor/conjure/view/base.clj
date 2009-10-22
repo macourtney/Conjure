@@ -234,5 +234,4 @@ option-tag
 #^{:doc "Creates a select tag."}
 select-tag
 ([html-options] (select-tag  " " html-options))
-([option-tags html-options] (htmli [:select html-options option-tags]))
-)
+([option-tags html-options] (htmli [:select html-options option-tags])))

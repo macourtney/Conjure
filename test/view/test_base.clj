@@ -69,5 +69,4 @@
 (deftest test-select
   (is (= "<select> </select>" (select-tag {})))
   (is (= "<select id=\"pony\"> </select>" (select-tag { :id "pony" })))
-  (is (= "<select><option>1</option></select>" (select-tag "<option>1</option>" {}))) 
-)
+  (is (= "<select><option>1</option></select>" (select-tag "<option>1</option>" {}))))
