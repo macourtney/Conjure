@@ -230,3 +230,9 @@ option-tag
 ([name-seq] (str-utils/str-join "\n" (map option-tag name-seq name-seq)))
 ([name value](option-tag name value false)))
 
+(defn
+#^{:doc "Creates a select tag."}
+select-tag
+([html-options] (select-tag  " " html-options))
+([option-tags html-options] (htmli [:select html-options option-tags]))
+)

@@ -66,6 +66,8 @@
   (is (= "<option selected=\"true\" value=\"blah\">test</option>" (option-tag "test" "blah" true)))
   (is (= "<option value=\"a\">a</option>\n<option value=\"b\">b</option>" (option-tag '("a" "b"))))) 
 
-;(deftest test-select
-;  (is (= "<select> </select>" (select-tag {})))
-;)
+(deftest test-select
+  (is (= "<select> </select>" (select-tag {})))
+  (is (= "<select id=\"pony\"> </select>" (select-tag { :id "pony" })))
+  (is (= "<select><option>1</option></select>" (select-tag "<option>1</option>" {}))) 
+)
