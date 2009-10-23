@@ -214,24 +214,36 @@ an optional option map for the html options." }
           (get record key-name) ]))))
 
 (defn
-#^{:doc "Creates an input tag of type \"hidden\" for a field of name key-name in record of the given name. You can pass along
-an optional option map for the html options." }
+#^{:doc "Creates an input tag of type \"hidden\" for a field of name key-name in record of the given name. You can pass
+along an optional option map for the html options." }
   hidden-field 
   ([record-name key-name record] (hidden-field record-name key-name record {}))
   ([record-name key-name record html-options]
     (input :hidden record-name key-name record html-options)))
 
 (defn
-#^{:doc "Creates a set of select option tags from one of the following: a pair of strings representing the name and value.  A name, value and selection boolean.  Or a list of options (the name and value are the same)."}
+#^{:doc "Creates a set of select option tags from one of the following: a pair of strings representing the name and 
+value.  A name, value and selection boolean.  Or a list of options (the name and value are the same)."}
   option-tag
   ([option-name value-name selected] 
     (htmli [:option (merge {:value value-name} 
       (if selected {:selected "true"} {})) option-name]))
-  ([name-seq] (str-utils/str-join "\n" (map option-tag name-seq name-seq)))
-  ([name value](option-tag name value false)))
+  ([option-name-seq] (str-utils/str-join "\n" (map option-tag option-name-seq option-name-seq)))
+  ([option-name value-name](option-tag option-name value-name false))
+  ([record-name key-name record option-name-seq] ;Note: record-name is not used except to give a 4th parameter and 
+                                                 ;distinguish this parameter list from the rest.
+    (str-utils/str-join "\n"
+      (map 
+        (fn [option-name]
+          (option-tag option-name option-name (= option-name (get record key-name))))
+        option-name-seq))))
 
 (defn
 #^{:doc "Creates a select tag."}
   select-tag
   ([html-options] (select-tag  " " html-options))
-  ([option-tags html-options] (htmli [:select html-options option-tags])))
+  ([option-tags html-options] (htmli [:select html-options option-tags]))
+  ([record-name key-name record option-name-seq html-options]
+    (select-tag
+      (option-tag record-name key-name record option-name-seq)
+      (merge { :name (name-value (conjure-str-utils/str-keyword record-name) (conjure-str-utils/str-keyword key-name)) } html-options))))

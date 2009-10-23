@@ -61,12 +61,13 @@
   (is (= "<input class=\"hidden-message\" id=\"message-text\" name=\"message[text]\" type=\"hidden\" value=\"Blah\" />" (hidden-field :message :text { :text "Blah" } { :class "hidden-message" } ))))
 
 (deftest test-option
-;  (is (= "<option value=\"test\">test</option>" (option-tag "test")))
   (is (= "<option value=\"blah\">test</option>" (option-tag "test" "blah")))
   (is (= "<option selected=\"true\" value=\"blah\">test</option>" (option-tag "test" "blah" true)))
-  (is (= "<option value=\"a\">a</option>\n<option value=\"b\">b</option>" (option-tag '("a" "b"))))) 
+  (is (= "<option value=\"a\">a</option>\n<option value=\"b\">b</option>" (option-tag '("a" "b"))))
+  (is (= "<option value=\"yellow\">yellow</option>\n<option value=\"red\">red</option>\n<option selected=\"true\" value=\"blue\">blue</option>" (option-tag :thing :color { :color "blue" } ["yellow", "red", "blue"])))) 
 
 (deftest test-select
   (is (= "<select> </select>" (select-tag {})))
   (is (= "<select id=\"pony\"> </select>" (select-tag { :id "pony" })))
-  (is (= "<select><option>1</option></select>" (select-tag "<option>1</option>" {}))))
+  (is (= "<select><option>1</option></select>" (select-tag "<option>1</option>" {})))
+  (is (= "<select id=\"pony\" name=\"thing[color]\"><option value=\"yellow\">yellow</option>\n<option value=\"red\">red</option>\n<option selected=\"true\" value=\"blue\">blue</option></select>" (select-tag :thing :color { :color "blue" } ["yellow", "red", "blue"] { :id "pony" }))))
