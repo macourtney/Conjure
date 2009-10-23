@@ -223,15 +223,15 @@ an optional option map for the html options." }
 
 (defn
 #^{:doc "Creates a set of select option tags from one of the following: a pair of strings representing the name and value.  A name, value and selection boolean.  Or a list of options (the name and value are the same)."}
-option-tag
-([option-name value-name selected] 
-   (htmli [:option (merge {:value value-name} 
-			  (if selected {:selected "true"} {})) option-name]))
-([name-seq] (str-utils/str-join "\n" (map option-tag name-seq name-seq)))
-([name value](option-tag name value false)))
+  option-tag
+  ([option-name value-name selected] 
+    (htmli [:option (merge {:value value-name} 
+      (if selected {:selected "true"} {})) option-name]))
+  ([name-seq] (str-utils/str-join "\n" (map option-tag name-seq name-seq)))
+  ([name value](option-tag name value false)))
 
 (defn
 #^{:doc "Creates a select tag."}
-select-tag
-([html-options] (select-tag  " " html-options))
-([option-tags html-options] (htmli [:select html-options option-tags])))
+  select-tag
+  ([html-options] (select-tag  " " html-options))
+  ([option-tags html-options] (htmli [:select html-options option-tags])))
