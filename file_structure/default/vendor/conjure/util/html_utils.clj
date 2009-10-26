@@ -13,9 +13,48 @@
   (. URLDecoder decode string "UTF-8"))
 
 (defn
+#^{:doc "Returns a sequence of keys to use in update-params to get the lowest map to add a value into. See the doc for
+update-params for more information on how the key-seq is used."}
+  key-seq [full-key-str]
+  (let [stripped-key (. full-key-str trim)]
+    (if (> (. stripped-key length) 0)
+      (if (re-matches #"^([\w-]+)(\[[\w-]+\])*$" stripped-key)
+        (cons 
+          (keyword (re-find #"^[\w-]+" stripped-key))
+          (let [matcher (re-matcher #"\[[\w-]+\]" stripped-key)]
+            (for [current-key (repeatedly #(re-find matcher)) :while current-key] 
+              (keyword (. current-key substring 1 (- (. current-key length) 1))))))
+        (throw (new RuntimeException (str "Key string is not valid: \"" full-key-str "\". Key string must be in the form <name>[<name>]*"))))
+      ())))
+
+(defn
+#^{:doc "Updates params with the given value placed in a map at the place indicated by the given key sequence.
+
+Examples:
+  params = { :foo :bar }, value = :biz
+  
+  key-seq = [ :baz ] => params = { :foo :bar, :baz :biz }
+  key-seq = [ :baz :boz ] => params = { :foo :bar, :baz { :boz :biz } }
+  key-seq = [ :baz :boz :buz ] => params = { :foo :bar, :baz { :boz { :buz :biz } } }
+  
+  params = { :baz { :biz :boz } }, value = :bar
+  
+  key-seq = [ :baz :foo ] => params = { :baz { :biz :boz, :foo :bar } }"}
+  update-params [params key-seq value]
+  (if (not-empty key-seq)
+    (let [first-key (first key-seq)
+          child-key-seq (rest key-seq)]
+      (if (and (contains? params first-key) (seq child-key-seq))
+        (assoc params first-key (update-params (get params first-key) child-key-seq value))
+        (if (not-empty child-key-seq)
+          (assoc params first-key (update-params {} child-key-seq value))
+          (assoc params first-key value))))
+    params))
+
+(defn
 #^{:doc "Adds the given query-key-value sequence as a key value pair to the map params."}
   add-param [params query-key-value]
-  (assoc params (keyword (first query-key-value)) (url-decode (second query-key-value))))
+  (update-params params (key-seq (first query-key-value)) (url-decode (second query-key-value))))
 
 (defn
 #^{:doc "Parses the parameters in the given query-string into a parameter map."}
