@@ -49,25 +49,48 @@
   (is (= "<form action=\"/hello/create\" method=\"put\" name=\"create\">create</form>" (form-for { :name "create", :url { :controller "hello", :action "create" } } #(:action %)))))
 
 (deftest test-text-field
-  (is (= "<input id=\"message-text\" name=\"message[text]\" type=\"text\" value=\"Blah\" />" (text-field :message :text { :text "Blah" } )))
-  (is (= "<input id=\"message-text\" name=\"message[text]\" size=\"20\" type=\"text\" value=\"Blah\" />" (text-field :message :text { :text "Blah" } { :size 20 } ))))
+  (is (= "<input id=\"message-text\" name=\"message[text]\" type=\"text\" value=\"Blah\" />" (text-field { :text "Blah" } :message :text )))
+  (is (= "<input id=\"message-text\" name=\"message[text]\" size=\"20\" type=\"text\" value=\"Blah\" />" (text-field { :text "Blah" } :message :text { :size 20 } ))))
   
 (deftest test-text-area
-  (is (= "<textarea cols=\"20\" id=\"message-text\" name=\"message[text]\" rows=\"40\">Blah</textarea>" (text-area :message :text { :text "Blah" } )))
-  (is (= "<textarea cols=\"40\" id=\"message-text\" name=\"message[text]\" rows=\"60\">Blah</textarea>" (text-area :message :text { :text "Blah" } { :rows 60, :cols 40 } ))))
+  (is (= "<textarea cols=\"20\" id=\"message-text\" name=\"message[text]\" rows=\"40\">Blah</textarea>" (text-area { :text "Blah" } :message :text )))
+  (is (= "<textarea cols=\"40\" id=\"message-text\" name=\"message[text]\" rows=\"60\">Blah</textarea>" (text-area { :text "Blah" } :message :text { :rows 60, :cols 40 } ))))
 
 (deftest test-hidden-field
-  (is (= "<input id=\"message-text\" name=\"message[text]\" type=\"hidden\" value=\"Blah\" />" (hidden-field :message :text { :text "Blah" } )))
-  (is (= "<input class=\"hidden-message\" id=\"message-text\" name=\"message[text]\" type=\"hidden\" value=\"Blah\" />" (hidden-field :message :text { :text "Blah" } { :class "hidden-message" } ))))
+  (is (= "<input id=\"message-text\" name=\"message[text]\" type=\"hidden\" value=\"Blah\" />" (hidden-field { :text "Blah" } :message :text )))
+  (is (= "<input class=\"hidden-message\" id=\"message-text\" name=\"message[text]\" type=\"hidden\" value=\"Blah\" />" (hidden-field { :text "Blah" } :message :text { :class "hidden-message" } ))))
 
-(deftest test-option
-  (is (= "<option value=\"blah\">test</option>" (option-tag "test" "blah")))
+(deftest test-option-tag
+  (is (= "<option value=\"blah\">test</option>" (option-tag "test" "blah" false)))
   (is (= "<option selected=\"true\" value=\"blah\">test</option>" (option-tag "test" "blah" true)))
-  (is (= "<option value=\"a\">a</option>\n<option value=\"b\">b</option>" (option-tag '("a" "b"))))
-  (is (= "<option value=\"yellow\">yellow</option>\n<option value=\"red\">red</option>\n<option selected=\"true\" value=\"blue\">blue</option>" (option-tag :thing :color { :color "blue" } ["yellow", "red", "blue"])))) 
+  (is (= "<option value=\"blah\">test</option>" (option-tag :test { :value "blah" })))
+  (is (= "<option selected=\"true\" value=\"blah\">test</option>" (option-tag :test { :value "blah" :selected true })))
+  (is (= "<option value=\"test\">test</option>" (option-tag :test {})))) 
 
-(deftest test-select
-  (is (= "<select> </select>" (select-tag {})))
-  (is (= "<select id=\"pony\"> </select>" (select-tag { :id "pony" })))
-  (is (= "<select><option>1</option></select>" (select-tag "<option>1</option>" {})))
-  (is (= "<select id=\"pony\" name=\"thing[color]\"><option value=\"yellow\">yellow</option>\n<option value=\"red\">red</option>\n<option selected=\"true\" value=\"blue\">blue</option></select>" (select-tag :thing :color { :color "blue" } ["yellow", "red", "blue"] { :id "pony" }))))
+(deftest test-option-tags
+  (is (= "<option value=\"blah\">test</option>" (option-tags { :test { :value "blah" }})))
+  (is (= "<option selected=\"true\" value=\"blah\">test</option><option value=\"blah2\">test2</option>" (option-tags { :test { :value "blah" :selected true }, :test2 { :value "blah2" }})))
+  (is (= "<option selected=\"true\" value=\"test\">test</option><option value=\"test2\">test2</option>" (option-tags { :test { :selected true }, :test2 nil })))
+  (is (= "<option value=\"test1\">test1</option><option value=\"test2\">test2</option><option value=\"test3\">test3</option>" (option-tags { :test1 nil, :test2 nil, :test3 nil }))))
+
+(deftest test-select-tag
+  (is (= "<select />" (select-tag {})))
+  (is (= "<select id=\"pony\"></select>" (select-tag { :html-options { :id "pony" } })))
+  (is (= 
+    "<select id=\"pony\"><option value=\"blah\">test</option></select>" 
+    (select-tag { :html-options { :id "pony" } :option-map { :test { :value "blah" }} })))
+  (is (= 
+    "<select name=\"foo[bar]\"><option value=\"bar\">bar</option><option selected=\"true\" value=\"baz\">baz</option><option value=\"boz\">boz</option></select>" 
+    (select-tag { :bar "baz" } :foo :bar
+      { :option-map 
+        { :bar nil
+          :baz nil
+          :boz nil } }))))
+          
+(deftest test-option-map-select-value
+  (is (= { :bar nil
+           :baz { :selected true, :value "baz" }
+           :boz nil }
+         (option-map-select-value { :bar nil
+             :baz nil
+             :boz nil } "baz"))))

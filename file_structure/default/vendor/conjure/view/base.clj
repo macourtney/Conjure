@@ -78,16 +78,6 @@ to it."}
             [controller action (id-from params) (anchor-from params)])))
       (throw (new RuntimeException (str "You must pass a controller and action to url-for. " params)))))))
 
-;(defn-
-;#^{:doc "Generates the html attributes for the given options."}
-;  generate-html-options [html-options]
-;  (apply str 
-;    (interleave
-;      (repeat " ")
-;      (map 
-;        #(str (conjure-str-utils/str-keyword  %) "=\"" (conjure-str-utils/str-keyword (get html-options %)) "\"") 
-;        (keys html-options)))))
-        
 (defn- #^{:doc "If function is a function, then this method evaluates it with the given args. Otherwise, it just returns
 function." }
   evaluate-if-fn [function & args]
@@ -104,21 +94,21 @@ function." }
 If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
 and params, text is called with request-map and params merged (not all keys used from request-map)."}
   link-to
-    ([text request-map params] (link-to text (merge-url-for-params request-map params)))
-    ([text params]
-      (let [html-options (if (:html-options params) (:html-options params) {})]
-        (htmli [:a (assoc html-options :href (url-for params)) (evaluate-if-fn text params)]))))
+  ([text request-map params] (link-to text (merge-url-for-params request-map params)))
+  ([text params]
+    (let [html-options (if (:html-options params) (:html-options params) {})]
+      (htmli [:a (assoc html-options :href (url-for params)) (evaluate-if-fn text params)]))))
 
 (defn
 #^{:doc "If condition is true, then call link-to with the given text, request-map and params. If condition is false, 
 then just return text. If condition is a function, it is evaluated with params merged with request-map. If text is a 
 function, it is evaluated with params merged with request-map (just like link-to)." }
   link-to-if
-    ([condition text request-map params] (link-to-if condition text (merge-url-for-params request-map params)))
-    ([condition text params]
-      (if (evaluate-if-fn condition params)
-        (link-to text params)
-        (evaluate-if-fn text params))))
+  ([condition text request-map params] (link-to-if condition text (merge-url-for-params request-map params)))
+  ([condition text params]
+    (if (evaluate-if-fn condition params)
+      (link-to text params)
+      (evaluate-if-fn text params))))
 
 (defn-
 #^{:doc "Inverses the results of condition. If condition is a function, then this method creates a new function which 
@@ -176,7 +166,7 @@ be strings." }
 (defn
 #^{:doc "Creates an input tag of the given type for a field of name key-name in record of the given name. You can pass along
 an optional option map for the html options." }
-  input [input-type record-name key-name record html-options]
+  input [input-type record record-name key-name html-options]
     (let [record-name-str (conjure-str-utils/str-keyword record-name)
           key-name-str (conjure-str-utils/str-keyword key-name)]
       (htmli 
@@ -192,16 +182,16 @@ an optional option map for the html options." }
 #^{:doc "Creates an input tag of type text for a field of name key-name in record of the given name. You can pass along
 an optional option map for the html options." }
   text-field
-  ([record-name key-name record] (text-field record-name key-name record {})) 
-  ([record-name key-name record html-options]
-    (input :text record-name key-name record html-options)))
+  ([record record-name key-name] (text-field record record-name key-name {})) 
+  ([record record-name key-name html-options]
+    (input :text record record-name key-name html-options)))
             
 (defn
 #^{:doc "Creates a text area tag for a field of name key-name in record of the given name. You can pass along
 an optional option map for the html options." }
   text-area 
-  ([record-name key-name record] (text-area record-name key-name record {}))
-  ([record-name key-name record html-options]
+  ([record record-name key-name] (text-area record record-name key-name {}))
+  ([record record-name key-name html-options]
     (let [record-name-str (conjure-str-utils/str-keyword record-name)
           key-name-str (conjure-str-utils/str-keyword key-name)]
       (htmli 
@@ -217,33 +207,55 @@ an optional option map for the html options." }
 #^{:doc "Creates an input tag of type \"hidden\" for a field of name key-name in record of the given name. You can pass
 along an optional option map for the html options." }
   hidden-field 
-  ([record-name key-name record] (hidden-field record-name key-name record {}))
-  ([record-name key-name record html-options]
-    (input :hidden record-name key-name record html-options)))
+  ([record record-name key-name] (hidden-field record record-name key-name {}))
+  ([record record-name key-name html-options]
+    (input :hidden record record-name key-name html-options)))
 
 (defn
-#^{:doc "Creates a set of select option tags from one of the following: a pair of strings representing the name and 
-value.  A name, value and selection boolean.  Or a list of options (the name and value are the same)."}
+#^{:doc "Creates a select option tag from one of the following: A name, value and selection boolean, or a map 
+containing a name, value (optional), and selected (optional) keys."}
   option-tag
   ([option-name value-name selected] 
     (htmli [:option (merge {:value value-name} 
       (if selected {:selected "true"} {})) option-name]))
-  ([option-name-seq] (str-utils/str-join "\n" (map option-tag option-name-seq option-name-seq)))
-  ([option-name value-name](option-tag option-name value-name false))
-  ([record-name key-name record option-name-seq] ;Note: record-name is not used except to give a 4th parameter and 
-                                                 ;distinguish this parameter list from the rest.
-    (str-utils/str-join "\n"
-      (map 
-        (fn [option-name]
-          (option-tag option-name option-name (= option-name (get record key-name))))
-        option-name-seq))))
+  ([option-name option-map]
+    (let [option-name-str (conjure-str-utils/str-keyword option-name)]
+      (option-tag option-name-str (or (:value option-map) option-name-str) (or (:selected option-map) false)))))
+      
+(defn
+#^{:doc "Returns a string containing a list of options using option-tag. The given option-map contains a maping from 
+option names to option-tag option maps."}
+  option-tags [option-map]
+  (apply str (map option-tag (keys option-map) (vals option-map))))
+
+(defn-
+#^{ :doc "Augments the given html-optiosn with a record name option." }
+  record-html-options [html-options record-name key-name]
+  (assoc html-options
+    :name (name-value (conjure-str-utils/str-keyword record-name) (conjure-str-utils/str-keyword key-name))))
 
 (defn
-#^{:doc "Creates a select tag."}
+#^{ :doc "Returns record-key if the value of record-key in option-map equals record-value. If option-map does not 
+contain record-key then this method returns record-key if record-key equals record-value." }
+  is-value-key? [option-map option-key value]
+  (if (= (or (get option-map option-key) (conjure-str-utils/str-keyword option-key)) value)
+    option-key
+    nil))
+
+(defn
+#^{ :doc "Augments the given option-map setting selected for the option with the value of record-value." }
+  option-map-select-value [option-map value]
+  (let [option-key (some #(is-value-key? option-map % value) (keys option-map))]
+    (if option-key
+      (assoc option-map option-key (assoc (or (get option-map option-key) { :value (conjure-str-utils/str-keyword option-key) } ) :selected true))
+      option-map)))
+
+(defn
+#^{ :doc "Creates a select tag using the given select-options or record info and select-options." }
   select-tag
-  ([html-options] (select-tag  " " html-options))
-  ([option-tags html-options] (htmli [:select html-options option-tags]))
-  ([record-name key-name record option-name-seq html-options]
+  ([select-options]
+    (htmli [:select (:html-options select-options) (option-tags (:option-map select-options))]))
+  ([record record-name key-name select-options]
     (select-tag
-      (option-tag record-name key-name record option-name-seq)
-      (merge { :name (name-value (conjure-str-utils/str-keyword record-name) (conjure-str-utils/str-keyword key-name)) } html-options))))
+      { :html-options (record-html-options (:html-options select-options) record-name key-name)
+        :option-map (option-map-select-value (:option-map select-options) (get record key-name)) })))
