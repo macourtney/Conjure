@@ -69,6 +69,7 @@
 
 (deftest test-option-tags
   (is (= "<option value=\"blah\">test</option>" (option-tags { :test { :value "blah" }})))
+  (is (= "<option value=\"blah\">test</option>" (option-tags { "test" { :value "blah" }})))
   (is (= "<option selected=\"true\" value=\"blah\">test</option><option value=\"blah2\">test2</option>" (option-tags { :test { :value "blah" :selected true }, :test2 { :value "blah2" }})))
   (is (= "<option selected=\"true\" value=\"test\">test</option><option value=\"test2\">test2</option>" (option-tags { :test { :selected true }, :test2 nil })))
   (is (= "<option value=\"test1\">test1</option><option value=\"test2\">test2</option><option value=\"test3\">test3</option>" (option-tags { :test1 nil, :test2 nil, :test3 nil }))))
@@ -94,3 +95,26 @@
          (option-map-select-value { :bar nil
              :baz nil
              :boz nil } "baz"))))
+
+(deftest test-options-from-records
+  (is (= 
+    { "name1" { :value "value1" } } 
+    (options-from-records [{ :name "name1", :value "value1" }] :name :value)))
+  (is (= 
+    { "name1" { :value "value1" }, "name2" { :value "value2" } } 
+    (options-from-records 
+      [{ :name "name1", :value "value1" }, { :name "name2", :value "value2" }] 
+      :name
+      :value)))
+  (is (= 
+    { "name1" { :value "value1" }, "name2" { :value "value2" }, "name3" { :value "value3" } } 
+    (options-from-records 
+      [{ :name "name1", :value "value1" }, { :name "name2", :value "value2" }, { :name "name3", :value "value3" }] 
+      :name
+      :value)))
+  (is (= 
+    { "name1" { :value "value1" } } 
+    (options-from-records [{ :name "name1", :id "value1" }] :name)))
+  (is (= 
+    { "name1" { :value "value1" } } 
+    (options-from-records [{ :name "name1", :id "value1" }]))))
