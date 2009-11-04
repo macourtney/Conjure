@@ -228,25 +228,25 @@ option names to option-tag option maps."}
   option-tags [option-map]
   (apply str (map option-tag (keys option-map) (vals option-map))))
   
-(defn-
-#^{ :doc "Augments the given options map with the values from record which correspond to the name and value keys." }
-  add-pair-to-options [options key-value-pair]
-  (let [option-name (first key-value-pair)
-        option-value (second key-value-pair)]
-    (assoc options (or option-name option-value) { :value option-value })))
-  
 (defn
-#^{ :doc "Creates an option map from the given list of records, using the given name key and value key." }
+#^{ :doc "Creates an option map from the seq of record in the given map. Map options include:
+
+  :records - The seq of records to use as options.
+  :name-key - The key in each record who's value will be used as the name of each option. If this key does not exist, then :name is used.
+  :value-key - The key in each record who's value will be used as the value of each option. If this key does not exist, then :id is used.
+  :blank - If true, adds a blank option (name = \"\", value = \"\"). Default is false." }
   options-from-records 
-  ([records] (options-from-records records :name :id))
-  ([records name-key] (options-from-records records name-key :id))
-  ([records name-key value-key]
-    (reduce 
-      add-pair-to-options 
-      {} 
-      (map 
-        (fn [record] [(or (get record name-key) (get record :name)) (or (get record value-key) (get record :id))]) 
-        records))))
+  ([record-map] 
+    (let [records (get record-map :records [])
+          name-key (get record-map :name-key :name)
+          value-key (get record-map :value-key :id)
+          blank (get record-map :blank false)]
+      (apply merge
+        (cons
+          (if blank { "" { :value "" } }) 
+          (map 
+            (fn [record] { (get record name-key) { :value (get record value-key) } }) 
+            records))))))
 
 (defn-
 #^{ :doc "Augments the given html-options with a record name option." }

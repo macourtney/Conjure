@@ -99,22 +99,28 @@
 (deftest test-options-from-records
   (is (= 
     { "name1" { :value "value1" } } 
-    (options-from-records [{ :name "name1", :value "value1" }] :name :value)))
+    (options-from-records 
+      { :records [{ :name "name1", :value "value1" }], 
+        :name-key :name, 
+        :value-key :value })))
   (is (= 
     { "name1" { :value "value1" }, "name2" { :value "value2" } } 
     (options-from-records 
-      [{ :name "name1", :value "value1" }, { :name "name2", :value "value2" }] 
-      :name
-      :value)))
+      { :records [{ :name "name1", :value "value1" }, { :name "name2", :value "value2" }], 
+        :name-key :name,
+        :value-key :value })))
   (is (= 
     { "name1" { :value "value1" }, "name2" { :value "value2" }, "name3" { :value "value3" } } 
     (options-from-records 
-      [{ :name "name1", :value "value1" }, { :name "name2", :value "value2" }, { :name "name3", :value "value3" }] 
-      :name
-      :value)))
+      { :records [{ :name "name1", :value "value1" }, { :name "name2", :value "value2" }, { :name "name3", :value "value3" }], 
+        :name-key :name
+        :value-key :value })))
   (is (= 
     { "name1" { :value "value1" } } 
-    (options-from-records [{ :name "name1", :id "value1" }] :name)))
+    (options-from-records 
+      { :records [{ :name "name1", :id "value1" }],
+        :name-key :name })))
   (is (= 
     { "name1" { :value "value1" } } 
-    (options-from-records [{ :name "name1", :id "value1" }]))))
+    (options-from-records 
+      { :records [{ :name "name1", :id "value1" }] }))))
