@@ -237,16 +237,14 @@ option names to option-tag option maps."}
   :blank - If true, adds a blank option (name = \"\", value = \"\"). Default is false." }
   options-from-records 
   ([record-map] 
-    (let [records (get record-map :records [])
-          name-key (get record-map :name-key :name)
-          value-key (get record-map :value-key :id)
-          blank (get record-map :blank false)]
+    (let [name-key (get record-map :name-key :name)
+          value-key (get record-map :value-key :id)]
       (apply merge
         (cons
-          (if blank { "" { :value "" } }) 
+          (if (:blank record-map) { "" { :value "" } }) 
           (map 
             (fn [record] { (get record name-key) { :value (get record value-key) } }) 
-            records))))))
+            (get record-map :records [])))))))
 
 (defn-
 #^{ :doc "Augments the given html-options with a record name option." }
