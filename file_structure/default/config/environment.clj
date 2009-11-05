@@ -3,6 +3,11 @@
   
 (defn conjure-environment-property "conjure.environment")
 
+(def assets-dir "public")
+(def javascripts-dir "javascripts")
+(def stylesheets-dir "stylesheets")
+(def images-dir "images")
+
 (defn
 #^{:doc "Initializes the environment."}
   init []

@@ -124,3 +124,15 @@
     { "name1" { :value "value1" } } 
     (options-from-records 
       { :records [{ :name "name1", :id "value1" }] }))))
+
+(deftest test-image-path
+  (is (= "/images/edit.png" (image-path "edit.png")))
+  (is (= "/images/icons/edit.png" (image-path "icons/edit.png")))
+  (is (= "/icons/edit.png" (image-path "/icons/edit.png")))
+  (is (= "http://www.conjureapplication.com/img/edit.png" 
+    (image-path "http://www.conjureapplication.com/img/edit.png"))))
+
+(deftest test-image-tag
+  (is (= "<img src=\"/images/icon.png\" />" (image-tag "icon.png")))
+  (is (= "<img src=\"/icons/icon.png\" />" (image-tag "/icons/icon.png")))
+  (is (= "<img class=\"menu-icon\" src=\"/icons/icon.png\" />" (image-tag "/icons/icon.png" { :class "menu-icon" }))))

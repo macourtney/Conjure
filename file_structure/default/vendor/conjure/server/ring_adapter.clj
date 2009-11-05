@@ -1,6 +1,7 @@
 (ns conjure.server.ring-adapter
   (:import [java.io File])
   (:require [conjure.server.server :as server]
+            [environment :as environment]
             [ring.middleware.file :as ring-file]))
 
 (defn
@@ -17,4 +18,4 @@ request map."}
 (defn
 #^{:doc "A Ring adapter function for Conjure."}
   conjure [req]
-  ((ring-file/wrap-file call-server (new File "public")) req))
+  ((ring-file/wrap-file call-server (new File environment/assets-dir)) req))

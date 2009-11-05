@@ -1,6 +1,7 @@
 (ns conjure.view.base
   (:use clj-html.core)
   (:require [clojure.contrib.str-utils :as str-utils]
+            environment
             [conjure.util.string-utils :as conjure-str-utils]))
 
 (defmacro
@@ -277,3 +278,18 @@ contain record-key then this method returns record-key if record-key equals reco
     (select-tag
       { :html-options (record-html-options (:html-options select-options) record-name key-name)
         :option-map (option-map-select-value (:option-map select-options) (get record key-name)) })))
+
+(defn
+#^{ :doc "Returns the full path to the given image source." }
+  image-path [source]
+  (if (. source startsWith "/")
+    source
+    (if (. source startsWith "http://") ; This should probably check for ftp, https, and etc.
+      source
+      (str "/" environment/images-dir "/" source))))
+  
+(defn
+#^{ :doc "Returns an image tag for the given source and with the given options." }
+  image-tag 
+  ([source] (image-tag source {}))
+  ([source options] (htmli [:img (merge options { :src (image-path source) })])))
