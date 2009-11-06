@@ -29,3 +29,14 @@ then this method simply returns it."}
     (let [ending-index (- (. string length) (. ending length))]
       (. string substring 0 ending-index))
     string))
+
+(defn
+#^{:doc "If the given string does not end with ending, then add ending to it."}
+  add-ending-if-absent [string ending]
+    (if string
+      (if ending
+        (if (. string endsWith ending)
+          string
+          (str string ending))
+        string)
+      ending))

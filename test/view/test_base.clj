@@ -136,3 +136,27 @@
   (is (= "<img src=\"/images/icon.png\" />" (image-tag "icon.png")))
   (is (= "<img src=\"/icons/icon.png\" />" (image-tag "/icons/icon.png")))
   (is (= "<img class=\"menu-icon\" src=\"/icons/icon.png\" />" (image-tag "/icons/icon.png" { :class "menu-icon" }))))
+
+(deftest test-stylesheet-path
+  (is (= "/stylesheets/style.css" (stylesheet-path "style")))
+  (is (= "/stylesheets/style.css" (stylesheet-path "style.css")))
+  (is (= "/stylesheets/dir/style.css" (stylesheet-path "dir/style.css")))
+  (is (= "http://www.conjureapplication.com/css/style.css" (stylesheet-path "http://www.conjureapplication.com/css/style")))
+  (is (= "http://www.conjureapplication.com/css/style.css" (stylesheet-path "http://www.conjureapplication.com/css/style.js"))))
+
+(deftest test-stylesheet-link-tag
+  (is (= 
+    "<link href=\"/stylesheets/style.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />" 
+    (stylesheet-link-tag "style")))
+  (is (= 
+    "<link href=\"/stylesheets/style.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />" 
+    (stylesheet-link-tag "style.css")))
+  (is (= 
+    "<link href=\"http://www.conjureapplication.com/style.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />" 
+    (stylesheet-link-tag "http://www.conjureapplication.com/style.css")))
+  (is (= 
+    "<link href=\"/stylesheets/style.css\" media=\"all\" rel=\"stylesheet\" type=\"text/css\" />" 
+    (stylesheet-link-tag "style.css" { :media "all" })))
+  (is (= 
+    "<link href=\"/stylesheets/random.styles.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" /><link href=\"/css/stylish.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />" 
+    (stylesheet-link-tag ["random.styles.css" "/css/stylish"]))))

@@ -26,3 +26,11 @@
    (is (= (strip-ending "" "Blah") ""))
    (is (= (strip-ending nil "Blah") nil))
    (is (= (strip-ending nil nil) nil)))
+   
+(deftest test-add-ending-if-absent
+  (is (= (add-ending-if-absent "blah" ".foo") "blah.foo"))
+  (is (= (add-ending-if-absent "blah.foo" ".foo") "blah.foo"))
+  (is (= (add-ending-if-absent "blah" nil) "blah"))
+  (is (= (add-ending-if-absent nil ".foo") ".foo"))
+  (is (= (add-ending-if-absent "blah" "") "blah"))
+  (is (= (add-ending-if-absent "" ".foo") ".foo")))   

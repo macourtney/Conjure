@@ -279,17 +279,66 @@ contain record-key then this method returns record-key if record-key equals reco
       { :html-options (record-html-options (:html-options select-options) record-name key-name)
         :option-map (option-map-select-value (:option-map select-options) (get record key-name)) })))
 
+(defn-
+#^{ :doc "Replaces the current extension on source with the given extension." }
+  replace-extension [source extension]
+  (if extension
+    (conjure-str-utils/add-ending-if-absent
+      (str-utils/re-sub #"\.[a-zA-Z0-9]*$" "" source) 
+      (if extension (str "." extension)))
+    source))
+
+(defn
+#^{ :doc "Returns a path for the given source in the given base-dir with the given extension (if none is given)." }
+  compute-public-path 
+  ([source base-dir] (compute-public-path source base-dir nil))
+  ([source base-dir extension]
+    (replace-extension
+      (if (. source startsWith "/")
+        source
+        (if (. source startsWith "http://") ; This should probably check for ftp, https, and etc.
+          source
+          (str "/" base-dir "/" source)))
+      extension)))
+
 (defn
 #^{ :doc "Returns the full path to the given image source." }
   image-path [source]
-  (if (. source startsWith "/")
-    source
-    (if (. source startsWith "http://") ; This should probably check for ftp, https, and etc.
-      source
-      (str "/" environment/images-dir "/" source))))
+    (compute-public-path source environment/images-dir))
   
 (defn
 #^{ :doc "Returns an image tag for the given source and with the given options." }
   image-tag 
   ([source] (image-tag source {}))
-  ([source options] (htmli [:img (merge options { :src (image-path source) })])))
+  ([source html-options] (htmli [:img (merge { :src (image-path source) } html-options)])))
+
+(defn
+#^{ :doc "Returns the full path to the given stylesheet source." }
+  stylesheet-path [source]
+    (compute-public-path source environment/stylesheets-dir "css"))
+
+(defn-
+#^{ :doc "Returns the type of the first parameter." }
+  first-type [& params]
+  (class (first params)))
+
+(defmulti 
+#^{ :doc "Returns a stylesheet tag for the given source and with the given options." }
+  stylesheet-link-tag first-type)
+  
+(defmethod stylesheet-link-tag clojure.lang.PersistentVector
+  ([sources] (stylesheet-link-tag sources {}))
+  ([sources html-options]
+    (apply str (map stylesheet-link-tag sources (repeat html-options)))))
+  
+(defmethod stylesheet-link-tag String
+  ([source] (stylesheet-link-tag source {}))
+  ([source html-options]
+    (htmli
+      [:link 
+        (merge 
+          { :href (stylesheet-path source), 
+            :media "screen", 
+            :rel "stylesheet", 
+            :type "text/css" } 
+          html-options)])))
