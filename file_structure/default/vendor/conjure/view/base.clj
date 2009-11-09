@@ -342,3 +342,27 @@ contain record-key then this method returns record-key if record-key equals reco
             :rel "stylesheet", 
             :type "text/css" } 
           html-options)])))
+
+(defn
+#^{ :doc "Returns the full path to the given javascript source." }
+  javascript-path [source]
+    (compute-public-path source environment/javascripts-dir "js"))
+
+(defmulti
+#^{ :doc "Returns a javascript include tag for the given source and with the given options." }
+  javascript-include-tag first-type)
+
+(defmethod javascript-include-tag clojure.lang.PersistentVector
+  ([sources] (javascript-include-tag sources {}))
+  ([sources html-options]
+    (apply str (map javascript-include-tag sources (repeat html-options)))))
+
+(defmethod javascript-include-tag String
+  ([source] (javascript-include-tag source {}))
+  ([source html-options]
+    (htmli
+      [:script
+        (merge 
+          { :src (javascript-path source),
+            :type "text/javascript" } 
+          html-options)])))

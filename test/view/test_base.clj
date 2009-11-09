@@ -160,3 +160,25 @@
   (is (= 
     "<link href=\"/stylesheets/random.styles.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" /><link href=\"/css/stylish.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />" 
     (stylesheet-link-tag ["random.styles.css" "/css/stylish"]))))
+
+(deftest test-javascript-path
+  (is (= "/javascripts/xmlhr.js" (javascript-path "xmlhr")))
+  (is (= "/javascripts/dir/xmlhr.js" (javascript-path "dir/xmlhr.js")))
+  (is (= "/dir/xmlhr.js" (javascript-path "/dir/xmlhr")))
+  (is (= "http://www.conjureapplication.com/js/xmlhr.js" 
+    (javascript-path "http://www.conjureapplication.com/js/xmlhr")))
+  (is (= "http://www.conjureapplication.com/js/xmlhr.js" 
+    (javascript-path "http://www.conjureapplication.com/js/xmlhr.js"))))
+    
+(deftest test-javascript-include-tag
+  (is (= "<script src=\"/javascripts/xmlhr.js\" type=\"text/javascript\" />" (javascript-include-tag "xmlhr")))
+  (is (= "<script src=\"/javascripts/xmlhr.js\" type=\"text/javascript\" />" (javascript-include-tag "xmlhr.js")))
+  (is (= 
+    "<script src=\"/javascripts/common.js\" type=\"text/javascript\" /><script src=\"/elsewhere/cools.js\" type=\"text/javascript\" />"
+    (javascript-include-tag ["common.js", "/elsewhere/cools"])))
+  (is (= 
+    "<script src=\"http://www.conjureapplication.com/js/xmlhr.js\" type=\"text/javascript\" />"
+    (javascript-include-tag "http://www.conjureapplication.com/js/xmlhr")))
+  (is (= 
+    "<script src=\"http://www.conjureapplication.com/js/xmlhr.js\" type=\"text/javascript\" />"
+    (javascript-include-tag "http://www.conjureapplication.com/js/xmlhr.js"))))
