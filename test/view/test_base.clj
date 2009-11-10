@@ -182,3 +182,19 @@
   (is (= 
     "<script src=\"http://www.conjureapplication.com/js/xmlhr.js\" type=\"text/javascript\" />"
     (javascript-include-tag "http://www.conjureapplication.com/js/xmlhr.js"))))
+
+(deftest test-mail-to
+  (is (= "<a href=\"mailto:me@example.com\">me@example.com</a>" (mail-to { :address "me@example.com" })))
+  (is (= "<a href=\"mailto:me@example.com\">My email</a>" (mail-to { :address "me@example.com", :name "My email" })))
+  (is (= 
+    "<a class=\"email\" href=\"mailto:me@example.com\">My email</a>" 
+    (mail-to { :address "me@example.com", :name "My email" :html-options { :class "email" }})))
+  (is (= 
+    "<a href=\"mailto:me@example.com\">me at example.com</a>" 
+    (mail-to { :address "me@example.com", :replace-at " at " })))
+  (is (= 
+    "<a href=\"mailto:me@example.com\">me@example dot com</a>" 
+    (mail-to { :address "me@example.com", :replace-dot " dot " })))
+  (is (= 
+    "<a href=\"mailto:me@example.com\">me at example dot com</a>" 
+    (mail-to { :address "me@example.com", :replace-at " at ", :replace-dot " dot " }))))

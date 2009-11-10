@@ -366,3 +366,24 @@ contain record-key then this method returns record-key if record-key equals reco
           { :src (javascript-path source),
             :type "text/javascript" } 
           html-options)])))
+
+(defn
+#^{ :doc "Returns a mailto link with the given mail options. Valid mail options are:
+
+  :address - The full e-mail address to use. (required)
+  :name - The display name to use. If not given, address is used.
+  :html-options - Any extra attributes for the mail to tag.
+  :replace-at - If name is not given, then replace the @ symbol with this text in the address before using it as the name.
+  :replace-dot - If name is not given, then replace the . in the email with this text in the address before using it as the name." }
+  mail-to [mail-options] 
+   (let [address (:address mail-options)
+         display-name 
+          (or 
+            (:name mail-options) 
+            (conjure-str-utils/str-replace-if address { "@" (:replace-at mail-options), "." (:replace-dot mail-options) }))]
+     (htmli
+       [:a
+         (merge
+           { :href (str "mailto:" address) }
+           (:html-options mail-options))
+         display-name])))

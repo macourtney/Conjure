@@ -40,3 +40,19 @@ then this method simply returns it."}
           (str string ending))
         string)
       ending))
+
+(defn-
+#^{ :doc "For the given replace pair, replace all occurences of (first replace-pair) in string with 
+(second replace-pair) if (second replace-pair) is not nil." }
+  str-replace-pair [string replace-pair]
+  (let [target (first replace-pair)
+        replacement (second replace-pair)]
+    (if replacement
+      (. string replace (str-keyword target) replacement)
+      string)))
+
+(defn
+#^{ :doc "For each key in replace-map, substitute the value in replace map for all occurances of the key in string." }
+  str-replace-if 
+  ([string replace-map]
+    (reduce str-replace-pair string (map (fn [map-key] [map-key (get replace-map map-key)]) (keys replace-map)))))
