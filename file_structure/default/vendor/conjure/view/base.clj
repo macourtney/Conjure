@@ -2,7 +2,8 @@
   (:use clj-html.core)
   (:require [clojure.contrib.str-utils :as str-utils]
             environment
-            [conjure.util.string-utils :as conjure-str-utils]))
+            [conjure.util.string-utils :as conjure-str-utils]
+            [conjure.util.html-utils :as html-utils]))
 
 (defmacro
 #^{:doc "Defines a view. This macro should be used in a view file to define the parameters used in the view."}
@@ -374,16 +375,21 @@ contain record-key then this method returns record-key if record-key equals reco
   :name - The display name to use. If not given, address is used.
   :html-options - Any extra attributes for the mail to tag.
   :replace-at - If name is not given, then replace the @ symbol with this text in the address before using it as the name.
-  :replace-dot - If name is not given, then replace the . in the email with this text in the address before using it as the name." }
+  :replace-dot - If name is not given, then replace the . in the email with this text in the address before using it as the name.
+  :subject - Presets the subject line of the e-mail.
+  :body - Presets the body of the email.
+  :cc - Carbon Copy. Adds additional recipients to the email.
+  :bcc - Blind Carbon Copy. Adds additional hidden recipients to the email." }
   mail-to [mail-options] 
    (let [address (:address mail-options)
          display-name 
           (or 
             (:name mail-options) 
-            (conjure-str-utils/str-replace-if address { "@" (:replace-at mail-options), "." (:replace-dot mail-options) }))]
+            (conjure-str-utils/str-replace-if address { "@" (:replace-at mail-options), "." (:replace-dot mail-options) }))
+         mailto-params (html-utils/url-param-str (select-keys mail-options [:cc :bcc :subject :body]))]
      (htmli
        [:a
          (merge
-           { :href (str "mailto:" address) }
+           { :href (str "mailto:" address mailto-params) }
            (:html-options mail-options))
          display-name])))

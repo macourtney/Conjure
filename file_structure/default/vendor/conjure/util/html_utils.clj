@@ -1,6 +1,7 @@
 (ns conjure.util.html-utils
   (:import [java.net URLEncoder URLDecoder])
-  (:require [clojure.contrib.str-utils :as str-utils]))
+  (:require [clojure.contrib.str-utils :as str-utils]
+            [conjure.util.string-utils :as conjure-str-utils]))
 
 (defn
 #^{:doc "Url encodes the given string."}
@@ -62,3 +63,20 @@ Examples:
   (if query-string
     (reduce add-param {} (filter second (map #(str-utils/re-split #"=" %) (str-utils/re-split #"&" query-string))))
     {}))
+
+(defn-
+#^{:doc "Takes a param pair and turns it into a string with the first and second value separated by \"=\". If either 
+value is nil, then this function returns nil."}
+  str-param-pair [param-pair]
+  (let [param-key (first param-pair)
+        param-value (second param-pair)]
+    (if (and param-key param-value)
+      (str (conjure-str-utils/str-keyword param-key) "=" (url-encode (conjure-str-utils/str-keyword param-value))))))
+
+(defn 
+#^{ :doc "Converts the given param-map into a url get param string for appending to a url." }
+  url-param-str [param-map]
+  (if (and param-map (not-empty param-map))
+    (str "?" 
+      (str-utils/str-join "&"
+        (filter identity (map str-param-pair param-map))))))

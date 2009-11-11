@@ -39,3 +39,11 @@
     (is (= (merge params { :baz { :boz { :buz "biz" } } }) (update-params params [:baz :boz :buz] "biz")))
     (is (= (merge params { :test { :id 0, :function "test-fn" } }) (update-params params [:test :function] "test-fn")))
     (is (= (merge params { :test { :id 0, :function { :id 1 } } }) (update-params params [:test :function :id] 1)))))
+
+(deftest test-url-param-str
+  (is (= "?foo=bar" (url-param-str { :foo "bar" })))
+  (is (= "?foo=bar&baz=biz" (url-param-str { :foo "bar", :baz :biz })))
+  (is (= "?foo=bar&baz=biz&boz=buz" (url-param-str { :foo "bar", :baz :biz, "boz" "buz" })))
+  (is (= "?foo=bar" (url-param-str { :foo "bar", :baz nil })))
+  (is (nil? (url-param-str {})))
+  (is (nil? (url-param-str nil))))

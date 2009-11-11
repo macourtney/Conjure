@@ -197,4 +197,13 @@
     (mail-to { :address "me@example.com", :replace-dot " dot " })))
   (is (= 
     "<a href=\"mailto:me@example.com\">me at example dot com</a>" 
-    (mail-to { :address "me@example.com", :replace-at " at ", :replace-dot " dot " }))))
+    (mail-to { :address "me@example.com", :replace-at " at ", :replace-dot " dot " })))
+  (is (= 
+    "<a href=\"mailto:me@example.com?cc=you%40example.com\">me@example.com</a>" 
+    (mail-to { :address "me@example.com", :cc "you@example.com" })))
+  (is (= 
+    "<a href=\"mailto:me@example.com?subject=Yo%21&cc=you%40example.com\">me@example.com</a>" 
+    (mail-to { :address "me@example.com", :cc "you@example.com", :subject "Yo!" })))
+  (is (= 
+    "<a href=\"mailto:me@example.com?body=Hey.&bcc=you%40example.com\">me@example.com</a>" 
+    (mail-to { :address "me@example.com", :bcc "you@example.com", :body "Hey." }))))

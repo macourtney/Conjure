@@ -33,4 +33,20 @@
   (is (= (add-ending-if-absent "blah" nil) "blah"))
   (is (= (add-ending-if-absent nil ".foo") ".foo"))
   (is (= (add-ending-if-absent "blah" "") "blah"))
-  (is (= (add-ending-if-absent "" ".foo") ".foo")))   
+  (is (= (add-ending-if-absent "" ".foo") ".foo")))
+  
+(deftest test-str-replace-pair
+  (is (= (str-replace-pair "foo.bar" ["." " dot "]) "foo dot bar"))
+  (is (= (str-replace-pair "foo-bar" ["." " dot "]) "foo-bar"))
+  (is (= (str-replace-pair nil ["." " dot "]) nil))
+  (is (= (str-replace-pair "foo.bar" nil) "foo.bar"))
+  (is (= (str-replace-pair nil nil) nil)))
+
+(deftest test-str-replace-if
+  (is (= (str-replace-if "foo.bar" { "." " dot " }) "foo dot bar"))
+  (is (= (str-replace-if "me@foo.bar" { "." " dot ", "@" " at " }) "me at foo dot bar"))
+  (is (= (str-replace-if "me@foo.bar" { "." " dot ", "@" " at ", "|" " or " }) "me at foo dot bar"))
+  (is (= (str-replace-if "me@foo.bar" { }) "me@foo.bar"))
+  (is (= (str-replace-if "me@foo.bar" nil) "me@foo.bar"))
+  (is (= (str-replace-if nil { "." " dot " }) nil))
+  (is (= (str-replace-if nil nil) nil)))
