@@ -173,12 +173,12 @@ an optional option map for the html options." }
           key-name-str (conjure-str-utils/str-keyword key-name)]
       (htmli 
         [:input 
-          (merge 
-            html-options
+          (merge
             { :type (conjure-str-utils/str-keyword input-type),
               :id (id-value record-name-str key-name-str), 
               :name (name-value record-name-str key-name-str)
-              :value (get record key-name) })])))
+              :value (get record key-name) } 
+            html-options)])))
 
 (defn
 #^{:doc "Creates an input tag of type text for a field of name key-name in record of the given name. You can pass along
@@ -393,3 +393,24 @@ contain record-key then this method returns record-key if record-key equals reco
            { :href (str "mailto:" address mailto-params) }
            (:html-options mail-options))
          display-name])))
+         
+(defn
+#^{ :doc "Returns a check box tag from the given record, record name, and key for the record. Note: browsers will send 
+nothing if a check box is not checked, therefore this function also creates a hidden field with the unchecked value." }
+  check-box 
+  ([record record-name key-name] (check-box record record-name key-name {}))
+  ([record record-name key-name html-options] (check-box record record-name key-name html-options 1))
+  ([record record-name key-name html-options checked-value] 
+    (check-box record record-name key-name html-options checked-value 0))
+  ([record record-name key-name html-options checked-value unchecked-value]
+    (str 
+      (input :checkbox record record-name key-name (merge html-options { :value (str checked-value) }))
+      (hidden-field record record-name key-name (merge html-options { :value (str unchecked-value) })))))
+
+(defn
+#^{ :doc "Returns a radio button tag for the given record, record name and key for the record." }
+  radio-button 
+  ([record record-name key-name value] (radio-button record record-name key-name value {}))
+  ([record record-name key-name value html-options]
+    (input :radio record record-name key-name 
+      (merge html-options { :value (str value), :checked (if (= (get record key-name) value) "checked") }))))

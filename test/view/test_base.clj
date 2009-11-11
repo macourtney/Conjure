@@ -207,3 +207,28 @@
   (is (= 
     "<a href=\"mailto:me@example.com?body=Hey.&bcc=you%40example.com\">me@example.com</a>" 
     (mail-to { :address "me@example.com", :bcc "you@example.com", :body "Hey." }))))
+
+(deftest test-check-box
+  (is (= 
+    "<input id=\"puppy-good\" name=\"puppy[good]\" type=\"checkbox\" value=\"1\" /><input id=\"puppy-good\" name=\"puppy[good]\" type=\"hidden\" value=\"0\" />"
+    (check-box { :good 0 } :puppy :good)))
+  (is (= 
+    "<input id=\"blah\" name=\"puppy[good]\" type=\"checkbox\" value=\"1\" /><input id=\"blah\" name=\"puppy[good]\" type=\"hidden\" value=\"0\" />"
+    (check-box { :good 0 } :puppy :good { :id "blah" })))
+  (is (= 
+    "<input id=\"puppy-good\" name=\"puppy[good]\" type=\"checkbox\" value=\"true\" /><input id=\"puppy-good\" name=\"puppy[good]\" type=\"hidden\" value=\"0\" />"
+    (check-box { :good 0 } :puppy :good {} true)))
+  (is (= 
+    "<input id=\"puppy-good\" name=\"puppy[good]\" type=\"checkbox\" value=\"true\" /><input id=\"puppy-good\" name=\"puppy[good]\" type=\"hidden\" value=\"false\" />"
+    (check-box { :good 0 } :puppy :good {} true false))))
+
+(deftest test-radio-button
+  (is (= 
+    "<input id=\"puppy-breed\" name=\"puppy[breed]\" type=\"radio\" value=\"great-dane\" />" 
+    (radio-button { :breed "chihuahua" } :puppy :breed "great-dane")))
+  (is (= 
+    "<input checked=\"checked\" id=\"puppy-breed\" name=\"puppy[breed]\" type=\"radio\" value=\"chihuahua\" />" 
+    (radio-button { :breed "chihuahua" } :puppy :breed "chihuahua")))
+  (is (= 
+    "<input id=\"dog-breed\" name=\"puppy[breed]\" type=\"radio\" value=\"great-dane\" />" 
+    (radio-button { :breed "chihuahua" } :puppy :breed "great-dane" { :id "dog-breed" }))))
