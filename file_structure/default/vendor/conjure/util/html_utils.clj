@@ -80,3 +80,10 @@ value is nil, then this function returns nil."}
     (str "?" 
       (str-utils/str-join "&"
         (filter identity (map str-param-pair param-map))))))
+
+(defn
+#^{ :doc "Adds the given protocal and server to the given url, if it does not already include a protocal and server." }
+  full-url [url protocal-and-server]
+  (if (. url matches "^\\w+://.+")
+    url
+    (str protocal-and-server url)))

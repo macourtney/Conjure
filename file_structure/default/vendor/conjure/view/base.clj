@@ -3,82 +3,14 @@
   (:require [clojure.contrib.str-utils :as str-utils]
             environment
             [conjure.util.string-utils :as conjure-str-utils]
-            [conjure.util.html-utils :as html-utils]))
+            [conjure.util.html-utils :as html-utils]
+            [conjure.view.util :as view-utils]))
 
 (defmacro
 #^{:doc "Defines a view. This macro should be used in a view file to define the parameters used in the view."}
   defview [params & body]
   `(defn ~'render-view [~'request-map ~@params]
     ~@body))
-
-(defn
-#^{:doc "Returns the value of :id from the given parameters. If the value of :id is a map, then this method returns the
-value of :id in the map. This method is used by url-for to get the id from from the params passed to it."}
-  id-from [params]
-  (let [id (:id params)]
-    (if (and id (map? id))
-      (:id id)
-      id)))
-
-(defn-
-#^{:doc "Returns the value of :anchor from the given parameters and adds a '#' before it. If the key :anchor does not 
-exist in params, then this method returns nil This method is used by url-for to get the id from from the params passed 
-to it."}
-  anchor-from [params]
-  (let [anchor (:anchor params)]
-    (if anchor
-      (str "#" anchor))))
-      
-(defn-
-#^{:doc "Returns the params merged with the request-map. Only including the keys from request-map used by url-for"}
-  merge-url-for-params [request-map params]
-  (merge (select-keys request-map [:controller :action :scheme :request-method :server-name :server-port ]) params))
-
-(defn-
-#^{:doc "Returns the full host string from the given params. Used by url-for." }
-  full-host [params]
-  (let [server-name (:server-name params)
-        scheme (:scheme params)
-        user (:user params)
-        password (:password params)
-        port (:port params)
-        server-port (:server-port params)]
-    (if (and server-name (not (:only-path params)))
-      (str 
-        (if scheme (conjure-str-utils/str-keyword scheme) "http") "://" 
-        (if (and user password) (str user ":" password "@")) 
-        server-name 
-        (if port 
-          (str ":" port)
-          (if (and server-port (not (= server-port 80))) 
-            (str ":" server-port)))))))
-
-(defn
-#^{:doc 
-"Returns the url for the given parameters. The following parameters are valid:
-
-     :action - The name of the action to link to.
-     :controller - The name of the controller to link to.
-     :id - The id to pass, or if id links to a map, then the value of :id in that map is used. (Optional)
-     :anchor - Specifies the anchor name to be appended to the path.
-     :user - Inline HTTP authentication (only used if :password is also present)
-     :password - Inline HTTP authentication (only use if :user is also present)
-     :scheme - Overrides the default scheme. Example values: :http, :ftp
-     :server-name - Overrides the default server name.
-     :port - Overrides the default server port."}
-  url-for
-  ([request-map params] (url-for (merge-url-for-params request-map params))) 
-  ([params]
-  (let [controller (conjure-str-utils/str-keyword (:controller params))
-        action (conjure-str-utils/str-keyword (:action params))]
-    (if (and controller action)
-      (apply str 
-        (full-host params) 
-        (interleave 
-          (repeat "/") 
-          (filter #(not (nil? %))
-            [controller action (id-from params) (anchor-from params)])))
-      (throw (new RuntimeException (str "You must pass a controller and action to url-for. " params)))))))
 
 (defn- #^{:doc "If function is a function, then this method evaluates it with the given args. Otherwise, it just returns
 function." }
@@ -96,17 +28,17 @@ function." }
 If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
 and params, text is called with request-map and params merged (not all keys used from request-map)."}
   link-to
-  ([text request-map params] (link-to text (merge-url-for-params request-map params)))
+  ([text request-map params] (link-to text (view-utils/merge-url-for-params request-map params)))
   ([text params]
     (let [html-options (if (:html-options params) (:html-options params) {})]
-      (htmli [:a (assoc html-options :href (url-for params)) (evaluate-if-fn text params)]))))
+      (htmli [:a (assoc html-options :href (view-utils/url-for params)) (evaluate-if-fn text params)]))))
 
 (defn
 #^{:doc "If condition is true, then call link-to with the given text, request-map and params. If condition is false, 
 then just return text. If condition is a function, it is evaluated with params merged with request-map. If text is a 
 function, it is evaluated with params merged with request-map (just like link-to)." }
   link-to-if
-  ([condition text request-map params] (link-to-if condition text (merge-url-for-params request-map params)))
+  ([condition text request-map params] (link-to-if condition text (view-utils/merge-url-for-params request-map params)))
   ([condition text params]
     (if (evaluate-if-fn condition params)
       (link-to text params)
@@ -140,7 +72,7 @@ Valid options:
     :url - A map for the target url of the form. Uses the same options as url-for.
     :html - The html attributes for the form tag." }
   form-for 
-  ([request-map options body] (form-for (assoc options :url (merge-url-for-params request-map (:url options))) body))
+  ([request-map options body] (form-for (assoc options :url (view-utils/merge-url-for-params request-map (:url options))) body))
   ([options body]
     (let [html-options (:html options)
           url-options (:url options)]
@@ -149,7 +81,7 @@ Valid options:
           (merge 
             html-options
             { :method (or (:method html-options) "put"), 
-              :action (url-for url-options),
+              :action (view-utils/url-for url-options),
               :name (or (:name options) (:controller url-options) "record") })
           (evaluate-if-fn body url-options)]))))
 

@@ -59,3 +59,18 @@
   (is (nil? (view-namespace controller-name nil)))
   (is (nil? (view-namespace nil (new File "show-foo.clj"))))
   (is (nil? (view-namespace nil nil))))
+
+(deftest test-url-for
+  (is (= "/hello/show" (url-for { :controller "hello", :action "show" })))
+  (is (= "/hello/show/1" (url-for { :controller "hello", :action "show", :id 1})))
+  (is (= "/hello/show/1" (url-for { :controller "hello", :action "show", :id { :id 1 }})))
+  (is (= "/hello/show/#message" (url-for { :controller "hello", :action "show", :anchor "message"})))
+  (is (= "/hello/show/1/#message" (url-for { :controller "hello", :action "show", :id 1, :anchor "message"})))
+  (is (= "/hello/show/1" (url-for { :controller "hello", :action "show" } { :id 1 })))
+  (is (= "/hello/show/1" (url-for { :controller "hello", :action "add" } { :action "show", :id 1 })))
+  (let [params { :controller "hello", :action "show" :id 1}]
+    (is (= "http://localhost/hello/show/1" (url-for { :server-name "localhost" } params)))
+    (is (= "http://localhost:8080/hello/show/1" (url-for { :server-name "localhost" :server-port 8080 } params)))
+    (is (= "ftp://localhost/hello/show/1" (url-for { :server-name "localhost" :scheme :ftp } params)))
+    (is (= "http://localhost:8080/hello/show/1" (url-for { :server-name "localhost" } (merge params { :port 8080}))))
+    (is (= "http://foo:bar@localhost/hello/show/1" (url-for { :server-name "localhost" } (merge params { :user "foo", :password "bar"}))))))
