@@ -6,7 +6,8 @@
             [generators.controller-test-generator :as controller-test-generator]
             [generators.model-generator :as model-generator]
             [generators.model-test-generator :as model-test-generator]
-            [generators.view-test-generator :as view-test-generator]))
+            [generators.view-test-generator :as view-test-generator]
+            [generators.xml-view-generator :as xml-view-generator]))
 
 (defn print-usage []
   (println "Usage: ./run.sh script/generate.clj <generate type> <generate params>*"))
@@ -40,6 +41,9 @@
       
     (. command equals "fixture")
       (fixture-generator/generate-fixture params)
+      
+    (. command equals "xml-view")
+      (xml-view-generator/generate-view params)
       
     true ; Default condition.
       (print-unknown-command command)))

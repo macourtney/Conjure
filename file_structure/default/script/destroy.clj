@@ -6,7 +6,8 @@
             [destroyers.controller-test-destroyer :as controller-test-destroyer]
             [destroyers.model-destroyer :as model-destroyer]
             [destroyers.model-test-destroyer :as model-test-destroyer]
-            [destroyers.view-test-destroyer :as view-test-destroyer]))
+            [destroyers.view-test-destroyer :as view-test-destroyer]
+            [destroyers.xml-view-destroyer :as xml-view-destroyer]))
 
 (defn
 #^{:doc "Prints the usage information to standard out."}
@@ -46,6 +47,9 @@
 
     (. command equals "fixture")
       (fixture-destroyer/destroy-fixture params)
+
+    (. command equals "xml-view")
+      (xml-view-destroyer/destroy-xml-view params)
       
     true ; Default condition.
       (print-unknown-command command)))

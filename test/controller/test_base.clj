@@ -27,7 +27,7 @@
   ([url] (redirect-map url 302))
   ([url status] 
     { :status status, 
-      :location url, 
+      :headers { "Location" url, "Connection" "close" }, 
       :body (str "<html><body>You are being redirected to <a href=\"" url "\">" url "</a></body></html>") }))
 
 (deftest test-redirect-to-full-url
