@@ -1,7 +1,8 @@
 (ns conjure.view.builder
   (:import [java.io File])
   (:require [conjure.view.util :as util]
-            [conjure.util.loading-utils :as loading-utils]))
+            [conjure.util.loading-utils :as loading-utils]
+            [conjure.util.string-utils :as conjure-str-utils]))
 
 (defn 
 #^{:doc "Finds or creates if missing, a controller directory for the given controller in the given views directory."}
@@ -24,7 +25,7 @@
 #^{:doc "Creates a new view file from the given migration name."}
   create-view-file [controller-directory action]
   (if (and controller-directory action)
-  (let [view-file-name (str (loading-utils/dashes-to-underscores action) ".clj")
+  (let [view-file-name (str (loading-utils/dashes-to-underscores (conjure-str-utils/str-keyword action)) ".clj")
         view-file (new File controller-directory  view-file-name)]
     (if (. view-file exists)
       (do

@@ -1,11 +1,12 @@
 (ns generate 
-  (:require [generators.fixture-generator :as fixture-generator]
-            [generators.migration-generator :as migration-generator]
-            [generators.view-generator :as view-generator]
-            [generators.controller-generator :as controller-generator]
+  (:require [generators.controller-generator :as controller-generator]
             [generators.controller-test-generator :as controller-test-generator]
+            [generators.fixture-generator :as fixture-generator]
+            [generators.migration-generator :as migration-generator]
             [generators.model-generator :as model-generator]
             [generators.model-test-generator :as model-test-generator]
+            [generators.scaffold-generator :as scaffold-generator]
+            [generators.view-generator :as view-generator]
             [generators.view-test-generator :as view-test-generator]
             [generators.xml-view-generator :as xml-view-generator]))
 
@@ -44,6 +45,9 @@
       
     (. command equals "xml-view")
       (xml-view-generator/generate-view params)
+      
+    (. command equals "scaffold")
+      (scaffold-generator/generate params)
       
     true ; Default condition.
       (print-unknown-command command)))

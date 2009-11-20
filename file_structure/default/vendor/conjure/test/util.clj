@@ -1,7 +1,8 @@
 (ns conjure.test.util
   (:import [java.io File])
-  (:require [conjure.util.loading-utils :as loading-utils]
-            [conjure.util.file-utils :as file-utils]))
+  (:require [conjure.util.file-utils :as file-utils]
+            [conjure.util.loading-utils :as loading-utils]
+            [conjure.util.string-utils :as conjure-str-utils]))
 
 (def test-dir-name "test")
 (def functional-dir-name "functional")
@@ -100,8 +101,10 @@
   view-unit-test-file
   ([controller action] (view-unit-test-file controller action (find-controller-view-unit-test-directory controller)))
   ([controller action controller-view-unit-test-dir]
-    (if (and controller (> (. controller length) 0) action (> (. action length) 0) controller-view-unit-test-dir)
-      (new File controller-view-unit-test-dir (view-unit-test-file-name action)))))
+    (let [controller-str (conjure-str-utils/str-keyword controller)
+          action-str (conjure-str-utils/str-keyword action)]
+      (if (and controller-str (> (. controller-str length) 0) action-str (> (. action-str length) 0) controller-view-unit-test-dir)
+        (new File controller-view-unit-test-dir (view-unit-test-file-name action-str))))))
 
 (defn
 #^{:doc "Returns the functional test file for the given controller name."}
@@ -128,8 +131,15 @@
 (defn
 #^{:doc "Returns the view test namespace for the given controller and action."}
   view-unit-test-namespace [controller action]
-  (if (and controller (> (. controller length) 0) action (> (. action length) 0))
-    (str "unit.view." (loading-utils/underscores-to-dashes controller) "." (loading-utils/underscores-to-dashes action) "-view-test")))
+  (let [controller-str (conjure-str-utils/str-keyword controller)
+        action-str (conjure-str-utils/str-keyword action)]
+    (if (and controller-str (> (. controller-str length) 0) action-str (> (. action-str length) 0))
+      (str 
+        "unit.view." 
+        (loading-utils/underscores-to-dashes controller-str) 
+        "." 
+        (loading-utils/underscores-to-dashes action-str) 
+        "-view-test"))))
 
 (defn
 #^{:doc "Returns the model test namespace for the given model."}

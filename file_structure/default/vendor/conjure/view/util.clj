@@ -36,7 +36,7 @@
   request-view-namespace [request-map]
   (if request-map
     (str "views." (loading-utils/underscores-to-dashes (:controller request-map)) "." 
-      (loading-utils/underscores-to-dashes (:action request-map)))))
+      (loading-utils/underscores-to-dashes (conjure-str-utils/str-keyword (:action request-map))))))
 
 (defn
 #^{:doc "Returns the view namespace for the given controller and action."}

@@ -58,3 +58,9 @@
   (is (nil? (find-model-file nil)))
   (is (nil? (find-model-file nil model-name)))
   (is (nil? (find-model-file nil nil))))
+
+(deftest test-to-model-name
+  (is (= "puppy" (to-model-name "puppy-id")))
+  (is (= "puppy" (to-model-name "puppy")))
+  (is (= "" (to-model-name "")))
+  (is (= nil (to-model-name nil))))

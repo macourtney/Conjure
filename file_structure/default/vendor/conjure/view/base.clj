@@ -1,10 +1,11 @@
 (ns conjure.view.base
   (:use clj-html.core)
-  (:require [clojure.contrib.str-utils :as str-utils]
-            environment
+  (:require [clj-html.helpers :as helpers]
+            [clojure.contrib.str-utils :as str-utils]
             [conjure.util.string-utils :as conjure-str-utils]
             [conjure.util.html-utils :as html-utils]
-            [conjure.view.util :as view-utils]))
+            [conjure.view.util :as view-utils]
+            environment))
 
 (defmacro
 #^{:doc "Defines a view. This macro should be used in a view file to define the parameters used in the view."}
@@ -80,7 +81,7 @@ Valid options:
         [:form 
           (merge 
             html-options
-            { :method (or (:method html-options) "put"), 
+            { :method (or (:method html-options) "post"), 
               :action (view-utils/url-for url-options),
               :name (or (:name options) (:controller url-options) "record") })
           (evaluate-if-fn body url-options)]))))
@@ -109,7 +110,7 @@ an optional option map for the html options." }
             { :type (conjure-str-utils/str-keyword input-type),
               :id (id-value record-name-str key-name-str), 
               :name (name-value record-name-str key-name-str)
-              :value (get record key-name) } 
+              :value (helpers/h (get record key-name)) } 
             html-options)])))
 
 (defn
@@ -135,15 +136,21 @@ an optional option map for the html options." }
             html-options
             { :id (id-value record-name-str key-name-str),
               :name (name-value record-name-str key-name-str) })
-          (get record key-name) ]))))
+          (helpers/h (get record key-name)) ]))))
 
 (defn
-#^{:doc "Creates an input tag of type \"hidden\" for a field of name key-name in record of the given name. You can pass
+#^{ :doc "Creates an input tag of type \"hidden\" for a field of name key-name in record of the given name. You can pass
 along an optional option map for the html options." }
   hidden-field 
   ([record record-name key-name] (hidden-field record record-name key-name {}))
   ([record record-name key-name html-options]
     (input :hidden record record-name key-name html-options)))
+
+(defn
+#^{ :doc "Creates an input tag for a submit button with the given value." }
+  form-button
+  ([value] (form-button value {})) 
+  ([value html-options] (htmli [:input (merge html-options { :type "submit", :value value })])))
 
 (defn
 #^{:doc "Creates a select option tag from one of the following: A name, value and selection boolean, or a map 
@@ -177,7 +184,7 @@ option names to option-tag option maps."}
         (cons
           (if (:blank record-map) { "" { :value "" } }) 
           (map 
-            (fn [record] { (get record name-key) { :value (get record value-key) } }) 
+            (fn [record] { (get record name-key) { :value (helpers/h (get record value-key)) } }) 
             (get record-map :records [])))))))
 
 (defn-
@@ -210,7 +217,7 @@ contain record-key then this method returns record-key if record-key equals reco
   ([record record-name key-name select-options]
     (select-tag
       { :html-options (record-html-options (:html-options select-options) record-name key-name)
-        :option-map (option-map-select-value (:option-map select-options) (get record key-name)) })))
+        :option-map (option-map-select-value (:option-map select-options) (helpers/h (get record key-name))) })))
 
 (defn-
 #^{ :doc "Replaces the current extension on source with the given extension." }

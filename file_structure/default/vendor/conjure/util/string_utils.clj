@@ -17,10 +17,12 @@ then this method simply returns it."}
         
 (defn
 #^{:doc "Converts a keyword to it's string value. Basically, it just removes the ':' from the beginning."}
-  str-keyword [keyword]
-  (if (keyword? keyword)
-    (. (str keyword) substring 1)
-    (str keyword)))
+  str-keyword [incoming-keyword]
+  (if (nil? incoming-keyword)
+    nil
+    (if (keyword? incoming-keyword)
+      (. (str incoming-keyword) substring 1)
+      (str incoming-keyword))))
     
 (defn
 #^{:doc "If string ends with the string ending, then remove ending and return the result. Otherwise, return string."}

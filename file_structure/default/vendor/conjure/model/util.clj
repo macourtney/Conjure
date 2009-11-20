@@ -2,6 +2,7 @@
   (:require [clojure.contrib.seq-utils :as seq-utils]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.file-utils :as file-utils]
+            [conjure.util.string-utils :as string-utils]
             [clj-record.util :as clj-record-util]))
 
 (defn
@@ -43,3 +44,8 @@
   ([models-directory model-name]
     (if (and models-directory model-name)
       (file-utils/find-file models-directory (model-file-name-string model-name)))))
+      
+(defn
+#^{:doc "Returns the model name for the given belongs to column."}
+  to-model-name [belongs-to-column]
+    (string-utils/strip-ending belongs-to-column "-id"))

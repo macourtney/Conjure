@@ -14,7 +14,8 @@
 
 (deftest test-str-keyword
    (is (= (str-keyword :test) "test"))
-   (is (= (str-keyword "test") "test")))
+   (is (= (str-keyword "test") "test"))
+   (is (= (str-keyword nil) nil)))
    
 (deftest test-strip-ending
    (is (= (strip-ending "Blah" "h") "Bla"))
