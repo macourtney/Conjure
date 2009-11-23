@@ -84,58 +84,84 @@
       (create-show-action nil)))))
 
 (deftest test-create-add-action
-  (is (= { 
-    :controller "(defn add [request-map]
-  (render-view request-map))", 
-    :view { :params "", :content "(add/render-view request-map)" :requires "[views.templates.add :as add]" } } 
-    (create-add-action))))
+  (let [view-map { :params "table-metadata", 
+                   :content "(add/render-view request-map table-metadata)"
+                   :requires "[views.templates.add :as add]" }]
+    (is (= { 
+      :controller "(defn add [request-map]
+  (render-view request-map (dog/table-metadata)))", 
+      :view view-map } 
+      (create-add-action "dog")))
+    (is (= { 
+      :controller "(defn add [request-map]
+  (render-view request-map (/table-metadata)))", 
+      :view view-map } 
+      (create-add-action nil)))))
 
 (deftest test-create-create-action
   (is (= { 
     :controller "(defn create [request-map]
-  (let [params (:params request-map)]
-    (if params
-      (dog/insert params))
-    (redirect-to request-map { :action \"list\" })))", 
+  (let [record (:record (:params request-map))]
+    (if record
+      (dog/insert record))
+    (redirect-to request-map { :action \"list-records\" })))", 
     :view nil } 
     (create-create-action "dog")))
   (is (= { 
     :controller "(defn create [request-map]
-  (let [params (:params request-map)]
-    (if params
-      (/insert params))
-    (redirect-to request-map { :action \"list\" })))", 
+  (let [record (:record (:params request-map))]
+    (if record
+      (/insert record))
+    (redirect-to request-map { :action \"list-records\" })))", 
     :view nil } 
     (create-create-action nil))))
 
 (deftest test-create-edit-action
-  (let [view-map { :params "record", 
-                   :content "(edit/render-view request-map record)"
+  (let [view-map { :params "table-metadata record", 
+                   :content "(edit/render-view request-map table-metadata record)"
                    :requires "[views.templates.edit :as edit]" }]
     (is (= { :controller "(defn edit [request-map]
   (let [id (:id (:params request-map))]
-    (render-view request-map (dog/get-record (or id 1)))))", 
+    (render-view request-map (dog/table-metadata) (dog/get-record (or id 1)))))", 
       :view view-map } 
       (create-edit-action "dog")))
     (is (= { :controller "(defn edit [request-map]
   (let [id (:id (:params request-map))]
-    (render-view request-map (/get-record (or id 1)))))", 
+    (render-view request-map (/table-metadata) (/get-record (or id 1)))))", 
       :view view-map } 
       (create-edit-action nil)))))
 
+(deftest test-create-save-action
+  (is (= { 
+    :controller "(defn save [request-map]
+  (let [record (:record (:params request-map))]
+    (if record
+      (dog/update record))
+    (redirect-to request-map { :action \"list-records\" })))", 
+    :view nil } 
+    (create-save-action "dog")))
+  (is (= { 
+    :controller "(defn save [request-map]
+  (let [record (:record (:params request-map))]
+    (if record
+      (/update record))
+    (redirect-to request-map { :action \"list-records\" })))", 
+    :view nil } 
+    (create-save-action nil))))
+
 (deftest test-create-delete-action
   (is (= { :controller "(defn delete [request-map]
-  (let [delete-id (:id (:params request-map))]
+  (let [delete-id (:id (:record (:params request-map)))]
     (do
       (if delete-id (dog/destroy-record { :id delete-id }))
-      (redirect-to request-map { :action \"list\" }))))", 
+      (redirect-to request-map { :action \"list-records\" }))))", 
     :view nil } 
     (create-delete-action "dog")))
   (is (= { :controller "(defn delete [request-map]
-  (let [delete-id (:id (:params request-map))]
+  (let [delete-id (:id (:record (:params request-map)))]
     (do
       (if delete-id (/destroy-record { :id delete-id }))
-      (redirect-to request-map { :action \"list\" }))))", 
+      (redirect-to request-map { :action \"list-records\" }))))", 
     :view nil } 
     (create-delete-action nil))))
 
@@ -146,6 +172,7 @@
     (is (:add action-map))
     (is (:create action-map))
     (is (:edit action-map))
+    (is (:save action-map))
     (is (:delete action-map))))
 
 (deftest test-create-controller-content
@@ -156,3 +183,6 @@
   (let [model "dog"]
     (is (create-view-content model :list-records (create-action-map model)))
     (is (create-view-content model :show))))
+
+(deftest test-extra-model-content
+  (is (extra-model-content)))

@@ -35,17 +35,25 @@
 
 (defn
 #^{ :doc "Creates the model file on disk" }
-  create-model-file 
-  ([model] (create-model-file model (builder/create-model-file (util/find-models-directory) model)))
-  ([model model-file]
+  model-file-content 
+  ([model] (model-file-content model ""))
+  ([model extra-content]
     (let [model-namespace (util/model-namespace model)]
-      (file-utils/write-file-content 
-        model-file 
-        (str "(ns " model-namespace "
+      (str "(ns " model-namespace "
   (:use conjure.model.base
         clj-record.boot))
 
-(clj-record.core/init-model)")))))
+(clj-record.core/init-model)
+
+" extra-content))))
+
+(defn
+#^{ :doc "Creates the model file on disk" }
+  create-model-file 
+  ([model] (create-model-file model (builder/create-model-file (util/find-models-directory) model)))
+  ([model model-file] (create-model-file model model-file (model-file-content model)))
+  ([model model-file model-content]
+    (file-utils/write-file-content model-file model-content)))
 
 (defn
 #^{:doc "Generates the model content and saves it into the given model file."}

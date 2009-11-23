@@ -3,9 +3,10 @@
   (:require [clj-html.core :as html]
             [clj-html.utils :as utils]))
 
-(defview [record]
+(defview [table-metadata record]
   (html/html
-    (utils/domap-str [record-key (keys record)]
-      (html/html
-        [:p record-key ": " (text-field record "record" record-key)]
-        [:br]))))
+    (utils/domap-str [table-column table-metadata]
+      (let [field-name (. (:column_name table-column) toLowerCase)]
+        (if (not (= field-name "id")) 
+          (html/html
+            [:p field-name ": " (text-field record "record" (keyword field-name))]))))))

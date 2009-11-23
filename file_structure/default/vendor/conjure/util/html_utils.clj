@@ -55,7 +55,7 @@ Examples:
 (defn
 #^{:doc "Adds the given query-key-value sequence as a key value pair to the map params."}
   add-param [params query-key-value]
-  (update-params params (key-seq (first query-key-value)) (url-decode (second query-key-value))))
+  (update-params params (key-seq (url-decode (first query-key-value))) (url-decode (second query-key-value))))
 
 (defn
 #^{:doc "Parses the parameters in the given query-string into a parameter map."}

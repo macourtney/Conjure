@@ -1,6 +1,7 @@
 (ns generators.scaffold-generator
   (:require [clojure.contrib.str-utils :as str-utils]
             [conjure.model.util :as model-util]
+            [conjure.model.builder :as model-builder]
             [conjure.util.string-utils :as conjure-str-utils]
             [generators.controller-generator :as controller-generator]
             [generators.view-generator :as view-generator]
@@ -74,22 +75,22 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
   
 (defn
 #^{ :doc "Returns the content for add in the action map." }
-  create-add-action []
-    { :controller "(defn add [request-map]
-  (render-view request-map))"
+  create-add-action [model]
+    { :controller (str "(defn add [request-map]
+  (render-view request-map (" model "/table-metadata)))")
       :view 
-        { :params "", 
-          :content "(add/render-view request-map)"
+        { :params "table-metadata", 
+          :content "(add/render-view request-map table-metadata)"
           :requires "[views.templates.add :as add]" } })
       
 (defn
 #^{ :doc "Returns the content for add in the action map." }
   create-create-action [model]
     { :controller (str "(defn create [request-map]
-  (let [params (:params request-map)]
-    (if params
-      (" model "/insert params))
-    (redirect-to request-map { :action \"list\" })))")
+  (let [record (:record (:params request-map))]
+    (if record
+      (" model "/insert record))
+    (redirect-to request-map { :action \"list-records\" })))")
       :view nil })
   
 (defn
@@ -97,20 +98,30 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
   create-edit-action [model]
     { :controller (str "(defn edit [request-map]
   (let [id (:id (:params request-map))]
-    (render-view request-map (" model "/get-record (or id 1)))))")
+    (render-view request-map (" model "/table-metadata) (" model "/get-record (or id 1)))))")
       :view 
-        { :params "record", 
-          :content "(edit/render-view request-map record)"
+        { :params "table-metadata record", 
+          :content "(edit/render-view request-map table-metadata record)"
           :requires "[views.templates.edit :as edit]" } })
+
+(defn
+#^{ :doc "Returns the content for add in the action map." }
+  create-save-action [model]
+    { :controller (str "(defn save [request-map]
+  (let [record (:record (:params request-map))]
+    (if record
+      (" model "/update record))
+    (redirect-to request-map { :action \"list-records\" })))")
+      :view nil })
 
 (defn
 #^{ :doc "Returns the content for delete in the action map." }
   create-delete-action [model]
     { :controller (str "(defn delete [request-map]
-  (let [delete-id (:id (:params request-map))]
+  (let [delete-id (:id (:record (:params request-map)))]
     (do
       (if delete-id (" model "/destroy-record { :id delete-id }))
-      (redirect-to request-map { :action \"list\" }))))")
+      (redirect-to request-map { :action \"list-records\" }))))")
       :view nil })
     
 (defn
@@ -118,9 +129,10 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
   create-action-map [model]
     { :list-records (create-list-records-action model)
       :show (create-show-action model)
-      :add (create-add-action)
+      :add (create-add-action model)
       :create (create-create-action model)
       :edit (create-edit-action model)
+      :save (create-save-action model)
       :delete (create-delete-action model) })
     
 (defn
@@ -157,6 +169,14 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
     (keys action-map))))
 
 (defn
+#^{ :doc "Creates the extra model functions for generated models." }
+  extra-model-content []
+  "(defn
+#^{ :doc \"Returns the metadata for the table associated with this model.\" }
+  table-metadata []
+    (doall (find-by-sql [(str \"SHOW COLUMNS FROM \" (table-name))])))")
+
+(defn
 #^{ :doc "Creates the controller file associated with the given controller." }
   generate-scaffold
     ([model fields]
@@ -166,7 +186,10 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
             model 
             (create-migration-up-content model fields) 
             (model-generator/create-migration-down-content model))
-          (model-generator/create-model-file model)
+          (model-generator/create-model-file 
+            model 
+            (model-builder/create-model-file (model-util/find-models-directory) model)
+            (model-generator/model-file-content model (extra-model-content)))
           (model-test-generator/generate-unit-test model)
           (let [action-map (create-action-map model)
                 actions (map conjure-str-utils/str-keyword (keys action-map))]

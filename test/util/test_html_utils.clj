@@ -11,7 +11,8 @@
 (deftest test-add-param
   (is (= { :foo "bar" } (add-param {} ["foo" "bar"])))
   (is (= { :foo "bar", :baz "biz" } (add-param { :foo "bar" } ["baz" "biz"])))
-  (is (= { :foo "bar biz" } (add-param {} ["foo" "bar+biz"]))))
+  (is (= { :foo "bar biz" } (add-param {} ["foo" "bar+biz"])))
+  (is (= { :foo { :bar "boz" } } (add-param {} ["foo%5Bbar%5D" "boz"]))))
 
 (deftest test-parse-query-params
   (is (= { :foo "bar" } (parse-query-params "foo=bar")))
