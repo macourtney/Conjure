@@ -51,3 +51,11 @@
   (is (= (str-replace-if "me@foo.bar" nil) "me@foo.bar"))
   (is (= (str-replace-if nil { "." " dot " }) nil))
   (is (= (str-replace-if nil nil) nil)))
+
+(deftest test-human-readable
+  (is (= (human-readable "foo-bar") "foo bar"))
+  (is (= (human-readable "foo_bar") "foo bar"))
+  (is (= (human-readable "foo_bar-baz") "foo bar baz"))
+  (is (= (human-readable "foo") "foo"))
+  (is (= (human-readable "") ""))
+  (is (= (human-readable nil) nil)))

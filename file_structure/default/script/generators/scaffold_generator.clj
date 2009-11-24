@@ -56,10 +56,10 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
 #^{ :doc "Returns the content for list in the action map." }
   create-list-records-action [model]
     { :controller (str "(defn list-records [request-map]
-  (render-view request-map (" model "/find-records [true])))")
+  (render-view request-map \"" model "\" (" model "/table-metadata) (" model "/find-records [true])))")
       :view 
-        { :params "records", 
-          :content "(list-records/render-view request-map records)" 
+        { :params "model-name table-metadata records", 
+          :content "(list-records/render-view request-map model-name table-metadata records)" 
           :requires "[views.templates.list-records :as list-records]" } })
   
 (defn
@@ -67,20 +67,20 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
   create-show-action [model]
     { :controller (str "(defn show [request-map]
   (let [id (:id (:params request-map))]
-    (render-view request-map (" model "/get-record (or id 1)))))")
+    (render-view request-map \"" model "\" (" model "/table-metadata) (" model "/get-record (or id 1)))))")
       :view 
-        { :params "record", 
-          :content "(show/render-view request-map record)" 
+        { :params "model-name table-metadata record", 
+          :content "(show/render-view request-map model-name table-metadata record)" 
           :requires "[views.templates.show :as show]" } })
   
 (defn
 #^{ :doc "Returns the content for add in the action map." }
   create-add-action [model]
     { :controller (str "(defn add [request-map]
-  (render-view request-map (" model "/table-metadata)))")
+  (render-view request-map \"" model "\" (" model "/table-metadata)))")
       :view 
-        { :params "table-metadata", 
-          :content "(add/render-view request-map table-metadata)"
+        { :params "model-name table-metadata", 
+          :content "(add/render-view request-map model-name table-metadata)"
           :requires "[views.templates.add :as add]" } })
       
 (defn
@@ -111,7 +111,7 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
   (let [record (:record (:params request-map))]
     (if record
       (" model "/update record))
-    (redirect-to request-map { :action \"list-records\" })))")
+    (redirect-to request-map { :action \"show\", :id (or record 1) })))")
       :view nil })
 
 (defn

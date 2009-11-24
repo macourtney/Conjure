@@ -12,4 +12,4 @@
         (hidden-field record :record :id)
         (record-form/render-view request-map table-metadata record)
         (form-button "Save")
-        (link-to "Cancel" request-map { :action "list-records" } )))))
+        (link-to "Cancel" request-map { :action "show", :id record } )))))

@@ -60,3 +60,11 @@ then this method simply returns it."}
   str-replace-if 
   ([string replace-map]
     (reduce str-replace-pair string replace-map)))
+
+(defn
+#^{ :doc "Replaces any underscores or dashes in the given string to spaces. If string is a keyword, it is converted to a
+string before the spaces are added." }
+  human-readable [string]
+    (if string
+      (str-utils/re-gsub #"[_-]" " " (str-keyword string))
+      string))
