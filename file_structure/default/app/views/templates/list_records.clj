@@ -22,9 +22,5 @@
               (map 
                 (fn [record-key] [:td (link-to-if (= :id record-key) (helpers/h (get record record-key)) request-map { :action "show", :id (:id record) })]) 
                 (map #(keyword (. (get % :column_name) toLowerCase)) table-metadata)))
-            [:td 
-              (form-for request-map { :url { :action "delete" } :name "delete" } 
-                (str 
-                  (hidden-field record "record" :id)
-                  (form-button "Delete")))]]))]
+            [:td (link-to "Delete" request-map { :action "delete-warning", :id record })]]))]
     (link-to "Add" request-map { :action "add" } )))

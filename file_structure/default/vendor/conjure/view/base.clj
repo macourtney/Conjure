@@ -219,6 +219,19 @@ contain record-key then this method returns record-key if record-key equals reco
       { :html-options (record-html-options (:html-options select-options) record-name key-name)
         :option-map (option-map-select-value (:option-map select-options) (helpers/h (get record key-name))) })))
 
+(defn
+#^{ :doc "Creates a form with a single input of type button for use when you only need a button somewhere.
+
+Supported options:
+
+  :url - The url map used by form-for
+  :html-options - The html options of the button." }
+  button-to 
+  ([text request-map params] (button-to text (view-utils/merge-url-for-params request-map params)))
+  ([text params]
+    (form-for { :url params }
+      (form-button text (:html-options params)))))
+
 (defn-
 #^{ :doc "Replaces the current extension on source with the given extension." }
   replace-extension [source extension]

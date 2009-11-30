@@ -11,44 +11,47 @@
   (is (= [["name"]] (field-pairs ["name"]))))
   
 (deftest test-field-column-spec
-  (is (= "(database/string \"name\")" (field-column-spec ["name" "string"])))
-  (is (= "(database/integer \"count\")" (field-column-spec ["count" "integer"])))
-  (is (= "(database/text \"description\")" (field-column-spec ["description" "text"])))
-  (is (= "(database/belongs-to \"puppy\")" (field-column-spec ["puppy-id" "belongs-to"])))
-  (is (= "(database/string \"name\")" (field-column-spec ["name"])))
+  (is (= "(string \"name\")" (field-column-spec ["name" "string"])))
+  (is (= "(integer \"count\")" (field-column-spec ["count" "integer"])))
+  (is (= "(text \"description\")" (field-column-spec ["description" "text"])))
+  (is (= "(belongs-to \"puppy\")" (field-column-spec ["puppy-id" "belongs-to"])))
+  (is (= "(date \"birth-day\")" (field-column-spec ["birth-day" "date"])))
+  (is (= "(time-type \"birth-time\")" (field-column-spec ["birth-time" "time"])))
+  (is (= "(date-time \"birth-day-and-time\")" (field-column-spec ["birth-day-and-time" "date-time"])))
+  (is (= "(string \"name\")" (field-column-spec ["name"])))
   (is (thrown? RuntimeException (field-column-spec ["foo" "bar"])))
-  (is (= "(database/string \"\")" (field-column-spec [""])))
+  (is (= "(string \"\")" (field-column-spec [""])))
   (is (= "" (field-column-spec [])))
   (is (= "" (field-column-spec nil))))
   
 (deftest test-fields-spec-string
-  (is (= "\n    (database/string \"name\")" (fields-spec-string ["name:string"])))
+  (is (= "\n    (string \"name\")" (fields-spec-string ["name:string"])))
   (is (= 
-    "\n    (database/string \"name\")\n    (database/integer \"count\")" 
+    "\n    (string \"name\")\n    (integer \"count\")" 
     (fields-spec-string ["name:string" "count:integer"])))
   (is (= 
-    "\n    (database/string \"name\")\n    (database/integer \"count\")\n    (database/text \"description\")" 
+    "\n    (string \"name\")\n    (integer \"count\")\n    (text \"description\")" 
     (fields-spec-string ["name:string" "count:integer" "description:text"])))
   (is (= "" (fields-spec-string [])))
   (is (= "" (fields-spec-string nil))))
 
 (deftest test-create-migration-up-content
-  (is (= "(database/create-table \"dogs\" 
-    (database/id))" (create-migration-up-content "dog" [])))
-  (is (= "(database/create-table \"dogs\" 
-    (database/id)
-    (database/string \"name\"))" 
+  (is (= "(create-table \"dogs\" 
+    (id))" (create-migration-up-content "dog" [])))
+  (is (= "(create-table \"dogs\" 
+    (id)
+    (string \"name\"))" 
     (create-migration-up-content "dog" ["name:string"])))
-  (is (= "(database/create-table \"dogs\" 
-    (database/id)
-    (database/string \"name\")
-    (database/integer \"count\"))" 
+  (is (= "(create-table \"dogs\" 
+    (id)
+    (string \"name\")
+    (integer \"count\"))" 
     (create-migration-up-content "dog" ["name:string" "count:integer"])))
-  (is (= "(database/create-table \"dogs\" 
-    (database/id)
-    (database/string \"name\")
-    (database/integer \"count\")
-    (database/text \"description\"))" 
+  (is (= "(create-table \"dogs\" 
+    (id)
+    (string \"name\")
+    (integer \"count\")
+    (text \"description\"))" 
     (create-migration-up-content "dog" ["name:string" "count:integer" "description:text"]))))
 
 (deftest test-create-list-records-action
@@ -149,16 +152,31 @@
     :view nil } 
     (create-save-action nil))))
 
+(deftest test-create-delete-warning-action
+  (let [view-map { :params "table-metadata record", 
+                   :content "(delete-warning/render-view request-map table-metadata record)"
+                   :requires "[views.templates.delete-warning :as delete-warning]" }]
+    (is (= { :controller "(defn delete-warning [request-map]
+  (let [id (:id (:params request-map))]
+    (render-view request-map (dog/table-metadata) (dog/get-record (or id 1)))))", 
+      :view view-map } 
+      (create-delete-warning-action "dog")))
+    (is (= { :controller "(defn delete-warning [request-map]
+  (let [id (:id (:params request-map))]
+    (render-view request-map (/table-metadata) (/get-record (or id 1)))))", 
+      :view view-map } 
+      (create-delete-warning-action nil)))))
+
 (deftest test-create-delete-action
   (is (= { :controller "(defn delete [request-map]
-  (let [delete-id (:id (:record (:params request-map)))]
+  (let [delete-id (:id (:params request-map))]
     (do
       (if delete-id (dog/destroy-record { :id delete-id }))
       (redirect-to request-map { :action \"list-records\" }))))", 
     :view nil } 
     (create-delete-action "dog")))
   (is (= { :controller "(defn delete [request-map]
-  (let [delete-id (:id (:record (:params request-map)))]
+  (let [delete-id (:id (:params request-map))]
     (do
       (if delete-id (/destroy-record { :id delete-id }))
       (redirect-to request-map { :action \"list-records\" }))))", 

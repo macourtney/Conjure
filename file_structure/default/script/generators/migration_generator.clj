@@ -16,7 +16,7 @@
   (let [migration-number (util/migration-number-from-file migration-file)
         migration-namespace (util/migration-namespace migration-file)
         content (str "(ns " migration-namespace "
-  (:require [conjure.model.database :as database]))
+  (:use conjure.model.database))
 
 (defn
 #^{:doc \"Migrates the database up to version " migration-number ".\"}

@@ -15,13 +15,13 @@
 (defn
 #^{:doc "Returns the content for the up function of the create migration for the given model."}
   create-migration-up-content [model]
-  (str "(database/create-table \"" (util/model-to-table-name model) "\" 
-    (database/id))"))
+  (str "(create-table \"" (util/model-to-table-name model) "\" 
+    (id))"))
     
 (defn
 #^{:doc "Returns the content for the down function of the create migration for the given model."}
   create-migration-down-content [model]
-  (str "(database/drop-table \"" (util/model-to-table-name model) "\")"))
+  (str "(drop-table \"" (util/model-to-table-name model) "\")"))
   
 (defn
 #^{ :doc "Generates the migration file for the model." }

@@ -28,27 +28,30 @@ a sequence of strings of the form \"field:type\"" }
     (if field-name
       (if field-type
         (cond 
-          (= "integer" field-type) (str "(database/integer \"" field-name "\")")
-          (= "string" field-type) (str "(database/string \"" field-name "\")")
-          (= "text" field-type) (str "(database/text \"" field-name "\")")
-          (= "belongs-to" field-type) (str "(database/belongs-to \"" (model-util/to-model-name field-name) "\")")
+          (= "integer" field-type) (str "(integer \"" field-name "\")")
+          (= "string" field-type) (str "(string \"" field-name "\")")
+          (= "text" field-type) (str "(text \"" field-name "\")")
+          (= "date" field-type) (str "(date \"" field-name "\")")
+          (= "time" field-type) (str "(time-type \"" field-name "\")")
+          (= "date-time" field-type) (str "(date-time \"" field-name "\")")
+          (= "belongs-to" field-type) (str "(belongs-to \"" (model-util/to-model-name field-name) "\")")
           true (throw (new RuntimeException (str "Unknown field type: " field-type ", for field:" field-name))))
-        (str "(database/string \"" field-name "\")"))
+        (str "(string \"" field-name "\")"))
       "")))
 
 (defn
 #^{ :doc "Returns a string of specs from the given fields. 
 
 For example: if fields is [\"name:string\" \"count:integer\"] this method would return 
-\"    (database/string name)\n    (database/integer count)\"" }
+\"    (string name)\n    (integer count)\"" }
   fields-spec-string [fields]
   (apply str (interleave (repeat "\n    ") (map field-column-spec (field-pairs fields)))))
 
 (defn
 #^{ :doc "Returns the content for the up function of the create migration for the given model." }
   create-migration-up-content [model fields]
-  (str "(database/create-table \"" (model-util/model-to-table-name model) "\" 
-    (database/id)"
+  (str "(create-table \"" (model-util/model-to-table-name model) "\" 
+    (id)"
     (fields-spec-string fields)
     ")"))
     
@@ -116,9 +119,19 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
 
 (defn
 #^{ :doc "Returns the content for delete in the action map." }
+  create-delete-warning-action [model]
+    { :controller (str "(defn delete-warning [request-map]
+  (let [id (:id (:params request-map))]
+    (render-view request-map (" model "/table-metadata) (" model "/get-record (or id 1)))))")
+      :view { :params "table-metadata record", 
+          :content "(delete-warning/render-view request-map table-metadata record)"
+          :requires "[views.templates.delete-warning :as delete-warning]" } })
+
+(defn
+#^{ :doc "Returns the content for delete in the action map." }
   create-delete-action [model]
     { :controller (str "(defn delete [request-map]
-  (let [delete-id (:id (:record (:params request-map)))]
+  (let [delete-id (:id (:params request-map))]
     (do
       (if delete-id (" model "/destroy-record { :id delete-id }))
       (redirect-to request-map { :action \"list-records\" }))))")
@@ -133,6 +146,7 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       :create (create-create-action model)
       :edit (create-edit-action model)
       :save (create-save-action model)
+      :delete-warning (create-delete-warning-action model)
       :delete (create-delete-action model) })
     
 (defn
@@ -160,13 +174,15 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
 (defn
 #^{ :doc "Creates all of the actions for a scaffold." }
   generate-views [controller-name action-map]
-  (doall (map 
-    (fn [action-name] 
-      (view-generator/generate-view-file 
-        controller-name 
-        action-name 
-        (create-view-content controller-name action-name action-map))) 
-    (keys action-map))))
+  (doall 
+    (map 
+      (fn [action-name] 
+        (if (get (get action-map action-name) :view)
+          (view-generator/generate-view-file 
+            controller-name 
+            action-name 
+            (create-view-content controller-name action-name action-map))))
+      (keys action-map))))
 
 (defn
 #^{ :doc "Creates the extra model functions for generated models." }
