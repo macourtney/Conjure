@@ -11,6 +11,8 @@ To get started with Conjure, see the "Getting Started":http://wiki.github.com/ma
 
 For a tutorial on Conjure, see the "Hello World tutorial":http://wiki.github.com/macourtney/Conjure/hello-world-tutorial
 
+You can find our google group at: "Conjure Google Group":http://groups.google.com/group/clojure-conjure
+
 h2. Contributors
 
 Conjure was created by "Matthew Courtney":http://github.com/macourtney, with special thanks to the following contributors:
