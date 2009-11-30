@@ -67,3 +67,9 @@ database flavor function passing any arguments."}
 (def-column-spec :belongs-to)
 
 (def-column-spec :id)
+
+(def-column-spec :date)
+
+(def-column-spec :time-type)
+
+(def-column-spec :date-time)

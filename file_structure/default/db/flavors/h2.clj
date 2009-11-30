@@ -166,7 +166,8 @@ create-table method.
       (concat [(column-name column) varchar] (not-null-mod mods) (primary-key-mod mods)))))
       
 (defn
-#^{:doc "Returns a new spec describing a text with the given column and spec mods map. Use this method with the create-table method.
+#^{:doc "Returns a new spec describing a text with the given column and spec mods map. Use this method with the 
+create-table method.
 
   Curently supported values for mods:
     None"}
@@ -174,6 +175,39 @@ create-table method.
   ([column] (text column {}))
   ([column mods]
       [(column-name column) "TEXT"]))
+      
+(defn
+#^{ :doc "Returns a new spec describing a date with the given column and spec mods map. Use this method with the 
+create-table method.
+
+  Curently supported values for mods:
+    None" }
+  date
+  ([column] (date column {}))
+  ([column mods]
+    [(column-name column) "DATE"]))
+
+(defn
+#^{ :doc "Returns a new spec describing a time with the given column and spec mods map. Use this method with the 
+create-table method.
+
+  Curently supported values for mods:
+    None" }
+  time-type
+  ([column] (time-type column {}))
+  ([column mods]
+    [(column-name column) "TIME"]))
+
+(defn
+#^{ :doc "Returns a new spec describing a date time with the given column and spec mods map. Use this method with the 
+create-table method.
+
+  Curently supported values for mods:
+    None" }
+  date-time
+  ([column] (date-time column {}))
+  ([column mods]
+    [(column-name column) "DATETIME"]))
     
 (defn
 #^{:doc "Deletes the table with the given name."}
@@ -203,5 +237,8 @@ create-table method.
     :id id
     :string string
     :text text
+    :date date
+    :time-type time-type
+    :date-time date-time
     :belongs-to belongs-to
   })

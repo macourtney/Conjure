@@ -48,3 +48,12 @@
 
 (deftest test-id
   (is (not (nil? (id)))))
+
+(deftest test-date
+  (is (not (nil? (date "test-date")))))
+  
+(deftest test-time-type
+  (is (not (nil? (time-type "test-time")))))
+  
+(deftest test-date-time
+  (is (not (nil? (date-time "test-date-time")))))
