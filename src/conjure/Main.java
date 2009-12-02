@@ -101,19 +101,8 @@ public class Main {
         }
     }
 
-    public static void main(String[] args) {
-
-        if (args.length != 1) {
-            System.out.println("Usage: java -jar conjure.jar <project name>");
-
-        } else {
-        	String firstArg = args[0].trim();
-        	
-        	if (firstArg.equalsIgnoreCase("-v") || firstArg.equalsIgnoreCase("--version")) {
-        		System.out.println("Conjure version: " + CONJURE_VERSION);
-        		
-        	} else {
-	            Main main = new Main(firstArg);
+    public static void createProject (String projectName) {
+	            Main main = new Main(projectName);
 	
 	            try {
 	                main.extractAll();
@@ -121,6 +110,27 @@ public class Main {
 	            } catch (IOException e) {
 	                e.printStackTrace();
 	            }
+    }
+
+    public static void main(String[] args) {
+
+        if (args.length != 1) {
+            System.out.println("Usage: java -jar conjure.jar <project name>");
+            System.out.println("       java -jar conjure.jar --version");
+            System.out.println("       java -jar conjure.jar --database=[mysql | h2] <project name>");
+
+        } else {
+        	String firstArg = args[0].trim();
+        	String secondArg = "";
+		if (args.length > 1) {
+		    secondArg = args[1].trim();
+		}
+
+        	if (firstArg.equalsIgnoreCase("-v") || firstArg.equalsIgnoreCase("--version")) {
+        		System.out.println("Conjure version: " + CONJURE_VERSION);
+        		
+        	} else {
+		    createProject(firstArg);
         	}
         }
     }
