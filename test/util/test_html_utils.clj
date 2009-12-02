@@ -48,3 +48,18 @@
   (is (= "?foo=bar" (url-param-str { :foo "bar", :baz nil })))
   (is (nil? (url-param-str {})))
   (is (nil? (url-param-str nil))))
+  
+(deftest test-full-url
+  (is (= "http://example.com/home/index" (full-url "home/index" "http://example.com/")))
+  (is (= "http://www.example.com/home/index" (full-url "http://www.example.com/home/index" "http://example.com/"))))
+
+(deftest test-attribute-str
+  (is (= "foo=\"bar\"" (attribute-str "foo" "bar")))
+  (is (= "foo=\"&quot;bread&quot; &amp; &quot;butter&quot;\"" (attribute-str "foo" "\"bread\" & \"butter\""))))
+
+(deftest test-attribute-list-str
+  (is (= "foo=\"bar\"" (attribute-list-str { :foo "bar" })))
+  (is (= "baz=\"biz\" foo=\"bar\"" (attribute-list-str { :baz "biz", :foo "bar" })))
+  (is (= "baz=\"biz\" boz=\"buz\" foo=\"bar\"" (attribute-list-str { :baz "biz", :boz "buz", :foo "bar" })))
+  (is (= "" (attribute-list-str { })))
+  (is (= "" (attribute-list-str nil))))

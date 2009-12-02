@@ -217,3 +217,18 @@
   (is (= 
     "<input id=\"dog-breed\" name=\"puppy[breed]\" type=\"radio\" value=\"great-dane\" />" 
     (radio-button { :breed "chihuahua" } :puppy :breed "great-dane" { :id "dog-breed" }))))
+
+(deftest test-xml-header-tag
+  (is (= "<?xml version=\"1.0\"?>" (xml-header-tag)))
+  (is (= "<?xml version=\"2.0\"?>" (xml-header-tag { :version "2.0" })))
+  (is (= "<?xml encoding=\"UTF-8\" version=\"1.0\"?>" (xml-header-tag { :encoding "UTF-8" }))))
+
+(deftest test-html-doctype
+  (is (html-doctype :html4.01-strict))
+  (is (html-doctype :html4.01-transitional))
+  (is (html-doctype :html4.01-frameset))
+  (is (html-doctype :xhtml1.0-strict))
+  (is (html-doctype :xhtml1.0-transitional))
+  (is (html-doctype :xhtml1.0-frameset))
+  (is (html-doctype :xhtml1.1))
+  (is (= (html-doctype) (html-doctype :xhtml1.0-transitional))))

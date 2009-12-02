@@ -63,9 +63,15 @@
 (defn
 #^{:doc "Returns the rendered layout for the given layout name."}
   render-layout [layout-name request-map body]
-  (let [layouts-request-map (assoc request-map :controller "layouts")
-        application-request-map (assoc layouts-request-map :action (if layout-name layout-name "application"))]
-    (render-view application-request-map body)))
+  (render-view 
+    (merge 
+      request-map 
+      { :controller "layouts", 
+        :action (or layout-name "application") 
+        :layout-info 
+          { :controller (:controller request-map)
+            :action (:action request-map) } }) 
+    body))
 
 (defn
 #^{:doc "Returns the full host string from the given params. Used by url-for." }
@@ -133,5 +139,5 @@ to it."}
         (interleave 
           (repeat "/") 
           (filter #(not (nil? %))
-            [controller action (id-from params) (anchor-from params)])))
+            [(loading-utils/dashes-to-underscores controller) (loading-utils/dashes-to-underscores action) (id-from params) (anchor-from params)])))
       (throw (new RuntimeException (str "You must pass a controller and action to url-for. " params)))))))
