@@ -112,13 +112,16 @@ public class Main {
 	            }
     }
 
-    public static void main(String[] args) {
-
-        if (args.length != 1) {
+    public static void printHelp () {
             System.out.println("Usage: java -jar conjure.jar <project name>");
             System.out.println("       java -jar conjure.jar --version");
             System.out.println("       java -jar conjure.jar --database=[mysql | h2] <project name>");
+    }
 
+    public static void main(String[] args) {
+
+        if (args.length < 1 || args.length > 2) {
+	    printHelp();
         } else {
         	String firstArg = args[0].trim();
         	String secondArg = "";
@@ -128,7 +131,14 @@ public class Main {
 
         	if (firstArg.equalsIgnoreCase("-v") || firstArg.equalsIgnoreCase("--version")) {
         		System.out.println("Conjure version: " + CONJURE_VERSION);
-        		
+        	} else if (firstArg.matches("--database.*")) {
+		    if (args.length == 2) {
+			String database = firstArg.substring(firstArg.length() - 4);
+			createProject(secondArg);
+			System.out.println(database);
+		    } else {
+			printHelp();
+		    }
         	} else {
 		    createProject(firstArg);
         	}
