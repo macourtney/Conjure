@@ -8,9 +8,11 @@
 
 (defn setup-all [function]
   (let [controller-name "test"]
-    (controller-generator/generate-controller-file controller-name [])
+    (controller-generator/generate-controller-file 
+      { :controller controller-name, :silent true })
     (function)
-    (controller-destroyer/destroy-all-dependencies controller-name)))
+    (controller-destroyer/destroy-all-dependencies 
+      { :controller controller-name, :silent true })))
         
 (use-fixtures :once setup-all)
   

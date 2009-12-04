@@ -7,23 +7,29 @@
         
 (def controller-name "test")
 (def action-name "show")
+(def uri (str controller-name "/" action-name "/1"))
 
 (defn setup-all [function]
-    (controller-generator/generate-controller-file controller-name [ action-name ])
+    (controller-generator/generate-controller-file 
+      { :controller controller-name, :actions [ action-name ], :silent true })
     (function)
-    (controller-destroyer/destroy-all-dependencies controller-name [ action-name ]))
+    (controller-destroyer/destroy-all-dependencies 
+      { :controller controller-name, :actions [ action-name ], :silent true }))
 
 (use-fixtures :once setup-all)
 
 (deftest test-call-server
-  (call-server 
-    { :uri (str controller-name "/" action-name) 
-      :query-string "foo=bar&baz=biz" }))
+  (is
+    (call-server 
+      { :uri uri
+        :query-string "foo=bar&baz=biz" })))
       
 (deftest test-conjure
-  (conjure 
-    { :uri (str controller-name "/" action-name) 
-      :query-string "foo=bar&baz=biz" })
-  (conjure 
-    { :uri "index.html" 
-      :query-string "" }))
+  (is
+    (conjure 
+      { :uri uri
+        :query-string "foo=bar&baz=biz" }))
+  (is
+    (conjure 
+      { :uri "index.html" 
+        :query-string "" })))

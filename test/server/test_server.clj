@@ -12,9 +12,11 @@
 (def action-name "show")
 
 (defn setup-all [function]
-    (controller-generator/generate-controller-file controller-name [ action-name ])
+    (controller-generator/generate-controller-file 
+      { :controller controller-name, :actions [ action-name ], :silent true })
     (function)
-    (controller-destroyer/destroy-all-dependencies controller-name [ action-name ]))
+    (controller-destroyer/destroy-all-dependencies 
+      { :controller controller-name, :actions [ action-name ], :silent true }))
         
 (use-fixtures :once setup-all)
 
@@ -46,10 +48,10 @@
     (is (= { :controller controller-name, :action action-name, :params { :id "1" } :uri uri } (update-request-map { :uri uri }))))
   (let [uri (str "/" controller-name "/" action-name)]
     (is (= { :controller controller-name, :action action-name, :params {} :uri uri } (update-request-map { :uri uri }))))
-  (is (= { :params {} :uri "test" } (update-request-map { :uri controller-name })))
-  (is (= { :params {} :uri ""} (update-request-map { :uri "" })))
+  (is (= { :params {}, :action "index", :controller "test", :uri "test" } (update-request-map { :uri controller-name })))
+  (is (= { :params {}, :action "index", :controller "home", :uri ""} (update-request-map { :uri "" })))
   (is (= { :params {} } (update-request-map nil)))
-  (is (= { :params { :foo "bar" } :uri "" :query-string "foo=bar" } (update-request-map { :uri "" :query-string "foo=bar" })))
+  (is (= { :params { :foo "bar" }, :action "index", :controller "home", :uri "", :query-string "foo=bar" } (update-request-map { :uri "" :query-string "foo=bar" })))
   (let [uri (str "/" controller-name "/" action-name "/1")]
     (is (= { :controller controller-name, :action action-name, :params { :id "1", :foo "bar" }, :uri uri, :query-string "foo=bar" } (update-request-map { :uri uri, :query-string "foo=bar" })))))
   

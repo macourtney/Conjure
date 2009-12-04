@@ -28,17 +28,19 @@
 
 (defn
 #^{:doc "Creates a new child directory under the given base-dir if the child dir does not already exist."}
-  create-dir [base-dir child-dir-name]
-  (let [child-directory (find-directory base-dir child-dir-name)]
-    (if child-directory
-      (do
-        (println (. child-directory getPath) "directory already exists.")
-        child-directory)
-      (do
-        (println "Creating" child-dir-name "directory in" (. base-dir getName) "...")
-        (let [child-directory (new File base-dir child-dir-name)]
-          (. child-directory mkdirs)
-          child-directory)))))
+  create-dir 
+  ([base-dir child-dir-name] (create-dir base-dir child-dir-name false))
+  ([base-dir child-dir-name silent]
+    (let [child-directory (find-directory base-dir child-dir-name)]
+      (if child-directory
+        (do
+          (if (not silent) (println (. child-directory getPath) "directory already exists."))
+          child-directory)
+        (do
+          (if (not silent) (println "Creating" child-dir-name "directory in" (. base-dir getName) "..."))
+          (let [child-directory (new File base-dir child-dir-name)]
+            (. child-directory mkdirs)
+            child-directory))))))
 
 (defn
 #^{:doc "Recursively creates the given child-dirs under the given base-dir.
@@ -46,21 +48,27 @@
 For example: (create-dirs (new File \"foo\") \"bar\" \"baz\") creates the directory /foo/bar/baz
 
 Note: this method prints a bunch of stuff to standard out."}
-  create-dirs [base-dir & child-dirs]
-    (if base-dir
-      (reduce create-dir base-dir child-dirs)
-      (println "You must pass in a base directory.")))
+  create-dirs 
+  ([dirs] (create-dirs dirs false))
+  ([dirs silent]
+    (let [base-dir (first dirs)
+          child-dirs (rest dirs)]
+      (if base-dir
+        (reduce (fn [base-dir child-dir] (create-dir base-dir child-dir silent)) base-dir child-dirs)
+        (if (not silent) (println "You must pass in a base directory."))))))
 
 (defn
 #^{:doc "Creates and returns the given file if it does not already exist. If it does exist, the method simply prints to
 standard out and returns nil"}
-  create-file [file]
-  (if (. file exists)
-    (println (. file getName) "already exists. Doing nothing.")
-    (do
-      (println "Creating file" (. file getName) "...")
-      (. file createNewFile)
-      file)))
+  create-file 
+  ([file] (create-file file false))
+  ([file silent]
+    (if (. file exists)
+      (if (not silent) (println (. file getName) "already exists. Doing nothing."))
+      (do
+        (if (not silent) (println "Creating file" (. file getName) "..."))
+        (. file createNewFile)
+        file))))
 
 (defn
 #^{:doc "Deletes the given directory if it contains no files or subdirectories."}

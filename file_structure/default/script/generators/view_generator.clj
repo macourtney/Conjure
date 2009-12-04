@@ -54,23 +54,29 @@ content." }
 (defn
 #^{:doc "Creates the view file associated with the given controller and action."}
   generate-view-file
-    ([controller action] (generate-view-file controller action nil))
-    ([controller action content]
+    ([{ :keys [controller action content silent] 
+        :or { content nil, silent false } }]
       (if (and controller action)
         (let [view-directory (util/find-views-directory)]
           (if view-directory
             (do 
-              (let [controller-directory (builder/find-or-create-controller-directory view-directory controller)
-                    view-file (builder/create-view-file controller-directory action)]
+              (let [params { :views-directory view-directory, 
+                             :controller controller,
+                             :action action,
+                             :silent silent }
+                    controller-directory (builder/find-or-create-controller-directory params)
+                    view-file (builder/create-view-file 
+                                (assoc params :controller-directory controller-directory))]
                 (if view-file
                   (generate-file-content view-file controller content)))
-              (view-test-generator/generate-unit-test controller action))
-            (do
-              (println "Could not find views directory.")
-              (println view-directory))))
+              (view-test-generator/generate-unit-test controller action silent))
+            (if (not silent)
+              (do
+                (println "Could not find views directory.")
+                (println view-directory)))))
         (view-usage))))
         
 (defn 
 #^{:doc "Generates a migration file for the migration name given in params."}
   generate-view [params]
-  (generate-view-file (first params) (second params)))
+  (generate-view-file { :controller (first params), :action (second params) }))

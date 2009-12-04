@@ -5,16 +5,14 @@
             [clojure.contrib.str-utils :as contrib-str-utils]))
 
 (defn draw []
-  [(fn [path]
-     (if path
-       (let [path-tokens (contrib-str-utils/re-split #"/" path)
-             controller (nth path-tokens 1 nil)
-             action (nth path-tokens 2 nil)
-             id (nth path-tokens 3 nil)]
-
-         (if (and controller action)
-           { :controller (loading-utils/underscores-to-dashes controller)
-             :action (loading-utils/underscores-to-dashes action)
-             :params (if id {:id id} {}) }
-           nil))
-       nil))])
+  [ (fn [path]
+      (if path
+        (let [path-groups (re-matches #"/?(([^/]+)(/([^/]+)(/([^/]+))?)?)?" path)]
+          (if path-groups
+            (let [controller (or (nth path-groups 2 nil) "home")
+                  action (or (nth path-groups 4 nil) "index")
+                  id (nth path-groups 6 nil)]
+    
+              { :controller (loading-utils/underscores-to-dashes controller)
+                :action (loading-utils/underscores-to-dashes action)
+                :params (if id {:id id} {}) })))))])

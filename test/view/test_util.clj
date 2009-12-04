@@ -10,9 +10,9 @@
 (def controller-name "test")
 
 (defn setup-all [function]
-  (view-generator/generate-view-file controller-name action-name)
+  (view-generator/generate-view-file { :controller controller-name, :action action-name, :content nil, :silent true })
   (function)
-  (view-destroyer/destroy-all-dependencies controller-name action-name))
+  (view-destroyer/destroy-all-dependencies controller-name action-name true))
         
 (use-fixtures :once setup-all)
 

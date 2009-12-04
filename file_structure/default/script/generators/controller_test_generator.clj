@@ -23,19 +23,21 @@
 
 (defn
 #^{:doc "Generates the functional test file for the given controller and actions."}
-  generate-functional-test [controller actions]
-  (let [functional-test-file (test-builder/create-functional-test controller)]
-    (if functional-test-file
-      (let [test-namespace (test-util/functional-test-namespace controller)
-            controller-namespace (util/controller-namespace controller)
-            test-content (str "(ns " test-namespace "
-  (:use clojure.contrib.test-is
-        " controller-namespace "))
-
-(def controller-name \"" controller "\")
-
-" (generate-all-action-tests actions))]
-        (file-utils/write-file-content functional-test-file test-content)))))
+  generate-functional-test 
+  ([controller actions] (generate-functional-test controller actions false))
+  ([controller actions silent]
+    (let [functional-test-file (test-builder/create-functional-test controller silent)]
+      (if functional-test-file
+        (let [test-namespace (test-util/functional-test-namespace controller)
+              controller-namespace (util/controller-namespace controller)
+              test-content (str "(ns " test-namespace "
+    (:use clojure.contrib.test-is
+          " controller-namespace "))
+  
+  (def controller-name \"" controller "\")
+  
+  " (generate-all-action-tests actions))]
+          (file-utils/write-file-content functional-test-file test-content))))))
         
 (defn 
 #^{:doc "Generates a controller file for the controller name and actions in params."}

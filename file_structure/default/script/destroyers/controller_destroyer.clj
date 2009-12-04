@@ -11,20 +11,21 @@
 
 (defn
 #^{:doc "Destroys the controller file from the given controller."}
-  destroy-controller-file [controller]
+  destroy-controller-file [controller silent]
   (if controller
     (let [controllers-directory (util/find-controllers-directory)]
       (if controllers-directory
         (let [controller-file (util/find-controller-file controllers-directory controller)]
           (if controller-file
             (let [is-deleted (. controller-file delete)] 
-              (println "File" (. controller-file getName) (if is-deleted "destroyed." "not destroyed.")))
-            (println "Controller file not found. Doing nothing.")))
-        (do
-          (println "Could not find controllers directory.")
-          (println controllers-directory)
-          (println "Command ignored."))))
-    (controller-usage)))
+              (if (not silent) (println "File" (. controller-file getName) (if is-deleted "destroyed." "not destroyed."))))
+            (if (not silent) (println "Controller file not found. Doing nothing."))))
+        (if (not silent) 
+          (do
+            (println "Could not find controllers directory.")
+            (println controllers-directory)
+            (println "Command ignored.")))))
+    (if (not silent) (controller-usage))))
 
 (defn
 #^{:doc "Destroys a controller file for the controller name given in params."}
@@ -34,8 +35,7 @@
 (defn
 #^{:doc "Destroys all of the files created by the controller_generator."}
   destroy-all-dependencies
-  ([controller] (destroy-all-dependencies controller ())) 
-  ([controller actions]
-    (destroy-controller-file controller)
-    (doall (map #(view-destroyer/destroy-all-dependencies controller %) actions))
-    (controller-test-destroyer/destroy-all-dependencies controller)))
+  [{ :keys [controller actions silent] :or { actions (), silent false } }]
+    (destroy-controller-file controller silent)
+    (doall (map #(view-destroyer/destroy-all-dependencies controller % silent) actions))
+    (controller-test-destroyer/destroy-all-dependencies controller silent))

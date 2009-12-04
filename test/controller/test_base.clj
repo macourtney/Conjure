@@ -9,9 +9,11 @@
 (def action-name "show")
 
 (defn setup-all [function]
-  (controller-generator/generate-controller-file controller-name [action-name])
+  (controller-generator/generate-controller-file 
+    { :controller controller-name, :actions [action-name], :silent true })
   (function)
-  (controller-destroyer/destroy-all-dependencies controller-name [action-name]))
+  (controller-destroyer/destroy-all-dependencies 
+    { :controller controller-name, :actions [action-name], :silent true }))
         
 (use-fixtures :once setup-all)
 

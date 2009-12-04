@@ -12,8 +12,10 @@
 
 (defn
 #^{:doc "Generates the functional test file for the given controller and actions."}
-  generate-unit-test [controller action]
-  (let [unit-test-file (test-builder/create-view-unit-test controller action)]
+  generate-unit-test 
+  ([controller action] (generate-unit-test controller action false))
+  ([controller action silent]
+  (let [unit-test-file (test-builder/create-view-unit-test controller action silent)]
     (if unit-test-file
       (let [test-namespace (test-util/view-unit-test-namespace controller action)
             view-namespace (util/view-namespace-by-action controller action)
@@ -28,7 +30,7 @@
 
 (deftest test-view
   (render-view request-map))")]
-        (file-utils/write-file-content unit-test-file test-content)))))
+        (file-utils/write-file-content unit-test-file test-content))))))
 
 (defn 
 #^{:doc "Generates a controller file for the controller name and actions in params."}

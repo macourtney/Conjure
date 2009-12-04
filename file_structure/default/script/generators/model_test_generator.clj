@@ -13,25 +13,27 @@
 
 (defn
 #^{:doc "Generates the unit test file for the given model."}
-  generate-unit-test [model]
-  (let [unit-test-file (test-builder/create-model-unit-test model)]
-    (if unit-test-file
-      (let [test-namespace (test-util/model-unit-test-namespace model)
-            model-namespace (util/model-namespace model)
-            fixture-namespace (test-util/fixture-namespace model)
-            test-content (str "(ns " test-namespace "
-  (:use clojure.contrib.test-is
-        " model-namespace "
-        " fixture-namespace "))
-
-(def model \"" model "\")
-
-(use-fixtures :once " model "-fixture)
-
-(deftest test-first-record
-  (is (get-record 1)))")]
-        (file-utils/write-file-content unit-test-file test-content)
-        (fixture-generator/generate-fixture-file model)))))
+  generate-unit-test 
+  ([model] (generate-unit-test model false))
+  ([model silent]
+    (let [unit-test-file (test-builder/create-model-unit-test model silent)]
+      (if unit-test-file
+        (let [test-namespace (test-util/model-unit-test-namespace model)
+              model-namespace (util/model-namespace model)
+              fixture-namespace (test-util/fixture-namespace model)
+              test-content (str "(ns " test-namespace "
+    (:use clojure.contrib.test-is
+          " model-namespace "
+          " fixture-namespace "))
+  
+  (def model \"" model "\")
+  
+  (use-fixtures :once " model "-fixture)
+  
+  (deftest test-first-record
+    (is (get-record 1)))")]
+          (file-utils/write-file-content unit-test-file test-content)
+          (fixture-generator/generate-fixture-file model silent))))))
 
 (defn 
 #^{:doc "Generates a model test file for the model name in params."}

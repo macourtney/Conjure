@@ -12,24 +12,25 @@
 
 (defn
 #^{:doc "Generates the fixture file for the given model."}
-  generate-fixture-file [model]
-  (let [fixture-file (test-builder/create-fixture model)]
-    (if fixture-file
-      (let [fixture-namespace (test-util/fixture-namespace model)
-            table-name (model-util/model-to-table-name model)
-            fixture-content (str "(ns " fixture-namespace "
-  (:use conjure.model.database))
-
-(defn " model "-fixture [function]
-  (do
-    (insert-into :" table-name "
-      ; Add your test data here.
-      { :id 1 })
-    (function)
-    (delete :" table-name " [ \"true\" ])))")]
-        (file-utils/write-file-content fixture-file fixture-content)))))
+  generate-fixture-file
+  ([model silent]
+    (let [fixture-file (test-builder/create-fixture model silent)]
+      (if fixture-file
+        (let [fixture-namespace (test-util/fixture-namespace model)
+              table-name (model-util/model-to-table-name model)
+              fixture-content (str "(ns " fixture-namespace "
+    (:use conjure.model.database))
+  
+  (defn " model "-fixture [function]
+    (do
+      (insert-into :" table-name "
+        ; Add your test data here.
+        { :id 1 })
+      (function)
+      (delete :" table-name " [ \"true\" ])))")]
+          (file-utils/write-file-content fixture-file fixture-content))))))
 
 (defn 
 #^{:doc "Generates a fixture file for the model name in params."}
   generate-fixture [params]
-  (generate-fixture-file (first params)))
+  (generate-fixture-file (first params) false))

@@ -28,7 +28,7 @@
     functional-dir-name 
     find-functional-test-directory 
     find-test-directory 
-    builder/find-or-create-functional-test-directory
+    #(builder/find-or-create-functional-test-directory { :silent true })
     []))
 
 (deftest test-find-unit-test-directory
@@ -36,7 +36,7 @@
     unit-dir-name 
     find-unit-test-directory 
     find-test-directory 
-    builder/find-or-create-unit-test-directory
+    #(builder/find-or-create-unit-test-directory { :silent true })
     []))
 
 (deftest test-find-view-unit-test-directory
@@ -44,7 +44,7 @@
     unit-view-dir-name 
     find-view-unit-test-directory 
     find-unit-test-directory
-    builder/find-or-create-view-unit-test-directory
+    #(builder/find-or-create-view-unit-test-directory { :silent true })
     [find-unit-test-directory]))
 
 (deftest test-find-controller-view-unit-test-directory
@@ -53,7 +53,7 @@
       controller 
       (partial find-controller-view-unit-test-directory controller) 
       find-view-unit-test-directory 
-      (partial builder/find-or-create-controller-view-unit-test-directory controller)
+      #(builder/find-or-create-controller-view-unit-test-directory { :controller controller, :silent true })
       [find-view-unit-test-directory find-unit-test-directory])))
 
 (deftest test-find-model-unit-test-directory
@@ -61,7 +61,7 @@
     unit-model-dir-name 
     find-model-unit-test-directory 
     find-unit-test-directory
-    builder/find-or-create-model-unit-test-directory
+    #(builder/find-or-create-model-unit-test-directory true)
     [find-unit-test-directory]))
 
 (deftest test-find-fixture-directory
@@ -69,7 +69,7 @@
     fixture-dir-name 
     find-fixture-directory 
     find-test-directory
-    builder/find-or-create-fixture-directory
+    #(builder/find-or-create-fixture-directory true)
     []))
 
 (deftest test-functional-test-file-name
@@ -101,7 +101,7 @@
   (is (nil? (fixture-file-name ""))))
 
 (deftest test-functional-test-file
-  (builder/find-or-create-functional-test-directory)
+  (builder/find-or-create-functional-test-directory { :silent true })
   (test-helper/test-file (functional-test-file "test") "test_controller_test.clj")
   (test-helper/test-file (functional-test-file "foo-bar" (find-functional-test-directory)) "foo_bar_controller_test.clj")
   (is (nil? (functional-test-file nil)))
@@ -110,7 +110,7 @@
 
 (deftest test-view-unit-test-file
   (let [controller "test"]
-    (builder/find-or-create-controller-view-unit-test-directory controller)
+    (builder/find-or-create-controller-view-unit-test-directory { :controller controller, :silent true })
     (test-helper/test-file (view-unit-test-file controller "show") "show_view_test.clj")
     (test-helper/test-file (view-unit-test-file controller "show-baz" (find-controller-view-unit-test-directory controller)) "show_baz_view_test.clj")
     (is (nil? (view-unit-test-file controller nil)))
@@ -120,7 +120,7 @@
     (is (file-utils/delete-all-if-empty (find-controller-view-unit-test-directory controller) (find-view-unit-test-directory) (find-unit-test-directory)))))
 
 (deftest test-model-unit-test-file
-  (builder/find-or-create-model-unit-test-directory)
+  (builder/find-or-create-model-unit-test-directory true)
   (test-helper/test-file (model-unit-test-file "test") "test_model_test.clj")
   (test-helper/test-file (model-unit-test-file "foo-bar" (find-model-unit-test-directory)) "foo_bar_model_test.clj")
   (is (nil? (model-unit-test-file nil)))
@@ -128,7 +128,7 @@
   (is (file-utils/delete-all-if-empty (find-model-unit-test-directory) (find-unit-test-directory))))
 
 (deftest test-fixture-file
-  (builder/find-or-create-fixture-directory)
+  (builder/find-or-create-fixture-directory true)
   (test-helper/test-file (fixture-file "test") "test.clj")
   (test-helper/test-file (fixture-file "foo-bar" (find-fixture-directory)) "foo_bar.clj")
   (is (nil? (fixture-file nil)))

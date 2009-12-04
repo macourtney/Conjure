@@ -8,6 +8,7 @@ Apache 2.0 License
  ant.jar
  ant-launcher.jar
  commons-io-1.4.jar
+ commons-lang-2.4.jar
  httpcore-4.0.jar
  httpcore-nio-4.0.jar
  jetty-6.1.18.jar
@@ -20,6 +21,7 @@ MIT License mmcgrana
  clj-backtrace.jar
  clj-html.jar
  clj-html-helpers.jar
+ clj-stacktrace.jar
  clj-unit.jar
  ring.jar
 
