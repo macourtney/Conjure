@@ -1,4 +1,4 @@
-(ns views.templates.application-breadcrumbs
+(ns views.layouts.templates.breadcrumbs
   (:use conjure.view.base)
   (:require [clj-html.core :as html]))
 

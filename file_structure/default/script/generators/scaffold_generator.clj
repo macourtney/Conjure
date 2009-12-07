@@ -54,7 +54,14 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
     (id)"
     (fields-spec-string fields)
     ")"))
-    
+
+(defn
+#^{ :doc "Returns the content for add in the action map." }
+  create-index-action []
+    { :controller (str "(defn index [request-map]
+  (redirect-to request-map { :action \"list-records\" }))")
+      :view nil })
+      
 (defn
 #^{ :doc "Returns the content for list in the action map." }
   create-list-records-action [model]
@@ -140,7 +147,8 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
 (defn
 #^{ :doc "Returns a map which links action names to content and such." }
   create-action-map [model]
-    { :list-records (create-list-records-action model)
+    { :index (create-index-action)
+      :list-records (create-list-records-action model)
       :show (create-show-action model)
       :add (create-add-action model)
       :create (create-create-action model)

@@ -69,8 +69,10 @@
       { :controller "layouts", 
         :action (or layout-name "application") 
         :layout-info 
-          { :controller (:controller request-map)
-            :action (:action request-map) } }) 
+          (merge
+            (:layout-info request-map) 
+            { :controller (:controller request-map)
+              :action (:action request-map) }) }) 
     body))
 
 (defn

@@ -1,10 +1,10 @@
-(ns views.templates.application-tabs
+(ns views.layouts.templates.tabs
   (:use conjure.view.base)
   (:require [clj-html.core :as html]
             [conjure.view.util :as view-util]))
 
 (defview [tabs]
-  (let [location-url (:uri request-map)]
+  (let [location-url (view-util/url-for (:layout-info request-map))]
     (html/html
       [:div { :id "tabs", :class "noprint" }
         [:h3 { :class "noscreen" } "Navigation"]

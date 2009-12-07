@@ -1,10 +1,12 @@
 (ns views.layouts.application
   (:use conjure.view.base)
   (:require [clj-html.core :as html]
-            [views.templates.application-breadcrumbs :as application-breadcrumbs]
-            [views.templates.application-header :as application-header]
-            [views.templates.application-links :as application-links]
-            [views.templates.application-tabs :as application-tabs]))
+            [conjure.controller.util :as controller-util]
+            [conjure.util.string-utils :as string-utils]
+            [views.layouts.templates.breadcrumbs :as breadcrumbs]
+            [views.layouts.templates.header :as header]
+            [views.layouts.templates.links :as links]
+            [views.layouts.templates.tabs :as tabs]))
 
 (defview [body]
   (let [title "Conjure"]
@@ -32,12 +34,15 @@
           [:div { :id "main", :class "box" }
   
             ;; Header
-            (application-header/render-view request-map title)
+            (header/render-view request-map title)
   
             ;; Main menu (tabs)
-            (application-tabs/render-view request-map 
-              [{ :text "List", :url-for (merge (:layout-info request-map) { :action "list-records" }) }
-               { :text "Add", :url-for (merge (:layout-info request-map) { :action "add" }) }])
+            (tabs/render-view request-map 
+              (let [tabs (:tabs (:layout-info request-map))]
+                (if tabs
+                  tabs
+                  [{ :text "List", :url-for (merge (:layout-info request-map) { :action "list-records" }) }
+                   { :text "Add", :url-for (merge (:layout-info request-map) { :action "add" }) }])))
   
             ;; Page (2 columns)
             [:div { :id "page", :class="box" }
@@ -50,7 +55,7 @@
                   ;[:hr { :class "noscreen" }]
   
                   ;; Breadcrumbs
-                  (application-breadcrumbs/render-view request-map)]
+                  (breadcrumbs/render-view request-map)]
   
                 ;; Content
                 [:div { :id "content" }
@@ -93,9 +98,12 @@
                     ;[:hr { :class "noscreen" }]
   
                     ;; Links
-                    (application-links/render-view request-map "Links" 
-                      [{ :text "List", :url-for (merge (:layout-info request-map) { :action "list-records" }) }
-                       { :text "Add", :url-for (merge (:layout-info request-map) { :action "add" }) }])]]]]
+                    (links/render-view request-map "Items"
+                      (map 
+                        (fn [controller] 
+                          { :text (string-utils/human-readable controller), 
+                            :url-for (merge (:layout-info request-map) { :controller controller, :action "index" })}) 
+                        (controller-util/all-controllers)))]]]]
   
             ;; Footer
             [:div { :id "footer" }

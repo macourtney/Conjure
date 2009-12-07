@@ -3,7 +3,12 @@
   (:require [models.book :as book]))
 
 (defn index [request-map]
-  (render-view request-map))
+  (render-view 
+    (assoc 
+      request-map 
+      :layout-info 
+      { :tabs 
+        [{ :text "Home", :url-for { :controller "home", :action "index" } }]})))
 
 (defn list-records [request-map]
   (redirect-to request-map { :action "index" }))

@@ -1,4 +1,4 @@
-(ns views.templates.application-header
+(ns views.layouts.templates.header
   (:use conjure.view.base)
   (:require [clj-html.core :as html]))
 

@@ -1,4 +1,4 @@
-(ns views.templates.application-links
+(ns views.layouts.templates.links
   (:use conjure.view.base)
   (:require [clj-html.core :as html]
             [conjure.view.util :as view-util]))
