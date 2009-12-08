@@ -4,7 +4,9 @@
             [conjure.view.util :as view-util]))
 
 (defview [title links]
-  (let [location-url (:uri request-map)]
+  (let [original-request-map (:layout-info request-map)
+        location-controller (:controller original-request-map)
+        location-action (:action original-request-map)]
     (html/html
       [:h3 [:span title]]
   
@@ -12,8 +14,10 @@
         (html/htmli
           (map 
             (fn [link-map] 
-              (let [link-url (or (:url link-map) (if (:url-for link-map) (view-util/url-for request-map (:url-for link-map))))]
-                [:li { :id (if (or (:is-active link-map) (if (and link-url location-url) (. link-url endsWith location-url))) "link-active") }
+              (let [link-controller (or (:controller (:url-for link-map)) location-controller)
+                    link-action (or (:action (:url-for link-map)) location-controller)
+                    link-url (or (:url link-map) (if (:url-for link-map) (view-util/url-for original-request-map (:url-for link-map))))]
+                [:li { :id (if (or (:is-active link-map) (if (and link-controller location-controller link-action location-action) (and (= link-controller location-controller) (= link-action location-action)))) "link-active") }
                   (or 
                     (:link link-map) 
                     [:a 

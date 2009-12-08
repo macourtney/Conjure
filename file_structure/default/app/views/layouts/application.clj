@@ -41,8 +41,11 @@
               (let [tabs (:tabs (:layout-info request-map))]
                 (if tabs
                   tabs
-                  [{ :text "List", :url-for (merge (:layout-info request-map) { :action "list-records" }) }
-                   { :text "Add", :url-for (merge (:layout-info request-map) { :action "add" }) }])))
+                  (map 
+                    (fn [controller] 
+                      { :text (string-utils/human-readable controller), 
+                        :url-for (merge (:layout-info request-map) { :controller controller, :action "index" })}) 
+                    (controller-util/all-controllers)))))
   
             ;; Page (2 columns)
             [:div { :id "page", :class="box" }
@@ -99,11 +102,11 @@
   
                     ;; Links
                     (links/render-view request-map "Items"
-                      (map 
-                        (fn [controller] 
-                          { :text (string-utils/human-readable controller), 
-                            :url-for (merge (:layout-info request-map) { :controller controller, :action "index" })}) 
-                        (controller-util/all-controllers)))]]]]
+                      (let [links (:links (:layout-info request-map))]
+                        (if links
+                          links
+                          [ { :text "List", :url-for (merge (:layout-info request-map) { :action "list-records" }) }
+                            { :text "Add", :url-for (merge (:layout-info request-map) { :action "add" }) }])))]]]]
   
             ;; Footer
             [:div { :id "footer" }

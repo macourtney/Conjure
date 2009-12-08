@@ -7,7 +7,7 @@
     (assoc 
       request-map 
       :layout-info 
-      { :tabs 
+      { :links 
         [{ :text "Home", :url-for { :controller "home", :action "index" } }]})))
 
 (defn list-records [request-map]
