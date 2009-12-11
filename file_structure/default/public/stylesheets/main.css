@@ -82,7 +82,8 @@ code, kbd, samp {font-family:monospace; font-size:110%;}
 #header {position:relative; width:770px; height:100px; margin:0; padding:0; background:#233C9B url("/images/header.jpg") 0 0 no-repeat; color:#FFF;}
 
     /* Header - logo */
-    #header #logo {position:absolute; top:35px; left:35px; margin:0;}
+    /* #header #logo {position:absolute; top:35px; left:35px; margin:0;} */
+    #header #logo {position:absolute; top:7px; left:25px; margin:0;}
 
     #header #logo a {color:#FFF;}
     #header #logo a:hover {color:#B5C4E3; text-decoration:underline;}
