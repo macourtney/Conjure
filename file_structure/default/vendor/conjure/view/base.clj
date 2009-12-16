@@ -2,6 +2,7 @@
   (:use clj-html.core)
   (:require [clj-html.helpers :as helpers]
             [clojure.contrib.str-utils :as str-utils]
+            [conjure.model.util :as model-util]
             [conjure.util.string-utils :as conjure-str-utils]
             [conjure.util.html-utils :as html-utils]
             [conjure.view.util :as view-utils]
@@ -158,7 +159,7 @@ containing a name, value (optional), and selected (optional) keys."}
   option-tag
   ([option-name value-name selected] 
     (htmli [:option (merge {:value value-name} 
-      (if selected {:selected "true"} {})) option-name]))
+      (if selected {:selected "true"} {})) (if (and option-name (> (. option-name length) 0)) option-name "&lt;blank&gt;")]))
   ([option-name option-map]
     (let [option-name-str (conjure-str-utils/str-keyword option-name)]
       (option-tag option-name-str (or (:value option-map) option-name-str) (or (:selected option-map) false)))))
@@ -184,8 +185,24 @@ option names to option-tag option maps."}
         (cons
           (if (:blank record-map) { "" { :value "" } }) 
           (map 
-            (fn [record] { (get record name-key) { :value (helpers/h (get record value-key)) } }) 
+            (fn [record] { (or (get record name-key) (get record value-key)) { :value (helpers/h (get record value-key)) } }) 
             (get record-map :records [])))))))
+
+(defn
+#^{ :doc "Creates an option map from the model in the given map. Options include:
+
+  :model - The name of the model to pull the records from.
+  :name-key - The key in each record who's value will be used as the name of each option. If this key does not exist, then :name is used.
+  :value-key - The key in each record who's value will be used as the value of each option. If this key does not exist, then :id is used.
+  :blank - If true, adds a blank option (name = \"\", value = \"\"). Default is false." }
+  options-from-model [option-map]
+  (let [model (:model option-map)
+        model-namespace (model-util/model-namespace model)
+        model-namespace-symbol (symbol model-namespace)
+        find-records-str (str "(" model-namespace "/find-records [true])")]
+    (do
+      (require model-namespace-symbol)
+      (options-from-records (assoc option-map :records (eval (read-string find-records-str)))))))
 
 (defn-
 #^{ :doc "Augments the given html-options with a record name option." }

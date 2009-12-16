@@ -31,5 +31,5 @@
         :query-string "foo=bar&baz=biz" }))
   (is
     (conjure 
-      { :uri "index.html" 
+      { :uri "" 
         :query-string "" })))

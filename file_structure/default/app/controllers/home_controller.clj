@@ -1,6 +1,5 @@
 (ns controllers.home-controller
-  (:use [conjure.controller.base])
-  (:require [models.book :as book]))
+  (:use [conjure.controller.base]))
 
 (defn index [request-map]
   (render-view 

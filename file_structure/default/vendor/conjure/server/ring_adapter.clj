@@ -9,12 +9,17 @@
 #^{:doc "The ring function which actually calls the conjure server and returns a properly formatted 
 request map."}
   call-server [req]
-  (let [response (server/process-request req)]
-    (if (map? response)
-      response
-      {:status  200
-       :headers {"Content-Type" "text/html"}
-       :body    response})))
+  (try
+    (let [response (server/process-request req)]
+      (if (map? response)
+        response
+        {:status  200
+         :headers {"Content-Type" "text/html"}
+         :body    response}))
+    (catch Throwable throwable
+      (do
+        (. throwable printStackTrace)
+        (throw throwable)))))
 
 (defn
 #^{:doc "A Ring adapter function for Conjure."}

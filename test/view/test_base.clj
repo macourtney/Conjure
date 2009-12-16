@@ -108,7 +108,17 @@
   (is (= 
     { "name1" { :value "value1" } } 
     (options-from-records 
-      { :records [{ :name "name1", :id "value1" }] }))))
+      { :records [{ :name "name1", :id "value1" }] })))
+  (is (= 
+    { "name1" { :value "value1" } 
+      "" { :value "" } } 
+    (options-from-records 
+      { :records [{ :name "name1", :id "value1" }]
+        :blank true })))
+  (is (= 
+    { "value1" { :value "value1" } } 
+    (options-from-records 
+      { :records [{ :id "value1" }] }))))
 
 (deftest test-image-path
   (is (= "/images/edit.png" (image-path "edit.png")))
