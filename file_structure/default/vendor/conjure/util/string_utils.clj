@@ -1,4 +1,6 @@
 (ns conjure.util.string-utils
+  (:import [java.security NoSuchAlgorithmException MessageDigest]
+           [java.math BigInteger])
   (:require [clojure.contrib.str-utils :as str-utils]))
 
 (defn
@@ -68,3 +70,15 @@ string before the spaces are added." }
     (if string
       (str-utils/re-gsub #"[_-]" " " (str-keyword string))
       string))
+
+(defn md5-sum
+  "Compute the hex MD5 sum of a list of strings."
+  [& strings]
+  (let [alg (doto (MessageDigest/getInstance "MD5")
+              (.reset))]
+    (try
+      (do
+        (doall (map #(. alg update (.getBytes %)) strings))
+        (.toString (new BigInteger 1 (.digest alg)) 16))
+      (catch NoSuchAlgorithmException e
+        (throw (new RuntimeException e))))))

@@ -1,10 +1,12 @@
 (ns conjure.server.server
+  (:import [java.util Calendar Date])
   (:require [http-config :as http-config]
             [environment :as environment]
             [routes :as routes]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.model.database :as database]
             [conjure.controller.util :as controller-util]
+            [conjure.util.string-utils :as conjure-str-utils]
             [conjure.view.util :as view-util]
             [conjure.util.html-utils :as html-utils]
             [clojure.contrib.str-utils :as str-utils]))
@@ -61,12 +63,45 @@
   (loading-utils/load-resource "controllers" controller-filename))
 
 (defn
-#^{:doc "Initializes the conjure server."}
+#^{ :doc "Initializes the conjure server." }
   init []
   (database/ensure-conjure-db))
 
 (defn
-#^{:doc "Takes the given path and calls the correct controller and action for it."}
+#^{ :doc "Updates the response map with a session cookie if necessary." }
+  manage-session [request-map response-map]
+  (if (not (or (get (:headers request-map) "cookie") (get (:headers response-map) "Set-Cookie")))
+    (let [tomorrow (doto (. Calendar getInstance)
+     								 (.add (. Calendar DATE) 1))]
+	    (assoc
+	      response-map 
+	      :headers 
+	        (merge 
+	          (:headers response-map)
+		      	{ "Set-Cookie"
+		       		(str 
+		       		  "SID=" 
+			      		(conjure-str-utils/md5-sum 
+			      			"Conjure" 
+			      			(str (. (new Date) getTime)) 
+			      	  	(str (. Math random)))
+			      	 "; expires=" 
+			      	 (html-utils/format-cookie-date (. tomorrow getTime))
+			      	 "; path=/") })))
+    response-map))
+
+(defn
+#^{ :doc "Converts the given response to a response map if it is not already 
+one." }
+  create-response-map [response]
+  (if (map? response)
+    response
+    {:status  200
+     :headers {"Content-Type" "text/html"}
+     :body    response}))
+
+(defn
+#^{ :doc "Takes the given path and calls the correct controller and action for it." }
   process-request [request-map]
   (when request-map
     (init)
@@ -75,17 +110,21 @@
       (if controller-file
         (do
           (load-controller controller-file)
-          ((load-string (fully-qualified-action generated-request-map)) generated-request-map))
+          (manage-session 
+          	request-map
+          	(create-response-map 
+          		((load-string (fully-qualified-action generated-request-map)) 
+          			generated-request-map))))
         nil))))
 
 (defn
-#^{:doc "A function for simplifying the loading of views."}
+#^{ :doc "A function for simplifying the loading of views." }
   render-view [request-map & params]
   (view-util/load-view request-map)
   (apply (read-string (fully-qualified-action request-map)) request-map params))
 
 (defn
-#^{:doc "Gets the user configured http properties."}
+#^{ :doc "Gets the user configured http properties." }
   http-config []
   (http-config/get-http-config))
 

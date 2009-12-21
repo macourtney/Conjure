@@ -10,12 +10,7 @@
 request map."}
   call-server [req]
   (try
-    (let [response (server/process-request req)]
-      (if (map? response)
-        response
-        {:status  200
-         :headers {"Content-Type" "text/html"}
-         :body    response}))
+		(server/process-request req)
     (catch Throwable throwable
       (do
         (. throwable printStackTrace)

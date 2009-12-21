@@ -1,5 +1,7 @@
 (ns conjure.util.html-utils
   (:import [java.net URLEncoder URLDecoder]
+           [java.text SimpleDateFormat]
+           [java.util Calendar TimeZone]
            [org.apache.commons.lang StringEscapeUtils])
   (:require [clojure.contrib.str-utils :as str-utils]
             [conjure.util.string-utils :as conjure-str-utils]))
@@ -102,3 +104,15 @@ value is nil, then this function returns nil."}
       (fn [key-value-pair] 
         (attribute-str (conjure-str-utils/str-keyword (first key-value-pair)) (second key-value-pair))) 
       attributes)))
+
+(defn
+#^{ :doc "Returns the string value of the given date for use in an http cookie." }
+  format-cookie-date [date]
+  (str 
+	  (. (new SimpleDateFormat "EEE, dd-MMM-yyyy HH:mm:ss") 
+	  	format 
+	  	(let [time-zone (. TimeZone getTimeZone "GMT+0:0")
+	  	      gmt-calendar (. Calendar getInstance time-zone)]
+		  		(. gmt-calendar setTime date)
+		  		(. gmt-calendar getTime)))
+	  " GMT"))
