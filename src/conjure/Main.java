@@ -1,15 +1,23 @@
 package conjure;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
-
 
 public class Main {
     private static final String CONJURE_JAR_NAME = "conjure.jar";
@@ -100,12 +108,50 @@ public class Main {
             }
         }
     }
+    public void setDatabase(String databaseFlavour) {
+	/* write out change of dataase flavour to db_config.clj */
+	//	read in file by line 
+	String s, s2 = new String();
+	try {
+	    BufferedReader in = new BufferedReader(
+						   new FileReader(this.projectName+"/config/db_config.clj"));
+	    while((s = in.readLine())!= null)
+		s2 += s + "\n";
+	    in.close();
+	}
+	catch(IOException e) {
+	    System.err.println("Bobbins, couldn't read the db_config.clj file");
+	}
+	// match up the regex database flavour
+	Pattern p = Pattern.compile("mysql");//(databaseFlavour);
+	Matcher m = p.matcher(s2);
+	while(m.find()) {
+	    s2 = s2.replaceAll("mysql", databaseFlavour);
+	}
 
-    public static void createProject (String projectName) {
+	
+	// 4. File output
+	try {
+	    BufferedReader in4 = new BufferedReader(
+						    new StringReader(s2));
+	    PrintWriter out1 = new PrintWriter(
+				     new BufferedWriter(new FileWriter(this.projectName+"/config/db_config.clj")));
+	    while((s = in4.readLine()) != null )
+		out1.println(s);
+	    out1.close();
+	} catch(EOFException e) {
+	    System.err.println("End of stream");
+	} catch(IOException e) {
+	    System.err.println("Bobbins, couldn't write the db_config.clj file");
+	}
+    }
+
+    public static void createProject (String projectName, String databaseFlavour) {
 	            Main main = new Main(projectName);
 	
 	            try {
 	                main.extractAll();
+			main.setDatabase(databaseFlavour);
 	
 	            } catch (IOException e) {
 	                e.printStackTrace();
@@ -133,14 +179,20 @@ public class Main {
         		System.out.println("Conjure version: " + CONJURE_VERSION);
         	} else if (firstArg.matches("--database.*")) {
 		    if (args.length == 2) {
-			String database = firstArg.substring(firstArg.length() - 4);
-			createProject(secondArg);
-			System.out.println(database);
+			String database = firstArg.substring(firstArg.length() - 5);
+			if (database.equals("mysql")) {
+			    createProject(secondArg, database);
+			} else {
+			    System.out.println("Couldn't use "+database);
+			    database = "h2";
+			    createProject(secondArg, database);
+			}
+			System.out.println("Using "+database+" to store data.");
 		    } else {
 			printHelp();
 		    }
         	} else {
-		    createProject(firstArg);
+		    createProject(firstArg, "h2");
         	}
         }
     }
