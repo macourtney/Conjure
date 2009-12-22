@@ -31,7 +31,7 @@
         subprotocol "mysql"
         
         ;; The database path.
-        subname (str dbname)
+        subname (str "//localhost/" dbname)
         
         ;; A datasource for the database.
         datasource (create-datasource (format "jdbc:%s:%s" subprotocol subname))]
