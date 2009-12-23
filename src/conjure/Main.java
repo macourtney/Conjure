@@ -183,7 +183,7 @@ public class Main {
 			if (database.equals("mysql")) {
 			    createProject(secondArg, database);
 			} else {
-			    System.out.println("Couldn't use "+database);
+			    System.out.println("Couldn't use "+database+" so I'm falling back to h2");
 			    database = "h2";
 			    createProject(secondArg, database);
 			}
@@ -192,7 +192,7 @@ public class Main {
 			printHelp();
 		    }
         	} else {
-		    createProject(firstArg, "h2");
+		    createProject(firstArg, "mysql");
         	}
         }
     }
