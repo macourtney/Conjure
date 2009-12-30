@@ -8,6 +8,8 @@
 (def stylesheets-dir "stylesheets")
 (def images-dir "images")
 
+(def use-session-cookie true) ; Causes Conjure to save session ids as cookies. If this is false, Conjure uses a parameter in html.
+
 (defn
 #^{:doc "Initializes the environment."}
   init []

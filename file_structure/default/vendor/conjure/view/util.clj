@@ -1,8 +1,11 @@
 (ns conjure.view.util
   (:require [clojure.contrib.seq-utils :as seq-utils]
             [conjure.util.file-utils :as file-utils]
+            [conjure.util.html-utils :as html-utils]
             [conjure.util.loading-utils :as loading-utils]
-            [conjure.util.string-utils :as conjure-str-utils]))
+            [conjure.util.session-utils :as session-utils]
+            [conjure.util.string-utils :as conjure-str-utils]
+            [environment :as environment]))
 
 (defn 
 #^{:doc "Finds the views directory which contains all of the files which describe the html pages of the app."}
@@ -104,18 +107,18 @@ value of :id in the map. This method is used by url-for to get the id from from 
       id)))
       
 (defn-
-#^{:doc "Returns the value of :anchor from the given parameters and adds a '#' before it. If the key :anchor does not 
+#^{ :doc "Returns the value of :anchor from the given parameters and adds a '#' before it. If the key :anchor does not 
 exist in params, then this method returns nil This method is used by url-for to get the id from from the params passed 
-to it."}
+to it." }
   anchor-from [params]
   (let [anchor (:anchor params)]
     (if anchor
       (str "#" anchor))))
 
 (defn
-#^{:doc "Returns the params merged with the request-map. Only including the keys from request-map used by url-for"}
+#^{ :doc "Returns the params merged with the request-map. Only including the keys from request-map used by url-for" }
   merge-url-for-params [request-map params]
-  (merge (select-keys request-map [:controller :action :scheme :request-method :server-name :server-port ]) params))
+  (merge (select-keys request-map [:controller :action :scheme :request-method :server-name :server-port :params]) params))
 
 (defn
 #^{:doc 
@@ -134,12 +137,21 @@ to it."}
   ([request-map params] (url-for (merge-url-for-params request-map params))) 
   ([params]
   (let [controller (conjure-str-utils/str-keyword (:controller params))
-        action (conjure-str-utils/str-keyword (:action params))]
+        action (conjure-str-utils/str-keyword (:action params))
+        url-params (or (:params params) {})
+        session-id (session-utils/session-id params)]
     (if (and controller action)
       (apply str 
-        (full-host params) 
-        (interleave 
-          (repeat "/") 
-          (filter #(not (nil? %))
-            [(loading-utils/dashes-to-underscores controller) (loading-utils/dashes-to-underscores action) (id-from params) (anchor-from params)])))
+        (seq-utils/flatten
+          [ (full-host params) 
+            (interleave 
+              (repeat "/") 
+              (filter #(not (nil? %))
+                [(loading-utils/dashes-to-underscores controller) (loading-utils/dashes-to-underscores action) (id-from params) (anchor-from params)]))
+            (let [new-session-id 
+                    (or session-id (if (not environment/use-session-cookie) (session-utils/create-session-id)))
+                  new-url-params 
+                    (if new-session-id (assoc url-params :session-id new-session-id) url-params)]
+              (if (seq new-url-params)
+                (html-utils/url-param-str new-url-params)))]))
       (throw (new RuntimeException (str "You must pass a controller and action to url-for. " params)))))))

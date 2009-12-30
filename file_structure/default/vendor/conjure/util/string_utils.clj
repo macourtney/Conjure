@@ -82,3 +82,23 @@ string before the spaces are added." }
         (.toString (new BigInteger 1 (.digest alg)) 16))
       (catch NoSuchAlgorithmException e
         (throw (new RuntimeException e))))))
+
+(defn
+#^{ :doc "Converts the given string to a map using separator to separate the key value pairs, and equals-separator to 
+separate the key from the value." }
+  str-to-map 
+  ([string] (str-to-map string #";"))
+  ([string separator] (str-to-map string separator #"="))
+  ([string separator equals-separator]
+    (if (and string separator equals-separator)
+      (reduce 
+        (fn [new-map pair] (assoc new-map (first pair) (second pair)))
+        {}
+        (map 
+          #(filter 
+            (fn [equals-seq] (not (re-matches equals-separator equals-seq))) 
+            (str-utils/re-partition equals-separator %))
+          (filter 
+            (fn [equals-pair] (not (re-matches separator equals-pair))) 
+            (str-utils/re-partition separator string))))
+      nil)))

@@ -59,3 +59,12 @@
   (is (= (human-readable "foo") "foo"))
   (is (= (human-readable "") ""))
   (is (= (human-readable nil) nil)))
+
+(deftest test-str-to-map
+  (is (= (str-to-map "foo=bar") { "foo" "bar" }))
+  (is (= (str-to-map "foo=bar;baz=boz") { "foo" "bar", "baz" "boz" }))
+  (is (= (str-to-map "foo=bar;baz=boz;buz=bez") { "foo" "bar", "baz" "boz", "buz" "bez" }))
+  (is (= (str-to-map "foo=bar|baz=boz|buz=bez" #"\|") { "foo" "bar", "baz" "boz", "buz" "bez" }))
+  (is (= (str-to-map "foo&bar|baz&boz|buz&bez" #"\|" #"\&") { "foo" "bar", "baz" "boz", "buz" "bez" }))
+  (is (= (str-to-map "") {}))
+  (is (nil? (str-to-map nil))))
