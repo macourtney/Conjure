@@ -31,12 +31,12 @@
             
         (= environment :development)
           (merge base-config { 
-            ;; The name of the production database to use.
+            ;; The name of the development database to use.
             :dbname "conjure_development" })
             
         (= environment :test)
           (merge base-config { 
-            ;; The name of the production database to use.
+            ;; The name of the test database to use.
             :dbname "conjure_test" })))))
             
 (defn
