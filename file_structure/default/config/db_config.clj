@@ -1,7 +1,7 @@
 ;; This file is used to configure the database and connection.
 
 (ns db-config
-  (:require [flavors.mysql :as mysql]
+  (:require [flavors.h2 :as h2]
             [clojure.contrib.java-utils :as java-utils]
             [environment :as environment]))
 
@@ -15,7 +15,7 @@
           base-config
             {
               ;; The database flavor (SQL syntax type)
-              :flavor (mysql/flavor)
+              :flavor (h2/flavor)
           
               ;; The user name to use when connecting to the database.
               :username "conjure"
