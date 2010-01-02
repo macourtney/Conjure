@@ -70,22 +70,22 @@ public class Main {
      * @throws IOException 
      */
     public JarFile findConjureJarFile() throws IOException {
-    	
-    	for (StringTokenizer classPathTokens = new StringTokenizer(
-    			System.getProperty("java.class.path"), 
-    			System.getProperty("path.separator")); 
-    	        classPathTokens.hasMoreTokens(); ) {
-    		
-    		String classPath = classPathTokens.nextToken();
-    		System.out.println("classPath: " + classPath);
-    		
-    		if (classPath.endsWith(CONJURE_JAR_NAME)) {
-    			System.out.println("classPath ends with conjure.jar.");
-    			return new JarFile(classPath);
-    		}
-    	}
-    	
-    	return null;
+
+        for (StringTokenizer classPathTokens = new StringTokenizer(
+                System.getProperty("java.class.path"),
+                System.getProperty("path.separator")); 
+                classPathTokens.hasMoreTokens(); ) {
+
+            String classPath = classPathTokens.nextToken();
+            System.out.println("classPath: " + classPath);
+
+            if (classPath.endsWith(CONJURE_JAR_NAME)) {
+                System.out.println("classPath ends with conjure.jar.");
+                return new JarFile(classPath);
+            }
+        }
+
+        return null;
     }
 
     public void extractAll() throws IOException {
@@ -108,92 +108,101 @@ public class Main {
             }
         }
     }
+    
     public void setDatabase(String databaseFlavour) {
-	/* write out change of dataase flavour to db_config.clj */
-	//	read in file by line 
-	String s, s2 = new String();
-	try {
-	    BufferedReader in = new BufferedReader(
-						   new FileReader(this.projectName+"/config/db_config.clj"));
-	    while((s = in.readLine())!= null)
-		s2 += s + "\n";
-	    in.close();
-	}
-	catch(IOException e) {
-	    System.err.println("Bobbins, couldn't read the db_config.clj file");
-	}
-	// match up the regex database flavour
-	Pattern p = Pattern.compile("mysql");//(databaseFlavour);
-	Matcher m = p.matcher(s2);
-	while(m.find()) {
-	    s2 = s2.replaceAll("mysql", databaseFlavour);
-	}
+        /* write out change of dataase flavour to db_config.clj */
+        // read in file by line 
+        String s, s2 = new String();
+        try {
+            BufferedReader in = new BufferedReader(
+                    new FileReader(this.projectName+"/config/db_config.clj"));
+            
+            while((s = in.readLine())!= null) {
+                s2 += s + "\n";
+            }
+            
+            in.close();
+        } catch(IOException e) {
+            System.err.println("Bobbins, couldn't read the db_config.clj file");
+        }
 
-	
-	// 4. File output
-	try {
-	    BufferedReader in4 = new BufferedReader(
-						    new StringReader(s2));
-	    PrintWriter out1 = new PrintWriter(
-				     new BufferedWriter(new FileWriter(this.projectName+"/config/db_config.clj")));
-	    while((s = in4.readLine()) != null )
-		out1.println(s);
-	    out1.close();
-	} catch(EOFException e) {
-	    System.err.println("End of stream");
-	} catch(IOException e) {
-	    System.err.println("Bobbins, couldn't write the db_config.clj file");
-	}
+        // match up the regex database flavour
+        Pattern p = Pattern.compile("mysql");//(databaseFlavour);
+        Matcher m = p.matcher(s2);
+        
+        while(m.find()) {
+            s2 = s2.replaceAll("mysql", databaseFlavour);
+        }
+
+
+        // 4. File output
+        try {
+            BufferedReader in4 = new BufferedReader(
+                    new StringReader(s2));
+            PrintWriter out1 = new PrintWriter(
+                    new BufferedWriter(new FileWriter(this.projectName+"/config/db_config.clj")));
+
+            while((s = in4.readLine()) != null ) {
+                out1.println(s);
+            }
+            out1.close();
+
+        } catch(EOFException e) {
+            System.err.println("End of stream");
+        } catch(IOException e) {
+            System.err.println("Bobbins, couldn't write the db_config.clj file");
+        }
     }
 
     public static void createProject (String projectName, String databaseFlavour) {
-	            Main main = new Main(projectName);
-	
-	            try {
-	                main.extractAll();
-			main.setDatabase(databaseFlavour);
-	
-	            } catch (IOException e) {
-	                e.printStackTrace();
-	            }
+        Main main = new Main(projectName);
+
+        try {
+            main.extractAll();
+            main.setDatabase(databaseFlavour);
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void printHelp () {
-            System.out.println("Usage: java -jar conjure.jar <project name>");
-            System.out.println("       java -jar conjure.jar --version");
-            System.out.println("       java -jar conjure.jar --database=[mysql | h2] <project name>");
+        System.out.println("Usage: java -jar conjure.jar <project name>");
+        System.out.println("       java -jar conjure.jar --version");
+        System.out.println("       java -jar conjure.jar --database=[mysql | h2] <project name>");
     }
 
     public static void main(String[] args) {
 
         if (args.length < 1 || args.length > 2) {
-	    printHelp();
+            printHelp();
         } else {
-        	String firstArg = args[0].trim();
-        	String secondArg = "";
-		if (args.length > 1) {
-		    secondArg = args[1].trim();
-		}
+            String firstArg = args[0].trim();
+            String secondArg = "";
+            if (args.length > 1) {
+                secondArg = args[1].trim();
+            }
+            
+            if (firstArg.equalsIgnoreCase("-v") || firstArg.equalsIgnoreCase("--version")) {
+                System.out.println("Conjure version: " + CONJURE_VERSION);
 
-        	if (firstArg.equalsIgnoreCase("-v") || firstArg.equalsIgnoreCase("--version")) {
-        		System.out.println("Conjure version: " + CONJURE_VERSION);
-        	} else if (firstArg.matches("--database.*")) {
-		    if (args.length == 2) {
-			String database = firstArg.substring(firstArg.length() - 5);
-			if (database.equals("mysql")) {
-			    createProject(secondArg, database);
-			} else {
-			    System.out.println("Couldn't use "+database+" so I'm falling back to h2");
-			    database = "h2";
-			    createProject(secondArg, database);
-			}
-			System.out.println("Using "+database+" to store data.");
-		    } else {
-			printHelp();
-		    }
-        	} else {
-		    createProject(firstArg, "mysql");
-        	}
+            } else if (firstArg.matches("--database.*")) {
+                if (args.length == 2) {
+                    String database = firstArg.substring(firstArg.length() - 5);
+                    if (database.equals("mysql")) {
+                        createProject(secondArg, database);
+                    } else {
+                        System.out.println("Couldn't use "+database+" so I'm falling back to h2");
+                        database = "h2";
+                        createProject(secondArg, database);
+                    }
+                    System.out.println("Using "+database+" to store data.");
+                } else {
+                    printHelp();
+                }
+            } else {
+                createProject(firstArg, "mysql");
+            }
         }
     }
 
