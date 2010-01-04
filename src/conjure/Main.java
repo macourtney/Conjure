@@ -3,21 +3,18 @@ package conjure;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.jar.JarFile;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
 import joptsimple.OptionParser;
@@ -34,6 +31,8 @@ public class Main {
     private static final String DATABASE_OPTION = "database";
     private static final String HELP_OPTION = "help";
     private static final String HELP_SHORT_OPTION = "h";
+    private static final String UPDATE_OPTION = "update";
+    private static final String UPDATE_SHORT_OPTION = "u";
     private static final String VERSION_OPTION = "version";
     private static final String VERSION_SHORT_OPTION = "v";
 
@@ -150,25 +149,29 @@ public class Main {
         }
     }
     
-    public void extractAll() throws IOException {
-        File projectDir = new File(this.projectName);
-        projectDir.mkdir();
-
+    private void extractZipEntries(String zipEntryDirPrefix) throws IOException {
         JarFile conjureJar = findConjureJarFile();
 
-        for (Enumeration<? extends ZipEntry> zipEntryEnumeration = conjureJar.entries(); zipEntryEnumeration.hasMoreElements(); ) {
+        for (Enumeration<? extends ZipEntry> zipEntryEnumeration = conjureJar.entries(); 
+                zipEntryEnumeration.hasMoreElements(); ) {
+
             ZipEntry entry = zipEntryEnumeration.nextElement();
             String entryName = entry.getName();
 
-            String defaultDirPrefix = DEFAULT_DIR + '/';
-
-            if (!entryName.equals(defaultDirPrefix) 
-                    && entryName.startsWith(defaultDirPrefix)) {
+            if (!entryName.equals(zipEntryDirPrefix) 
+                    && entryName.startsWith(zipEntryDirPrefix)) {
 
                 System.out.println(entry.getName());
                 extractZipEntry(conjureJar, entry);
             }
         }
+    }
+    
+    public void extractAll() throws IOException {
+        File projectDir = new File(this.projectName);
+        projectDir.mkdir();
+
+        extractZipEntries(DEFAULT_DIR + '/');
         
         //Update the database flavor.
         if (this.options.has(DATABASE_OPTION)) {
@@ -177,6 +180,10 @@ public class Main {
             System.out.println("database = " + database);
             setDatabase(database);
         }
+    }
+    
+    public void update() throws IOException {
+        extractZipEntries(DEFAULT_DIR + "/vendor");
     }
     
     public void run() throws IOException {
@@ -188,7 +195,13 @@ public class Main {
         }
         
         if (this.projectName != null) {
-            extractAll();
+            
+            if ((this.options.has(UPDATE_SHORT_OPTION)) || (this.options.has(UPDATE_OPTION))) {
+                update();
+                
+            } else {
+                extractAll();
+            }
 
         } else if (!showVersion 
                 || (this.options.has(HELP_SHORT_OPTION)) 
@@ -223,6 +236,8 @@ public class Main {
         parser.accepts(DATABASE_OPTION).withRequiredArg();
         parser.accepts(HELP_OPTION);
         parser.accepts(HELP_SHORT_OPTION);
+        parser.accepts(UPDATE_OPTION);
+        parser.accepts(UPDATE_SHORT_OPTION);
         parser.accepts(VERSION_OPTION);
         parser.accepts(VERSION_SHORT_OPTION);
 

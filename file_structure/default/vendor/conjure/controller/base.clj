@@ -5,7 +5,7 @@
             [conjure.util.string-utils :as string-utils]))
 
 (defn
-#^{:doc "Determines the type of render-view called. Possible values: :request-map, :parameters."}
+#^{ :doc "Determines the type of render-view called. Possible values: :request-map, :parameters." }
   render-type? [request-map & params]
   (if (and (contains? request-map :controller) (contains? request-map :action))
     :request-map
@@ -21,7 +21,7 @@
     (apply view-util/render-view request-map params)))
 
 (defn
-#^{:doc "Redirects to the given url with the given status. If status is not given, 302 (redirect found) is used."}
+#^{ :doc "Redirects to the given url with the given status. If status is not given, 302 (redirect found) is used." }
   redirect-to-full-url
   ([url] (redirect-to-full-url url 302))
   ([url status] 
@@ -32,15 +32,15 @@
       :body (str "<html><body>You are being redirected to <a href=\"" url "\">" url "</a></body></html>") })) ; 
 
 (defn-
-#^{:doc "Determines the type of redirect-to called. Possible values: :string, :request-map, :parameters. Uses 
-render-type? to determine :request-map or :parameters."}
+#^{ :doc "Determines the type of redirect-to called. Possible values: :string, :request-map, :parameters. Uses 
+render-type? to determine :request-map or :parameters." }
   redirect-type? [& params]
   (if (or (string? (first params)) (string? (second params)))
     :string
     :request-map))
 
 (defmulti
-#^{:doc "Redirects to either the given url or a url generated from the given parameters and request map."}
+#^{ :doc "Redirects to either the given url or a url generated from the given parameters and request map." }
   redirect-to redirect-type?)
 
 (defmethod redirect-to :string 
