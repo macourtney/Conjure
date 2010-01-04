@@ -18,10 +18,10 @@
               :flavor (h2/flavor)
           
               ;; The user name to use when connecting to the database.
-              :username "sa"
+              :username "conjure"
             
               ;; The password to use when connecting to the database.
-              :password "" }]
+              :password "conjure" }]
 
       (cond
         (= environment :production)

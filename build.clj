@@ -10,14 +10,17 @@
 (def classes (str target "/classes"))
 (def test-app (str target "/test_app"))
 (def file-structure "file_structure")
-(def default (str file-structure "/default"))
+(def default-dir (str file-structure "/default"))
 
 (deftarget compile-conjure "Compile Conjure sources."
   (mkdir { :dir classes })
+  (unjar { :src (str default-dir "/lib/jopt-simple-3.1.jar")
+           :dest classes })
   (javac { :fork "true"
            :srcdir src
            :destdir classes
-           :debug "on" }))
+           :debug "on"
+           :classpath classes }))
            
 (deftarget jar-conjure "Creates the conjure.jar file."
   (compile-conjure)
