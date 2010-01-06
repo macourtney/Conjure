@@ -1,5 +1,7 @@
 (ns flavors.h2
-  (:import [org.h2.jdbcx JdbcDataSource])
+  (:import [org.h2.jdbcx JdbcDataSource]
+           [org.h2.jdbc JdbcClob]
+           [java.text SimpleDateFormat])
   (:require [clojure.contrib.str-utils :as str-utils]
             [clojure.contrib.sql :as sql]
             [conjure.util.loading-utils :as conjure-loading-utils]
@@ -41,14 +43,30 @@
     :subprotocol subprotocol
     :subname subname 
     :datasource datasource })))
+    
+(defn-
+#^{ :doc "Cleans up the given value, loading any clobs into memory." }
+  clean-value [value]
+  (if (and value (instance? JdbcClob value))
+    (.getSubString value 1 (.length value))
+    value))
+  
+(defn-
+#^{ :doc "Cleans up the given row, loading any clobs into memory." }
+  clean-row [row]
+  (reduce 
+    (fn [new-map pair] 
+        (assoc new-map (first pair) (clean-value (second pair))))
+    {} 
+    row))
   
 (defn
-#^{:doc "Executes an sql string and returns the results as a sequence of maps."}
+#^{ :doc "Executes an sql string and returns the results as a sequence of maps." }
   execute-query [db-spec sql-vector]
   ;;(println sql-string)
   (sql/with-connection db-spec
     (sql/with-query-results rows sql-vector
-      (doall rows))))
+      (doall (map clean-row rows)))))
   
 (defn
 #^{:doc "Returns the given key or string as valid table name. Basically turns 
@@ -63,7 +81,6 @@ any keyword into a string, and replaces dashes with underscores."}
   where-params - The parameters to test for.
   record - A map from strings or keywords (identifying columns) to updated values."}
   update [db-spec table where-params record]
-  ;;(println sql-string)
   (sql/with-connection db-spec
     (sql/update-values (table-name table) where-params record)))
 
@@ -73,7 +90,6 @@ any keyword into a string, and replaces dashes with underscores."}
   table - The name of the table to update.
   records - A map from strings or keywords (identifying columns) to updated values."}
   insert-into [db-spec table & records]
-  ;;(println sql-string)
   (sql/with-connection db-spec
     (apply sql/insert-records (table-name table) records)))
 
@@ -207,7 +223,7 @@ create-table method.
   date-time
   ([column] (date-time column {}))
   ([column mods]
-    [(column-name column) "DATETIME"]))
+    [(column-name column) "TIMESTAMP"]))
     
 (defn
 #^{:doc "Deletes the table with the given name."}
@@ -220,6 +236,21 @@ create-table method.
   delete [db-spec table where]
   (sql/with-connection db-spec
     (sql/delete-rows (table-name table) where)))
+    
+(defn
+#^{ :doc "Returns the string value of the given date for use in the database." }
+  format-date [date]
+  (. (new SimpleDateFormat "yyyy-MM-dd") format date))
+
+(defn
+#^{ :doc "Returns the string value of the given date as a date time for use in the database." }
+  format-date-time [date]
+  (. (new SimpleDateFormat "yyyy-MM-dd HH:mm:ss") format date))
+    
+(defn
+#^{ :doc "Returns the string value of the given date as a time for use in the database." }
+  format-time [date]
+  (. (new SimpleDateFormat "HH:mm:ss") format date))
   
 (defn
 #^{:doc "Returns a database flavor for a derby database."}
@@ -241,4 +272,7 @@ create-table method.
     :time-type time-type
     :date-time date-time
     :belongs-to belongs-to
+    :format-date format-date
+    :format-date-time format-date-time
+    :format-time format-time
   })

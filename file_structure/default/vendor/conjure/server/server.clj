@@ -1,5 +1,6 @@
 (ns conjure.server.server
-  (:require [http-config :as http-config]
+  (:require [environment :as environment]
+            [http-config :as http-config]
             [routes :as routes]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.model.database :as database]
@@ -34,12 +35,11 @@
 (defn
 #^{:doc "Gets a route map for use by conjure to call the correct methods."}
   update-request-map [request-map]
-  (let [path (:uri request-map)
-        params (parse-params request-map)
-        output (augment-params (some identity (map #(% path) (routes/draw))) params)]
-    (if output
-      (merge request-map output)
-      (assoc request-map :params params )))) 
+  (session-utils/update-request-session 
+    (merge request-map 
+      (augment-params 
+        (or (some identity (map #(% (:uri request-map)) (routes/draw))) { :params {} }) 
+        (parse-params request-map)))))
 
 (defn
 #^{:doc "Returns the controller file name generated from the given request map."}
@@ -63,9 +63,8 @@
 (defn
 #^{ :doc "Initializes the conjure server." }
   init []
-  (database/ensure-conjure-db))
-
-
+  (database/ensure-conjure-db)
+  ((:init environment/session-store)))
 
 (defn
 #^{ :doc "Converts the given response to a response map if it is not already 

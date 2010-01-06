@@ -58,7 +58,7 @@ then this method simply returns it."}
     nil))
 
 (defn
-#^{ :doc "For each key in replace-map, substitute the value in replace map for all occurances of the key in string." }
+#^{ :doc "For each key in replace-map, substitute the value in replace map for all occurrences of the key in string." }
   str-replace-if 
   ([string replace-map]
     (reduce str-replace-pair string replace-map)))
@@ -102,3 +102,19 @@ separate the key from the value." }
             (fn [equals-pair] (not (re-matches separator equals-pair))) 
             (str-utils/re-partition separator string))))
       nil)))
+
+(defn
+#^{ :doc "Converts the given form into a string which can later be parsed using read-string." }
+  form-str [form]
+  (cond
+    (char? form) (str "(char " (int form) ")")
+    (float? form) (str form)
+    (integer? form) (str form)
+    (keyword? form) (str form)
+    (list? form) (str "(list " (str-utils/str-join " " (map form-str form)) ")")
+    (map? form) (str "{ " (str-utils/str-join ", " (map (fn [pair] (str (form-str (first pair)) " " (form-str (second pair)))) form)) " }")
+    (set? form) (str "#{" (str-utils/str-join " " (map form-str form)) "}") 
+    (string? form) (str "\"" (str-replace-if form { "\\" "\\\\", "\"" "\\\"" }) "\"")
+    (symbol? form) (str "(symbol \"" form "\")")
+    (vector? form) (str "[" (str-utils/str-join " " (map form-str form)) "]")
+    ))

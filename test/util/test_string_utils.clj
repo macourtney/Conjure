@@ -68,3 +68,16 @@
   (is (= (str-to-map "foo&bar|baz&boz|buz&bez" #"\|" #"\&") { "foo" "bar", "baz" "boz", "buz" "bez" }))
   (is (= (str-to-map "") {}))
   (is (nil? (str-to-map nil))))
+
+(deftest test-form-str
+  (is (= (form-str "foo") "\"foo\""))
+  (is (= (form-str :foo) ":foo"))
+  (is (= (form-str (char 102)) "(char 102)"))
+  (is (= (form-str (symbol "foo")) "(symbol \"foo\")"))
+  (is (= (form-str 2) "2"))
+  (is (= (form-str 2.3) "2.3"))
+  (is (= (form-str { :foo "bar" }) "{ :foo \"bar\" }"))
+  (is (= (form-str [:foo "bar"]) "[:foo \"bar\"]"))
+  (is (= (form-str #{:foo "bar"}) "#{:foo \"bar\"}"))
+  (is (= (form-str '(:foo "bar")) "(list :foo \"bar\")"))
+  )

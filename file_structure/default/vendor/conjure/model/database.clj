@@ -73,3 +73,17 @@ database flavor function passing any arguments."}
 (def-column-spec :time-type)
 
 (def-column-spec :date-time)
+
+(defmacro
+#^{:doc "Given the type-key of a function in the database flavor, define a function named type-key which calls the 
+database flavor function passing any arguments."}
+  def-db-forward [type-key]
+  (let [spec-name (string-utils/str-keyword type-key)]
+    `(defn ~(symbol spec-name)
+      ([& args#] (apply (db-flavor ~type-key) args#)))))
+
+(def-db-forward :format-date)
+
+(def-db-forward :format-date-time)
+
+(def-db-forward :format-time)

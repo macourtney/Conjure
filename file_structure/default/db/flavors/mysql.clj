@@ -222,6 +222,21 @@ create-table method.
     (sql/delete-rows (table-name table) where)))
 
 (defn
+#^{ :doc "Returns the string value of the given date for use in the database." }
+  format-date [date]
+  (. (new SimpleDateFormat "yyyy-MM-dd") format date))
+
+(defn
+#^{ :doc "Returns the string value of the given date as a date time for use in the database." }
+  format-date-time [date]
+  (. (new SimpleDateFormat "yyyy-MM-dd HH:mm:ss") format date))
+    
+(defn
+#^{ :doc "Returns the string value of the given date as a time for use in the database." }
+  format-time [date]
+  (. (new SimpleDateFormat "HH:mm:ss") format date))
+
+(defn
 #^{:doc "Returns a database flavor for a mysql database."}
   flavor []
   { :db-map db-map
@@ -241,4 +256,7 @@ create-table method.
     :time-type time-type
     :date-time date-time
     :belongs-to belongs-to
+    :format-date format-date
+    :format-date-time format-date-time
+    :format-time format-time
   })
