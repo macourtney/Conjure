@@ -54,12 +54,3 @@
     (is (= 
       (redirect-map "http://www.conjureapp.com/home/goodbye" 301)
       (redirect-to request-map { :controller "home", :action "goodbye", :status 301 })))))
-
-(deftest test-session
-  ((:init environment/session-store))
-  (let [request-map { :temp-session "blah" }]
-    (session-store request-map "foo")
-    (is (= (session-retrieve request-map) "foo"))
-    (session-delete request-map)
-    (is (nil? (session-retrieve request-map))))
-  (database/drop-table session-utils/session-table))

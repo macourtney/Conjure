@@ -47,23 +47,3 @@
   (let [response-map (manage-session {} { :headers { "Set-Cookie" (str session-id-name "=blah") } })]
     (is (:headers response-map))
     (is (= (get (:headers response-map) "Set-Cookie") (str session-id-name "=blah")))))
-
-(deftest test-session-db-store
-  (is (= (:init session-db-store) init))
-  (is (= (:delete session-db-store) delete-session))
-  (is (= (:store session-db-store) save-store))
-  (is (= (:retrieve session-db-store) retrieve-store))
-  (init)
-  (is (database/table-exists? session-table))
-  
-  (create-session { :params { :session-id "blah" } } "foo")
-  (is (= (retrieve-store { :params { :session-id "blah" } }) "foo"))
-  
-  (save-store { :headers { "cookie" (str session-id-name "=blah") } } { :foo "bar" })
-  (is (= (retrieve-store { :headers { "cookie" (str session-id-name "=blah") } }) { :foo "bar" }))
-  
-  (delete-session { :temp-session "blah" })
-  (is (nil? (retrieve-store { :temp-session "blah" })))
-  
-  (database/drop-table session-table)
-  (is (not (database/table-exists? session-table))))

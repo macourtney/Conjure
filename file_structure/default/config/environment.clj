@@ -25,5 +25,5 @@
 
 (def use-session-cookie true) ; Causes Conjure to save session ids as cookies. If this is false, Conjure uses a parameter in html.
 
-(require 'conjure.util.session-utils) ; Avoids a circular dependency issue.
-(def session-store conjure.util.session-utils/session-db-store)
+(require 'conjure.model.database-session-store) ; Avoids a circular dependency issue.
+(def session-store conjure.model.database-session-store/session-store)

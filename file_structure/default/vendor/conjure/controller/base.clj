@@ -2,8 +2,7 @@
   (:require [conjure.controller.util :as controller-util]
             [conjure.view.util :as view-util]
             [conjure.util.html-utils :as html-utils]
-            [conjure.util.string-utils :as string-utils]
-            [environment :as environment]))
+            [conjure.util.string-utils :as string-utils]))
 
 (defn
 #^{ :doc "Determines the type of render-view called. Possible values: :request-map, :parameters." }
@@ -58,11 +57,3 @@ render-type? to determine :request-map or :parameters." }
         (redirect-to-full-url (view-util/url-for request-map (dissoc params :status)) status)
         (redirect-to-full-url (view-util/url-for request-map params))))))
 
-(defn session-store [request-map value]
-  ((:store environment/session-store) request-map value))
-
-(defn session-retrieve [request-map]
-  ((:retrieve environment/session-store) request-map))
-
-(defn session-delete [request-map]
-  ((:delete environment/session-store) request-map))
