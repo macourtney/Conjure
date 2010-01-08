@@ -1,6 +1,7 @@
 (ns conjure.server.ring-adapter
   (:import [java.io File])
-  (:require [conjure.server.server :as server]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.server.server :as server]
             [environment :as environment]
             [ring.middleware.file :as ring-file]
             [ring.middleware.stacktrace :as ring-stacktrace]))
@@ -13,7 +14,7 @@ request map."}
 		(server/process-request req)
     (catch Throwable throwable
       (do
-        (. throwable printStackTrace)
+        (logging/error "An error occurred while processing the request." throwable)
         (throw throwable)))))
 
 (defn

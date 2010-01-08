@@ -8,7 +8,8 @@
             [conjure.view.util :as view-util]
             [conjure.util.html-utils :as html-utils]
             [conjure.util.session-utils :as session-utils]
-            [clojure.contrib.str-utils :as str-utils]))
+            [clojure.contrib.str-utils :as str-utils]
+            [clojure.contrib.logging :as logging]))
 
 (defn
 #^{:doc "Merges the params value of the given request-map with params"}
@@ -63,8 +64,11 @@
 (defn
 #^{ :doc "Initializes the conjure server." }
   init []
-  (database/ensure-conjure-db)
-  ((:init environment/session-store)))
+  (do
+    (logging/info "Initializing server...")
+    (database/ensure-conjure-db)
+    ((:init environment/session-store))
+    (logging/info "Server Initialized.")))
 
 (defn
 #^{ :doc "Converts the given response to a response map if it is not already 
