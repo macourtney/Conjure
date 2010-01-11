@@ -1,4 +1,5 @@
-(ns environments.production)
+(ns environments.production
+  (:require [conjure.util.logging-utils :as logging-utils]))
 
 ; Sets up the logger for production mode.
 (logging-utils/load-configuration-map {

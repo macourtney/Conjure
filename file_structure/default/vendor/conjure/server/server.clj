@@ -11,6 +11,8 @@
             [clojure.contrib.str-utils :as str-utils]
             [clojure.contrib.logging :as logging]))
 
+(def initialized? (ref false))
+
 (defn
 #^{:doc "Merges the params value of the given request-map with params"}
   augment-params [request-map params]
@@ -64,11 +66,14 @@
 (defn
 #^{ :doc "Initializes the conjure server." }
   init []
-  (do
-    (logging/info "Initializing server...")
-    (database/ensure-conjure-db)
-    ((:init environment/session-store))
-    (logging/info "Server Initialized.")))
+  (if (not @initialized?)
+    (do
+      (dosync
+        (ref-set initialized? true))
+      (logging/info "Initializing server...")
+      (database/ensure-conjure-db)
+      ((:init environment/session-store))
+      (logging/info "Server Initialized."))))
 
 (defn
 #^{ :doc "Converts the given response to a response map if it is not already 

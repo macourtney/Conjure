@@ -1,6 +1,7 @@
 (ns flavors.mysql
   (:import [com.mysql.jdbc.jdbc2.optional MysqlDataSource])
-  (:require [clojure.contrib.str-utils :as str-utils]
+  (:require [clojure.contrib.logging :as logging]
+            [clojure.contrib.str-utils :as str-utils]
             [clojure.contrib.sql :as sql]
             [conjure.util.loading-utils :as conjure-loading-utils]
             [conjure.util.string-utils :as conjure-string-utils]))
@@ -45,10 +46,11 @@
 (defn
 #^{:doc "Executes an sql string and returns the results as a sequence of maps."}
   execute-query [db-spec sql-vector]
-  ;;(println sql-string)
-  (sql/with-connection db-spec
-    (sql/with-query-results rows sql-vector
-      (doall rows))))
+  (do
+    (logging/debug (str "Executing query: " sql-vector))
+    (sql/with-connection db-spec
+      (sql/with-query-results rows sql-vector
+        (doall rows)))))
   
 (defn
 #^{:doc "Returns the given key or string as valid table name. Basically turns 
@@ -63,9 +65,10 @@ any keyword into a string, and replaces dashes with underscores."}
   where-params - The parameters to test for.
   record - A map from strings or keywords (identifying columns) to updated values."}
   update [db-spec table where-params record]
-  ;;(println sql-string)
-  (sql/with-connection db-spec
-    (sql/update-values (table-name table) where-params record)))
+  (do
+    (logging/debug (str "Update table: " table " where: " where-params " record: " record))
+    (sql/with-connection db-spec
+      (sql/update-values (table-name table) where-params record))))
 
 (defn
 #^{:doc "Runs an insert given the table, and a set of records.
@@ -73,9 +76,10 @@ any keyword into a string, and replaces dashes with underscores."}
   table - The name of the table to update.
   records - A map from strings or keywords (identifying columns) to updated values."}
   insert-into [db-spec table & records]
-  ;;(println sql-string)
-  (sql/with-connection db-spec
-    (apply sql/insert-records (table-name table) records)))
+  (do
+    (logging/debug (str "insert into: " table " records: " records))
+    (sql/with-connection db-spec
+      (apply sql/insert-records (table-name table) records))))
 
 
 (defn
@@ -101,8 +105,10 @@ any keyword into a string, and replaces dashes with underscores."}
 (defn
 #^{:doc "Creates a new table with the given name and with columns based on the given specs."}
   create-table [db-spec table & specs]
-  (sql/with-connection db-spec
-    (apply sql/create-table (table-name table) specs)))
+  (do
+    (logging/debug (str "Create table: " table " with specs: " specs))
+    (sql/with-connection db-spec
+      (apply sql/create-table (table-name table) specs))))
 
 (defn
 #^{:doc "Returns the not null spec vector from the given mods map."}
@@ -212,14 +218,18 @@ create-table method.
 (defn
 #^{:doc "Deletes the table with the given name."}
   drop-table [db-spec table]
-  (sql/with-connection db-spec
-    (sql/drop-table (table-name table))))
+  (do
+    (logging/debug (str "Drop table: " table))
+    (sql/with-connection db-spec
+      (sql/drop-table (table-name table)))))
 
 (defn
 #^{:doc "Deletes rows from the table with the given name."}
   delete [db-spec table where]
-  (sql/with-connection db-spec
-    (sql/delete-rows (table-name table) where)))
+  (do
+    (logging/debug (str "Delete from " table " where " where))
+    (sql/with-connection db-spec
+      (sql/delete-rows (table-name table) where))))
 
 (defn
 #^{ :doc "Returns the string value of the given date for use in the database." }

@@ -52,6 +52,7 @@
   (let [initial-value (java-utils/get-system-property environment/conjure-environment-property nil)]
     (if (not initial-value)
       (java-utils/set-system-properties { environment/conjure-environment-property "test" })))
+  (println "environment name: " (environment/environment-name))
   (conjure-server/init))
 
 (init)

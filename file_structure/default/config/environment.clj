@@ -15,7 +15,8 @@
   init []
   (let [initial-value (java-utils/get-system-property conjure-environment-property nil)]
     (if (not initial-value)
-      (java-utils/set-system-properties { conjure-environment-property default-environment }))))
+      (java-utils/set-system-properties { conjure-environment-property default-environment })))
+  (loading-utils/load-resource "environments" (str (java-utils/get-system-property conjure-environment-property nil) ".clj")))
 
 (defn
 #^{ :doc "Returns the name of the environment." }
@@ -23,8 +24,6 @@
   (do
     (init)
     (java-utils/get-system-property conjure-environment-property nil)))
-    
-(loading-utils/load-resource "environments" (str (environment-name) ".clj"))
 
 (def use-session-cookie true) ; Causes Conjure to save session ids as cookies. If this is false, Conjure uses a parameter in html.
 
