@@ -60,10 +60,15 @@ public class Main {
 
         if (zipEntry.isDirectory()) {
             File dirFile = new File(entryFileName);
+            
+            System.out.println("Creating: " + dirFile.getPath());
+            
             dirFile.mkdir();
         
         } else {
             File file = new File(entryFileName);
+            
+            System.out.println("Creating: " + file.getPath());
 
             FileOutputStream fileOutputStream = new FileOutputStream(file);
 
@@ -98,10 +103,8 @@ public class Main {
                 classPathTokens.hasMoreTokens(); ) {
 
             String classPath = classPathTokens.nextToken();
-            System.out.println("classPath: " + classPath);
 
             if (classPath.endsWith(CONJURE_JAR_NAME)) {
-                System.out.println("classPath ends with conjure.jar.");
                 return new JarFile(classPath);
             }
         }
@@ -161,7 +164,6 @@ public class Main {
             if (!entryName.equals(zipEntryDirPrefix) 
                     && entryName.startsWith(zipEntryDirPrefix)) {
 
-                System.out.println(entry.getName());
                 extractZipEntry(conjureJar, entry);
             }
         }
