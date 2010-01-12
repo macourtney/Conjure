@@ -3,4 +3,5 @@
             [conjure.server.server :as conjure-server]
             [conjure.server.ring-adapter :as ring-adapter]))
 
+(conjure-server/init)
 (ring-jetty/run-jetty ring-adapter/conjure (conjure-server/http-config))

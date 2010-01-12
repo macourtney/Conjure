@@ -1,10 +1,11 @@
 (ns conjure.view.util
-  (:require [clojure.contrib.seq-utils :as seq-utils]
-            [conjure.util.file-utils :as file-utils]
+  (:require [conjure.util.file-utils :as file-utils]
             [conjure.util.html-utils :as html-utils]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.session-utils :as session-utils]
             [conjure.util.string-utils :as conjure-str-utils]
+            [clojure.contrib.logging :as logging]
+            [clojure.contrib.seq-utils :as seq-utils]
             [environment :as environment]))
 
 (defn 
@@ -59,9 +60,11 @@
 #^{:doc "Returns the rendered view from the given request-map."}
   render-view [request-map & params]
   (load-view request-map)
-  (apply
-    (eval (read-string (str (request-view-namespace request-map) "/render-view")))
-    request-map params))
+  (let [view-namespace (request-view-namespace request-map)]
+    (logging/debug (str "Rendering view: " view-namespace))
+    (apply
+      (eval (read-string (str view-namespace "/render-view")))
+      request-map params)))
 
 (defn
 #^{:doc "Returns the rendered layout for the given layout name."}

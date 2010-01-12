@@ -1,4 +1,5 @@
 (ns conjure.server.server
+  (:import [java.util Date])
   (:require [environment :as environment]
             [http-config :as http-config]
             [routes :as routes]
@@ -78,29 +79,43 @@
 (defn
 #^{ :doc "Converts the given response to a response map if it is not already 
 one." }
-  create-response-map [response]
-  (if (map? response)
-    response
-    {:status  200
-     :headers {"Content-Type" "text/html"}
-     :body    response}))
+  create-response-map [response request-map]
+  (session-utils/manage-session 
+    request-map
+    (if (map? response)
+      response
+      {:status  200
+       :headers {"Content-Type" "text/html"}
+       :body    response})))
+     
+(defn
+#^{ :doc "Calls the given controller with the given request map returning the response." }
+  call-controller [request-map]
+  (let [controller-file (controller-file-name request-map)]
+    (when controller-file
+      (let [action (fully-qualified-action request-map)]
+        (logging/debug (str "Running action: " action))
+        (load-controller controller-file)
+        (create-response-map 
+          ((load-string action) request-map)
+          request-map)))))
+
+(defn
+#^{ :doc "Initializes the server if necessary and runs the controller based on the given request-map and returns a 
+response map.. If the request-map is nil, this function does nothing and returns nil." }
+  respond-to [request-map]
+  (when request-map
+    (init)
+    (logging/debug (str "Requested uri: " (:uri request-map)))
+    (call-controller (update-request-map request-map))))
 
 (defn
 #^{ :doc "Takes the given path and calls the correct controller and action for it." }
   process-request [request-map]
-  (when request-map
-    (init)
-    (let [generated-request-map (update-request-map request-map)
-          controller-file (controller-file-name generated-request-map)]
-      (if controller-file
-        (do
-          (load-controller controller-file)
-          (session-utils/manage-session 
-          	request-map
-          	(create-response-map 
-          		((load-string (fully-qualified-action generated-request-map)) 
-          			generated-request-map))))
-        nil))))
+  (let [start-time (new Date)
+        response (respond-to request-map)]
+    (logging/debug (str "Response time: " (- (.getTime (new Date)) (.getTime start-time)) " ms"))
+    response))
 
 (defn
 #^{ :doc "A function for simplifying the loading of views." }

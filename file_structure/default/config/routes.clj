@@ -2,6 +2,7 @@
 
 (ns routes
   (:require [conjure.util.loading-utils :as loading-utils]
+            [clojure.contrib.logging :as logging]
             [clojure.contrib.str-utils :as contrib-str-utils]))
 
 (defn draw []
@@ -13,6 +14,7 @@
                   action (or (nth path-groups 4 nil) "index")
                   id (nth path-groups 6 nil)]
     
+              (logging/debug "Using default router.")
               { :controller (loading-utils/underscores-to-dashes controller)
                 :action (loading-utils/underscores-to-dashes action)
                 :params (if id {:id id} {}) })))))])
