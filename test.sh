@@ -9,7 +9,7 @@ JARS_PATH=`echo $LIB_DIR/*.jar | sed 's/ /:/g'`
 CLASSPATH=.:$JARS_PATH
 
 scriptname=$1
-COMMAND="java -cp $CLASSPATH clojure.lang.Script test.clj $scriptname -- $*"
+COMMAND="java -cp $CLASSPATH clojure.main test.clj $scriptname -- $*"
 
 echo $COMMAND
 echo

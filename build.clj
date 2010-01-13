@@ -41,7 +41,7 @@
   (copy { :todir (str test-app "/test") }
     (fileset { :dir test-dir }))
   (echo { :message "\nRunning Tests...\n\n"})
-  (java { :classname "clojure.lang.Script"
+  (java { :classname "clojure.main"
           :dir test-app
           :fork "true" }
     [:arg { :value "test/run_tests.clj" }]
