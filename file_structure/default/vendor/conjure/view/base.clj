@@ -1,7 +1,9 @@
 (ns conjure.view.base
   (:use clj-html.core)
   (:require [clj-html.helpers :as helpers]
+            [clojure.contrib.json.write :as json-write]
             [clojure.contrib.str-utils :as str-utils]
+            [conjure.util.javascript-utils :as javascript-utils]
             [conjure.model.util :as model-util]
             [conjure.util.string-utils :as conjure-str-utils]
             [conjure.util.html-utils :as html-utils]
@@ -9,12 +11,13 @@
             environment))
 
 (defmacro
-#^{:doc "Defines a view. This macro should be used in a view file to define the parameters used in the view."}
+#^{ :doc "Defines a view. This macro should be used in a view file to define the parameters used in the view." }
   defview [params & body]
   `(defn ~'render-view [~'request-map ~@params]
     ~@body))
 
-(defn- #^{:doc "If function is a function, then this method evaluates it with the given args. Otherwise, it just returns
+(defn- 
+#^{ :doc "If function is a function, then this method evaluates it with the given args. Otherwise, it just returns
 function." }
   evaluate-if-fn [function & args]
   (if (fn? function)
@@ -22,17 +25,17 @@ function." }
     function))
 
 (defn
-#^{:doc 
+#^{ :doc 
 "Returns a link for the given text and parameters using url-for. Params has the same valid parameters as url-for, plus:
 
      :html-options - a map of html attributes to add to the anchor tag.
      
 If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
-and params, text is called with request-map and params merged (not all keys used from request-map)."}
+and params, text is called with request-map and params merged (not all keys used from request-map)." }
   link-to
   ([text request-map params] (link-to text (view-utils/merge-url-for-params request-map params)))
   ([text params]
-    (let [html-options (if (:html-options params) (:html-options params) {})]
+    (let [html-options (or (:html-options params) {})]
       (htmli [:a (assoc html-options :href (view-utils/url-for params)) (evaluate-if-fn text params)]))))
 
 (defn
@@ -433,3 +436,82 @@ with the following defaults:
       (= doc-type :xhtml1.1) 
         "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">"
       true (throw (RuntimeException. (str "Unknown doc type: " doc-type))))))
+
+(defn-
+#^{ :doc "Returns the position function for the given position." }
+  position-function [position]
+  (cond 
+    (= position :content) "html"
+    (= position :replace) "replaceWith"
+    (= position :before) "before"
+    (= position :after) "after"
+    (= position :top) "prepend"
+    (= position :bottom) "append"))
+
+(defn-
+#^{ :doc "Generates the link-to-remote onclick function." }
+  link-to-remote-onclick [params]
+  (let [update (:update params)
+        success-id (if (map? update) (:success update) update)
+        failure-id (if (map? update) (:failure update))
+        position (or (:position params) :content)]
+    (str "function(e){
+              // stop normal link click
+              e.preventDefault();
+             
+              // send request
+              $.ajax({
+                type: \"" (or (:method params) "POST") "\",
+                url: \"" (view-utils/url-for params) "\", 
+                dataType: \"html\",
+                success: " (javascript-utils/function ["data"]
+                       "
+                       $(\"#" success-id "\")." (position-function position) "(data);
+                       ") ",
+                error: " (javascript-utils/function ["XMLHttpRequest", "textStatus", "errorThrown"]
+                       "
+                       alert(\"Error! \" + textStatus + \"\\n\" + errorThrown);
+                       ")
+                "
+              });
+            }")))
+
+(defn 
+#^{:doc 
+"Returns a ajax link for the given text and parameters using url-for. Params has the same valid parameters as url-for, 
+plus:
+
+     :update - The id of the element to update. If the value is a map then it looks for the following keys: 
+                  :success - The id of the element to update if the request succeeds.
+                  :failure - The id of the element to update if the request fails.
+     :position - How the target element should be updated. Valid values are:
+                  :content - Replaces the contents of the target element. Default.
+                  :replace - replaces the target element.
+                  :before - Adds before the target element.
+                  :after - Adds after the target element.
+                  :top - Adds to the first position in the target element.
+                  :bottom - Adds to the last position in the target element.
+     :method - The request method. Possible values POST, GET, PUT, DELETE. However, not all browsers support PUT and 
+               DELETE. Default is POST.
+     :html-options - a map of html attributes to add to the anchor tag.
+     
+If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
+and params, text is called with request-map and params merged (not all keys used from request-map)."}
+  link-to-remote 
+  ([text request-map params] (link-to-remote text (view-utils/merge-url-for-params request-map params)))
+  ([text params]
+    (let [html-options (or (:html-options params) {})
+          id (or (:id html-options) (str "id-" (rand-int 1000000)))]
+      (htmli 
+        [:a 
+          (merge html-options 
+            { :href (or (:href html-options) "#")
+              :id id })
+          (evaluate-if-fn text params)]
+        [:script { :type "text/javascript" } 
+          (str "$(document).ready(function() {
+
+          // add markup to container and apply click handlers to anchors
+          $(\"#" id "\").click(
+            " (link-to-remote-onclick params) ");
+          });")]))))

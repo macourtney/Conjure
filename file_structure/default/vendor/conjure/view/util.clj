@@ -69,16 +69,18 @@
 (defn
 #^{:doc "Returns the rendered layout for the given layout name."}
   render-layout [layout-name request-map body]
-  (render-view 
-    (merge 
-      request-map 
-      { :controller "layouts", 
-        :action (or layout-name "application") 
-        :layout-info 
-          (merge
-            (:layout-info request-map) 
-            { :controller (:controller request-map)
-              :action (:action request-map) }) }) 
+  (if layout-name
+    (render-view 
+      (merge 
+        request-map 
+        { :controller "layouts", 
+          :action layout-name 
+          :layout-info 
+            (merge
+              (:layout-info request-map) 
+              { :controller (:controller request-map)
+                :action (:action request-map) }) }) 
+      body)
     body))
 
 (defn

@@ -104,6 +104,11 @@ separate the key from the value." }
       nil)))
 
 (defn
+#^{ :doc "Java escapes the given string." }
+  escape-str [string]
+  (str-replace-if string { "\\" "\\\\", "\"" "\\\"" })) ;"
+
+(defn
 #^{ :doc "Converts the given form into a string which can later be parsed using read-string." }
   form-str [form]
   (cond
@@ -114,7 +119,7 @@ separate the key from the value." }
     (list? form) (str "(list " (str-utils/str-join " " (map form-str form)) ")")
     (map? form) (str "{ " (str-utils/str-join ", " (map (fn [pair] (str (form-str (first pair)) " " (form-str (second pair)))) form)) " }")
     (set? form) (str "#{" (str-utils/str-join " " (map form-str form)) "}") 
-    (string? form) (str "\"" (str-replace-if form { "\\" "\\\\", "\"" "\\\"" }) "\"")
+    (string? form) (str "\"" (escape-str form) "\"")
     (symbol? form) (str "(symbol \"" form "\")")
     (vector? form) (str "[" (str-utils/str-join " " (map form-str form)) "]")
     ))
