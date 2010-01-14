@@ -335,7 +335,14 @@ Supported options:
         (merge 
           { :src (javascript-path source),
             :type "text/javascript" } 
-          html-options)])))
+          html-options) ""])))
+
+(defn
+#^{ :doc "Returns a jquery javascript include tag with the optional given options." } 
+  jquery-include-tag
+  ([] (jquery-include-tag {}))
+  ([html-options]
+    (javascript-include-tag environment/jquery html-options)))
 
 (defn
 #^{ :doc "Returns a mailto link with the given mail options. Valid mail options are:

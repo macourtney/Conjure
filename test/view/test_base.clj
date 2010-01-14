@@ -166,17 +166,20 @@
     (javascript-path "http://www.conjureapplication.com/js/xmlhr.js"))))
     
 (deftest test-javascript-include-tag
-  (is (= "<script src=\"/javascripts/xmlhr.js\" type=\"text/javascript\" />" (javascript-include-tag "xmlhr")))
-  (is (= "<script src=\"/javascripts/xmlhr.js\" type=\"text/javascript\" />" (javascript-include-tag "xmlhr.js")))
+  (is (= "<script src=\"/javascripts/xmlhr.js\" type=\"text/javascript\"></script>" (javascript-include-tag "xmlhr")))
+  (is (= "<script src=\"/javascripts/xmlhr.js\" type=\"text/javascript\"></script>" (javascript-include-tag "xmlhr.js")))
   (is (= 
-    "<script src=\"/javascripts/common.js\" type=\"text/javascript\" /><script src=\"/elsewhere/cools.js\" type=\"text/javascript\" />"
+    "<script src=\"/javascripts/common.js\" type=\"text/javascript\"></script><script src=\"/elsewhere/cools.js\" type=\"text/javascript\"></script>"
     (javascript-include-tag ["common.js", "/elsewhere/cools"])))
   (is (= 
-    "<script src=\"http://www.conjureapplication.com/js/xmlhr.js\" type=\"text/javascript\" />"
+    "<script src=\"http://www.conjureapplication.com/js/xmlhr.js\" type=\"text/javascript\"></script>"
     (javascript-include-tag "http://www.conjureapplication.com/js/xmlhr")))
   (is (= 
-    "<script src=\"http://www.conjureapplication.com/js/xmlhr.js\" type=\"text/javascript\" />"
+    "<script src=\"http://www.conjureapplication.com/js/xmlhr.js\" type=\"text/javascript\"></script>"
     (javascript-include-tag "http://www.conjureapplication.com/js/xmlhr.js"))))
+    
+(deftest test-jquery-include-tag
+  (is (= (str "<script src=\"/javascripts/" environment/jquery "\" type=\"text/javascript\"></script>") (jquery-include-tag))))
 
 (deftest test-mail-to
   (is (= "<a href=\"mailto:me@example.com\">me@example.com</a>" (mail-to { :address "me@example.com" })))

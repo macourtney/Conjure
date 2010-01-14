@@ -10,6 +10,8 @@
 (def stylesheets-dir "stylesheets")
 (def images-dir "images")
 
+(def jquery "jquery-1.3.2.min.js")
+
 (defn
 #^{ :doc "Initializes the environment." }
   init []
