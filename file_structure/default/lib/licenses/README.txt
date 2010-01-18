@@ -39,3 +39,4 @@ Eclipse Public License
  clojure-1.0.0.jar
  clojure-contrib.jar
  h2-1.1.114.jar
+ scriptjure.jar

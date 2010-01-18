@@ -3,6 +3,7 @@
   (:require [clj-html.helpers :as helpers]
             [clojure.contrib.json.write :as json-write]
             [clojure.contrib.str-utils :as str-utils]
+            [com.reasonr.scriptjure :as scriptjure]
             [conjure.util.javascript-utils :as javascript-utils]
             [conjure.model.util :as model-util]
             [conjure.util.string-utils :as conjure-str-utils]
@@ -447,34 +448,45 @@ with the following defaults:
     (= position :after) "after"
     (= position :top) "prepend"
     (= position :bottom) "append"))
+    
+(defn
+#^{ :doc "Creates a link-to-remote-onclick success function which adds the returned content to the tag with the given 
+id based on position. Position can be one of the following:
+
+  :content - Replaces the entire contents of success-id (default)
+  :replace - Replaces success-id
+  :before - Adds the content before success-id
+  :after - Adds the content after success-id
+  :top - Adds the content in the first position in success-id
+  :bottom - Adds the content in the last position in success-id" }
+  success-fn 
+  ([success-id] (success-fn success-id :content))
+  ([success-id position]
+    (let [position-function-symbol (symbol (str "." (position-function position)))]
+      (list 'fn ['data] (list position-function-symbol (list '$ (str "#" success-id)) 'data)))))
+
+(defn
+#^{ :doc "Creates a standard link-to-remote-onclick error function which simply displays the returned error." }
+  error-fn []
+  '(fn [XMLHttpRequest textStatus errorThrown] (alert (+ "Error! " (+ textStatus (+ "\\n" errorThrown))))))
 
 (defn-
 #^{ :doc "Generates the link-to-remote onclick function." }
   link-to-remote-onclick [params]
-  (let [update (:update params)
-        success-id (if (map? update) (:success update) update)
-        failure-id (if (map? update) (:failure update))
-        position (or (:position params) :content)]
-    (str "function(e){
-              // stop normal link click
-              e.preventDefault();
-             
-              // send request
-              $.ajax({
-                type: \"" (or (:method params) "POST") "\",
-                url: \"" (view-utils/url-for params) "\", 
-                dataType: \"html\",
-                success: " (javascript-utils/function ["data"]
-                       "
-                       $(\"#" success-id "\")." (position-function position) "(data);
-                       ") ",
-                error: " (javascript-utils/function ["XMLHttpRequest", "textStatus", "errorThrown"]
-                       "
-                       alert(\"Error! \" + textStatus + \"\\n\" + errorThrown);
-                       ")
-                "
-              });
-            }")))
+  (let [ajax-type (or (:method params) "POST")
+        url (view-utils/url-for params)
+        update (:update params)
+        success-fn (if (map? update) (:success update) update)
+        error-fn (if (map? update) (:error update) (error-fn))]
+
+    (list 'fn ['e]
+      '(.preventDefault e)
+      (list '.ajax '$ 
+        { :type ajax-type
+          :url url
+          :dataType "html"
+          :success success-fn
+          :error error-fn }))))
 
 (defn 
 #^{:doc 
@@ -501,7 +513,9 @@ and params, text is called with request-map and params merged (not all keys used
   ([text request-map params] (link-to-remote text (view-utils/merge-url-for-params request-map params)))
   ([text params]
     (let [html-options (or (:html-options params) {})
-          id (or (:id html-options) (str "id-" (rand-int 1000000)))]
+          id (or (:id html-options) (str "id-" (rand-int 1000000)))
+          id-string (str "#" id)
+          link-to-remote-onclick-function (link-to-remote-onclick params)]
       (htmli 
         [:a 
           (merge html-options 
@@ -509,9 +523,7 @@ and params, text is called with request-map and params merged (not all keys used
               :id id })
           (evaluate-if-fn text params)]
         [:script { :type "text/javascript" } 
-          (str "$(document).ready(function() {
-
-          // add markup to container and apply click handlers to anchors
-          $(\"#" id "\").click(
-            " (link-to-remote-onclick params) ");
-          });")]))))
+          (scriptjure/js 
+            (.ready ($ document) 
+              (fn []
+                (.click ($ (clj id-string)) (clj link-to-remote-onclick-function)))))]))))
