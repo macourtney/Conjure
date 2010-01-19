@@ -27,7 +27,8 @@
           (stylesheet-link-tag "main.css" { :media "screen,projection" } )
           (stylesheet-link-tag "print.css" { :media "print" } )
           (stylesheet-link-tag "aural.css" { :media "aural" } )
-          (jquery-include-tag)]
+          (jquery-include-tag)
+          (conjure-js-include-tag)]
   
         [:body { :id "www-url-cz" }
   

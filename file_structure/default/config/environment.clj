@@ -11,6 +11,7 @@
 (def images-dir "images")
 
 (def jquery "jquery-1.3.2.min.js")
+(def conjure-js "conjure.js")
 
 (defn
 #^{ :doc "Initializes the environment." }

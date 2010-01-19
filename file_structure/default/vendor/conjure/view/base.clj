@@ -347,6 +347,13 @@ Supported options:
   ([] (jquery-include-tag {}))
   ([html-options]
     (javascript-include-tag environment/jquery html-options)))
+    
+(defn
+#^{ :doc "Returns a jquery javascript include tag with the optional given options." } 
+  conjure-js-include-tag
+  ([] (conjure-js-include-tag {}))
+  ([html-options]
+    (javascript-include-tag environment/conjure-js html-options)))
 
 (defn
 #^{ :doc "Returns a mailto link with the given mail options. Valid mail options are:
@@ -463,12 +470,14 @@ id based on position. Position can be one of the following:
   ([success-id] (success-fn success-id :content))
   ([success-id position]
     (let [position-function-symbol (symbol (str "." (position-function position)))]
-      (list 'fn ['data] (list position-function-symbol (list '$ (str "#" success-id)) 'data)))))
+      (scriptjure/quasiquote
+        (fn [data] 
+          ((clj position-function-symbol) ($ (clj (str "#" success-id))) data))))))
 
 (defn
 #^{ :doc "Creates a standard link-to-remote-onclick error function which simply displays the returned error." }
   error-fn []
-  '(fn [XMLHttpRequest textStatus errorThrown] (alert (+ "Error! " (+ textStatus (+ "\\n" errorThrown))))))
+  'ajaxError)
 
 (defn-
 #^{ :doc "Generates the link-to-remote onclick function." }
@@ -477,16 +486,14 @@ id based on position. Position can be one of the following:
         url (view-utils/url-for params)
         update (:update params)
         success-fn (if (map? update) (:success update) update)
-        error-fn (if (map? update) (:error update) (error-fn))]
+        error-fn (if (and (map? update) (contains? update :error)) (:error update) (error-fn))]
 
-    (list 'fn ['e]
-      '(.preventDefault e)
-      (list '.ajax '$ 
-        { :type ajax-type
-          :url url
-          :dataType "html"
-          :success success-fn
-          :error error-fn }))))
+    (scriptjure/quasiquote 
+      { :type (clj ajax-type)
+        :url (clj url)
+        :dataType "html"
+        :success (clj success-fn)
+        :error (clj error-fn) })))
 
 (defn 
 #^{:doc 
@@ -523,7 +530,5 @@ and params, text is called with request-map and params merged (not all keys used
               :id id })
           (evaluate-if-fn text params)]
         [:script { :type "text/javascript" } 
-          (scriptjure/js 
-            (.ready ($ document) 
-              (fn []
-                (.click ($ (clj id-string)) (clj link-to-remote-onclick-function)))))]))))
+          (scriptjure/js
+            (ajaxClick (clj id-string) (clj link-to-remote-onclick-function)))]))))
