@@ -2,8 +2,7 @@
   (:import [java.util Calendar Date])
   (:require [clojure.contrib.str-utils :as str-utils]
             [conjure.util.html-utils :as html-utils]
-            [conjure.util.string-utils :as conjure-str-utils]
-            [environment :as environment]))
+            [conjure.util.string-utils :as conjure-str-utils]))
 
 (def session-id-name "SID")
 
@@ -51,7 +50,7 @@
 (defn
 #^{ :doc "Updates the response map with a session cookie if necessary." }
   manage-session [request-map response-map]
-  (if (and environment/use-session-cookie (not (session-created? request-map response-map)))
+  (if (not (session-created? request-map response-map))
     (let [tomorrow (doto (. Calendar getInstance)
                      (.add (. Calendar DATE) 1))]
       (assoc

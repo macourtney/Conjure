@@ -76,11 +76,18 @@
       ((:init environment/session-store))
       (logging/info "Server Initialized."))))
 
+(defn 
+#^{ :doc "Manages the session cookie in the response map." }
+  manage-session [request-map response-map]
+  (if (and environment/use-session-cookie)
+    (session-utils/manage-session request-map response-map)
+    response-map))
+
 (defn
 #^{ :doc "Converts the given response to a response map if it is not already 
 one." }
   create-response-map [response request-map]
-  (session-utils/manage-session 
+  (manage-session 
     request-map
     (if (map? response)
       response
