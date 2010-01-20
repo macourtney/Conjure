@@ -352,76 +352,85 @@
   (is (= 'ajaxError (error-fn))))
 
 (deftest test-link-to-remote
-  (is (= 
-    (htmli 
-      [:a { :href "#", :id "test-id"}
-        "update"]
-      [:script { :type "text/javascript" }
-        (scriptjure/js 
-          (ajaxClick "#test-id"
-            { :type "POST"
-              :url "/home/index"
-              :dataType "html"
-              :success successFunction
-              :error ajaxError }))])
-    (link-to-remote "update" 
-      { :controller "home", 
-        :action "index", 
-        :update 'successFunction, 
-        :html-options { :id "test-id" } })))
-  (is (= 
-    (htmli 
-      [:a { :href "#", :id "test-id"}
-        "update"]
-      [:script { :type "text/javascript" }
-        (scriptjure/js 
-          (ajaxClick "#test-id"
-            { :type "GET"
-              :url "/home/index"
-              :dataType "html"
-              :success successFunction
-              :error ajaxError }))])
-    (link-to-remote "update" 
-      { :controller "home", 
-        :action "index", 
-        :update 'successFunction, 
-        :method "GET", 
-        :html-options { :id "test-id" } })))
-  (is (= 
-    (htmli 
-      [:a { :href "#", :id "test-id"}
-        "update"]
-      [:script { :type "text/javascript" }
-        (scriptjure/js 
-          (ajaxClick "#test-id"
-            { :type "POST"
-              :url "/home/index"
-              :dataType "html"
-              :success successFunction
-              :error ajaxError }))])
-    (link-to-remote "update" 
-      { :controller "home", 
-        :action "index", 
-        :update { :success 'successFunction }, 
-        :html-options { :id "test-id" } })))
-  (is (= 
-    (htmli 
-      [:a { :href "/noscript/update", :id "test-id"}
-        "update"]
-      [:script { :type "text/javascript" }
-        (scriptjure/js 
-          (ajaxClick "#test-id"
-            { :type "POST"
-              :url "/home/index"
-              :dataType "html"
-              :success successFunction
-              :error errorFunction }))])
-    (link-to-remote "update" 
-      { :controller "home", 
-        :action "index", 
-        :update 
-          { :success 'successFunction, 
-            :error 'errorFunction }, 
-        :html-options 
-          { :id "test-id", 
-            :href "/noscript/update" } }))))
+  (let [ajax-map { :type "POST"
+                   :url "/home/index"
+                   :dataType "html"
+                   :success 'successFunction
+                   :error 'ajaxError }
+        script-tag [:script { :type "text/javascript" }
+                     (scriptjure/js 
+                       (ajaxClick "#test-id" (clj ajax-map)))]
+        a-tag [:a { :href "#", :id "test-id"}
+                "update"]
+        link-to-options { :controller "home", 
+                          :action "index", 
+                          :update 'successFunction, 
+                          :html-options { :id "test-id" } }]
+    (is (= 
+      (htmli a-tag script-tag)
+      (link-to-remote "update" link-to-options)))
+    (is (= 
+      (htmli a-tag
+        [:script { :type "text/javascript" }
+          (scriptjure/js 
+            (ajaxClick "#test-id" (clj (assoc ajax-map :type "GET"))))])
+      (link-to-remote "update" (assoc link-to-options :method "GET"))))
+    (is (= 
+      (htmli a-tag script-tag)
+      (link-to-remote "update" (assoc link-to-options :update { :success 'successFunction }))))
+    (is (= 
+      (htmli 
+        [:a { :href "/noscript/update", :id "test-id"}
+          "update"]
+        [:script { :type "text/javascript" }
+          (scriptjure/js 
+            (ajaxClick "#test-id" (clj (assoc ajax-map :error 'errorFunction))))])
+      (link-to-remote "update" 
+        (merge 
+          link-to-options 
+          { :update { :success 'successFunction, 
+                      :error 'errorFunction }
+            :html-options { :id "test-id", 
+                            :href "/noscript/update" } }))))))
+
+(deftest test-remote-form-for
+  (let [form-map { :action "/home/index", :id "test-id", :method "post", :name "home" }
+        form-tag [:form form-map
+                   [:input { :type "submit", :value "Submit" } ]]
+        ajax-map { :type "POST"
+                   :url "/home/index"
+                   :dataType "html"
+                   :success 'successFunction
+                   :error 'ajaxError }
+        script-tag [:script { :type "text/javascript" }
+                     (scriptjure/js 
+                       (ajaxSubmit "#test-id" (clj ajax-map)))]
+        form-for-options { :url { :controller "home", 
+                                  :action "index" }, 
+                           :update 'successFunction, 
+                           :html-options { :id "test-id" } }
+        form-for-body (form-button "Submit")]
+    (is (=
+      (htmli form-tag script-tag)
+      (remote-form-for form-for-options form-for-body)))
+    (is (=
+      (htmli form-tag 
+        [:script { :type "text/javascript" }
+         (scriptjure/js 
+           (ajaxSubmit "#test-id" (clj (assoc ajax-map :type "GET"))))])
+      (remote-form-for (assoc form-for-options :method "GET") form-for-body)))
+    (is (=
+      (htmli 
+        [:form (merge form-map { :name "noscript-update", :action "/noscript/update" })
+          [:input { :type "submit", :value "Submit" } ]]
+        [:script { :type "text/javascript" }
+         (scriptjure/js 
+           (ajaxSubmit "#test-id" (clj (assoc ajax-map :error 'errorFunction))))])
+      (remote-form-for 
+        (merge form-for-options 
+          { :name "noscript-update"
+            :update { :success 'successFunction, 
+                      :error 'errorFunction }
+            :html-options { :id "test-id", 
+                            :action "/noscript/update" } })
+        form-for-body)))))

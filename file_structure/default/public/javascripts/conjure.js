@@ -8,6 +8,16 @@ function ajaxClick(id, ajaxOptions) {
     });
 }
 
+function ajaxSubmit(id, ajaxOptions) {
+    $(document).ready(function () {
+        $(id).submit(function () {
+            $.ajax(ajaxOptions);
+
+            return false;
+        });
+    });
+}
+
 function ajaxError(XMLHttpRequest, textStatus, errorThrown) {
     alert("Error! " + textStatus + "\n" + errorThrown);
 }

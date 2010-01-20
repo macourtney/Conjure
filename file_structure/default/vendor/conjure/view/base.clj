@@ -75,19 +75,21 @@ If body is a function, it is passed the url options after being merged with the 
 Valid options:    
     :name - The key for the params map passed to the target url. If name is not given, then the value of :controller in
         the url map is used. If :controller is not given in the url map, then \"record\" is used. 
-    :url - A map for the target url of the form. Uses the same options as url-for.
-    :html - The html attributes for the form tag." }
+    :url - A map or string for the target url of the form. If :url is a map then it uses the same options as url-for.
+        If :url is a string, then it is assumed to be the specific url target.
+    :html-options - The html attributes for the form tag." }
   form-for 
   ([request-map options body] (form-for (assoc options :url (view-utils/merge-url-for-params request-map (:url options))) body))
   ([options body]
-    (let [html-options (:html options)
-          url-options (:url options)]
+    (let [html-options (:html-options options)
+          url-options (:url options)
+          action (if (map? url-options) (view-utils/url-for url-options) url-options)]
       (htmli 
         [:form 
           (merge 
             html-options
             { :method (or (:method html-options) "post"), 
-              :action (view-utils/url-for url-options),
+              :action action,
               :name (or (:name options) (:controller url-options) "record") })
           (evaluate-if-fn body url-options)]))))
 
@@ -478,12 +480,20 @@ id based on position. Position can be one of the following:
 #^{ :doc "Creates a standard link-to-remote-onclick error function which simply displays the returned error." }
   error-fn []
   'ajaxError)
-
+  
 (defn-
-#^{ :doc "Generates the link-to-remote onclick function." }
-  link-to-remote-onclick [params]
+#^{ :doc "Generates the ajax map for the given params. Valid params are:
+
+    :method - The method to use for the ajax call. Default is \"POST\"
+    :url - A map or string for the url to target. If :url is a string, then it is used as the target url. If it is a 
+           map, the value of :url is passed to conjure.view.util/url-for.
+    :update - A scriptjure function or a map. If it is a function, then it is called when the ajax request returns with 
+              success. If it is a map, then the scriptjure function value of :success is called when the ajax request 
+              returns successfully, and the scriptjure function value of :error is called when the ajaz request fails." }
+  ajax-map [params]
   (let [ajax-type (or (:method params) "POST")
-        url (view-utils/url-for params)
+        url-params (:url params)
+        url (if (map? url-params) (view-utils/url-for url-params) url-params)
         update (:update params)
         success-fn (if (map? update) (:success update) update)
         error-fn (if (and (map? update) (contains? update :error)) (:error update) (error-fn))]
@@ -495,27 +505,25 @@ id based on position. Position can be one of the following:
         :success (clj success-fn)
         :error (clj error-fn) })))
 
+(defn-
+#^{ :doc "Generates the link-to-remote onclick function." }
+  link-to-remote-onclick [params]
+    (ajax-map (assoc params :url params)))
+
 (defn 
-#^{:doc 
-"Returns a ajax link for the given text and parameters using url-for. Params has the same valid parameters as url-for, 
+#^{ :doc 
+"Returns an ajax link for the given text and parameters using url-for. Params has the same valid parameters as url-for, 
 plus:
 
      :update - The id of the element to update. If the value is a map then it looks for the following keys: 
                   :success - The id of the element to update if the request succeeds.
                   :failure - The id of the element to update if the request fails.
-     :position - How the target element should be updated. Valid values are:
-                  :content - Replaces the contents of the target element. Default.
-                  :replace - replaces the target element.
-                  :before - Adds before the target element.
-                  :after - Adds after the target element.
-                  :top - Adds to the first position in the target element.
-                  :bottom - Adds to the last position in the target element.
      :method - The request method. Possible values POST, GET, PUT, DELETE. However, not all browsers support PUT and 
                DELETE. Default is POST.
      :html-options - a map of html attributes to add to the anchor tag.
      
 If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
-and params, text is called with request-map and params merged (not all keys used from request-map)."}
+and params, text is called with request-map and params merged (not all keys used from request-map)." }
   link-to-remote 
   ([text request-map params] (link-to-remote text (view-utils/merge-url-for-params request-map params)))
   ([text params]
@@ -532,3 +540,40 @@ and params, text is called with request-map and params merged (not all keys used
         [:script { :type "text/javascript" } 
           (scriptjure/js
             (ajaxClick (clj id-string) (clj link-to-remote-onclick-function)))]))))
+            
+(defn-
+#^{ :doc "Generates the link-to-remote onclick function." }
+  remote-form-for-onclick [options]
+  (ajax-map options))
+
+(defn
+#^{ :doc 
+"Returns an ajax form for with the given body. Params has the same valid parameters as form-for, 
+plus:
+
+     :update - The id of the element to update. If the value is a map then it looks for the following keys: 
+                  :success - The id of the element to update if the request succeeds.
+                  :failure - The id of the element to update if the request fails.
+     :method - The request method. Possible values POST, GET, PUT, DELETE. However, not all browsers support PUT and 
+               DELETE. Default is POST.
+     
+If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
+and params, text is called with request-map and params merged (not all keys used from request-map)." }
+  remote-form-for
+  ([request-map options body] 
+    (remote-form-for (assoc options :url (view-utils/merge-url-for-params request-map (:url options))) body))
+  ([options body]
+    (let [html-options (or (:html-options options) {})
+          id (or (:id html-options) (str "id-" (rand-int 1000000)))
+          id-string (str "#" id)
+          remote-form-for-onclick-function (remote-form-for-onclick options)
+          form-for-id-options (assoc options :html-options (merge html-options { :id id }))
+          form-for-options (if (contains? html-options :action) 
+                             (assoc form-for-id-options :url (:action html-options)) 
+                             form-for-id-options)]
+      (str 
+        (form-for form-for-options body)
+        (htmli
+          [:script { :type "text/javascript" } 
+            (scriptjure/js
+              (ajaxSubmit (clj id-string) (clj remote-form-for-onclick-function)))])))))
