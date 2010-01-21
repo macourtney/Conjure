@@ -340,13 +340,13 @@
   (is (= (html-doctype) (html-doctype :xhtml1.0-transitional))))
 
 (deftest test-success-fn
-  (is (= '(fn [data] (.html ($ "#test-id") data)) (success-fn "test-id")))
-  (is (= '(fn [data] (.html ($ "#test-id") data)) (success-fn "test-id" :content)))
-  (is (= '(fn [data] (.replaceWith ($ "#test-id") data)) (success-fn "test-id" :replace)))
-  (is (= '(fn [data] (.before ($ "#test-id") data)) (success-fn "test-id" :before)))
-  (is (= '(fn [data] (.after ($ "#test-id") data)) (success-fn "test-id" :after)))
-  (is (= '(fn [data] (.prepend ($ "#test-id") data)) (success-fn "test-id" :top)))
-  (is (= '(fn [data] (.append ($ "#test-id") data)) (success-fn "test-id" :bottom))))
+  (is (= '(ajaxContent "#test-id") (success-fn "test-id")))
+  (is (= '(ajaxContent "#test-id") (success-fn "test-id" :content)))
+  (is (= '(ajaxReplace "#test-id") (success-fn "test-id" :replace)))
+  (is (= '(ajaxBefore "#test-id") (success-fn "test-id" :before)))
+  (is (= '(ajaxAfter "#test-id") (success-fn "test-id" :after)))
+  (is (= '(ajaxTop "#test-id") (success-fn "test-id" :top)))
+  (is (= '(ajaxBottom "#test-id") (success-fn "test-id" :bottom))))
   
 (deftest test-error-fn
   (is (= 'ajaxError (error-fn))))

@@ -451,12 +451,12 @@ with the following defaults:
 #^{ :doc "Returns the position function for the given position." }
   position-function [position]
   (cond 
-    (= position :content) "html"
-    (= position :replace) "replaceWith"
-    (= position :before) "before"
-    (= position :after) "after"
-    (= position :top) "prepend"
-    (= position :bottom) "append"))
+    (= position :content) 'ajaxContent
+    (= position :replace) 'ajaxReplace
+    (= position :before) 'ajaxBefore
+    (= position :after) 'ajaxAfter
+    (= position :top) 'ajaxTop
+    (= position :bottom) 'ajaxBottom))
     
 (defn
 #^{ :doc "Creates a link-to-remote-onclick success function which adds the returned content to the tag with the given 
@@ -471,10 +471,8 @@ id based on position. Position can be one of the following:
   success-fn 
   ([success-id] (success-fn success-id :content))
   ([success-id position]
-    (let [position-function-symbol (symbol (str "." (position-function position)))]
-      (scriptjure/quasiquote
-        (fn [data] 
-          ((clj position-function-symbol) ($ (clj (str "#" success-id))) data))))))
+    (scriptjure/quasiquote
+      ((clj (position-function position)) (clj (str "#" success-id))))))
 
 (defn
 #^{ :doc "Creates a standard link-to-remote-onclick error function which simply displays the returned error." }
