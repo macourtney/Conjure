@@ -115,27 +115,12 @@
           { :uri uri,
             :query-string "foo=bar"
             :headers headers }))))))
-  
-(deftest test-controller-file-name
-  (is (= (str controller-name "_controller.clj") (controller-file-name { :controller controller-name })))
-  (is (nil? (controller-file-name { :controller "" })))
-  (is (nil? (controller-file-name { :controller nil })))
-  (is (nil? (controller-file-name {}))))
-  
-(deftest test-fully-qualified-action
-  (is (= (str "controllers." controller-name "-controller/" action-name) (fully-qualified-action { :controller controller-name, :action action-name })))
-  (is (= nil (fully-qualified-action { :controller controller-name })))
-  (is (= nil (fully-qualified-action { })))
-  (is (= nil (fully-qualified-action nil))))
-  
-(deftest test-load-controller
-  (load-controller (controller-file-name { :controller controller-name })))
-    
+      
 (deftest test-process-request
   (process-request { :controller controller-name, :action action-name }))
   
-(deftest test-render-view
-  (render-view { :controller controller-name, :action action-name } ))
+;(deftest test-render-view
+;  (render-view { :controller controller-name, :action action-name } ))
 
 (deftest test-http-config
   (is (not (nil? (http-config)))))
