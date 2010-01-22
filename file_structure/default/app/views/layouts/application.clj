@@ -23,6 +23,7 @@
           [:meta { :name "description", :content "..." } ]
           [:meta { :name="keywords", :content "..." } ]
       
+          [:link { :rel "icon", :type "image/vnd.microsoft.icon" :href (image-path "favicon.ico") } ]
           [:link { :rel "index", :href "./", :title "Home" } ]
           (stylesheet-link-tag "main.css" { :media "screen,projection" } )
           (stylesheet-link-tag "print.css" { :media "print" } )
