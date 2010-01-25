@@ -3,6 +3,8 @@
   (:require [clj-html.core :as html]
             [clj-html.helpers :as helpers]
             [clj-html.utils :as utils]
+            [com.reasonr.scriptjure :as scriptjure]
+            [conjure.view.util :as view-utils]
             [conjure.util.string-utils :as conjure-str-utils]))
 
 (defn
@@ -32,11 +34,17 @@ belongs-to field and links to the corresponding show page for the record it poin
                 [:th (conjure-str-utils/human-readable field-name)])))
           [:th]]
         (utils/domap-str [record records]
-          (html/html 
-            [:tr 
-              (html/htmli 
-                (map 
-                  #(cell-value request-map record %) 
-                  (map #(keyword (. (get % :column_name) toLowerCase)) table-metadata)))
-              [:td (link-to "Delete" request-map { :action "delete-warning", :id record })]]))]
+          (let [row-id (str "row-" (:id record) )]
+            (html/html 
+              [:tr { :id row-id } 
+                (html/htmli 
+                  (map 
+                    #(cell-value request-map record %) 
+                    (map #(keyword (. (get % :column_name) toLowerCase)) table-metadata)))
+                [:td (link-to-remote "Delete" request-map 
+                      { :update (success-fn row-id :remove)
+                        :action "ajax-delete" 
+                        :id record 
+                        :html-options 
+                          { :href (view-utils/url-for request-map { :action "delete-warning", :id record }) } })]])))]
       (link-to "Add" request-map { :action "add" } )]))

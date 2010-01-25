@@ -107,7 +107,7 @@
   (let [record (:record (:params request-map))]
     (if record
       (dog/insert record))
-    (redirect-to request-map { :action \"list-records\" })))", 
+    (redirect-to (select-keys request-map [:controller] ) { :action \"list-records\" })))", 
     :view nil } 
     (create-create-action "dog")))
   (is (= { 
@@ -115,7 +115,7 @@
   (let [record (:record (:params request-map))]
     (if record
       (/insert record))
-    (redirect-to request-map { :action \"list-records\" })))", 
+    (redirect-to (select-keys request-map [:controller] ) { :action \"list-records\" })))", 
     :view nil } 
     (create-create-action nil))))
 

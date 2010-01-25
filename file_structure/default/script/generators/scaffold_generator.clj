@@ -100,7 +100,7 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
   (let [record (:record (:params request-map))]
     (if record
       (" model "/insert record))
-    (redirect-to request-map { :action \"list-records\" })))")
+    (redirect-to (select-keys request-map [:controller] ) { :action \"list-records\" })))")
       :view nil })
   
 (defn
@@ -143,6 +143,17 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       (if delete-id (" model "/destroy-record { :id delete-id }))
       (redirect-to request-map { :action \"list-records\" }))))")
       :view nil })
+
+(defn
+#^{ :doc "Returns the content for the ajax delete in the action map." }
+  create-ajax-delete [model]
+  { :controller (str "(defn ajax-delete [request-map]
+  (let [delete-id (:id (:params request-map))]
+    (do
+      (if delete-id (" model "/destroy-record { :id delete-id }))
+      (render-view { :layout nil } request-map))))")
+      :view { :content "(empty/render-view request-map)"
+              :requires "[views.templates.empty :as empty]" } })
     
 (defn
 #^{ :doc "Returns a map which links action names to content and such." }
@@ -155,7 +166,8 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       :edit (create-edit-action model)
       :save (create-save-action model)
       :delete-warning (create-delete-warning-action model)
-      :delete (create-delete-action model) })
+      :delete (create-delete-action model)
+      :ajax-delete (create-ajax-delete model) })
     
 (defn
 #^{ :doc "Returns the content for the scaffold controller." }

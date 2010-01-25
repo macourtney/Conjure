@@ -125,6 +125,15 @@ function ajaxTop(id) {
 }
 
 /*
+A basic ajax success function for removing the element with the given id.
+*/
+function ajaxRemove(id) {
+    return function (data) {
+        $(id).remove();
+    }
+}
+
+/*
 A basic function for displaying an error message if the ajax request fails.
 */
 function ajaxError(XMLHttpRequest, textStatus, errorThrown) {

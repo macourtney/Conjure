@@ -456,7 +456,8 @@ with the following defaults:
     (= position :before) 'ajaxBefore
     (= position :after) 'ajaxAfter
     (= position :top) 'ajaxTop
-    (= position :bottom) 'ajaxBottom))
+    (= position :bottom) 'ajaxBottom
+    (= position :remove) 'ajaxRemove))
     
 (defn
 #^{ :doc "Creates a link-to-remote-onclick success function which adds the returned content to the tag with the given 
