@@ -6,7 +6,7 @@
             [conjure.util.string-utils :as conjure-str-utils]
             [clojure.contrib.logging :as logging]
             [clojure.contrib.seq-utils :as seq-utils]
-            [environment :as environment]))
+            session-config))
 
 (defn 
 #^{:doc "Finds the views directory which contains all of the files which describe the html pages of the app."}
@@ -154,7 +154,7 @@ to it." }
               (filter #(not (nil? %))
                 [(loading-utils/dashes-to-underscores controller) (loading-utils/dashes-to-underscores action) (id-from params) (anchor-from params)]))
             (let [new-session-id 
-                    (or session-id (if (not environment/use-session-cookie) (session-utils/create-session-id)))
+                    (or session-id (if (not session-config/use-session-cookie) (session-utils/create-session-id)))
                   new-url-params 
                     (if new-session-id (assoc url-params :session-id new-session-id) url-params)]
               (if (seq new-url-params)

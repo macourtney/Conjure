@@ -75,5 +75,5 @@
     (is (= "http://localhost:8080/hello/show/1" (url-for { :server-name "localhost" } (merge params { :port 8080}))))
     (is (= "http://foo:bar@localhost/hello/show/1" (url-for { :server-name "localhost" } (merge params { :user "foo", :password "bar"})))))
   (let [params { :controller "hello", :action "show", :id 1, :params { :session-id "blah" } }]
-    (binding [environment/use-session-cookie false]
+    (binding [session-config/use-session-cookie false]
       (is (= "http://localhost/hello/show/1?session-id=blah" (url-for { :server-name "localhost" } params))))))

@@ -1,8 +1,8 @@
 (ns conjure.server.server
   (:import [java.util Date])
-  (:require [environment :as environment]
-            [http-config :as http-config]
-            [routes :as routes]
+  (:require http-config
+            routes
+            session-config
             [conjure.util.loading-utils :as loading-utils]
             [conjure.model.database :as database]
             [conjure.controller.util :as controller-util]
@@ -54,13 +54,13 @@
         (ref-set initialized? true))
       (logging/info "Initializing server...")
       (database/ensure-conjure-db)
-      ((:init environment/session-store))
+      ((:init session-config/session-store))
       (logging/info "Server Initialized."))))
 
 (defn 
 #^{ :doc "Manages the session cookie in the response map." }
   manage-session [request-map response-map]
-  (if (and environment/use-session-cookie)
+  (if (and session-config/use-session-cookie)
     (session-utils/manage-session request-map response-map)
     response-map))
 
