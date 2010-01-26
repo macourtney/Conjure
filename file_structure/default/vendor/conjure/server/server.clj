@@ -81,7 +81,8 @@ one." }
   call-controller [request-map]
   (let [response (controller-util/call-controller request-map)]
     (if response
-      (create-response-map response request-map))))
+      (create-response-map response request-map)
+      (controller-util/call-controller { :controller "home", :action "error-404" }))))
 
 (defn
 #^{ :doc "Initializes the server if necessary and runs the controller based on the given request-map and returns a 

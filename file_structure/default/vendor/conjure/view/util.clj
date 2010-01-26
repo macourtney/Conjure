@@ -51,13 +51,13 @@
         :action action })))
 
 (defn
-#^{:doc "Returns the view namespace for the given view file."}
+#^{ :doc "Returns the view namespace for the given view file." }
   view-namespace [controller view-file]
   (if (and controller view-file)
     (view-namespace-by-action controller (loading-utils/clj-file-to-symbol-string (. view-file getName)))))
 
 (defn
-#^{:doc "Returns the rendered view from the given request-map."}
+#^{ :doc "Returns the rendered view from the given request-map." }
   render-view [request-map & params]
   (load-view request-map)
   (let [view-namespace (request-view-namespace request-map)]
@@ -66,21 +66,31 @@
       (eval (read-string (str view-namespace "/render-view")))
       request-map params)))
 
+(defn-
+#^{ :doc "Creates a new request-map for use when rendering a layout. The new map is similar to the given request-map 
+except the controller is \"layouts\", the action is layout-name, and layout-info contains the controller and action from
+the given request-map." }
+  merge-layout-request-map [request-map layout-name]
+  (merge request-map 
+    { :controller "layouts", 
+      :action layout-name 
+      :layout-info 
+        (merge
+          (:layout-info request-map) 
+          { :controller (:controller request-map)
+            :action (:action request-map) }) }))
+
 (defn
 #^{:doc "Returns the rendered layout for the given layout name."}
   render-layout [layout-name request-map body]
   (if layout-name
-    (render-view 
-      (merge 
-        request-map 
-        { :controller "layouts", 
-          :action layout-name 
-          :layout-info 
-            (merge
-              (:layout-info request-map) 
-              { :controller (:controller request-map)
-                :action (:action request-map) }) }) 
-      body)
+    (let [body-is-map? (map? body)
+          layout-body (if body-is-map? (:body body) body)
+          layout-request-map (merge-layout-request-map request-map layout-name)
+          full-body (render-view layout-request-map layout-body)]
+      (if body-is-map?
+        (assoc body :body full-body)
+        full-body))
     body))
 
 (defn
