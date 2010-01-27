@@ -69,6 +69,12 @@
   (is (= (str-to-map "") {}))
   (is (nil? (str-to-map nil))))
 
+(deftest test-escape-str
+  (is (= (escape-str "\\") "\\\\"))
+  (is (= (escape-str "\"") "\\\""))
+  (is (= (escape-str " ") " "))
+  (is (= (escape-str "blah\\") "blah\\\\"))) ;"
+
 (deftest test-form-str
   (is (= (form-str "foo") "\"foo\""))
   (is (= (form-str :foo) ":foo"))
@@ -79,5 +85,19 @@
   (is (= (form-str { :foo "bar" }) "{ :foo \"bar\" }"))
   (is (= (form-str [:foo "bar"]) "[:foo \"bar\"]"))
   (is (= (form-str #{:foo "bar"}) "#{:foo \"bar\"}"))
-  (is (= (form-str '(:foo "bar")) "(list :foo \"bar\")"))
-  )
+  (is (= (form-str '(:foo "bar")) "(list :foo \"bar\")")))
+
+(deftest test-title-case-word
+  (is (= (title-case "foo") "Foo"))
+  (is (= (title-case "1") "1"))
+  (is (= (title-case "") ""))
+  (is (= (title-case " ") " "))
+  (is (= (title-case "\t") "\t"))
+  (is (= (title-case nil) nil)))
+
+(deftest test-title-case
+  (is (= (title-case "foo") "Foo"))
+  (is (= (title-case "foo bar") "Foo Bar"))
+  (is (= (title-case "foo 1 bar") "Foo 1 Bar"))
+  (is (= (title-case "") ""))
+  (is (= (title-case nil) nil)))

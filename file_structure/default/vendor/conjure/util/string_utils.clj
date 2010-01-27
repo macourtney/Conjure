@@ -106,7 +106,10 @@ separate the key from the value." }
 (defn
 #^{ :doc "Java escapes the given string." }
   escape-str [string]
-  (str-replace-if string { "\\" "\\\\", "\"" "\\\"" })) ;"
+  (apply str
+    (map 
+      (fn [character] (or (char-escape-string character) character))
+      string)))
 
 (defn
 #^{ :doc "Converts the given form into a string which can later be parsed using read-string." }
@@ -121,5 +124,23 @@ separate the key from the value." }
     (set? form) (str "#{" (str-utils/str-join " " (map form-str form)) "}") 
     (string? form) (str "\"" (escape-str form) "\"")
     (symbol? form) (str "(symbol \"" form "\")")
-    (vector? form) (str "[" (str-utils/str-join " " (map form-str form)) "]")
-    ))
+    (vector? form) (str "[" (str-utils/str-join " " (map form-str form)) "]")))
+    
+(defn
+#^{ :doc "If the given word starts with a lower case letter, then this function capitalizes the first letter. 
+Otherwise, this method simply returns the given word." }
+  title-case-word [word]
+  (if (and word (> (.length word) 0) (re-matches #"^[a-z].*" word))
+    (apply str (. Character toUpperCase (first word)) (rest word))
+    word))
+    
+(defn
+#^{ :doc "Converts the given string to title case by capitalizing each word in the string." }
+  title-case [string]
+  (if string
+    (apply str (map title-case-word (str-utils/re-partition #"\s+" string)))))
+
+(defn
+#^{ :doc "Converts the given string human readable format then title cases the result." }
+  human-title-case [string]
+  (title-case (human-readable string)))

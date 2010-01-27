@@ -8,7 +8,7 @@
 (defview [model-name table-metadata]
   (html/html
     [:div { :class "article" }
-      [:h2 (str "Add a " (conjure-str-utils/human-readable model-name))]
+      [:h2 (str "Add a " (conjure-str-utils/human-title-case model-name))]
       (form-for request-map { :name "create", :url { :action "create" } }
         (str
           (record-form/render-view request-map table-metadata {})

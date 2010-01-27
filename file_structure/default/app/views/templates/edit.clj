@@ -13,4 +13,5 @@
           (hidden-field record :record :id)
           (record-form/render-view request-map table-metadata record)
           (form-button "Save")
+          "&nbsp;"
           (link-to "Cancel" request-map { :action "show", :id record } )))]))

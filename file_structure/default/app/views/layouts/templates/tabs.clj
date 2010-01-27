@@ -14,7 +14,7 @@
             (map 
               (fn [tab] 
                 (let [tab-controller (or (:controller (:url-for tab)) location-controller)
-                      tab-url (or (:url tab) (if (:url-for tab) (view-util/url-for original-request-map (:url-for tab))))]
+                      tab-url (or (:url tab) (if (:url-for tab) (view-util/url-for (dissoc original-request-map :params) (:url-for tab))))]
                   [:li { :id (if (or (:is-active tab) (if (and tab-controller location-controller) (= tab-controller location-controller))) "active") } 
                     [:a { :href (or tab-url "#") } 
                       (or (:text tab) "Tab") "<span class=\"tab-l\"></span><span class=\"tab-r\"></span>"]]))

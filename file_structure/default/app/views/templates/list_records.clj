@@ -17,7 +17,7 @@ belongs-to field and links to the corresponding show page for the record it poin
     (let [record-key-str (conjure-str-utils/str-keyword record-key)]
       (if (. record-key-str endsWith "_id")
         (let [belongs-to-model (conjure-str-utils/strip-ending record-key-str "_id")
-              field-name (conjure-str-utils/human-readable belongs-to-model)
+              field-name (conjure-str-utils/human-title-case belongs-to-model)
               belongs-to-id (helpers/h (get record record-key))]
           [:td (link-to belongs-to-id request-map { :controller belongs-to-model, :action "show", :id belongs-to-id })])
         [:td (helpers/h (get record record-key))]))))
@@ -25,13 +25,13 @@ belongs-to field and links to the corresponding show page for the record it poin
 (defview [model-name table-metadata records]
   (html/html 
     [:div { :class "article" }
-      [:h2 (str (conjure-str-utils/human-readable model-name) " List")]
+      [:h2 (str (conjure-str-utils/human-title-case model-name) " List")]
       [:table
         [:tr
           (utils/domap-str [table-column table-metadata]
             (let [field-name (conjure-str-utils/strip-ending (. (:column_name table-column) toLowerCase) "_id")]
               (html/html
-                [:th (conjure-str-utils/human-readable field-name)])))
+                [:th (conjure-str-utils/human-title-case field-name)])))
           [:th]]
         (utils/domap-str [record records]
           (let [row-id (str "row-" (:id record) )]

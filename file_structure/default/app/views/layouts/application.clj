@@ -46,8 +46,8 @@
                   tabs
                   (map 
                     (fn [controller] 
-                      { :text (string-utils/human-readable controller), 
-                        :url-for (merge (:layout-info request-map) { :controller controller, :action "index" })}) 
+                      { :text (string-utils/human-title-case controller), 
+                        :url-for { :controller controller, :action "index" } }) 
                     (controller-util/all-controllers)))))
   
             ;; Page (2 columns)
@@ -104,7 +104,7 @@
                     ;[:hr { :class "noscreen" }]
   
                     ;; Links
-                    (links/render-view request-map "Items"
+                    (links/render-view request-map "Actions"
                       (let [links (:links (:layout-info request-map))]
                         (if links
                           links

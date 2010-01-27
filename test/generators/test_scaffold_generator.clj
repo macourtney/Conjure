@@ -76,13 +76,17 @@
     (is (= { 
       :controller "(defn show [request-map]
   (let [id (:id (:params request-map))]
-    (render-view request-map \"dog\" (dog/table-metadata) (dog/get-record (or id 1)))))", 
+    (if id
+      (render-view request-map \"dog\" (dog/table-metadata) (dog/get-record id))
+      (redirect-to request-map { :action \"list-records\", :params {} }))))", 
       :view view-map } 
       (create-show-action "dog")))
     (is (= { 
       :controller "(defn show [request-map]
   (let [id (:id (:params request-map))]
-    (render-view request-map \"\" (/table-metadata) (/get-record (or id 1)))))", 
+    (if id
+      (render-view request-map \"\" (/table-metadata) (/get-record id))
+      (redirect-to request-map { :action \"list-records\", :params {} }))))", 
       :view view-map } 
       (create-show-action nil)))))
 
@@ -125,12 +129,16 @@
                    :requires "[views.templates.edit :as edit]" }]
     (is (= { :controller "(defn edit [request-map]
   (let [id (:id (:params request-map))]
-    (render-view request-map (dog/table-metadata) (dog/get-record (or id 1)))))", 
+    (if id
+      (render-view request-map (dog/table-metadata) (dog/get-record id))
+      (redirect-to request-map { :action \"list-records\", :params {} }))))", 
       :view view-map } 
       (create-edit-action "dog")))
     (is (= { :controller "(defn edit [request-map]
   (let [id (:id (:params request-map))]
-    (render-view request-map (/table-metadata) (/get-record (or id 1)))))", 
+    (if id
+      (render-view request-map (/table-metadata) (/get-record id))
+      (redirect-to request-map { :action \"list-records\", :params {} }))))", 
       :view view-map } 
       (create-edit-action nil)))))
 

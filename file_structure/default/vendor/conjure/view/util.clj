@@ -77,8 +77,7 @@ the given request-map." }
       :layout-info 
         (merge
           (:layout-info request-map) 
-          { :controller (:controller request-map)
-            :action (:action request-map) }) }))
+          (select-keys request-map [:controller :action :params])) }))
 
 (defn
 #^{:doc "Returns the rendered layout for the given layout name."}

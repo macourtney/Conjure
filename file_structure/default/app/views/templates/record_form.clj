@@ -22,4 +22,4 @@
       (let [field-name (. (:column_name table-column) toLowerCase)]
         (if (not (= field-name "id")) 
           (html/html
-            [:p (conjure-str-utils/human-readable field-name) ": " (editor record field-name)]))))))
+            [:p [:strong (conjure-str-utils/human-title-case field-name)] ": " (editor record field-name)]))))))

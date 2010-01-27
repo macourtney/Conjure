@@ -77,7 +77,9 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
   create-show-action [model]
     { :controller (str "(defn show [request-map]
   (let [id (:id (:params request-map))]
-    (render-view request-map \"" model "\" (" model "/table-metadata) (" model "/get-record (or id 1)))))")
+    (if id
+      (render-view request-map \"" model "\" (" model "/table-metadata) (" model "/get-record id))
+      (redirect-to request-map { :action \"list-records\", :params {} }))))")
       :view 
         { :params "model-name table-metadata record", 
           :content "(show/render-view request-map model-name table-metadata record)" 
@@ -108,7 +110,9 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
   create-edit-action [model]
     { :controller (str "(defn edit [request-map]
   (let [id (:id (:params request-map))]
-    (render-view request-map (" model "/table-metadata) (" model "/get-record (or id 1)))))")
+    (if id
+      (render-view request-map (" model "/table-metadata) (" model "/get-record id))
+      (redirect-to request-map { :action \"list-records\", :params {} }))))")
       :view 
         { :params "table-metadata record", 
           :content "(edit/render-view request-map table-metadata record)"
