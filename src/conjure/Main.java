@@ -40,17 +40,10 @@ public class Main {
     private String projectName;
 
 
-    public Main(OptionSet options) {
+    public Main(String projectName, OptionSet options) {
         this.options = options;
         
-        List<String> nonOptionArguments = this.options.nonOptionArguments();
-        
-        if ((nonOptionArguments != null) && (nonOptionArguments.size() > 0)) {
-            this.projectName = nonOptionArguments.get(0);
-            
-        } else {
-            this.projectName = null;
-        }
+        this.projectName = projectName;
     }
 
     private void extractZipEntry(JarFile conjureJar, ZipEntry zipEntry) throws IOException {
@@ -185,7 +178,33 @@ public class Main {
     }
     
     public void update() throws IOException {
-        extractZipEntries(DEFAULT_DIR + "/vendor");
+        List<String> updateDirs = null;
+        
+        if (this.options.has(UPDATE_SHORT_OPTION)) {
+            updateDirs = (List<String>) this.options.valuesOf(UPDATE_SHORT_OPTION);
+            
+        } else if (this.options.has(UPDATE_OPTION)) {
+            updateDirs = (List<String>) this.options.valuesOf(UPDATE_OPTION);
+        }
+
+        if ((updateDirs != null) && (updateDirs.size() > 0)) {
+            
+            for (String updateDir : updateDirs) {
+                updateDir.replace('\\', '/');
+                
+                if (!updateDir.startsWith("/")) {
+                    updateDir = "/" + updateDir;
+                }
+                
+                System.out.println("\nUpdating directory: " + updateDir + "\n");
+                
+                extractZipEntries(DEFAULT_DIR + updateDir);
+            }
+            
+        } else {
+            System.out.println("\nUpdating directory: /vendor\n");
+            extractZipEntries(DEFAULT_DIR + "/vendor");
+        }
     }
     
     public void run() throws IOException {
@@ -195,7 +214,7 @@ public class Main {
         if (showVersion) {
             System.out.println("Conjure version: " + CONJURE_VERSION);
         }
-        
+
         if (this.projectName != null) {
             
             if ((this.options.has(UPDATE_SHORT_OPTION)) || (this.options.has(UPDATE_OPTION))) {
@@ -213,8 +232,8 @@ public class Main {
         }
     }
 
-    public static void createProject(OptionSet options) {
-        Main main = new Main(options);
+    public static void createProject(String projectName, OptionSet options) {
+        Main main = new Main(projectName, options);
 
         try {
             main.run();
@@ -227,10 +246,11 @@ public class Main {
     public static void printHelp() {
         System.out.println("Usage: java -jar conjure.jar [<options>] <project name>\n"
                 + "\n"
-                + "Valid options include:\n"
-                + "  --" + DATABASE_OPTION + " - Changes the database for your project. Example: --" + DATABASE_OPTION + "=mysql will set your project to use the mysql database.\n"
-                + "  -" + HELP_SHORT_OPTION + " or --" + HELP_OPTION + " - Displays this text.\n"
-                + "  -" + VERSION_SHORT_OPTION + " or --" + VERSION_OPTION + " - Displays your Conjure's version number.\n");
+                + "Valid options include:\n\n"
+                + "  --" + DATABASE_OPTION + " - Changes the database for your project. Example: --" + DATABASE_OPTION + "=mysql will set your project to use the mysql database.\n\n"
+                + "  -" + HELP_SHORT_OPTION + " or --" + HELP_OPTION + " - Displays this text.\n\n"
+                + "  -" + UPDATE_SHORT_OPTION + " or --"  + UPDATE_OPTION + " - Only updates the given project. If no option is passed, then conjure will only update the vendor/conjure directory. Otherwise, conjure will update the directories specified. For example, -" + UPDATE_SHORT_OPTION + "=script will update your script directory.\n\n"
+                + "  -" + VERSION_SHORT_OPTION + " or --" + VERSION_OPTION + " - Displays your Conjure's version number.\n\n");
     }
     
     public static OptionParser createOptionParser() {
@@ -238,8 +258,8 @@ public class Main {
         parser.accepts(DATABASE_OPTION).withRequiredArg();
         parser.accepts(HELP_OPTION);
         parser.accepts(HELP_SHORT_OPTION);
-        parser.accepts(UPDATE_OPTION);
-        parser.accepts(UPDATE_SHORT_OPTION);
+        parser.accepts(UPDATE_OPTION).withOptionalArg();
+        parser.accepts(UPDATE_SHORT_OPTION).withOptionalArg();
         parser.accepts(VERSION_OPTION);
         parser.accepts(VERSION_SHORT_OPTION);
 
@@ -248,11 +268,26 @@ public class Main {
 
     public static void main(String[] args) {
 
-        if (args.length < 1 || args.length > 2) {
+        if (args.length < 1) {
             printHelp();
+            
         } else {
             OptionParser parser = createOptionParser();
-            createProject(parser.parse(args));
+            
+            String projectName = args[args.length - 1];
+            
+            if (projectName.startsWith("-")) {
+                createProject(null, parser.parse(args));
+                
+            } else {
+                String[] parserArgs = new String[args.length - 1];
+                
+                for (int x = 0; x < parserArgs.length; x++) {
+                    parserArgs[x] = args[x];
+                }
+                
+                createProject(projectName, parser.parse(parserArgs));
+            }
         }
     }
 
