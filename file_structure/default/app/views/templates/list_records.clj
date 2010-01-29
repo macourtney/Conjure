@@ -1,32 +1,17 @@
 (ns views.templates.list-records
   (:use conjure.view.base)
   (:require [clj-html.core :as html]
-            [clj-html.helpers :as helpers]
             [clj-html.utils :as utils]
             [com.reasonr.scriptjure :as scriptjure]
-            [conjure.view.util :as view-utils]
-            [conjure.util.string-utils :as conjure-str-utils]))
-
-(defn
-#^{ :doc "Returns a table cell for the value at the given record-key in record. If record-key is :id then this function 
-links to the show page for this record. If the record key ends with \"_id\", then this function assumes it is a 
-belongs-to field and links to the corresponding show page for the record it points to." }
-  cell-value [request-map record record-key]
-  (if (= :id record-key)
-    [:td (link-to (helpers/h (get record record-key)) request-map { :action "show", :id (:id record) })]
-    (let [record-key-str (conjure-str-utils/str-keyword record-key)]
-      (if (. record-key-str endsWith "_id")
-        (let [belongs-to-model (conjure-str-utils/strip-ending record-key-str "_id")
-              field-name (conjure-str-utils/human-title-case belongs-to-model)
-              belongs-to-id (helpers/h (get record record-key))]
-          [:td (link-to belongs-to-id request-map { :controller belongs-to-model, :action "show", :id belongs-to-id })])
-        [:td (helpers/h (get record record-key))]))))
+            [conjure.util.string-utils :as conjure-str-utils]
+            [views.templates.record-form :as record-form]
+            [views.templates.record-row :as record-row]))
 
 (defview [model-name table-metadata records]
   (html/html 
     [:div { :class "article" }
       [:h2 (str (conjure-str-utils/human-title-case model-name) " List")]
-      [:table
+      [:table { :id "list-table" }
         [:tr
           (utils/domap-str [table-column table-metadata]
             (let [field-name (conjure-str-utils/strip-ending (. (:column_name table-column) toLowerCase) "_id")]
@@ -34,18 +19,19 @@ belongs-to field and links to the corresponding show page for the record it poin
                 [:th (conjure-str-utils/human-title-case field-name)])))
           [:th]]
         (utils/domap-str [record records]
-          (let [row-id (str "row-" (:id record) )]
-            (html/html 
-              [:tr { :id row-id } 
-                (html/htmli 
-                  (map 
-                    #(cell-value request-map record %) 
-                    (map #(keyword (. (get % :column_name) toLowerCase)) table-metadata)))
-                [:td (link-to-remote "Delete" request-map 
-                      { :update (success-fn row-id :remove)
-                        :confirm (confirm-fn (str "Are you sure you want to delete the record with id: " (:id record)))
-                        :action "ajax-delete" 
-                        :id record 
-                        :html-options 
-                          { :href (view-utils/url-for request-map { :action "delete-warning", :id record }) } })]])))]
-      (link-to "Add" request-map { :action "add" } )]))
+          (record-row/render-view request-map table-metadata record))]
+      [:div { :id "add" }
+        [:div { :id "add-form", :style "display: none" }
+          (remote-form-for request-map 
+            { :name "record",
+              :url { :action "ajax-add" },
+              :update '(addFormSuccess "#list-table" "#add-link" "#add-form") }
+            (str 
+              (record-form/render-view request-map table-metadata {})
+              (form-button "Create")
+              "&nbsp;"
+              (link-to "Cancel" request-map { :action "list-records", :html-options { :id "add-cancel" } } )))]
+        (link-to "Add" request-map { :action "add", :html-options { :id "add-link" } } )]]
+    [:script { :type "text/javascript" } 
+      (scriptjure/js
+        (initListAddLink "#add-link" "#add-form"))]))

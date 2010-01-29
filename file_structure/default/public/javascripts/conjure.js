@@ -150,3 +150,26 @@ function ajaxConfirm(message) {
         return confirm(message);
     }
 }
+
+/*
+Used on the list records page to initialize the 'Add' link for ajax.
+*/
+function initListAddLink(linkSelector, formSelector) {
+    $(document).ready(function () {
+        $(linkSelector).click(function (e) {
+            e.preventDefault();
+            
+            $(formSelector).show();
+            $(linkSelector).hide();
+        });
+    });
+}
+
+function addFormSuccess(tableSelector, linkSelector, formSelector) {
+    return function (data) {
+        $(tableSelector).append(data);
+        
+        $(formSelector).hide();
+        $(linkSelector).show();
+    }
+}

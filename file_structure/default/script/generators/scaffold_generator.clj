@@ -158,6 +158,20 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       (render-view { :layout nil } request-map))))")
       :view { :content "(empty/render-view request-map)"
               :requires "[views.templates.empty :as empty]" } })
+
+(defn
+#^{ :doc "Returns the content for the ajax delete in the action map." }
+  create-ajax-add [model]
+  { :controller (str "(defn ajax-add [request-map]
+  (let [record (:record (:params request-map))]
+    (if record
+      (do
+        (" model "/insert record)
+        (let [created-record ("model"/find-record record)]
+          (render-view { :layout nil } request-map (" model "/table-metadata) created-record))))))")
+      :view { :params "table-metadata record"
+              :content "(record-row/render-view request-map table-metadata record)"
+              :requires "[views.templates.record-row :as record-row]" } })
     
 (defn
 #^{ :doc "Returns a map which links action names to content and such." }
@@ -171,7 +185,8 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       :save (create-save-action model)
       :delete-warning (create-delete-warning-action model)
       :delete (create-delete-action model)
-      :ajax-delete (create-ajax-delete model) })
+      :ajax-delete (create-ajax-delete model)
+      :ajax-add (create-ajax-add model) })
     
 (defn
 #^{ :doc "Returns the content for the scaffold controller." }
