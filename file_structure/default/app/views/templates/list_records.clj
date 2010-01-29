@@ -43,6 +43,7 @@ belongs-to field and links to the corresponding show page for the record it poin
                     (map #(keyword (. (get % :column_name) toLowerCase)) table-metadata)))
                 [:td (link-to-remote "Delete" request-map 
                       { :update (success-fn row-id :remove)
+                        :confirm (confirm-fn (str "Are you sure you want to delete the record with id: " (:id record)))
                         :action "ajax-delete" 
                         :id record 
                         :html-options 

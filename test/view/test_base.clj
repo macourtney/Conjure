@@ -356,7 +356,8 @@
                    :url "/home/index"
                    :dataType "html"
                    :success 'successFunction
-                   :error 'ajaxError }
+                   :error 'ajaxError
+                   :confirm nil }
         script-tag [:script { :type "text/javascript" }
                      (scriptjure/js 
                        (ajaxClick "#test-id" (clj ajax-map)))]
@@ -401,7 +402,8 @@
                    :url "/home/index"
                    :dataType "html"
                    :success 'successFunction
-                   :error 'ajaxError }
+                   :error 'ajaxError
+                   :confirm nil }
         script-tag [:script { :type "text/javascript" }
                      (scriptjure/js 
                        (ajaxSubmit "#test-id" (clj ajax-map)))]

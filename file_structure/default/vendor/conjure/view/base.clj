@@ -479,6 +479,11 @@ id based on position. Position can be one of the following:
 #^{ :doc "Creates a standard link-to-remote-onclick error function which simply displays the returned error." }
   error-fn []
   'ajaxError)
+
+(defn
+#^{ :doc "Creates a standard confirm dialog with the given message." }
+  confirm-fn [message]
+  (scriptjure/quasiquote (ajaxConfirm (clj message))))
   
 (defn-
 #^{ :doc "Generates the ajax map for the given params. Valid params are:
@@ -495,14 +500,16 @@ id based on position. Position can be one of the following:
         url (if (map? url-params) (view-utils/url-for url-params) url-params)
         update (:update params)
         success-fn (if (map? update) (:success update) update)
-        error-fn (if (and (map? update) (contains? update :error)) (:error update) (error-fn))]
+        error-fn (if (and (map? update) (contains? update :error)) (:error update) (error-fn))
+        confirm-fn (:confirm params)]
 
     (scriptjure/quasiquote 
       { :type (clj ajax-type)
         :url (clj url)
         :dataType "html"
         :success (clj success-fn)
-        :error (clj error-fn) })))
+        :error (clj error-fn)
+        :confirm (clj confirm-fn) })))
 
 (defn-
 #^{ :doc "Generates the link-to-remote onclick function." }
@@ -519,6 +526,7 @@ plus:
                   :failure - The id of the element to update if the request fails.
      :method - The request method. Possible values POST, GET, PUT, DELETE. However, not all browsers support PUT and 
                DELETE. Default is POST.
+     :confirm - a method to call before the ajax call to get a confirmation from the user.
      :html-options - a map of html attributes to add to the anchor tag.
      
 If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
@@ -555,6 +563,7 @@ plus:
                   :failure - The id of the element to update if the request fails.
      :method - The request method. Possible values POST, GET, PUT, DELETE. However, not all browsers support PUT and 
                DELETE. Default is POST.
+     :confirm - a method to call before the ajax call to get a confirmation from the user.
      
 If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
 and params, text is called with request-map and params merged (not all keys used from request-map)." }

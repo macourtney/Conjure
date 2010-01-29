@@ -7,7 +7,9 @@ function ajaxClick(id, ajaxOptions) {
         $(id).click(function (e) {
             e.preventDefault();
             
-            $.ajax(ajaxOptions);
+            if ((ajaxOptions.confirm == null) || (ajaxOptions.confirm())) {
+                $.ajax(ajaxOptions);
+            }
         });
     });
 }
@@ -138,4 +140,13 @@ A basic function for displaying an error message if the ajax request fails.
 */
 function ajaxError(XMLHttpRequest, textStatus, errorThrown) {
     alert("Error! " + textStatus + "\n" + errorThrown);
+}
+
+/*
+Returns a function which calls the confirm dialog with the given message.
+*/
+function ajaxConfirm(message) {
+    return function () {
+        return confirm(message);
+    }
 }
