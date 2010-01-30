@@ -199,7 +199,11 @@
     (is (:create action-map))
     (is (:edit action-map))
     (is (:save action-map))
-    (is (:delete action-map))))
+    (is (:delete action-map))
+    (is (:ajax-delete action-map))
+    (is (:ajax-add action-map))
+    (is (:ajax-show action-map))
+    (is (:ajax-row action-map))))
 
 (deftest test-create-controller-content
   (let [model "dog"]

@@ -59,6 +59,23 @@
   (is (nil? (view-namespace controller-name nil)))
   (is (nil? (view-namespace nil (new File "show-foo.clj"))))
   (is (nil? (view-namespace nil nil))))
+  
+(deftest test-merge-url-for-params
+  (is (= 
+    { :controller "hello", :action "edit", :params { :id 0 } } 
+    (merge-url-for-params 
+      { :controller "hello", :action "show", :params { :id 1 } } 
+      { :action "edit", :params { :id 0 } })))
+  (is (= 
+    { :controller "hello", :action "edit" } 
+    (merge-url-for-params 
+      { :controller "hello", :action "show", :params { :id 1 } } 
+      { :action "edit" })))
+  (is (= 
+    { :controller "hello", :action "edit", :id 0 } 
+    (merge-url-for-params 
+      { :controller "hello", :action "show", :params { :id 1, :text "blah" } } 
+      { :action "edit", :id 0 }))))
 
 (deftest test-url-for
   (is (= "/hello/show" (url-for { :controller "hello", :action "show" })))

@@ -160,7 +160,7 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
               :requires "[views.templates.empty :as empty]" } })
 
 (defn
-#^{ :doc "Returns the content for the ajax delete in the action map." }
+#^{ :doc "Returns the content for the ajax add in the action map." }
   create-ajax-add [model]
   { :controller (str "(defn ajax-add [request-map]
   (let [record (:record (:params request-map))]
@@ -172,6 +172,35 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       :view { :params "table-metadata record"
               :content "(record-row/render-view request-map table-metadata record)"
               :requires "[views.templates.record-row :as record-row]" } })
+    
+(defn
+#^{ :doc "Returns the content for the ajax show in the action map." }
+  create-ajax-show [model]
+  { :controller (str "(defn ajax-show [request-map]
+  (let [id (:id (:params request-map))]
+    (if id
+      (render-view { :layout nil } request-map \"" model "\"
+        (" model "/table-metadata) 
+        (" model "/get-record id)))))")
+      :view 
+        { :params "model-name table-metadata record",
+          :content "(ajax-show/render-view request-map 
+    model-name table-metadata record (inc (count table-metadata)))" 
+          :requires "[views.templates.ajax-show :as ajax-show]" } })
+          
+(defn
+#^{ :doc "Returns the content for the ajax row in the action map." }
+  create-ajax-row [model]
+  { :controller (str "(defn ajax-row [request-map]
+  (let [id (:id (:params request-map))]
+    (if id
+      (render-view { :layout nil } request-map
+        (" model "/table-metadata)
+        (" model "/get-record id)))))")
+      :view 
+        { :params "table-metadata record",
+          :content "(record-row/render-view request-map table-metadata record)" 
+          :requires "[views.templates.record-row :as record-row]" } })
     
 (defn
 #^{ :doc "Returns a map which links action names to content and such." }
@@ -186,7 +215,9 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       :delete-warning (create-delete-warning-action model)
       :delete (create-delete-action model)
       :ajax-delete (create-ajax-delete model)
-      :ajax-add (create-ajax-add model) })
+      :ajax-add (create-ajax-add model)
+      :ajax-show (create-ajax-show model)
+      :ajax-row (create-ajax-row model) })
     
 (defn
 #^{ :doc "Returns the content for the scaffold controller." }

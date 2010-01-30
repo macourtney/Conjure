@@ -1,6 +1,8 @@
 (ns views.layouts.application
   (:use conjure.view.base)
   (:require [clj-html.core :as html]
+            [com.reasonr.scriptjure :as scriptjure]
+            [conjure.view.util :as view-util]
             [conjure.controller.util :as controller-util]
             [conjure.util.string-utils :as string-utils]
             [views.layouts.templates.breadcrumbs :as breadcrumbs]
@@ -18,11 +20,11 @@
           [:meta { :http-equiv "content-type", :content "text/html; charset=utf-8" } ]
           [:meta { :http-equiv "content-language", :content "en" } ]
           [:meta { :name "copyright", :content "Design/Code: Vit Dlouhy [Nuvio - www.nuvio.cz]; e-mail: vit.dlouhy@nuvio.cz" } ]
-      
+
           [:title title]
           [:meta { :name "description", :content "..." } ]
           [:meta { :name="keywords", :content "..." } ]
-      
+
           [:link { :rel "icon", :type "image/vnd.microsoft.icon" :href (image-path "favicon.ico") } ]
           [:link { :rel "index", :href "./", :title "Home" } ]
           (stylesheet-link-tag "main.css" { :media "screen,projection" } )
@@ -30,15 +32,15 @@
           (stylesheet-link-tag "aural.css" { :media "aural" } )
           (jquery-include-tag)
           (conjure-js-include-tag)]
-  
+
         [:body { :id "www-url-cz" }
-  
+
           ;; Main
           [:div { :id "main", :class "box" }
-  
+
             ;; Header
             (header/render-view request-map title)
-  
+
             ;; Main menu (tabs)
             (tabs/render-view request-map 
               (let [tabs (:tabs (:layout-info request-map))]
@@ -49,24 +51,24 @@
                       { :text (string-utils/human-title-case controller), 
                         :url-for { :controller controller, :action "index" } }) 
                     (controller-util/all-controllers)))))
-  
+
             ;; Page (2 columns)
             [:div { :id "page", :class="box" }
               [:div { :id "page-in", :class "box" }
-  
+
                 [:div { :id "strip" :class "box noprint" }
-  
+
                   ;; Example RSS feeds -->
                   ;[:p { :id "rss" } [:strong "RSS:"] [:a { :href "#" } "articles"] " / " [:a { :href "#" } "comments"]]
                   ;[:hr { :class "noscreen" }]
-  
+
                   ;; Breadcrumbs
                   (breadcrumbs/render-view request-map)]
-  
+
                 ;; Content
                 [:div { :id "content" }
                     body
-                    
+
                     ;; Example Article:
                     ;;[:div { :class "article" }
                     ;;  [:h2 [:span [:a { :href "#" } "This is my best article"]]]
@@ -86,35 +88,40 @@
                     ;;
                     ;;[:hr { :class "noscreen" }
                 ] ; content end
-  
+
                 ;; Right column
                 [:div { :id "col", :class"noprint" }
                   [:div { :id "col-in" }
-  
+
                     ;; Example About Me
                     ;[:h3 [:span [:a { :href "#" } "About Me"]]]
-  
+
                     ;[:div { :id "about-me" }
                     ;  [:p (image-tag "tmp_photo.gif" { :id "me", :alt "Yeah, it´s me!" } )
                     ;  [:strong "John Doe"] [:br]
                     ;  "Age: 26" [:br]
                     ;  "Dallas, TX" [:br]
                     ;  [:a { :href "#" } "Profile on MySpace"]]]
-  
+
                     ;[:hr { :class "noscreen" }]
-  
+
                     ;; Links
                     (links/render-view request-map "Actions"
                       (let [links (:links (:layout-info request-map))]
                         (if links
                           links
-                          [ { :text "List", :url-for (merge (:layout-info request-map) { :action "list-records" }) }
-                            { :text "Add", :url-for (merge (:layout-info request-map) { :action "add" }) }])))]]]]
-  
-            ;; Footer
+                          [ { :text "List", :url-for (view-util/merge-url-for-params (:layout-info request-map) { :action "list-records" }) }
+                            { :text "Add", :url-for (view-util/merge-url-for-params (:layout-info request-map) { :action "add" }) :html-options { :id "add-action-link" } }])))]]]]
+
+              ;; Footer
             [:div { :id "footer" }
               [:div { :id "top", :class "noprint" } [:p [:span { :class "noscreen" } "Back on top"] [:a { :href "#header", :title "Back on top ^" } "^"[:span]]]]
               [:hr { :class "noscreen" }]
           
               [:p { :id "createdby" } "created by " [:a { :href "http://www.nuvio.cz" } "Nuvio | Webdesign"]] ; DON´T REMOVE, PLEASE!
-              [:p { :id "copyright" } "&copy; 2007 " [:a { :href "mailto:my@mail.com" } "My Name"]]]]]])))
+              [:p { :id "copyright" } "&copy; 2007 " [:a { :href "mailto:my@mail.com" } "My Name"]]]]]
+
+        [:script { :type "text/javascript" } 
+          (scriptjure/js
+            (.ready ($ document) (fn [] 
+              (.hide ($ "#add-action-link")))))]])))

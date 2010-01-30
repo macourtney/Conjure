@@ -132,7 +132,11 @@ to it." }
 (defn
 #^{ :doc "Returns the params merged with the request-map. Only including the keys from request-map used by url-for" }
   merge-url-for-params [request-map params]
-  (merge (select-keys request-map [:controller :action :scheme :request-method :server-name :server-port :params]) params))
+    (merge 
+      (select-keys 
+        request-map 
+        [:controller :action :scheme :request-method :server-name :server-port])
+      params))
 
 (defn
 #^{:doc 
