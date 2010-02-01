@@ -9,7 +9,7 @@ Conjure is a Rails like framework for the Clojure programming language. The goal
 
 To get started with Conjure, see the "Getting Started":http://wiki.github.com/macourtney/Conjure/getting-started wiki page.
 
-For a tutorial on Conjure, see the "Hello World tutorial":http://wiki.github.com/macourtney/Conjure/hello-world-tutorial
+For a tutorial on Conjure, see the "Hello World tutorial":http://wiki.github.com/macourtney/Conjure/hello-world-tutorial-2
 
 You can find our google group at: "Conjure Google Group":http://groups.google.com/group/clojure-conjure
 
