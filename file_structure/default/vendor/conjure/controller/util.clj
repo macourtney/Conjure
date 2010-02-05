@@ -3,7 +3,8 @@
             [clojure.contrib.seq-utils :as seq-utils]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.file-utils :as file-utils]
-            [conjure.util.string-utils :as string-utils]))
+            [conjure.util.string-utils :as string-utils]
+            [clojure.contrib.ns-utils :as ns-utils]))
 
 (def controllers-dir "controllers")
 (def controllers-namespace controllers-dir)
@@ -83,4 +84,7 @@
       (let [action (fully-qualified-action request-map)]
         (logging/debug (str "Running action: " action))
         (load-controller controller-file)
-        ((load-string action) request-map)))))
+        (if (ns-resolve 
+              (ns-utils/get-ns (symbol (controller-namespace (:controller request-map))))
+              (symbol (:action request-map)))
+          ((load-string action) request-map))))))
