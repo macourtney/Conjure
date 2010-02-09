@@ -12,6 +12,11 @@
           [:div { :id (str "show-div-" (:id record)) }
             [:h3 (or (:name record) (str "Showing a " (conjure-str-utils/human-title-case model-name)))]
             (record-view/render-view request-map table-metadata record)
+            (link-to-remote "Edit" request-map
+              { :update (success-fn row-id :replace)
+                :action "ajax-edit"
+                :id record })
+            "&nbsp;"
             (link-to-remote "Hide" request-map
               { :update (success-fn row-id :replace)
                 :action "ajax-row"

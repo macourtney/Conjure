@@ -201,6 +201,37 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
         { :params "table-metadata record",
           :content "(record-row/render-view request-map table-metadata record)" 
           :requires "[views.templates.record-row :as record-row]" } })
+
+(defn
+#^{ :doc "Returns the content for the ajax show in the action map." }
+  create-ajax-edit [model]
+  { :controller (str "(defn ajax-edit [request-map]
+  (let [id (:id (:params request-map))]
+    (if id
+      (render-view { :layout nil } request-map \"" model "\"
+        (" model "/table-metadata) 
+        (" model "/get-record id)))))")
+      :view 
+        { :params "model-name table-metadata record",
+          :content "(ajax-edit/render-view request-map 
+    model-name table-metadata record (inc (count table-metadata)))" 
+          :requires "[views.templates.ajax-edit :as ajax-edit]" } })
+    
+(defn
+#^{ :doc "Returns the content for the ajax row in the action map." }
+  create-ajax-save [model]
+  { :controller (str "(defn ajax-save [request-map]
+  (let [record (:record (:params request-map))]
+    (if record
+      (do
+        (" model "/update record)
+        (render-view { :layout nil } request-map
+          (" model "/table-metadata)
+          record)))))")
+      :view 
+        { :params "table-metadata record",
+          :content "(record-row/render-view request-map table-metadata record)" 
+          :requires "[views.templates.record-row :as record-row]" } })
     
 (defn
 #^{ :doc "Returns a map which links action names to content and such." }
@@ -217,7 +248,9 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       :ajax-delete (create-ajax-delete model)
       :ajax-add (create-ajax-add model)
       :ajax-show (create-ajax-show model)
-      :ajax-row (create-ajax-row model) })
+      :ajax-row (create-ajax-row model)
+      :ajax-edit (create-ajax-edit model)
+      :ajax-save (create-ajax-save model) })
     
 (defn
 #^{ :doc "Returns the content for the scaffold controller." }
