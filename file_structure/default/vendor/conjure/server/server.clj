@@ -26,10 +26,16 @@
 (defn
 #^{ :doc "Returns a parameter map generated from the post content." }
   parse-post-params [request-map]
-  (if (= (:request-method request-map) :post)
-    (html-utils/parse-query-params 
-      (loading-utils/string-input-stream (:body request-map) (:content-length request-map)))
-    {}))
+  (let [content-type (:content-type request-map)]
+    (if 
+      (and 
+        (= (:request-method request-map) :post)
+        content-type
+        (.startsWith content-type "application/x-www-form-urlencoded"))
+  
+      (html-utils/parse-query-params 
+        (loading-utils/string-input-stream (:body request-map) (:content-length request-map)))
+      {})))
 
 (defn
 #^{ :doc "Parses all of the params from the given request map." }

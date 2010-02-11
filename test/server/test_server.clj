@@ -33,14 +33,51 @@
   (new ByteArrayInputStream (. string getBytes "UTF-8")))
 
 (deftest test-parse-post-params
-  (is (= { :foo "bar" } (parse-post-params { :request-method :post, :content-length 7, :body (string-as-input-stream "foo=bar") })))
-  (is (= { :foo "bar", :biz "baz" } (parse-post-params { :request-method :post, :content-length 15, :body (string-as-input-stream "foo=bar&biz=baz") })))
-  (is (= {} (parse-post-params { :request-method :get, :content-length 7, :body (string-as-input-stream "foo=bar") }))))
+  (is (= 
+    { :foo "bar" }
+    (parse-post-params
+      { :request-method :post,
+        :content-type "application/x-www-form-urlencoded",
+        :content-length 7,
+        :body (string-as-input-stream "foo=bar") })))
+  (is (= 
+    { :foo "bar", :biz "baz" }
+    (parse-post-params
+      { :request-method :post,
+        :content-type "application/x-www-form-urlencoded",
+        :content-length 15,
+        :body (string-as-input-stream "foo=bar&biz=baz") })))
+  (is (= 
+    {} 
+    (parse-post-params 
+      { :request-method :get, 
+        :content-length 7, 
+        :body (string-as-input-stream "foo=bar") })))
+  (is (= 
+    {} 
+    (parse-post-params 
+      { :request-method :post,
+        :content-type "multipart/form-data",
+        :content-length 7, 
+        :body (string-as-input-stream "foo=bar") }))))
 
 (deftest test-parse-params
-  (is (= { :foo "bar", :biz "baz" } (parse-params { :request-method :post, :content-length 7, :body (string-as-input-stream "foo=bar"), :query-string "biz=baz" } )))
+  (is (= 
+    { :foo "bar", :biz "baz" }
+    (parse-params 
+      { :request-method :post,
+        :content-type "application/x-www-form-urlencoded",
+        :content-length 7,
+        :body (string-as-input-stream "foo=bar"),
+        :query-string "biz=baz" })))
   (is (= { :biz "baz" } (parse-params { :query-string "biz=baz" } )))
-  (is (= { :foo "bar" } (parse-params { :request-method :post, :content-length 7, :body (string-as-input-stream "foo=bar") } )))
+  (is (= 
+    { :foo "bar" } 
+    (parse-params 
+      { :request-method :post,
+        :content-type "application/x-www-form-urlencoded",
+        :content-length 7,
+        :body (string-as-input-stream "foo=bar") } )))
   (is (= {} (parse-params {} ))))
 
 (deftest test-update-request-map
