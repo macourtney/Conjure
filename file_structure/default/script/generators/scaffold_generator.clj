@@ -3,6 +3,8 @@
             [conjure.model.util :as model-util]
             [conjure.model.builder :as model-builder]
             [conjure.util.string-utils :as conjure-str-utils]
+            [conjure.test.util :as test-util]
+            [conjure.view.util :as view-util]
             [generators.controller-generator :as controller-generator]
             [generators.view-generator :as view-generator]
             [generators.model-generator :as model-generator]
@@ -63,6 +65,38 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       :view nil })
       
 (defn
+#^{ :doc "Returns the content for a view test." }
+  create-view-test [model action params include-fixture?]
+  (str "(ns " (test-util/view-unit-test-namespace model action) "
+  (:use clojure.contrib.test-is
+        " (view-util/view-namespace-by-action model action) ")
+  (:require [" (model-util/model-namespace model) " :as model]"
+  (if include-fixture? (str "\n            [" (test-util/fixture-namespace model) " :as fixture]"))
+"))
+
+(def controller-name \"" model "\")
+(def view-name \""action"\")
+(def request-map { :controller controller-name
+                   :action view-name } )
+
+(deftest test-view
+  (render-view request-map " params "))"))
+
+(defn
+#^{ :doc "Returns the content for a view test using a single record, the model
+name and the table metadata as params." }
+  create-view-test-with-model-and-one-record [model action]
+  (create-view-test model action 
+    (str "\"" model "\" (model/table-metadata) (first fixture/records)") true))
+
+(defn
+#^{ :doc "Returns the content for a view test using a single record and the 
+table metadata as params." }
+  create-view-test-with-one-record [model action]
+  (create-view-test model action 
+    (str "(model/table-metadata) (first fixture/records)") true))
+
+(defn
 #^{ :doc "Returns the content for list in the action map." }
   create-list-records-action [model]
     { :controller (str "(defn list-records [request-map]
@@ -70,7 +104,10 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       :view 
         { :params "model-name table-metadata records", 
           :content "(list-records/render-view request-map model-name table-metadata records)" 
-          :requires "[views.templates.list-records :as list-records]" } })
+          :requires "[views.templates.list-records :as list-records]" }
+      :view-test 
+        (create-view-test model "list-records" 
+          (str "\"" model "\" (model/table-metadata) fixture/records") true) })
   
 (defn
 #^{ :doc "Returns the content for list in the action map." }
@@ -83,7 +120,8 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       :view 
         { :params "model-name table-metadata record", 
           :content "(show/render-view request-map model-name table-metadata record)" 
-          :requires "[views.templates.show :as show]" } })
+          :requires "[views.templates.show :as show]" }
+      :view-test (create-view-test-with-model-and-one-record model "show") })
   
 (defn
 #^{ :doc "Returns the content for add in the action map." }
@@ -93,7 +131,10 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       :view 
         { :params "model-name table-metadata", 
           :content "(add/render-view request-map model-name table-metadata)"
-          :requires "[views.templates.add :as add]" } })
+          :requires "[views.templates.add :as add]" }
+      :view-test 
+        (create-view-test model "add" 
+          (str "\"" model "\" (model/table-metadata)") false) })
       
 (defn
 #^{ :doc "Returns the content for add in the action map." }
@@ -116,7 +157,8 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       :view 
         { :params "table-metadata record", 
           :content "(edit/render-view request-map table-metadata record)"
-          :requires "[views.templates.edit :as edit]" } })
+          :requires "[views.templates.edit :as edit]" }
+      :view-test (create-view-test-with-one-record model "edit") })
 
 (defn
 #^{ :doc "Returns the content for add in the action map." }
@@ -133,10 +175,12 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
   create-delete-warning-action [model]
     { :controller (str "(defn delete-warning [request-map]
   (let [id (:id (:params request-map))]
-    (render-view request-map (" model "/table-metadata) (" model "/get-record (or id 1)))))")
-      :view { :params "table-metadata record", 
+    (render-view request-map (" model "/table-metadata) (if id (" model "/get-record id)))))")
+      :view 
+        { :params "table-metadata record", 
           :content "(delete-warning/render-view request-map table-metadata record)"
-          :requires "[views.templates.delete-warning :as delete-warning]" } })
+          :requires "[views.templates.delete-warning :as delete-warning]" }
+      :view-test (create-view-test-with-one-record model "delete-warning") })
 
 (defn
 #^{ :doc "Returns the content for delete in the action map." }
@@ -169,9 +213,11 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
         (" model "/insert record)
         (let [created-record ("model"/find-record record)]
           (render-view { :layout nil } request-map (" model "/table-metadata) created-record))))))")
-      :view { :params "table-metadata record"
-              :content "(record-row/render-view request-map table-metadata record)"
-              :requires "[views.templates.record-row :as record-row]" } })
+      :view 
+        { :params "table-metadata record"
+          :content "(record-row/render-view request-map table-metadata record)"
+          :requires "[views.templates.record-row :as record-row]" }
+      :view-test (create-view-test-with-one-record model "ajax-add") })
     
 (defn
 #^{ :doc "Returns the content for the ajax show in the action map." }
@@ -186,7 +232,8 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
         { :params "model-name table-metadata record",
           :content "(ajax-show/render-view request-map 
     model-name table-metadata record (inc (count table-metadata)))" 
-          :requires "[views.templates.ajax-show :as ajax-show]" } })
+          :requires "[views.templates.ajax-show :as ajax-show]" }
+      :view-test (create-view-test-with-model-and-one-record model "ajax-show") })
           
 (defn
 #^{ :doc "Returns the content for the ajax row in the action map." }
@@ -200,7 +247,8 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       :view 
         { :params "table-metadata record",
           :content "(record-row/render-view request-map table-metadata record)" 
-          :requires "[views.templates.record-row :as record-row]" } })
+          :requires "[views.templates.record-row :as record-row]" }
+      :view-test (create-view-test-with-one-record model "ajax-row") })
 
 (defn
 #^{ :doc "Returns the content for the ajax show in the action map." }
@@ -215,7 +263,8 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
         { :params "model-name table-metadata record",
           :content "(ajax-edit/render-view request-map 
     model-name table-metadata record (inc (count table-metadata)))" 
-          :requires "[views.templates.ajax-edit :as ajax-edit]" } })
+          :requires "[views.templates.ajax-edit :as ajax-edit]" }
+      :view-test (create-view-test-with-model-and-one-record model "ajax-edit") })
     
 (defn
 #^{ :doc "Returns the content for the ajax row in the action map." }
@@ -231,7 +280,8 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
       :view 
         { :params "table-metadata record",
           :content "(record-row/render-view request-map table-metadata record)" 
-          :requires "[views.templates.record-row :as record-row]" } })
+          :requires "[views.templates.record-row :as record-row]" }
+      :view-test (create-view-test-with-one-record model "ajax-save") })
     
 (defn
 #^{ :doc "Returns a map which links action names to content and such." }
@@ -284,7 +334,8 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
           (view-generator/generate-view-file 
             { :controller controller-name, 
               :action action-name, 
-              :content (create-view-content controller-name action-name action-map) })))
+              :content (create-view-content controller-name action-name action-map)
+              :test-content (get (get action-map action-name) :view-test) })))
       (keys action-map))))
 
 (defn

@@ -14,12 +14,13 @@
 #^{:doc "Generates the functional test file for the given controller and actions."}
   generate-unit-test 
   ([controller action] (generate-unit-test controller action false))
-  ([controller action silent]
+  ([controller action silent] (generate-unit-test controller action silent nil))
+  ([controller action silent incoming-content]
   (let [unit-test-file (test-builder/create-view-unit-test controller action silent)]
     (if unit-test-file
       (let [test-namespace (test-util/view-unit-test-namespace controller action)
             view-namespace (util/view-namespace-by-action controller action)
-            test-content (str "(ns " test-namespace "
+            test-content (or incoming-content (str "(ns " test-namespace "
   (:use clojure.contrib.test-is
         " view-namespace "))
 
@@ -29,7 +30,7 @@
                    :action view-name } )
 
 (deftest test-view
-  (render-view request-map))")]
+  (render-view request-map))"))]
         (file-utils/write-file-content unit-test-file test-content))))))
 
 (defn 

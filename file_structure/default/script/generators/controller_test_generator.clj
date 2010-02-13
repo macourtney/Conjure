@@ -31,12 +31,12 @@
         (let [test-namespace (test-util/functional-test-namespace controller)
               controller-namespace (util/controller-namespace controller)
               test-content (str "(ns " test-namespace "
-    (:use clojure.contrib.test-is
-          " controller-namespace "))
-  
-  (def controller-name \"" controller "\")
-  
-  " (generate-all-action-tests actions))]
+  (:use clojure.contrib.test-is
+        " controller-namespace "))
+
+(def controller-name \"" controller "\")
+
+" (generate-all-action-tests actions))]
           (file-utils/write-file-content functional-test-file test-content))))))
         
 (defn 

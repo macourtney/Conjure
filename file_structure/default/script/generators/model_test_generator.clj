@@ -28,7 +28,7 @@
   
   (def model \"" model "\")
   
-  (use-fixtures :once " model "-fixture)
+  (use-fixtures :once fixture)
   
   (deftest test-first-record
     (is (get-record 1)))")]

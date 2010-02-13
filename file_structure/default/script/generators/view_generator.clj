@@ -54,8 +54,8 @@ content." }
 (defn
 #^{:doc "Creates the view file associated with the given controller and action."}
   generate-view-file
-    ([{ :keys [controller action content silent] 
-        :or { content nil, silent false } }]
+    ([{ :keys [controller action content silent test-content] 
+        :or { content nil, silent false, test-content nil } }]
       (if (and controller action)
         (let [view-directory (util/find-views-directory)]
           (if view-directory
@@ -69,7 +69,7 @@ content." }
                                 (assoc params :controller-directory controller-directory))]
                 (if view-file
                   (generate-file-content view-file controller content)))
-              (view-test-generator/generate-unit-test controller action silent))
+              (view-test-generator/generate-unit-test controller action silent test-content))
             (if (not silent)
               (do
                 (println "Could not find views directory.")
