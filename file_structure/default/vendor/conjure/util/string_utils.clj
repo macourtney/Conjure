@@ -1,6 +1,7 @@
 (ns conjure.util.string-utils
   (:import [java.security NoSuchAlgorithmException MessageDigest]
-           [java.math BigInteger])
+           [java.math BigInteger]
+           [java.util StringTokenizer])
   (:require [clojure.contrib.str-utils :as str-utils]))
 
 (defn
@@ -67,9 +68,9 @@ then this method simply returns it."}
 #^{ :doc "Replaces any underscores or dashes in the given string to spaces. If string is a keyword, it is converted to a
 string before the spaces are added." }
   human-readable [string]
-    (if string
-      (str-utils/re-gsub #"[_-]" " " (str-keyword string))
-      string))
+  (if string
+    (str-utils/re-gsub #"[_-]" " " (str-keyword string))
+    string))
 
 (defn md5-sum
   "Compute the hex MD5 sum of a list of strings."
@@ -92,7 +93,7 @@ separate the key from the value." }
   ([string separator equals-separator]
     (if (and string separator equals-separator)
       (reduce 
-        (fn [new-map pair] (assoc new-map (first pair) (second pair)))
+        (fn [new-map pair] (assoc new-map (.trim (first pair)) (second pair)))
         {}
         (map 
           #(filter 
@@ -144,3 +145,22 @@ Otherwise, this method simply returns the given word." }
 #^{ :doc "Converts the given string human readable format then title cases the result." }
   human-title-case [string]
   (title-case (human-readable string)))
+
+(defn
+#^{ :doc "Tokenizes the given string into a seq." }
+  tokenize 
+  ([string] 
+    (if string (enumeration-seq (new StringTokenizer string))))
+  ([string delimiters] 
+    (if string (enumeration-seq (new StringTokenizer string delimiters))))
+  ([string delimiters return-delimiters?]
+    (if string (enumeration-seq (new StringTokenizer string delimiters return-delimiters?)))))
+
+(defn
+#^{ :doc "Strips the quotes from around the given string if they exist." }
+  strip-quotes [string]
+  (if string
+    (let [last-char-index (dec (.length string))]
+      (if (and (= (.substring string 0 1) "\"") (= (.substring string last-char-index) "\""))
+        (.substring string 1 last-char-index)
+        string))))

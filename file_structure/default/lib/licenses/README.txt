@@ -32,6 +32,7 @@ MIT License duelinmarkers
  
 MIT License
  jopt-simple-3.1.jar
+ jquery-1.3.2.min.js
 
 
 Eclipse Public License

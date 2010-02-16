@@ -4,6 +4,7 @@
            [java.util Calendar TimeZone]
            [org.apache.commons.lang StringEscapeUtils])
   (:require [clojure.contrib.str-utils :as str-utils]
+            [clojure.contrib.logging :as logging]
             [conjure.util.string-utils :as conjure-str-utils]))
 
 (defn
@@ -116,3 +117,63 @@ value is nil, then this function returns nil."}
 		  		(. gmt-calendar setTime date)
 		  		(. gmt-calendar getTime)))
 	  " GMT"))
+
+(defn
+#^{ :doc "Strips quotes from all of the values in the given map." }
+  strip-map-value-quotes [map-to-strip]
+  (reduce 
+    (fn [new-map [key-name value]]
+      (assoc new-map key-name (conjure-str-utils/strip-quotes value)))
+    {}
+    map-to-strip))
+
+(defn
+#^{ :doc "Parses a content line and adds it into the given content map. The key for the given line in the content-map is
+the name of the attribute." }
+  parse-content-line [content-map content-line]
+  (if content-line
+    (let [colon-index (.indexOf content-line ":")]
+      (if (> colon-index 0) 
+        (assoc content-map (.substring content-line 0 colon-index)
+          (strip-map-value-quotes 
+            (conjure-str-utils/str-to-map (.substring content-line (inc colon-index)))))))))
+
+(defn
+#^{ :doc "Converts the given multipart form data into a tree of maps." }
+  split-multipart-form [string boundary]
+  (let [full-boundary (str "--" boundary)]
+    (filter 
+      (fn [item] 
+        (not (or (= item full-boundary) (.startsWith item "--")))) ;(= (.length item) 0)
+      (str-utils/re-partition 
+        (re-pattern full-boundary) 
+        string))))
+
+(declare multipart-form-part)
+
+(defn
+#^{ :doc "Parses the data in data-lines and adds the data under the key :data in content-map and returns the result." }
+  parse-data [content-map data-lines]
+  (let [data (str-utils/str-join "\r\n" data-lines)
+        content-type-map (get content-map "Content-Type")]
+    (assoc content-map :data 
+      (if (or (contains? content-type-map "multipart/mixed") (contains? content-type-map "multipart/form-data")) 
+        (map multipart-form-part 
+          (drop 1 (split-multipart-form data (get content-type-map "boundary"))))
+        data))))
+
+(defn
+#^{ :doc "Converts the given multipart form part into a map with keys: :content-disposition, :content-type, and :data.
+The values of :content-disposition and :content-type are maps. The value of data is the actual data of a part, If the 
+part is also a multipart, then data is a mulipart form map built by multipart-form-data." }
+  multipart-form-part [string]
+  (let [lines (drop-while empty? (if string (.split string "\\r\\n") []))
+        content-lines (take-while #(> (.length %) 0) lines)
+        content-map (reduce parse-content-line {} content-lines)] 
+    (parse-data content-map (drop (inc (count content-map)) lines))))
+
+(defn
+#^{ :doc "Converts the given multipart form data into a tree of maps." }
+  multipart-form-data [string boundary]
+  (map multipart-form-part 
+    (drop 1 (split-multipart-form string boundary))))

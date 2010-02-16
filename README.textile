@@ -20,6 +20,10 @@ Conjure was created by "Matthew Courtney":http://github.com/macourtney, with spe
 * "Robert Postill":http://github.com/robertpostill
 * "Stuart Halloway":http://github.com/stuarthalloway
 
+Conjure default web design by "Nuvio":http://www.nuvio.cz/
+
+Conjure bunny logo by Chris Bailey
+
 h2. License
 
 Copyright (c) 2009 Matthew Courtney and released under the Apache 2.0 license.

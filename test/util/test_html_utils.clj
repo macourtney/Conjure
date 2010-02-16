@@ -1,4 +1,5 @@
 (ns test.util.test-html-utils
+  (:import [java.util Calendar])
   (:use clojure.contrib.test-is
         conjure.util.html-utils))
 
@@ -63,3 +64,82 @@
   (is (= "baz=\"biz\" boz=\"buz\" foo=\"bar\"" (attribute-list-str { :baz "biz", :boz "buz", :foo "bar" })))
   (is (= "" (attribute-list-str { })))
   (is (= "" (attribute-list-str nil))))
+
+(deftest test-format-cookie-date
+  (is (= "Tue, 16-Feb-2010 10:30:25 GMT" 
+    (format-cookie-date 
+      (.getTime 
+        (doto (. Calendar getInstance) 
+          (.set 2010 1 16 10 30 25)))))))
+
+(deftest test-multipart-form-part
+  (is (= { "Content-Disposition" { "filename" "file1.txt", "name" "files", "form-data" nil },
+           "Content-Type" { "text/plain" nil }
+           :data "Blah" } 
+    (multipart-form-part 
+      "Content-Disposition: form-data; name=\"files\"; filename=\"file1.txt\"\r\nContent-Type: text/plain\r\n\r\nBlah")))
+  (is (= { "Content-Disposition" { "form-data" nil, "name" "submit-name" },
+           :data "Larry" } 
+    (multipart-form-part 
+      "Content-Disposition: form-data; name=\"submit-name\"\r\n\r\nLarry"))))
+
+(deftest test-multipart-form-data
+  (is (= 
+    [ { :data "Larry"
+        "Content-Disposition" { "form-data" nil, "name" "submit-name" } }
+    
+      { :data "contents of file1.txt"
+        "Content-Disposition" { "form-data" nil, "name" "files", "filename" "file1.txt" }
+        "Content-Type" { "text/plain" nil } } ]
+    (multipart-form-data 
+"Content-Type: multipart/form-data; boundary=AaB03x\r
+\r
+--AaB03x\r
+Content-Disposition: form-data; name=\"submit-name\"\r
+\r
+Larry\r
+--AaB03x\r
+Content-Disposition: form-data; name=\"files\"; filename=\"file1.txt\"\r
+Content-Type: text/plain\r
+\r
+contents of file1.txt\r
+--AaB03x--" "AaB03x")))
+  (is (= 
+    [ { :data "Larry"
+        "Content-Disposition" { "form-data" nil, "name" "submit-name" } }
+    
+      { :data 
+          [ { :data "contents of file1.txt"
+              "Content-Type" { "text/plain" nil }
+              "Content-Disposition" { "file" nil, "filename" "file1.txt" } }
+              
+            { :data "contents of file2.gif"
+              "Content-Type" { "image/gif" nil }
+              "Content-Transfer-Encoding" { "binary" nil }
+              "Content-Disposition" { "file" nil, "filename" "file2.gif" } } ]
+        "Content-Type" { "multipart/mixed" nil, "boundary" "BbC04y" }
+        "Content-Disposition" { "form-data" nil, "name" "files" } } ]
+    (multipart-form-data 
+"Content-Type: multipart/form-data; boundary=AaB03x\r
+\r
+--AaB03x\r
+Content-Disposition: form-data; name=\"submit-name\"\r
+\r
+Larry\r
+--AaB03x\r
+Content-Disposition: form-data; name=\"files\"\r
+Content-Type: multipart/mixed; boundary=BbC04y\r
+\r
+--BbC04y\r
+Content-Disposition: file; filename=\"file1.txt\"\r
+Content-Type: text/plain\r
+\r
+contents of file1.txt\r
+--BbC04y\r
+Content-Disposition: file; filename=\"file2.gif\"\r
+Content-Type: image/gif\r
+Content-Transfer-Encoding: binary\r
+\r
+contents of file2.gif\r
+--BbC04y--\r
+--AaB03x--" "AaB03x"))))

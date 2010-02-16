@@ -101,3 +101,19 @@
   (is (= (title-case "foo 1 bar") "Foo 1 Bar"))
   (is (= (title-case "") ""))
   (is (= (title-case nil) nil)))
+
+(deftest test-human-title-case
+  (is (= (human-title-case "foo") "Foo"))
+  (is (= (human-title-case "foo-bar") "Foo Bar"))
+  (is (= (human-title-case "foo_bar") "Foo Bar"))
+  (is (= (human-title-case "") ""))
+  (is (= (human-title-case nil) nil)))
+  
+(deftest test-tokenize
+  (is (= (tokenize "foo bar") ["foo" "bar"]))
+  (is (= (tokenize "foo-bar" "-") ["foo" "bar"]))
+  (is (= (tokenize "foo-bar|baz" "-|") ["foo" "bar" "baz"]))
+  (is (= (tokenize "foo-bar-baz" "-" true) ["foo" "-" "bar" "-" "baz"]))
+  (is (= (tokenize "foo-bar-baz" "-" false) ["foo" "bar" "baz"]))
+  (is (= (tokenize "") nil))
+  (is (= (tokenize nil) nil)))
