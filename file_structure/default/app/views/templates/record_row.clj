@@ -17,6 +17,6 @@
             { :update (success-fn row-id :remove)
               :confirm (confirm-fn (str "Are you sure you want to delete the record with id: " (:id record)))
               :action "ajax-delete"
-              :id record
+              :params { :id record }
               :html-options
-                { :href (view-utils/url-for request-map { :action "delete-warning", :id record }) } })]])))
+                { :href (view-utils/url-for request-map { :action "delete-warning", :params { :id record } }) } })]])))

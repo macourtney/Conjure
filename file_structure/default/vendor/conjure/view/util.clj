@@ -115,7 +115,7 @@ the given request-map." }
 #^{:doc "Returns the value of :id from the given parameters. If the value of :id is a map, then this method returns the
 value of :id in the map. This method is used by url-for to get the id from from the params passed to it."}
   id-from [params]
-  (let [id (:id params)]
+  (let [id (:id (:params params))]
     (if (and id (map? id))
       (:id id)
       id)))
@@ -156,7 +156,7 @@ to it." }
   ([params]
   (let [controller (conjure-str-utils/str-keyword (:controller params))
         action (conjure-str-utils/str-keyword (:action params))
-        url-params (or (:params params) {})
+        url-params (or (dissoc (:params params) :id) {})
         session-id (session-utils/session-id params)]
     (if (and controller action)
       (apply str 

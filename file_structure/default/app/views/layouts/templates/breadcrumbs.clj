@@ -20,7 +20,7 @@
             (html/htmli
               (link-to 
                 [:strong (conjure-str-utils/human-title-case original-action)] 
-                { :controller original-controller, :action original-action, :id id })
+                { :controller original-controller, :action original-action, :params { :id id } })
               " &gt; " [:strong id])
             (link-to 
               [:strong (conjure-str-utils/human-title-case original-action)] 

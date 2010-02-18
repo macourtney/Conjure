@@ -9,6 +9,6 @@
       [:h2 (or (:name record) (str "Deleting " (:id record)))]
       [:p "Are you sure you want to delete this record?"]
       (record-view/render-view request-map table-metadata record)
-      (button-to "Delete" request-map { :action "delete", :id record })
+      (button-to "Delete" request-map { :action "delete", :params { :id record } })
       "&nbsp;"
       (link-to "Cancel" { :action "list-records", :controller (:controller request-map) })]))

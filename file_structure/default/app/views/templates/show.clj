@@ -11,4 +11,4 @@
       (record-view/render-view request-map table-metadata record)
       (link-to "List" { :action "list-records" :controller (:controller request-map) })
       "&nbsp;"
-      (link-to "Edit" { :action "edit", :id record, :controller (:controller request-map) })]))
+      (link-to "Edit" { :controller (:controller request-map), :action "edit", :params { :id record } })]))

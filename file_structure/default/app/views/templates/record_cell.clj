@@ -13,10 +13,10 @@
           (link-to-remote (helpers/h record-id) request-map 
             { :update (success-fn (str "row-" record-id) :replace)
               :action "ajax-show"
-              :id record-id
+              :params { :id record-id }
               :html-options
                 { :href (view-utils/url-for request-map  
-                          { :action "show", :id (:id record) }) } })]
+                          { :action "show", :params { :id (:id record) } }) } })]
         (let [record-key-str (conjure-str-utils/str-keyword record-key)]
           (if (. record-key-str endsWith "_id")
             (let [belongs-to-model (conjure-str-utils/strip-ending record-key-str "_id")

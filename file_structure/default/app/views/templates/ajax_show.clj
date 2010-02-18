@@ -15,9 +15,9 @@
             (link-to-remote "Edit" request-map
               { :update (success-fn row-id :replace)
                 :action "ajax-edit"
-                :id record })
+                :params { :id record } })
             "&nbsp;"
             (link-to-remote "Hide" request-map
               { :update (success-fn row-id :replace)
                 :action "ajax-row"
-                :id record })]]])))
+                :params { :id record } })]]])))

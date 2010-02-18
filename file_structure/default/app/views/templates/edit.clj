@@ -14,4 +14,4 @@
           (record-form/render-view request-map table-metadata record)
           (form-button "Save")
           "&nbsp;"
-          (link-to "Cancel" request-map { :action "show", :id record } )))]))
+          (link-to "Cancel" request-map { :action "show", :params { :id record } } )))]))
