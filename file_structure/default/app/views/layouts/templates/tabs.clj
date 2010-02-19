@@ -3,21 +3,32 @@
   (:require [clj-html.core :as html]
             [conjure.view.util :as view-util]))
 
+(defn
+#^{ :doc "Generates the clj-html structure for a given tab map." } 
+  generate-tab [tab-map original-request-map]
+  (let [location-controller (:controller original-request-map)
+        tab-controller (or (:controller (:url-for tab-map)) location-controller)
+        tab-url 
+            (or 
+              (:url tab-map) 
+              (if (:url-for tab-map) 
+                (view-util/url-for original-request-map (:url-for tab-map))))]
+    [:li 
+      { :id 
+          (if 
+            (or 
+              (:is-active tab-map) 
+              (and tab-controller location-controller (= tab-controller location-controller)))
+            "active") }
+
+      [:a { :href (or tab-url "#") } 
+        (or (:text tab-map) "Tab") "<span class=\"tab-l\"></span><span class=\"tab-r\"></span>"]]))
+
 (defview [tabs]
-  (let [original-request-map (:layout-info request-map)
-        location-controller (:controller original-request-map)]
-    (html/html
-      [:div { :id "tabs", :class "noprint" }
-        [:h3 { :class "noscreen" } "Navigation"]
-        [:ul { :class "box" }
-          (html/htmli
-            (map 
-              (fn [tab] 
-                (let [tab-controller (or (:controller (:url-for tab)) location-controller)
-                      tab-url (or (:url tab) (if (:url-for tab) (view-util/url-for (dissoc original-request-map :params) (:url-for tab))))]
-                  [:li { :id (if (or (:is-active tab) (if (and tab-controller location-controller) (= tab-controller location-controller))) "active") } 
-                    [:a { :href (or tab-url "#") } 
-                      (or (:text tab) "Tab") "<span class=\"tab-l\"></span><span class=\"tab-r\"></span>"]]))
-              tabs))]
-  
-        [:hr { :class "noscreen" }]])))
+  (html/html
+    [:div { :id "tabs", :class "noprint" }
+      [:h3 { :class "noscreen" } "Navigation"]
+      [:ul { :class "box" }
+        (html/htmli (map #(generate-tab % (:layout-info request-map)) tabs))]
+
+      [:hr { :class "noscreen" }]]))
