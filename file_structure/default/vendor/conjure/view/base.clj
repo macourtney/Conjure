@@ -217,19 +217,31 @@ option names to option-tag option maps."}
     :name (name-value (conjure-str-utils/str-keyword record-name) (conjure-str-utils/str-keyword key-name))))
 
 (defn
-#^{ :doc "Returns record-key if the value of record-key in option-map equals record-value. If option-map does not 
-contain record-key then this method returns record-key if record-key equals record-value." }
+#^{ :doc "Returns option-key if the value of option-key in option-map equals value. If option-map does not 
+contain option-key then this method returns option-key if option-key equals value." }
   is-value-key? [option-map option-key value]
-  (if (= (or (get option-map option-key) (conjure-str-utils/str-keyword option-key)) value)
-    option-key
-    nil))
+  (let [map-value (get option-map option-key)
+        final-map-value (if (map? map-value) (:value map-value) map-value)]
+    (if (= (or final-map-value (conjure-str-utils/str-keyword option-key)) value)
+      option-key
+      nil)))
 
 (defn
 #^{ :doc "Augments the given option-map setting selected for the option with the value of record-value." }
   option-map-select-value [option-map value]
   (let [option-key (some #(is-value-key? option-map % value) (keys option-map))]
     (if option-key
-      (assoc option-map option-key (assoc (or (get option-map option-key) { :value (conjure-str-utils/str-keyword option-key) } ) :selected true))
+      (let [map-value (get option-map option-key)
+            final-map-value 
+              (if (and map-value (not (map? map-value)))
+                { :value map-value } 
+                map-value)]
+        (assoc option-map option-key 
+          (assoc 
+            (or final-map-value 
+              { :value (conjure-str-utils/str-keyword option-key) } ) 
+              :selected 
+              true)))
       option-map)))
 
 (defn

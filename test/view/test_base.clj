@@ -140,7 +140,29 @@
       { :option-map 
         { :bar nil
           :baz nil
-          :boz nil } }))))
+          :boz nil } })))
+  (is (= 
+    (htmli 
+      [:select { :name "foo[bar]" } 
+        [:option { :value "bar" } "bar"]
+        [:option { :selected "true", :value "baz" } "baz"]
+        [:option { :value "boz" } "boz"]])
+    (select-tag { :bar "baz" } :foo :bar
+      { :option-map 
+        { :bar "bar"
+          :baz "baz"
+          :boz "boz" } })))
+  (is (= 
+    (htmli 
+      [:select { :name "foo[bar]" } 
+        [:option { :value "bar" } "bar"]
+        [:option { :selected "true", :value "baz" } "baz"]
+        [:option { :value "boz" } "boz"]])
+    (select-tag { :bar "baz" } :foo :bar
+      { :option-map 
+        { :bar { :value "bar" }
+          :baz { :value "baz" }
+          :boz { :value "boz" } } }))))
           
 (deftest test-option-map-select-value
   (is (= { :bar nil
