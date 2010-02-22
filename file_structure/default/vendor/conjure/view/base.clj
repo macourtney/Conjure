@@ -265,7 +265,7 @@ Supported options:
   ([text request-map params] (button-to text (view-utils/merge-url-for-params request-map params)))
   ([text params]
     (form-for { :url params }
-      (form-button text (:html-options params)))))
+      (form-button (evaluate-if-fn text params) (:html-options params)))))
 
 (defn-
 #^{ :doc "Replaces the current extension on source with the given extension." }
