@@ -480,7 +480,8 @@ id based on position. Position can be one of the following:
   :before - Adds the content before success-id
   :after - Adds the content after success-id
   :top - Adds the content in the first position in success-id
-  :bottom - Adds the content in the last position in success-id" }
+  :bottom - Adds the content in the last position in success-id
+  :remove - Removes success-id" }
   success-fn 
   ([success-id] (success-fn success-id :content))
   ([success-id position]
