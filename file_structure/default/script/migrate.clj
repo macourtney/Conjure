@@ -1,5 +1,6 @@
 (ns migrate
-  (:require [conjure.migration.runner :as runner]
+  (:require [clojure.contrib.command-line :as command-line]
+            [conjure.migration.runner :as runner]
             [conjure.server.server :as server]))
 
 (defn 
@@ -9,17 +10,19 @@
 
 (defn
 #^{:doc "Gets the version number from the passed in version parameter. If the given version string is nil, then this method returns Integer.MAX_VALUE. If the version parameter is invalid, then this method prints an error and returns nil."}
-  version-number [version-string]
-  (if version-string
-    (let [version-sequence (re-find #"^VERSION=([0-9]+)" version-string)]
-      (if (and version-sequence (seq version-sequence))
-        (. Integer parseInt (nth version-sequence 1))
-        (do 
-          (println "Invalid parameter:" version-string)
-          nil)))
+  version-number [version]
+  (if version
+    (if (string? version)
+      (. Integer parseInt version)
+      version)
     (. Integer MAX_VALUE)))
 
-(let [version (first *command-line-args*)]
-  (do
-    (server/init)
-    (runner/update-to-version (version-number version))))
+(command-line/with-command-line *command-line-args*
+  "./run.sh script/migrate.clj [options]"
+  [ [version "The version to migrate to. Example: -version 0 -> migrates to version 2." nil]
+    [mode "The server mode. For example, development, production, or test." nil]
+    remaining]
+
+  (server/set-mode mode)
+  (server/init)
+  (runner/update-to-version (version-number version)))

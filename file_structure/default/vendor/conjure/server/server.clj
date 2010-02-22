@@ -1,16 +1,19 @@
 (ns conjure.server.server
   (:import [java.util Date])
-  (:require http-config
-            routes
-            session-config
-            [conjure.util.loading-utils :as loading-utils]
-            [conjure.model.database :as database]
-            [conjure.controller.util :as controller-util]
-            [conjure.view.util :as view-util]
-            [conjure.util.html-utils :as html-utils]
-            [conjure.util.session-utils :as session-utils]
+  (:require [clojure.contrib.java-utils :as java-utils]
+            [clojure.contrib.logging :as logging]
             [clojure.contrib.str-utils :as str-utils]
-            [clojure.contrib.logging :as logging]))
+            [conjure.controller.util :as controller-util]
+            [conjure.model.database :as database]
+            [conjure.util.html-utils :as html-utils]
+            [conjure.util.loading-utils :as loading-utils]
+            [conjure.util.session-utils :as session-utils]
+            [conjure.util.string-utils :as conjure-str-utils]
+            [conjure.view.util :as view-util]
+            environment
+            http-config
+            routes
+            session-config))
 
 (def initialized? (ref false))
 
@@ -123,3 +126,11 @@ response map.. If the request-map is nil, this function does nothing and returns
 #^{ :doc "Gets the user configured database properties." }
   db-config []
   database/conjure-db)
+
+(defn
+#^{ :doc "Sets the server mode to the given mode. The given mode must be a keyword or string like development, 
+production, or test." }
+  set-mode [mode]
+  (if mode 
+    (java-utils/set-system-properties 
+      { environment/conjure-environment-property (conjure-str-utils/str-keyword mode) })))
