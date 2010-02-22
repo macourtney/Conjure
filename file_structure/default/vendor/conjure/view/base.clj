@@ -544,8 +544,8 @@ plus:
      
 If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
 and params, text is called with request-map and params merged (not all keys used from request-map)." }
-  link-to-remote 
-  ([text request-map params] (link-to-remote text (view-utils/merge-url-for-params request-map params)))
+  ajax-link-to
+  ([text request-map params] (ajax-link-to text (view-utils/merge-url-for-params request-map params)))
   ([text params]
     (let [html-options (or (:html-options params) {})
           id (or (:id html-options) (str "id-" (rand-int 1000000)))
@@ -580,9 +580,9 @@ plus:
      
 If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
 and params, text is called with request-map and params merged (not all keys used from request-map)." }
-  remote-form-for
+  ajax-form-for
   ([request-map options body] 
-    (remote-form-for (assoc options :url (view-utils/merge-url-for-params request-map (:url options))) body))
+    (ajax-form-for (assoc options :url (view-utils/merge-url-for-params request-map (:url options))) body))
   ([options body]
     (let [html-options (or (:html-options options) {})
           id (or (:id html-options) (str "id-" (rand-int 1000000)))

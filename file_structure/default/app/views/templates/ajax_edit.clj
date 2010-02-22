@@ -12,7 +12,7 @@
         [:td { :colspan column-count }
           [:div { :id (str "show-div-" (:id record)) }
             [:h3 (or (helpers/h (:name record)) (str "Editing a " (conjure-str-utils/human-title-case model-name)))]
-            (remote-form-for request-map 
+            (ajax-form-for request-map 
                 { :name "ajax-save", 
                   :url { :action "ajax-save" }, 
                   :update (success-fn row-id :replace) }
@@ -21,7 +21,7 @@
                 (record-form/render-view request-map table-metadata record)
                 (form-button "Save")
                 "&nbsp;"
-                (link-to-remote "Hide" request-map
+                (ajax-link-to "Hide" request-map
                   { :update (success-fn row-id :replace)
                     :action "ajax-row"
                     :params { :id record } })))]]])))

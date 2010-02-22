@@ -22,7 +22,7 @@
           (record-row/render-view request-map table-metadata record))]
       [:div { :id "add" }
         [:div { :id "add-form", :style "display: none" }
-          (remote-form-for request-map 
+          (ajax-form-for request-map 
             { :name "record",
               :url { :action "ajax-add" },
               :update '(addFormSuccess "#list-table" "#add-link" "#add-form") }

@@ -10,7 +10,7 @@
     (html/htmli
       (if (= :id record-key)
         [:td 
-          (link-to-remote (helpers/h record-id) request-map 
+          (ajax-link-to (helpers/h record-id) request-map 
             { :update (success-fn (str "row-" record-id) :replace)
               :action "ajax-show"
               :params { :id record-id }

@@ -10,6 +10,6 @@
     [:div { :class "article" }
       [:h2 (or (helpers/h (:name record)) (str "Showing a " (conjure-str-utils/human-title-case model-name)))]
       (record-view/render-view request-map table-metadata record)
-      (link-to "List" { :action "list-records" :controller (:controller request-map) })
+      (link-to "List" request-map { :action "list-records" })
       "&nbsp;"
-      (link-to "Edit" { :controller (:controller request-map), :action "edit", :params { :id record } })]))
+      (link-to "Edit" request-map { :action "edit", :params { :id record } })]))

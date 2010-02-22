@@ -13,7 +13,7 @@
             #(record-cell/render-view request-map record %) 
             (map #(keyword (. (get % :column_name) toLowerCase)) table-metadata)))
         [:td 
-          (link-to-remote "Delete" request-map 
+          (ajax-link-to "Delete" request-map 
             { :update (success-fn row-id :remove)
               :confirm (confirm-fn (str "Are you sure you want to delete the record with id: " (:id record)))
               :action "ajax-delete"

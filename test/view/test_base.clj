@@ -373,7 +373,7 @@
 (deftest test-error-fn
   (is (= 'ajaxError (error-fn))))
 
-(deftest test-link-to-remote
+(deftest test-ajax-link-to
   (let [ajax-map { :type "POST"
                    :url "/home/index"
                    :dataType "html"
@@ -391,16 +391,16 @@
                           :html-options { :id "test-id" } }]
     (is (= 
       (htmli a-tag script-tag)
-      (link-to-remote "update" link-to-options)))
+      (ajax-link-to "update" link-to-options)))
     (is (= 
       (htmli a-tag
         [:script { :type "text/javascript" }
           (scriptjure/js 
             (ajaxClick "#test-id" (clj (assoc ajax-map :type "GET"))))])
-      (link-to-remote "update" (assoc link-to-options :method "GET"))))
+      (ajax-link-to "update" (assoc link-to-options :method "GET"))))
     (is (= 
       (htmli a-tag script-tag)
-      (link-to-remote "update" (assoc link-to-options :update { :success 'successFunction }))))
+      (ajax-link-to "update" (assoc link-to-options :update { :success 'successFunction }))))
     (is (= 
       (htmli 
         [:a { :href "/noscript/update", :id "test-id"}
@@ -408,7 +408,7 @@
         [:script { :type "text/javascript" }
           (scriptjure/js 
             (ajaxClick "#test-id" (clj (assoc ajax-map :error 'errorFunction))))])
-      (link-to-remote "update" 
+      (ajax-link-to "update" 
         (merge 
           link-to-options 
           { :update { :success 'successFunction, 
@@ -416,7 +416,7 @@
             :html-options { :id "test-id", 
                             :href "/noscript/update" } }))))))
 
-(deftest test-remote-form-for
+(deftest test-ajax-form-for
   (let [form-map { :action "/home/index", :id "test-id", :method "post", :name "home" }
         form-tag [:form form-map
                    [:input { :type "submit", :value "Submit" } ]]
@@ -436,13 +436,13 @@
         form-for-body (form-button "Submit")]
     (is (=
       (htmli form-tag script-tag)
-      (remote-form-for form-for-options form-for-body)))
+      (ajax-form-for form-for-options form-for-body)))
     (is (=
       (htmli form-tag 
         [:script { :type "text/javascript" }
          (scriptjure/js 
            (ajaxSubmit "#test-id" (clj (assoc ajax-map :type "GET"))))])
-      (remote-form-for (assoc form-for-options :method "GET") form-for-body)))
+      (ajax-form-for (assoc form-for-options :method "GET") form-for-body)))
     (is (=
       (htmli 
         [:form (merge form-map { :name "noscript-update", :action "/noscript/update" })
@@ -450,7 +450,7 @@
         [:script { :type "text/javascript" }
          (scriptjure/js 
            (ajaxSubmit "#test-id" (clj (assoc ajax-map :error 'errorFunction))))])
-      (remote-form-for 
+      (ajax-form-for 
         (merge form-for-options 
           { :name "noscript-update"
             :update { :success 'successFunction, 
