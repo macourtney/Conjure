@@ -5,6 +5,7 @@
             [conjure.util.session-utils :as session-utils]
             [conjure.util.string-utils :as conjure-str-utils]
             [clojure.contrib.logging :as logging]
+            [clojure.contrib.ns-utils :as ns-utils]
             [clojure.contrib.seq-utils :as seq-utils]
             session-config))
 
@@ -63,7 +64,7 @@
   (let [view-namespace (request-view-namespace request-map)]
     (logging/debug (str "Rendering view: " view-namespace))
     (apply
-      (eval (read-string (str view-namespace "/render-view")))
+      (ns-resolve (ns-utils/get-ns (symbol view-namespace)) (symbol "render-view"))
       request-map params)))
 
 (defn-
