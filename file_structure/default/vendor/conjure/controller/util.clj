@@ -77,14 +77,19 @@
         (str (controller-namespace controller) "/" action)))))
 
 (defn
+#^{ :doc "Returns the action function for the controller and action listed in the given request-map." }
+  find-action-fn [request-map]
+  (ns-resolve 
+    (ns-utils/get-ns (symbol (controller-namespace (:controller request-map))))
+    (symbol (:action request-map))))
+
+(defn
 #^{ :doc "Calls the given controller with the given request map returning the response." }
   call-controller [request-map]
   (let [controller-file (controller-file-name request-map)]
     (when (and controller-file (controller-exists? controller-file))
-      (let [action (fully-qualified-action request-map)]
-        (logging/debug (str "Running action: " action))
-        (load-controller controller-file)
-        (if (ns-resolve 
-              (ns-utils/get-ns (symbol (controller-namespace (:controller request-map))))
-              (symbol (:action request-map)))
-          ((load-string action) request-map))))))
+      (logging/debug (str "Running action: " (fully-qualified-action request-map)))
+      (load-controller controller-file)
+      (let [action-fn (find-action-fn request-map)]
+        (if action-fn
+          (action-fn request-map))))))
