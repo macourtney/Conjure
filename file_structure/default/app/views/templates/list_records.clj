@@ -24,7 +24,7 @@
         [:div { :id "add-form", :style "display: none" }
           (ajax-form-for request-map 
             { :name "record",
-              :url { :action "ajax-add" },
+              :action "ajax-add",
               :update '(addFormSuccess "#list-table" "#add-link" "#add-form") }
             (str 
               (record-form/render-view request-map table-metadata {})

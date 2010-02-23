@@ -14,7 +14,7 @@
             [:h3 (or (helpers/h (:name record)) (str "Editing a " (conjure-str-utils/human-title-case model-name)))]
             (ajax-form-for request-map 
                 { :name "ajax-save", 
-                  :url { :action "ajax-save" }, 
+                  :action "ajax-save", 
                   :update (success-fn row-id :replace) }
               (str
                 (hidden-field record :record :id)

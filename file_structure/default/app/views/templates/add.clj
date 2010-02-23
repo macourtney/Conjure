@@ -9,7 +9,7 @@
   (html/html
     [:div { :class "article" }
       [:h2 (str "Add a " (conjure-str-utils/human-title-case model-name))]
-      (form-for request-map { :name "create", :url { :action "create" } }
+      (form-for request-map { :name "create", :action "create" }
         (str
           (record-form/render-view request-map table-metadata {})
           (form-button "Create")

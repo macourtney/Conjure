@@ -26,18 +26,26 @@ function." }
     function))
 
 (defn
+#^{ :doc "Returns the attributes for the link tag (\"a\" tag) from the given request-map." }
+  a-attributes [request-map]
+  (let [html-options (or (:html-options request-map) {})]
+    (if (:href html-options)
+      html-options
+      (assoc html-options :href (view-utils/url-for request-map)))))
+
+(defn
 #^{ :doc 
 "Returns a link for the given text and parameters using url-for. Params has the same valid parameters as url-for, plus:
 
-     :html-options - a map of html attributes to add to the anchor tag.
+     :html-options - a map of html attributes to add to the anchor tag. If html-options contains a :href key, the value 
+                     override the href generated from params.
      
 If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
 and params, text is called with request-map and params merged (not all keys used from request-map)." }
   link-to
   ([text request-map params] (link-to text (view-utils/merge-url-for-params request-map params)))
-  ([text params]
-    (let [html-options (or (:html-options params) {})]
-      (htmli [:a (assoc html-options :href (view-utils/url-for params)) (evaluate-if-fn text params)]))))
+  ([text request-map]
+    (htmli [:a (a-attributes request-map) (evaluate-if-fn text request-map)])))
 
 (defn
 #^{:doc "If condition is true, then call link-to with the given text, request-map and params. If condition is false, 
@@ -45,10 +53,10 @@ then just return text. If condition is a function, it is evaluated with params m
 function, it is evaluated with params merged with request-map (just like link-to)." }
   link-to-if
   ([condition text request-map params] (link-to-if condition text (view-utils/merge-url-for-params request-map params)))
-  ([condition text params]
-    (if (evaluate-if-fn condition params)
-      (link-to text params)
-      (evaluate-if-fn text params))))
+  ([condition text request-map]
+    (if (evaluate-if-fn condition request-map)
+      (link-to text request-map)
+      (evaluate-if-fn text request-map))))
 
 (defn-
 #^{:doc "Inverses the results of condition. If condition is a function, then this method creates a new function which 
@@ -63,35 +71,32 @@ wraps condition, forwarding any parameters to it, but inversing the result." }
 created to wrap it, and simply inverse the result of condition." }
   link-to-unless
     ([condition text request-map params] (link-to-if (inverse-condition condition) text request-map params))
-    ([condition text params] (link-to-if (inverse-condition condition) text params)))
+    ([condition text request-map] (link-to-if (inverse-condition condition) text request-map)))
 
 (defn
 #^{:doc 
-"Creates a form tag block from the given options and with the given body. If the request-map is given, it is merged into
-the url options map.
+"Creates a form tag block from the given options and with the given body. If options is given, it is merged into
+the request-map.
 
-If body is a function, it is passed the url options after being merged with the given request-map.
+If body is a function, it is passed the request-map after being merged with the given options.
 
-Valid options:    
+Options has the same options as url-for plus the following options:    
     :name - The key for the params map passed to the target url. If name is not given, then the value of :controller in
         the url map is used. If :controller is not given in the url map, then \"record\" is used. 
-    :url - A map or string for the target url of the form. If :url is a map then it uses the same options as url-for.
-        If :url is a string, then it is assumed to be the specific url target.
     :html-options - The html attributes for the form tag." }
   form-for 
-  ([request-map options body] (form-for (assoc options :url (view-utils/merge-url-for-params request-map (:url options))) body))
-  ([options body]
-    (let [html-options (:html-options options)
-          url-options (:url options)
-          action (if (map? url-options) (view-utils/url-for url-options) url-options)]
+  ([request-map options body] (form-for (view-utils/merge-url-for-params request-map options) body))
+  ([request-map body]
+    (let [html-options (:html-options request-map)
+          action (or (:action html-options) (view-utils/url-for request-map))]
       (htmli 
         [:form 
           (merge 
             html-options
             { :method (or (:method html-options) "post"), 
               :action action,
-              :name (or (:name options) (:controller url-options) "record") })
-          (evaluate-if-fn body url-options)]))))
+              :name (or (:name request-map) (:controller request-map) "record") })
+          (evaluate-if-fn body request-map)]))))
 
 (defn-
 #^{:doc "Returns the id value for the given record name and key name. Note, both record-name-str and key-name-str must 
@@ -258,14 +263,12 @@ contain option-key then this method returns option-key if option-key equals valu
 #^{ :doc "Creates a form with a single input of type button for use when you only need a button somewhere.
 
 Supported options:
-
-  :url - The url map used by form-for
   :html-options - The html options of the button." }
   button-to 
   ([text request-map params] (button-to text (view-utils/merge-url-for-params request-map params)))
-  ([text params]
-    (form-for { :url params }
-      (form-button (evaluate-if-fn text params) (:html-options params)))))
+  ([text request-map]
+    (form-for (dissoc request-map :html-options)
+      (form-button (evaluate-if-fn text request-map) (:html-options request-map)))))
 
 (defn-
 #^{ :doc "Replaces the current extension on source with the given extension." }
@@ -502,19 +505,17 @@ id based on position. Position can be one of the following:
 #^{ :doc "Generates the ajax map for the given params. Valid params are:
 
     :method - The method to use for the ajax call. Default is \"POST\"
-    :url - A map or string for the url to target. If :url is a string, then it is used as the target url. If it is a 
-           map, the value of :url is passed to conjure.view.util/url-for.
+    :ajax-url - The url for the ajax request to call instead of creating a url from the given controller and action.
     :update - A scriptjure function or a map. If it is a function, then it is called when the ajax request returns with 
               success. If it is a map, then the scriptjure function value of :success is called when the ajax request 
               returns successfully, and the scriptjure function value of :error is called when the ajaz request fails." }
-  ajax-map [params]
-  (let [ajax-type (or (:method params) "POST")
-        url-params (:url params)
-        url (if (map? url-params) (view-utils/url-for url-params) url-params)
-        update (:update params)
+  ajax-map [request-map]
+  (let [ajax-type (or (:method request-map) "POST")
+        url (or (:ajax-url request-map) (view-utils/url-for request-map))
+        update (:update request-map)
         success-fn (if (map? update) (:success update) update)
         error-fn (if (and (map? update) (contains? update :error)) (:error update) (error-fn))
-        confirm-fn (:confirm params)]
+        confirm-fn (:confirm request-map)]
 
     (scriptjure/quasiquote 
       { :type (clj ajax-type)
@@ -524,17 +525,13 @@ id based on position. Position can be one of the following:
         :error (clj error-fn)
         :confirm (clj confirm-fn) })))
 
-(defn-
-#^{ :doc "Generates the link-to-remote onclick function." }
-  link-to-remote-onclick [params]
-    (ajax-map (assoc params :url params)))
-
 (defn 
 #^{ :doc 
 "Returns an ajax link for the given text and parameters using url-for. Params has the same valid parameters as url-for, 
 plus:
 
-     :update - The id of the element to update. If the value is a map then it looks for the following keys: 
+     :update - A map or a function. If the value is a function, then it is called when the ajax request succeeds.
+               If the value is a map then it looks for the following keys: 
                   :success - The id of the element to update if the request succeeds.
                   :failure - The id of the element to update if the request fails.
      :method - The request method. Possible values POST, GET, PUT, DELETE. However, not all browsers support PUT and 
@@ -546,25 +543,20 @@ If text is a function, then it is called passing params. If link-to is called wi
 and params, text is called with request-map and params merged (not all keys used from request-map)." }
   ajax-link-to
   ([text request-map params] (ajax-link-to text (view-utils/merge-url-for-params request-map params)))
-  ([text params]
-    (let [html-options (or (:html-options params) {})
+  ([text request-map]
+    (let [html-options (or (:html-options request-map) {})
           id (or (:id html-options) (str "id-" (rand-int 1000000)))
           id-string (str "#" id)
-          link-to-remote-onclick-function (link-to-remote-onclick params)]
+          ajax-function (ajax-map request-map)]
       (htmli 
         [:a 
           (merge html-options 
             { :href (or (:href html-options) "#")
               :id id })
-          (evaluate-if-fn text params)]
+          (evaluate-if-fn text request-map)]
         [:script { :type "text/javascript" } 
           (scriptjure/js
-            (ajaxClick (clj id-string) (clj link-to-remote-onclick-function)))]))))
-            
-(defn-
-#^{ :doc "Generates the link-to-remote onclick function." }
-  remote-form-for-onclick [options]
-  (ajax-map options))
+            (ajaxClick (clj id-string) (clj ajax-function)))]))))
 
 (defn
 #^{ :doc 
@@ -582,19 +574,16 @@ If text is a function, then it is called passing params. If link-to is called wi
 and params, text is called with request-map and params merged (not all keys used from request-map)." }
   ajax-form-for
   ([request-map options body] 
-    (ajax-form-for (assoc options :url (view-utils/merge-url-for-params request-map (:url options))) body))
-  ([options body]
-    (let [html-options (or (:html-options options) {})
+    (ajax-form-for (view-utils/merge-url-for-params request-map options) body))
+  ([request-map body]
+    (let [html-options (or (:html-options request-map) {})
           id (or (:id html-options) (str "id-" (rand-int 1000000)))
           id-string (str "#" id)
-          remote-form-for-onclick-function (remote-form-for-onclick options)
-          form-for-id-options (assoc options :html-options (merge html-options { :id id }))
-          form-for-options (if (contains? html-options :action) 
-                             (assoc form-for-id-options :url (:action html-options)) 
-                             form-for-id-options)]
+          ajax-function (ajax-map request-map)
+          form-for-options (assoc request-map :html-options (merge html-options { :id id }))]
       (str 
         (form-for form-for-options body)
         (htmli
           [:script { :type "text/javascript" } 
             (scriptjure/js
-              (ajaxSubmit (clj id-string) (clj remote-form-for-onclick-function)))])))))
+              (ajaxSubmit (clj id-string) (clj ajax-function)))])))))
