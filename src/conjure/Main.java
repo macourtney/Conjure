@@ -24,7 +24,7 @@ public class Main {
     private static final String CONJURE_JAR_NAME = "conjure.jar";
     private static final String DEFAULT_DIR = "default";
     
-    private static final String CONJURE_VERSION = "0.4 TC-3";
+    private static final String CONJURE_VERSION = "0.4 RC-1";
     
     private static final String DEFAULT_DATABASE = "h2";
     
