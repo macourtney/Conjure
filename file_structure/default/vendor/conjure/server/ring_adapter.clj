@@ -11,7 +11,7 @@
 request map."}
   call-server [req]
   (try
-		(server/process-request req)
+		(server/process-request { :request req })
     (catch Throwable throwable
       (do
         (logging/error "An error occurred while processing the request." throwable)

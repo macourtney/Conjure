@@ -86,11 +86,11 @@
   (is (= "/hello/show/1" (url-for { :controller "hello", :action "show" } { :params { :id 1 } })))
   (is (= "/hello/show/1" (url-for { :controller "hello", :action "add" } { :action "show", :params { :id 1 } })))
   (let [params { :controller "hello", :action "show", :params { :id 1 } }]
-    (is (= "http://localhost/hello/show/1" (url-for { :server-name "localhost" } params)))
-    (is (= "http://localhost:8080/hello/show/1" (url-for { :server-name "localhost" :server-port 8080 } params)))
-    (is (= "ftp://localhost/hello/show/1" (url-for { :server-name "localhost" :scheme :ftp } params)))
-    (is (= "http://localhost:8080/hello/show/1" (url-for { :server-name "localhost" } (merge params { :port 8080}))))
-    (is (= "http://foo:bar@localhost/hello/show/1" (url-for { :server-name "localhost" } (merge params { :user "foo", :password "bar"})))))
+    (is (= "http://localhost/hello/show/1" (url-for { :request { :server-name "localhost" } } params)))
+    (is (= "http://localhost:8080/hello/show/1" (url-for { :request { :server-name "localhost" :server-port 8080 } } params)))
+    (is (= "ftp://localhost/hello/show/1" (url-for { :request { :server-name "localhost" :scheme :ftp } } params)))
+    (is (= "http://localhost:8080/hello/show/1" (url-for { :request { :server-name "localhost" } } (merge params { :port 8080}))))
+    (is (= "http://foo:bar@localhost/hello/show/1" (url-for { :request { :server-name "localhost" } } (merge params { :user "foo", :password "bar"})))))
   (let [params { :controller "hello", :action "show", :params { :id 1, :session-id "blah" } }]
     (binding [session-config/use-session-cookie false]
-      (is (= "http://localhost/hello/show/1?session-id=blah" (url-for { :server-name "localhost" } params))))))
+      (is (= "http://localhost/hello/show/1?session-id=blah" (url-for { :request { :server-name "localhost" } } params))))))

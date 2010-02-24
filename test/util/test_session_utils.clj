@@ -14,7 +14,7 @@
 
 (deftest test-session-id
   (is (= (session-id { :params {:session-id "blah" } }) "blah"))
-  (is (= (session-id { :headers { "cookie" (str session-id-name "=blah") } }) "blah"))
+  (is (= (session-id { :request { :headers { "cookie" (str session-id-name "=blah") } } }) "blah"))
   (is (= (session-id { :temp-session "blah" }) "blah"))
   (is (nil? (session-id { :params { } })))
   (is (nil? (session-id { }))))
@@ -24,7 +24,7 @@
     (is (contains? request-map :temp-session)))
   (let [request-map { :params { :session-id "blah" } }]
     (is (= request-map (update-request-session request-map))))
-  (let [request-map { :headers { "cookie" (str session-id-name "=blah") } }]
+  (let [request-map { :request { :headers { "cookie" (str session-id-name "=blah") } } }]
     (is (= request-map (update-request-session request-map))))
   (let [request-map { :temp-session "blah" }]
     (is (= request-map (update-request-session request-map)))))
@@ -33,14 +33,14 @@
   (is (not (session-created? {} {})))
   (is (not (session-created? { :temp-session "blah" } {})))
   (is (session-created? { :params { :session-id "blah" } } {}))
-  (is (session-created? { :headers { "cookie" (str session-id-name "=blah") } } {}))
+  (is (session-created? { :request { :headers { "cookie" (str session-id-name "=blah") } } } {}))
   (is (session-created? {} { :headers { "Set-Cookie" (str session-id-name "=blah") } })))
   
 (deftest test-manage-session
   (let [response-map (manage-session {} {})]
     (is (:headers response-map))
     (is (get (:headers response-map) "Set-Cookie")))
-  (let [response-map (manage-session { :headers { "cookie" "blah" } } {})]
+  (let [response-map (manage-session { :request { :headers { "cookie" "blah" } } } {})]
     (is (nil? (:headers response-map))))
   (let [response-map (manage-session { :temp-session "blah" } {})]
     (is (= (get (conjure-str-utils/str-to-map (get (:headers response-map) "Set-Cookie")) session-id-name) "blah")))

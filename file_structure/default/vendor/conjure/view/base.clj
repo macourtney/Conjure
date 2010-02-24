@@ -508,7 +508,8 @@ id based on position. Position can be one of the following:
     :ajax-url - The url for the ajax request to call instead of creating a url from the given controller and action.
     :update - A scriptjure function or a map. If it is a function, then it is called when the ajax request returns with 
               success. If it is a map, then the scriptjure function value of :success is called when the ajax request 
-              returns successfully, and the scriptjure function value of :error is called when the ajaz request fails." }
+              returns successfully, and the scriptjure function value of :error is called when the ajax request fails.
+    :confirm - A scriptjure function to call to confirm the action before the ajax call is executed." }
   ajax-map [request-map]
   (let [ajax-type (or (:method request-map) "POST")
         url (or (:ajax-url request-map) (view-utils/url-for request-map))

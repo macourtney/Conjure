@@ -95,14 +95,15 @@ the given request-map." }
 
 (defn
 #^{:doc "Returns the full host string from the given params. Used by url-for." }
-  full-host [params]
-  (let [server-name (:server-name params)
-        scheme (:scheme params)
-        user (:user params)
-        password (:password params)
-        port (:port params)
-        server-port (:server-port params)]
-    (if (and server-name (not (:only-path params)))
+  full-host [request-map]
+  (let [request (:request request-map)
+        server-name (or (:server-name request-map) (:server-name request))
+        scheme (or (:scheme request-map) (:scheme request))
+        user (:user request-map)
+        password (:password request-map)
+        port (:port request-map)
+        server-port (:server-port request)]
+    (if (and server-name (not (:only-path request-map)))
       (str 
         (if scheme (conjure-str-utils/str-keyword scheme) "http") "://" 
         (if (and user password) (str user ":" password "@")) 
@@ -115,8 +116,8 @@ the given request-map." }
 (defn
 #^{:doc "Returns the value of :id from the given parameters. If the value of :id is a map, then this method returns the
 value of :id in the map. This method is used by url-for to get the id from from the params passed to it."}
-  id-from [params]
-  (let [id (:id (:params params))]
+  id-from [request-map]
+  (let [id (:id (:params request-map))]
     (if (and id (map? id))
       (:id id)
       id)))
@@ -125,8 +126,8 @@ value of :id in the map. This method is used by url-for to get the id from from 
 #^{ :doc "Returns the value of :anchor from the given parameters and adds a '#' before it. If the key :anchor does not 
 exist in params, then this method returns nil This method is used by url-for to get the id from from the params passed 
 to it." }
-  anchor-from [params]
-  (let [anchor (:anchor params)]
+  anchor-from [request-map]
+  (let [anchor (:anchor request-map)]
     (if anchor
       (str "#" anchor))))
 
@@ -136,7 +137,7 @@ to it." }
     (merge 
       (select-keys 
         request-map 
-        [:controller :action :scheme :request-method :server-name :server-port])
+        [:controller :action :request])
       params))
 
 (defn
@@ -154,23 +155,23 @@ to it." }
      :port - Overrides the default server port."}
   url-for
   ([request-map params] (url-for (merge-url-for-params request-map params))) 
-  ([params]
-  (let [controller (conjure-str-utils/str-keyword (:controller params))
-        action (conjure-str-utils/str-keyword (:action params))
-        url-params (or (dissoc (:params params) :id) {})
-        session-id (session-utils/session-id params)]
+  ([request-map]
+  (let [controller (conjure-str-utils/str-keyword (:controller request-map))
+        action (conjure-str-utils/str-keyword (:action request-map))
+        url-params (or (dissoc (:params request-map) :id) {})
+        session-id (session-utils/session-id request-map)]
     (if (and controller action)
       (apply str 
         (seq-utils/flatten
-          [ (full-host params) 
+          [ (full-host request-map) 
             (interleave 
               (repeat "/") 
               (filter #(not (nil? %))
-                [(loading-utils/dashes-to-underscores controller) (loading-utils/dashes-to-underscores action) (id-from params) (anchor-from params)]))
+                [(loading-utils/dashes-to-underscores controller) (loading-utils/dashes-to-underscores action) (id-from request-map) (anchor-from request-map)]))
             (let [new-session-id 
                     (or session-id (if (not session-config/use-session-cookie) (session-utils/create-session-id)))
                   new-url-params 
                     (if new-session-id (assoc url-params :session-id new-session-id) url-params)]
               (if (seq new-url-params)
                 (html-utils/url-param-str new-url-params)))]))
-      (throw (new RuntimeException (str "You must pass a controller and action to url-for. " params)))))))
+      (throw (new RuntimeException (str "You must pass a controller and action to url-for. " request-map)))))))

@@ -44,7 +44,7 @@
   (is (= 
     (redirect-map "http://www.conjureapp.com/home/welcome") 
     (redirect-to { :scheme :http, :server-name "www.conjureapp.com" } "/home/welcome")))
-  (let [request-map { :scheme :http, :server-name "www.conjureapp.com" :controller "home" :action "welcome" }]
+  (let [request-map { :request { :scheme :http, :server-name "www.conjureapp.com" } :controller "home" :action "welcome" }]
     (is (= 
       (redirect-map "http://www.conjureapp.com/home/welcome") 
       (redirect-to request-map)))

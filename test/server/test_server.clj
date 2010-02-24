@@ -36,17 +36,19 @@
   (is (= 
     { :foo "bar" }
     (parse-post-params
-      { :request-method :post,
-        :content-type "application/x-www-form-urlencoded",
-        :content-length 7,
-        :body (string-as-input-stream "foo=bar") })))
+      { :request 
+        { :request-method :post,
+          :content-type "application/x-www-form-urlencoded",
+          :content-length 7,
+          :body (string-as-input-stream "foo=bar") } })))
   (is (= 
     { :foo "bar", :biz "baz" }
     (parse-post-params
-      { :request-method :post,
-        :content-type "application/x-www-form-urlencoded",
-        :content-length 15,
-        :body (string-as-input-stream "foo=bar&biz=baz") })))
+      { :request 
+        { :request-method :post,
+          :content-type "application/x-www-form-urlencoded",
+          :content-length 15,
+          :body (string-as-input-stream "foo=bar&biz=baz") } })))
   (is (= 
     {} 
     (parse-post-params 
@@ -65,19 +67,21 @@
   (is (= 
     { :foo "bar", :biz "baz" }
     (parse-params 
-      { :request-method :post,
-        :content-type "application/x-www-form-urlencoded",
-        :content-length 7,
-        :body (string-as-input-stream "foo=bar"),
-        :query-string "biz=baz" })))
-  (is (= { :biz "baz" } (parse-params { :query-string "biz=baz" } )))
+      { :request 
+        { :request-method :post,
+          :content-type "application/x-www-form-urlencoded",
+          :content-length 7,
+          :body (string-as-input-stream "foo=bar"),
+          :query-string "biz=baz" } })))
+  (is (= { :biz "baz" } (parse-params { :request { :query-string "biz=baz" } } )))
   (is (= 
     { :foo "bar" } 
     (parse-params 
-      { :request-method :post,
-        :content-type "application/x-www-form-urlencoded",
-        :content-length 7,
-        :body (string-as-input-stream "foo=bar") } )))
+      { :request 
+        { :request-method :post,
+          :content-type "application/x-www-form-urlencoded",
+          :content-length 7,
+          :body (string-as-input-stream "foo=bar") } } )))
   (is (= {} (parse-params {} ))))
 
 (deftest test-update-request-map
@@ -87,42 +91,50 @@
         { :controller controller-name,
           :action action-name,
           :params { :id "1" }
-          :uri uri,
-          :headers headers }
+          :request 
+          { :uri uri,
+            :headers headers } }
         (update-request-map 
-          { :uri uri, 
-            :headers headers }))))
+          { :request 
+            { :uri uri, 
+              :headers headers } }))))
             
     (let [uri (str "/" controller-name "/" action-name)]
       (is (= 
         { :controller controller-name,
           :action action-name,
           :params {}
-          :uri uri
-          :headers headers }
-        (update-request-map 
+          :request 
           { :uri uri
-            :headers headers }))))
+            :headers headers } }
+        (update-request-map 
+          { :request 
+            { :uri uri
+              :headers headers } }))))
       
     (is (= 
         { :params {}, 
           :action "index", 
           :controller "test", 
-          :uri "test"
-          :headers headers } 
+          :request 
+          { :uri "test"
+            :headers headers } }
         (update-request-map 
-          { :uri controller-name
-            :headers headers })))
+          { :request 
+            { :uri controller-name
+              :headers headers } })))
           
     (is (= 
       { :params {}, 
         :action "index", 
         :controller "home", 
-        :uri ""
-        :headers headers } 
-      (update-request-map 
+        :request 
         { :uri ""
-          :headers headers })))
+          :headers headers } } 
+      (update-request-map 
+        { :request 
+          { :uri ""
+            :headers headers } })))
         
     (let [request-map (update-request-map nil)]
       (is (= {} (:params request-map)))
@@ -132,33 +144,34 @@
       { :params { :foo "bar" },
         :action "index",
         :controller "home",
-        :uri "",
-        :query-string "foo=bar"
-        :headers headers }
-      (update-request-map 
+        :request 
         { :uri "",
           :query-string "foo=bar"
-          :headers headers })))
+          :headers headers } }
+      (update-request-map 
+        { :request 
+          { :uri "",
+            :query-string "foo=bar"
+            :headers headers } })))
           
     (let [uri (str "/" controller-name "/" action-name "/1")]
       (is (= 
         { :controller controller-name, 
           :action action-name, 
           :params { :id "1", :foo "bar" }, 
-          :uri uri, 
-          :query-string "foo=bar"
-          :headers headers } 
-        (update-request-map 
-          { :uri uri,
+          :request 
+          { :uri uri, 
             :query-string "foo=bar"
-            :headers headers }))))))
+            :headers headers } }
+        (update-request-map 
+          { :request 
+            { :uri uri,
+              :query-string "foo=bar"
+              :headers headers } }))))))
       
 (deftest test-process-request
   (process-request { :controller controller-name, :action action-name }))
   
-;(deftest test-render-view
-;  (render-view { :controller controller-name, :action action-name } ))
-
 (deftest test-http-config
   (is (not (nil? (http-config)))))
 

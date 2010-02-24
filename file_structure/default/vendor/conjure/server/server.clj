@@ -29,21 +29,22 @@
 (defn
 #^{ :doc "Returns a parameter map generated from the post content." }
   parse-post-params [request-map]
-  (let [content-type (:content-type request-map)]
+  (let [request (:request request-map)
+        content-type (:content-type request)]
     (if 
       (and 
-        (= (:request-method request-map) :post)
+        (= (:request-method request) :post)
         content-type
         (.startsWith content-type "application/x-www-form-urlencoded"))
   
       (html-utils/parse-query-params 
-        (loading-utils/string-input-stream (:body request-map) (:content-length request-map)))
+        (loading-utils/string-input-stream (:body request) (:content-length request)))
       {})))
 
 (defn
 #^{ :doc "Parses all of the params from the given request map." }
   parse-params [request-map]
-  (merge (parse-post-params request-map) (html-utils/parse-query-params (:query-string request-map))))
+  (merge (parse-post-params request-map) (html-utils/parse-query-params (:query-string (:request request-map)))))
 
 (defn
 #^{ :doc "Gets a route map for use by conjure to call the correct methods." }
@@ -51,7 +52,7 @@
   (session-utils/update-request-session 
     (merge request-map 
       (augment-params 
-        (or (some identity (map #(% (:uri request-map)) (routes/draw))) { :params {} }) 
+        (or (some identity (map #(% (:uri (:request request-map))) (routes/draw))) { :params {} }) 
         (parse-params request-map)))))
 
 (defn
@@ -99,7 +100,7 @@ response map.. If the request-map is nil, this function does nothing and returns
   respond-to [request-map]
   (when request-map
     (init)
-    (logging/debug (str "Requested uri: " (:uri request-map)))
+    (logging/debug (str "Requested uri: " (:uri (:request request-map))))
     (call-controller (update-request-map request-map))))
 
 (defn

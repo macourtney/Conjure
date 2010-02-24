@@ -26,7 +26,7 @@
         params-session-id (or (if params (:session-id params)) (temp-session-id request-map))]
     (if params-session-id
       params-session-id
-      (let [headers (:headers request-map)]
+      (let [headers (:headers (:request request-map))]
         (get
           (conjure-str-utils/str-to-map 
             (if headers (get headers "cookie") ""))
@@ -43,7 +43,7 @@
 #^{ :doc "Returns true if a session has already been created." }
   session-created? [request-map response-map]
   (or 
-    (get (:headers request-map) "cookie")
+    (get (:headers (:request request-map)) "cookie")
     (:session-id (:params request-map))
     (get (:headers response-map) "Set-Cookie")))
 

@@ -25,7 +25,7 @@
       (delete request-map "foo")
       (is (= (retrieve request-map) {})))
     
-    (let [request-map { :headers { "cookie" (str session-utils/session-id-name "=" test-session-id) } }]
+    (let [request-map { :request { :headers { "cookie" (str session-utils/session-id-name "=" test-session-id) } } }]
       (save request-map :foo "bar")
       (is (= (retrieve request-map) { :foo "bar" }))
       
