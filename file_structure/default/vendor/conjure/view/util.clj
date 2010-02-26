@@ -169,7 +169,7 @@ to it." }
               (filter #(not (nil? %))
                 [(loading-utils/dashes-to-underscores controller) (loading-utils/dashes-to-underscores action) (id-from request-map) (anchor-from request-map)]))
             (let [new-session-id 
-                    (or session-id (if (not session-config/use-session-cookie) (session-utils/create-session-id)))
+                    (if (not session-config/use-session-cookie) (or session-id (session-utils/create-session-id)))
                   new-url-params 
                     (if new-session-id (assoc url-params :session-id new-session-id) url-params)]
               (if (seq new-url-params)
