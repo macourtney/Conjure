@@ -1,27 +1,47 @@
 (ns views.layouts.templates.links
   (:use conjure.view.base)
   (:require [clj-html.core :as html]
+            [conjure.util.string-utils :as string-utils]
             [conjure.view.util :as view-util]))
+
+(defn
+#^{ :doc "Returns the link controller from the given link map." }
+  link-controller [link-map location-controller]
+  (string-utils/str-keyword (or (:controller (:url-for link-map)) location-controller)))
+
+(defn
+#^{ :doc "Returns the link action from the given link map." }
+  link-action [link-map location-action]
+  (string-utils/str-keyword (or (:action (:url-for link-map)) location-action)))
+  
+(defn
+#^{ :doc "Returns the link url from the given link map." }
+  link-url [link-map original-request-map]
+  (or 
+    (:url link-map) 
+    (if (:url-for link-map) 
+      (view-util/url-for original-request-map (:url-for link-map)))))
+
+(defn
+#^{ :doc "Returns the id for a link or nil if no id should be set for the link." }
+  link-id [link-map original-request-map]
+  (let [location-controller (:controller original-request-map)
+        location-action (:action original-request-map)
+        link-controller (link-controller link-map location-controller)
+        link-action (link-action link-map location-action)]
+    (if 
+      (or 
+        (:is-active link-map) 
+        (and link-controller location-controller link-action location-action
+          (= link-controller location-controller) (= link-action location-action)))
+      "link-active")))
 
 (defn
 #^{ :doc "Generates the clj-html structure for a given link map." }
   generate-link [link-map original-request-map]
-  (let [location-controller (:controller original-request-map)
-        location-action (:action original-request-map)
-        link-controller (or (:controller (:url-for link-map)) location-controller)
-        link-action (or (:action (:url-for link-map)) location-action)
-        link-url (or 
-                  (:url link-map) 
-                  (if (:url-for link-map) 
-                    (view-util/url-for original-request-map (:url-for link-map))))]
+  (let [link-url (link-url link-map original-request-map)]
     [:li 
-      { :id 
-        (if 
-          (or 
-            (:is-active link-map) 
-            (and link-controller location-controller link-action location-action
-              (= link-controller location-controller) (= link-action location-action)))
-          "link-active") }
+      { :id (link-id link-map original-request-map) }
       (or 
         (:link link-map) 
         [:a 

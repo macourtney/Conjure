@@ -7,7 +7,7 @@
             [conjure.util.string-utils :as string-utils]
             [views.layouts.templates.breadcrumbs :as breadcrumbs]
             [views.layouts.templates.header :as header]
-            [views.layouts.templates.links :as links]
+            [views.layouts.templates.links-sidebar :as links-sidebar]
             [views.layouts.templates.tabs :as tabs]))
 
 (defview [body]
@@ -42,15 +42,7 @@
             (header/render-view request-map title)
 
             ;; Main menu (tabs)
-            (tabs/render-view request-map 
-              (let [tabs (:tabs (:layout-info request-map))]
-                (if tabs
-                  tabs
-                  (map 
-                    (fn [controller] 
-                      { :text (string-utils/human-title-case controller), 
-                        :url-for { :controller controller, :action "index" } }) 
-                    (controller-util/all-controllers)))))
+            (tabs/render-view request-map)
 
             ;; Page (2 columns)
             [:div { :id "page", :class="box" }
@@ -105,13 +97,8 @@
 
                     ;[:hr { :class "noscreen" }]
 
-                    ;; Links
-                    (links/render-view request-map "Actions"
-                      (let [links (:links (:layout-info request-map))]
-                        (if links
-                          links
-                          [ { :text "List", :url-for (view-util/merge-url-for-params (:layout-info request-map) { :action "list-records" }) }
-                            { :text "Add", :url-for (view-util/merge-url-for-params (:layout-info request-map) { :action "add" }) :html-options { :id "add-action-link" } }])))]]]]
+                    ;; Links Sidebar
+                    (links-sidebar/render-view request-map)]]]]
 
               ;; Footer
             [:div { :id "footer" }

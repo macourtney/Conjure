@@ -7,4 +7,4 @@
       request-map 
       :layout-info 
       { :links 
-        [{ :text "Home", :url-for { :controller "home", :action "index" } }]}))
+        [{ :text "Home", :url-for { :controller :home, :action :index } }]}))
