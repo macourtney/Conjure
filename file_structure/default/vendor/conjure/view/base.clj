@@ -162,7 +162,7 @@ along an optional option map for the html options." }
 #^{ :doc "Creates an input tag for a submit button with the given value." }
   form-button
   ([value] (form-button value {})) 
-  ([value html-options] (htmli [:input (merge html-options { :type "submit", :value value })])))
+  ([value html-options] (htmli [:input (merge html-options { :type "submit", :value value, :name "button" })])))
 
 (defn
 #^{:doc "Creates a select option tag from one of the following: A name, value and selection boolean, or a map 
@@ -531,7 +531,8 @@ id based on position. Position can be one of the following:
 "Returns an ajax link for the given text and parameters using url-for. Params has the same valid parameters as url-for, 
 plus:
 
-     :update - A map or a function. If the value is a function, then it is called when the ajax request succeeds.
+     :update - A map or a scriptjure function. If the value is a function, then it is called when the ajax request 
+               succeeds.
                If the value is a map then it looks for the following keys: 
                   :success - The id of the element to update if the request succeeds.
                   :failure - The id of the element to update if the request fails.
