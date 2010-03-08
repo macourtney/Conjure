@@ -18,7 +18,7 @@
     (htmli [:a { :href "/hello/show" } "view"])
     (link-to "view" { :controller "hello" :action "add" } { :action "show" })))
   (is (= 
-    (htmli [:a { :href "/hello/show", :class "bar", :id "foo" } "view"])
+    (htmli [:a { :href "/hello/show", :id "foo", :class "bar" } "view"])
     (link-to "view" { :controller "hello" :action "show" :html-options { :id "foo" :class "bar" } })))
   (is (= 
     (htmli [:a { :href "/hello/show" } "show"])
@@ -51,40 +51,40 @@
 
 (deftest test-form-for
   (is (= 
-    (htmli [:form { :action "/hello/create", :method "post", :name "create" } "Blah"])
+    (htmli [:form { :name "create", :action "/hello/create", :method "post" } "Blah"])
     (form-for { :name "create", :controller "hello", :action "create" } "Blah")))
   (is (= 
-    (htmli [:form { :action "/hello/create", :method "post", :name "hello" } "Blah"])
+    (htmli [:form { :name "hello", :action "/hello/create", :method "post" } "Blah"])
     (form-for { :controller "hello", :action "create" } "Blah")))
   (is (= 
-    (htmli [:form { :action "/hello/create", :method "post", :name "create" } "create"])
+    (htmli [:form { :name "create", :action "/hello/create", :method "post" } "create"])
     (form-for { :name "create", :controller "hello", :action "create" } #(:action %))))
   (is (= 
-    (htmli [:form { :action "/home/index", :method "post", :name "create" } "Blah"])
+    (htmli [:form { :name "create", :method "post", :action "/home/index" } "Blah"])
     (form-for { :name "create", :controller "hello", :action "create", :html-options { :action "/home/index" } } "Blah"))))
 
 (deftest test-text-field
   (is (= 
-    (htmli [:input { :id "message-text", :name "message[text]", :type "text", :value "Blah" }])
+    (htmli [:input { :type "text", :id "message-text", :name "message[text]", :value "Blah" }])
     (text-field { :text "Blah" } :message :text )))
   (is (= 
-    (htmli [:input { :id "message-text", :name "message[text]", :size 20, :type "text", :value "Blah" }])
+    (htmli [:input { :size 20, :type "text", :id "message-text", :name "message[text]", :value "Blah" }])
     (text-field { :text "Blah" } :message :text { :size 20 } ))))
   
 (deftest test-text-area
   (is (= 
-    (htmli [:textarea { :cols 20, :id "message-text", :name "message[text]", :rows 40 } "Blah"])
+    (htmli [:textarea { :name "message[text]", :id "message-text", :rows 40, :cols 20 } "Blah"])
     (text-area { :text "Blah" } :message :text )))
   (is (= 
-    (htmli [:textarea { :cols 40, :id "message-text", :name "message[text]", :rows 60 } "Blah"])
+    (htmli [:textarea { :name "message[text]", :id "message-text", :rows 60, :cols 40 } "Blah"])
     (text-area { :text "Blah" } :message :text { :rows 60, :cols 40 } ))))
 
 (deftest test-hidden-field
   (is (= 
-    (htmli [:input { :id "message-text", :name "message[text]", :type "hidden", :value "Blah" }])
+    (htmli [:input { :type "hidden", :id "message-text", :name "message[text]", :value "Blah" }])
     (hidden-field { :text "Blah" } :message :text )))
   (is (= 
-    (htmli [:input { :class "hidden-message", :id "message-text", :name "message[text]", :type "hidden", :value "Blah" }])
+    (htmli [:input { :class "hidden-message", :type "hidden", :id "message-text", :name "message[text]", :value "Blah" }])
     (hidden-field { :text "Blah" } :message :text { :class "hidden-message" } ))))
 
 (deftest test-option-tag
@@ -322,34 +322,34 @@
 (deftest test-check-box
   (is (= 
     (htmli 
-      [:input { :id "puppy-good", :name "puppy[good]", :type "checkbox", :value "1" }]
-      [:input { :id "puppy-good", :name "puppy[good]", :type "hidden", :value "0" }])
+      [:input { :type "checkbox", :id "puppy-good", :name "puppy[good]", :value "1" }]
+      [:input { :type "hidden", :id "puppy-good", :name "puppy[good]", :value "0" }])
     (check-box { :good 0 } :puppy :good)))
   (is (= 
     (htmli 
-      [:input { :id "blah", :name "puppy[good]", :type "checkbox", :value "1" }]
-      [:input { :id "blah", :name "puppy[good]", :type "hidden", :value "0" }])
+      [:input { :type "checkbox", :id "blah", :name "puppy[good]", :value "1" }]
+      [:input { :type "hidden", :id "blah", :name "puppy[good]", :value "0" }])
     (check-box { :good 0 } :puppy :good { :id "blah" })))
   (is (=
     (htmli 
-      [:input { :id "puppy-good", :name "puppy[good]", :type "checkbox", :value "true" }]
-      [:input { :id "puppy-good", :name "puppy[good]", :type "hidden", :value "0" }])
+      [:input { :type "checkbox", :id "puppy-good", :name "puppy[good]", :value "true" }]
+      [:input { :type "hidden", :id "puppy-good", :name "puppy[good]", :value "0" }])
     (check-box { :good 0 } :puppy :good {} true)))
   (is (= 
     (htmli 
-      [:input { :id "puppy-good", :name "puppy[good]", :type "checkbox", :value "true" }]
-      [:input { :id "puppy-good", :name "puppy[good]", :type "hidden", :value "false" }])
+      [:input { :type "checkbox", :id "puppy-good", :name "puppy[good]", :value "true" }]
+      [:input { :type "hidden", :id "puppy-good", :name "puppy[good]", :value "false" }])
     (check-box { :good 0 } :puppy :good {} true false))))
 
 (deftest test-radio-button
   (is (= 
-    (htmli [:input { :id "puppy-breed", :name "puppy[breed]", :type "radio", :value "great-dane" }])
+    (htmli [:input { :type "radio", :id "puppy-breed", :name "puppy[breed]", :value "great-dane" }])
     (radio-button { :breed "chihuahua" } :puppy :breed "great-dane")))
   (is (=
-    (htmli [:input { :checked "checked", :id "puppy-breed", :name "puppy[breed]", :type "radio", :value "chihuahua" }])
+    (htmli [:input { :checked "checked", :type "radio", :id "puppy-breed", :name "puppy[breed]", :value "chihuahua" }])
     (radio-button { :breed "chihuahua" } :puppy :breed "chihuahua")))
   (is (=
-    (htmli [:input { :id "dog-breed", :name "puppy[breed]", :type "radio", :value "great-dane" }])  
+    (htmli [:input { :type "radio", :id "dog-breed", :name "puppy[breed]", :value "great-dane" }])  
     (radio-button { :breed "chihuahua" } :puppy :breed "great-dane" { :id "dog-breed" }))))
 
 (deftest test-xml-header-tag
@@ -415,7 +415,7 @@
       (ajax-link-to "update" (assoc link-to-options :update { :success 'successFunction }))))
     (is (= 
       (htmli 
-        [:a { :href "/noscript/update", :id "test-id"}
+        [:a { :id "test-id", :href "/noscript/update" }
           "update"]
         [:script { :type "text/javascript" }
           (scriptjure/js 
@@ -429,9 +429,9 @@
                             :href "/noscript/update" } }))))))
 
 (deftest test-ajax-form-for
-  (let [form-map { :action "/home/index", :id "test-id", :method "post", :name "home" }
+  (let [form-map { :name "home", :action "/home/index", :method "post", :id "test-id" }
         form-tag [:form form-map
-                   [:input { :type "submit", :value "Submit", :name "button" } ]]
+                   [:input { :name "button", :value "Submit", :type "submit" } ]]
         ajax-map { :type "POST"
                    :url "/home/index"
                    :dataType "html"
@@ -463,8 +463,8 @@
       (ajax-form-for (assoc form-for-options :ajax-url "/hello/show") form-for-body)))
     (is (=
       (htmli 
-        [:form (merge form-map { :name "noscript-update", :action "/noscript/update" })
-          [:input { :type "submit", :value "Submit", :name "button" } ]]
+        [:form { :name "noscript-update", :method "post", :id "test-id", :action "/noscript/update" }
+          [:input { :name "button", :value "Submit", :type "submit" } ]]
         [:script { :type "text/javascript" }
          (scriptjure/js 
            (ajaxSubmit "#test-id" (clj (assoc ajax-map :error 'errorFunction))))])
