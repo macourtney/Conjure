@@ -1,5 +1,6 @@
 (ns destroyers.controller-test-destroyer
-  (:require [conjure.test.util :as util]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.test.util :as util]
             [conjure.util.file-utils :as file-utils]))
 
 (defn
@@ -17,15 +18,13 @@
         (let [functional-test-file (util/functional-test-file controller functional-test-directory)]
           (if functional-test-file
             (let [is-deleted (. functional-test-file delete)] 
-              (if (not silent) 
-                (println "File" (. functional-test-file getName) (if is-deleted "destroyed." "not destroyed.")))
+              (logging/info (str "File " (. functional-test-file getName) (if is-deleted " destroyed." " not destroyed.")))
               (if is-deleted (file-utils/delete-if-empty functional-test-directory)))
-            (if (not silent) (println "Controller test file not found. Doing nothing."))))
-        (if (not silent) 
-            (do
-            (println "Could not find the functional test directory.")
-            (println "Command ignored.")))))
-    (if (not silent) (controller-usage))))
+            (logging/info "Controller test file not found. Doing nothing.")))
+        (do
+          (logging/info "Could not find the functional test directory.")
+          (logging/info "Command ignored."))))
+    (controller-usage)))
 
 (defn
 #^{:doc "Destroys a controller test file for the controller name given in params."}

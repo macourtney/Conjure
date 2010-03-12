@@ -1,5 +1,6 @@
 (ns destroyers.fixture-destroyer
-  (:require [conjure.test.util :as util]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.test.util :as util]
             [conjure.util.file-utils :as file-utils]))
 
 (defn
@@ -17,12 +18,12 @@
         (let [fixture-file (util/fixture-file model fixture-dir)]
           (if fixture-file
             (let [is-deleted (. fixture-file delete)] 
-              (println "File" (. fixture-file getName) (if is-deleted "destroyed." "not destroyed."))
+              (logging/info (str "File " (. fixture-file getName) (if is-deleted " destroyed." " not destroyed.")))
               (file-utils/delete-all-if-empty fixture-dir))
-            (println "Fixture file not found. Doing nothing.")))
+            (logging/info "Fixture file not found. Doing nothing.")))
         (do
-          (println "Could not find the fixture directory.")
-          (println "Command ignored."))))
+          (logging/error "Could not find the fixture directory.")
+          (logging/error "Command ignored."))))
     (usage)))
 
 (defn

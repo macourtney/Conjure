@@ -22,7 +22,6 @@
   (is (table-exists? test-table))
   (insert-into test-table { :id 1 :value "test-value" })
   (let [test-row (first (sql-find { :table test-table :where "id = 1" }))]
-    (println "test-row:" test-row)
     (is (not (nil? test-row)))
     (is (map? test-row))
     (is (= "test-value" (:value test-row))))

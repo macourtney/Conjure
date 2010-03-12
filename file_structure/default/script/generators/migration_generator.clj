@@ -1,6 +1,7 @@
 (ns generators.migration-generator
   (:import [java.io File])
-  (:require [conjure.migration.builder :as builder]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.migration.builder :as builder]
             [conjure.migration.util :as util]
             [conjure.util.file-utils :as file-utils]))
 
@@ -40,7 +41,7 @@
             (let [migrate-directory (builder/find-or-create-migrate-directory db-directory)
                   migration-file (builder/create-migration-file migrate-directory migration-name)] 
               (generate-file-content migration-file migration-name up-content down-content))
-            (println "Could not find db directory.")))
+            (logging/error "Could not find db directory.")))
         (migration-usage))))
 
 (defn 

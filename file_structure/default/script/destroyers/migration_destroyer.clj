@@ -1,5 +1,6 @@
 (ns destroyers.migration-destroyer
-  (:require [conjure.migration.util :as util]))
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.migration.util :as util]))
 
 (defn
 #^{:doc "Prints out how to use the destroy migration command."}
@@ -16,9 +17,9 @@
         (let [migration-file (util/find-migration-file migrate-directory migration-name)]
            (if migration-file
              (let [is-deleted (. migration-file delete)]
-               (println "File" (. migration-file getPath) (if is-deleted "deleted." "not deleted.") ))
-             (println "Could not find migration file for" migration-name)))
-        (println "Could not find db directory.")))
+               (logging/info (str "File " (. migration-file getPath) (if is-deleted " deleted." " not deleted.") )))
+             (logging/error (str "Could not find migration file for " migration-name))))
+        (logging/error "Could not find db directory.")))
     (migration-usage)))
 
 (defn

@@ -1,6 +1,7 @@
 (ns conjure.view.builder
   (:import [java.io File])
-  (:require [conjure.view.util :as util]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.view.util :as util]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.string-utils :as conjure-str-utils]))
 
@@ -12,10 +13,10 @@
       (let [controller-directory (util/find-controller-directory views-directory controller)]
         (if controller-directory
           (do
-            (if (not silent) (println (. controller-directory getPath) "directory already exists."))
+            (logging/info (str (. controller-directory getPath) " directory already exists."))
             controller-directory)
           (do
-            (if (not silent) (println "Creating controller directory in views..."))
+            (logging/info "Creating controller directory in views...")
             (let [new-controller-directory (new File views-directory (loading-utils/dashes-to-underscores controller))]
               (. new-controller-directory mkdirs)
               new-controller-directory)))))))
@@ -29,9 +30,9 @@
             view-file (new File controller-directory  view-file-name)]
         (if (. view-file exists)
           (do
-            (if (not silent) (println (. view-file getName) "already exists. Doing nothing."))
+            (logging/info (str (. view-file getName) " already exists. Doing nothing."))
             view-file)
           (do
-            (if (not silent) (println "Creating view file" view-file-name "..."))
+            (logging/info (str "Creating view file " view-file-name "..."))
             (. view-file createNewFile)
             view-file))))))

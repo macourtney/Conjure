@@ -1,5 +1,6 @@
 (ns destroyers.controller-destroyer
-  (:require [conjure.controller.util :as util]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.controller.util :as util]
             [destroyers.controller-test-destroyer :as controller-test-destroyer]
             [destroyers.view-destroyer :as view-destroyer]))
 
@@ -18,13 +19,11 @@
         (let [controller-file (util/find-controller-file controllers-directory controller)]
           (if controller-file
             (let [is-deleted (. controller-file delete)] 
-              (if (not silent) (println "File" (. controller-file getName) (if is-deleted "destroyed." "not destroyed."))))
-            (if (not silent) (println "Controller file not found. Doing nothing."))))
-        (if (not silent) 
-          (do
-            (println "Could not find controllers directory.")
-            (println controllers-directory)
-            (println "Command ignored.")))))
+              (logging/info (str "File " (. controller-file getName) (if is-deleted " destroyed." " not destroyed."))))
+            (logging/info "Controller file not found. Doing nothing.")))
+        (do
+          (logging/error (str "Could not find controllers directory.: " controllers-directory))
+          (logging/error "Command ignored."))))
     (if (not silent) (controller-usage))))
 
 (defn

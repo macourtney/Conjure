@@ -1,8 +1,9 @@
 (ns generators.controller-generator
-  (:require [conjure.controller.builder :as builder]
+  (:require [clojure.contrib.logging :as logging]
+            [clojure.contrib.str-utils :as str-utils]
+            [conjure.controller.builder :as builder]
             [conjure.controller.util :as util]
             [conjure.util.file-utils :as file-utils]
-            [clojure.contrib.str-utils :as str-utils]
             [generators.view-generator :as view-generator]
             [generators.controller-test-generator :as controller-test-generator]))
 
@@ -51,11 +52,8 @@
                                     :silent silent })]
             (if controller-file
               (file-utils/write-file-content controller-file controller-content)))
-          (controller-test-generator/generate-functional-test controller actions silent))
-        (if (not silent) 
-          (do
-            (println "Could not find controllers directory.")
-            (println controllers-directory))))))
+          (controller-test-generator/generate-functional-test controller actions silent)) 
+        (logging/error (str "Could not find controllers directory: " controllers-directory)))))
 
 (defn
 #^{ :doc "Generates the controller content and saves it into the given controller file." }

@@ -1,5 +1,6 @@
 (ns conjure.util.file-utils
-  (:import [java.io File FileWriter]))
+  (:import [java.io File FileWriter])
+  (:require [clojure.contrib.logging :as logging]))
 
 (defn
 #^{:doc "Returns the directory where Conjure is running from."}
@@ -33,11 +34,9 @@
   ([base-dir child-dir-name silent]
     (let [child-directory (find-directory base-dir child-dir-name)]
       (if child-directory
+        child-directory
         (do
-          (if (not silent) (println (. child-directory getPath) "directory already exists."))
-          child-directory)
-        (do
-          (if (not silent) (println "Creating" child-dir-name "directory in" (. base-dir getName) "..."))
+          (logging/info (str "Creating " child-dir-name " directory in " (. base-dir getName) "..."))
           (let [child-directory (new File base-dir child-dir-name)]
             (. child-directory mkdirs)
             child-directory))))))
@@ -55,7 +54,7 @@ Note: this method prints a bunch of stuff to standard out."}
           child-dirs (rest dirs)]
       (if base-dir
         (reduce (fn [base-dir child-dir] (create-dir base-dir child-dir silent)) base-dir child-dirs)
-        (if (not silent) (println "You must pass in a base directory."))))))
+        (logging/error "You must pass in a base directory.")))))
 
 (defn
 #^{:doc "Creates and returns the given file if it does not already exist. If it does exist, the method simply prints to
@@ -64,9 +63,9 @@ standard out and returns nil"}
   ([file] (create-file file false))
   ([file silent]
     (if (. file exists)
-      (if (not silent) (println (. file getName) "already exists. Doing nothing."))
+      (logging/info (str (. file getName) " already exists. Doing nothing."))
       (do
-        (if (not silent) (println "Creating file" (. file getName) "..."))
+        (logging/info (str "Creating file " (. file getName) "..."))
         (. file createNewFile)
         file))))
 

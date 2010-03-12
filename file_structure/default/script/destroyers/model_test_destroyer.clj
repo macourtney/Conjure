@@ -1,5 +1,6 @@
 (ns destroyers.model-test-destroyer
-  (:require [conjure.test.util :as util]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.test.util :as util]
             [conjure.util.file-utils :as file-utils]
             [destroyers.fixture-destroyer :as fixture-destroyer]))
 
@@ -18,12 +19,12 @@
         (let [model-unit-test-file (util/model-unit-test-file model model-unit-test-dir)]
           (if model-unit-test-file
             (let [is-deleted (. model-unit-test-file delete)] 
-              (println "File" (. model-unit-test-file getName) (if is-deleted "destroyed." "not destroyed."))
+              (logging/info (str "File " (. model-unit-test-file getName) (if is-deleted " destroyed." " not destroyed.")))
               (file-utils/delete-all-if-empty model-unit-test-dir (util/find-unit-test-directory)))
-            (println "Model test file not found. Doing nothing.")))
+            (logging/info "Model test file not found. Doing nothing.")))
         (do
-          (println "Could not find the model unit test directory.")
-          (println "Command ignored."))))
+          (logging/error "Could not find the model unit test directory.")
+          (logging/error "Command ignored."))))
     (usage)))
 
 (defn

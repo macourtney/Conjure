@@ -1,6 +1,7 @@
 (ns conjure.test.builder
   (:import [java.io File])
-  (:require [conjure.test.util :as util]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.test.util :as util]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.loading-utils :as loading-utils]))
 
@@ -10,7 +11,7 @@
   ([{ :keys [test-directory silent] :or { test-directory (util/find-test-directory), silent false } }]
     (if test-directory
       (file-utils/create-dirs [test-directory util/functional-dir-name] silent)
-      (if (not silent) (println "You must pass in a test directory.")))))
+      (logging/error "You must pass in a test directory."))))
 
 (defn
 #^{:doc "Finds (or creates if not found) the unit test directory."}
@@ -18,7 +19,7 @@
   [{ :keys [test-directory silent] :or { test-directory (util/find-test-directory), silent false } }]
     (if test-directory
       (file-utils/create-dirs [ test-directory util/unit-dir-name ] silent)
-      (if (not silent) (println "You must pass in a test directory."))))
+      (logging/error "You must pass in a test directory.")))
 
 (defn
 #^{:doc "Finds (or creates if not found) the view unit test directory."}
@@ -26,7 +27,7 @@
   [{ :keys [test-directory silent] :or { test-directory (util/find-test-directory), silent false } }]
     (if test-directory
       (file-utils/create-dirs [test-directory util/unit-dir-name util/unit-view-dir-name] silent)
-      (if (not silent) (println "You must pass in a test directory."))))
+      (logging/error "You must pass in a test directory.")))
 
 (defn
 #^{:doc "Finds (or creates if not found) the unit test directory."}
@@ -34,7 +35,7 @@
   [{ :keys [controller test-directory silent] :or { test-directory (util/find-test-directory), silent false} }]
     (if test-directory
       (file-utils/create-dirs [test-directory util/unit-dir-name util/unit-view-dir-name (loading-utils/dashes-to-underscores controller)] silent)
-      (if (not silent) (println "You must pass in a test directory."))))
+      (logging/error "You must pass in a test directory.")))
 
 (defn
 #^{:doc "Finds (or creates if not found) the model unit test directory."}
@@ -42,7 +43,7 @@
     (let [test-directory (util/find-test-directory)] 
       (if test-directory
         (file-utils/create-dirs [test-directory util/unit-dir-name util/unit-model-dir-name] silent)
-        (if (not silent) (println "You must pass in a test directory.")))))
+        (logging/error "You must pass in a test directory."))))
       
 (defn
 #^{:doc "Finds (or creates if not found) the fixture directory."}
@@ -50,7 +51,7 @@
     (let [test-directory (util/find-test-directory)]
       (if test-directory
         (file-utils/create-dirs [test-directory util/fixture-dir-name] silent)
-        (if (not silent) (println "You must pass in a test directory.")))))
+        (logging/error "You must pass in a test directory."))))
 
 (defn
 #^{:doc "Creates a new functional test file from the given controller name."}

@@ -1,6 +1,7 @@
 (ns conjure.model.builder
   (:import [java.io File])
-  (:require [conjure.model.util :as util]))
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.model.util :as util]))
 
 (defn
 #^{:doc "Creates a new model file from the given model name."}
@@ -11,9 +12,9 @@
       (let [model-file (new File models-directory (util/model-file-name-string model-name))]
         (if (. model-file exists)
           (do
-            (println (. model-file getName) "already exits. Doing nothing.")
+            (logging/info (str (. model-file getName) " already exits. Doing nothing."))
             model-file)
           (do
-            (println "Creating model file" (. model-file getName) "...")
+            (logging/info (str "Creating model file " (. model-file getName) "..."))
             (. model-file createNewFile)
             model-file))))))

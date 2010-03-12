@@ -1,6 +1,7 @@
 (ns conjure.controller.builder
   (:import [java.io File])
-  (:require [conjure.controller.util :as util]))
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.controller.util :as util]))
 
 (defn
 #^{:doc "Creates a new controller file from the given controller name."}
@@ -10,8 +11,8 @@
     (if (and controllers-directory controller)
       (let [controller-file (new File controllers-directory (util/controller-file-name-string controller))]
         (if (. controller-file exists)
-          (if (not silent) (println (. controller-file getName) "already exists. Doing nothing."))
+          (logging/info (str (. controller-file getName) " already exists. Doing nothing."))
           (do
-            (if (not silent) (println "Creating controller file" (. controller-file getName) "..."))
+            (logging/info (str "Creating controller file " (. controller-file getName) "..."))
             (. controller-file createNewFile)
             controller-file)))))

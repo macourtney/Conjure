@@ -1,5 +1,6 @@
 (ns destroyers.model-destroyer
-  (:require [conjure.model.util :as util]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.model.util :as util]
             [destroyers.migration-destroyer :as migration-destroyer]
             [destroyers.model-test-destroyer :as model-test-destroyer]))
 
@@ -23,12 +24,11 @@
         (let [model-file (util/find-model-file models-directory model)]
           (if model-file
             (let [is-deleted (. model-file delete)] 
-              (println "File" (. model-file getPath) (if is-deleted "deleted." "not deleted.") ))
-            (println "Model file not found. Doing nothing.")))
+              (logging/info (str "File " (. model-file getPath) (if is-deleted " deleted." " not deleted."))))
+            (logging/info "Model file not found. Doing nothing.")))
         (do
-          (println "Could not find models directory.")
-          (println models-directory)
-          (println "Command ignored."))))
+          (logging/error (str "Could not find models directory: " models-directory))
+          (logging/error "Command ignored."))))
     (model-usage)))
 
 (defn

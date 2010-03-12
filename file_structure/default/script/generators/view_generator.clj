@@ -1,6 +1,7 @@
 (ns generators.view-generator
   (:import [java.io File])
-  (:require [conjure.view.builder :as builder]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.view.builder :as builder]
             [conjure.view.util :as util]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.loading-utils :as loading-utils]
@@ -70,10 +71,7 @@ content." }
                 (if view-file
                   (generate-file-content view-file controller content)))
               (view-test-generator/generate-unit-test controller action silent test-content))
-            (if (not silent)
-              (do
-                (println "Could not find views directory.")
-                (println view-directory)))))
+            (logging/error (str "Could not find views directory: " view-directory))))
         (view-usage))))
         
 (defn 

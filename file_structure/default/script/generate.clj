@@ -1,5 +1,6 @@
 (ns generate 
-  (:require [generators.controller-generator :as controller-generator]
+  (:require [conjure.server.server :as server]
+            [generators.controller-generator :as controller-generator]
             [generators.controller-test-generator :as controller-test-generator]
             [generators.fixture-generator :as fixture-generator]
             [generators.migration-generator :as migration-generator]
@@ -51,6 +52,8 @@
       
     true ; Default condition.
       (print-unknown-command command)))
+
+(server/init)
 
 (let [generate-command (first *command-line-args*)
       generate-type-params (rest *command-line-args*)]

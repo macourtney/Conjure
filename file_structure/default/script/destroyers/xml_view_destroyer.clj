@@ -1,5 +1,6 @@
 (ns destroyers.xml-view-destroyer
-  (:require [conjure.view.util :as util]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.view.util :as util]
             [destroyers.view-test-destroyer :as view-test-destroyer]))
 
 (defn
@@ -19,13 +20,12 @@
             (let [view-file (util/find-view-file controller-directory action)]
               (if view-file
                 (let [is-deleted (. view-file delete)] 
-                  (println "File" (. view-file getName) (if is-deleted "destroyed." "not destroyed.")))
-                (println "View file not found. Doing nothing.")))
-            (println "The directory for controller" controller "was not found. Doing nothing.")))
+                  (logging/info (str "File " (. view-file getName) (if is-deleted " destroyed." " not destroyed."))))
+                (logging/info "View file not found. Doing nothing.")))
+            (logging/info (str "The directory for controller " controller " was not found. Doing nothing."))))
         (do
-          (println "Could not find views directory.")
-          (println view-directory)
-          (println "Command ignored."))))
+          (logging/error (str "Could not find views directory: " view-directory))
+          (logging/error "Command ignored."))))
     (view-usage)))
 
 (defn

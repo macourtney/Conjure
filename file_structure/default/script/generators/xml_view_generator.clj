@@ -1,6 +1,7 @@
 (ns generators.xml-view-generator
   (:import [java.io File])
-  (:require [conjure.view.builder :as builder]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.view.builder :as builder]
             [conjure.view.util :as util]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.loading-utils :as loading-utils]
@@ -50,10 +51,7 @@ inner-content is added to the body of the xml view code."}
                 (if view-file
                   (generate-file-content view-file controller nil)))
               (view-test-generator/generate-unit-test controller action silent))
-            (if (not silent)
-              (do
-                (println "Could not find views directory.")
-                (println view-directory)))))
+            (logging/error (str "Could not find views directory: " view-directory))))
         (view-usage))))
         
 (defn 
