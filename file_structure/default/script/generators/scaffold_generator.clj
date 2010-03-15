@@ -60,7 +60,7 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
 (defn
 #^{ :doc "Returns the content for add in the action map." }
   create-index-action []
-    { :controller (str "(defn index [request-map]
+    { :controller (str "(defaction index
   (redirect-to request-map { :action \"list-records\" }))")
       :view nil })
       
@@ -99,7 +99,7 @@ table metadata as params." }
 (defn
 #^{ :doc "Returns the content for list in the action map." }
   create-list-records-action [model]
-    { :controller (str "(defn list-records [request-map]
+    { :controller (str "(defaction list-records
   (render-view request-map \"" model "\" (" model "/table-metadata) (" model "/find-records [true])))")
       :view 
         { :params "model-name table-metadata records", 
@@ -112,7 +112,7 @@ table metadata as params." }
 (defn
 #^{ :doc "Returns the content for list in the action map." }
   create-show-action [model]
-    { :controller (str "(defn show [request-map]
+    { :controller (str "(defaction show
   (let [id (:id (:params request-map))]
     (if id
       (render-view request-map \"" model "\" (" model "/table-metadata) (" model "/get-record id))
@@ -126,7 +126,7 @@ table metadata as params." }
 (defn
 #^{ :doc "Returns the content for add in the action map." }
   create-add-action [model]
-    { :controller (str "(defn add [request-map]
+    { :controller (str "(defaction add
   (render-view request-map \"" model "\" (" model "/table-metadata)))")
       :view 
         { :params "model-name table-metadata", 
@@ -139,7 +139,7 @@ table metadata as params." }
 (defn
 #^{ :doc "Returns the content for add in the action map." }
   create-create-action [model]
-    { :controller (str "(defn create [request-map]
+    { :controller (str "(defaction create
   (let [record (:record (:params request-map))]
     (if record
       (" model "/insert record))
@@ -149,7 +149,7 @@ table metadata as params." }
 (defn
 #^{ :doc "Returns the content for edit in the action map." }
   create-edit-action [model]
-    { :controller (str "(defn edit [request-map]
+    { :controller (str "(defaction edit
   (let [id (:id (:params request-map))]
     (if id
       (render-view request-map (" model "/table-metadata) (" model "/get-record id))
@@ -163,7 +163,7 @@ table metadata as params." }
 (defn
 #^{ :doc "Returns the content for add in the action map." }
   create-save-action [model]
-    { :controller (str "(defn save [request-map]
+    { :controller (str "(defaction save
   (let [record (:record (:params request-map))]
     (if record
       (" model "/update record))
@@ -173,7 +173,7 @@ table metadata as params." }
 (defn
 #^{ :doc "Returns the content for delete in the action map." }
   create-delete-warning-action [model]
-    { :controller (str "(defn delete-warning [request-map]
+    { :controller (str "(defaction delete-warning
   (let [id (:id (:params request-map))]
     (render-view request-map (" model "/table-metadata) (if id (" model "/get-record id)))))")
       :view 
@@ -185,7 +185,7 @@ table metadata as params." }
 (defn
 #^{ :doc "Returns the content for delete in the action map." }
   create-delete-action [model]
-    { :controller (str "(defn delete [request-map]
+    { :controller (str "(defaction delete
   (let [delete-id (:id (:params request-map))]
     (do
       (if delete-id (" model "/destroy-record { :id delete-id }))
@@ -195,7 +195,7 @@ table metadata as params." }
 (defn
 #^{ :doc "Returns the content for the ajax delete in the action map." }
   create-ajax-delete [model]
-  { :controller (str "(defn ajax-delete [request-map]
+  { :controller (str "(defaction ajax-delete
   (let [delete-id (:id (:params request-map))]
     (do
       (if delete-id (" model "/destroy-record { :id delete-id }))
@@ -206,7 +206,7 @@ table metadata as params." }
 (defn
 #^{ :doc "Returns the content for the ajax add in the action map." }
   create-ajax-add [model]
-  { :controller (str "(defn ajax-add [request-map]
+  { :controller (str "(defaction ajax-add
   (let [record (:record (:params request-map))]
     (if record
       (do
@@ -222,7 +222,7 @@ table metadata as params." }
 (defn
 #^{ :doc "Returns the content for the ajax show in the action map." }
   create-ajax-show [model]
-  { :controller (str "(defn ajax-show [request-map]
+  { :controller (str "(defaction ajax-show
   (let [id (:id (:params request-map))]
     (if id
       (render-view { :layout nil } request-map \"" model "\"
@@ -238,7 +238,7 @@ table metadata as params." }
 (defn
 #^{ :doc "Returns the content for the ajax row in the action map." }
   create-ajax-row [model]
-  { :controller (str "(defn ajax-row [request-map]
+  { :controller (str "(defaction ajax-row
   (let [id (:id (:params request-map))]
     (if id
       (render-view { :layout nil } request-map
@@ -253,7 +253,7 @@ table metadata as params." }
 (defn
 #^{ :doc "Returns the content for the ajax show in the action map." }
   create-ajax-edit [model]
-  { :controller (str "(defn ajax-edit [request-map]
+  { :controller (str "(defaction ajax-edit
   (let [id (:id (:params request-map))]
     (if id
       (render-view { :layout nil } request-map \"" model "\"
@@ -269,7 +269,7 @@ table metadata as params." }
 (defn
 #^{ :doc "Returns the content for the ajax row in the action map." }
   create-ajax-save [model]
-  { :controller (str "(defn ajax-save [request-map]
+  { :controller (str "(defaction ajax-save
   (let [record (:record (:params request-map))]
     (if record
       (do

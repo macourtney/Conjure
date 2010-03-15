@@ -6,7 +6,7 @@
 ; Sets up the logger for test mode.
 (def output-pattern (new PatternLayout "%-5p [%c]: %m%n"))
 
-(def file-appender (new FileAppender output-pattern "log/production.log"))
+(def file-appender (new FileAppender output-pattern "log/test.log"))
 (.addFilter file-appender 
   (doto (new LevelRangeFilter)
     (.setLevelMin (. Level ALL))))

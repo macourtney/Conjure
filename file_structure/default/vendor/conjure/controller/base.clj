@@ -57,3 +57,23 @@ render-type? to determine :request-map or :parameters." }
         (redirect-to-full-url (view-util/url-for request-map (dissoc params :status)) status)
         (redirect-to-full-url (view-util/url-for request-map params))))))
 
+(defmacro defcontroller []
+  `(def ~'actions (atom {})))
+
+(defn
+#^{ :doc "Returns a new map with the given action function added to the given actions-map based on the given 
+parameters." }
+  assoc-action [actions-map action-function { :keys [action-name method] :or { method :all } }]
+  (assoc actions-map method (assoc (get actions-map method) (keyword action-name) action-function)))
+
+(defmacro defaction [action-name & body]
+  (let [attributes (first body)]
+    (if (map? attributes)
+      `(reset! ~'actions 
+        (assoc-action (deref ~'actions) 
+          (fn [~'request-map] ~@(rest body)) 
+          (merge { :action-name ~(str action-name) } ~attributes)))
+      `(reset! ~'actions 
+        (assoc-action (deref ~'actions) 
+          (fn [~'request-map] ~@body) 
+          { :action-name ~(str action-name) })))))

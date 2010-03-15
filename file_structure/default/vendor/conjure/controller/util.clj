@@ -77,11 +77,32 @@
         (str (controller-namespace controller) "/" action)))))
 
 (defn
+#^{ :doc "Returns a keyword for the request method." }
+  method-key [request-map]
+  (let [request-method (:method (:request request-map))]
+    (cond
+      (= "GET" request-method) :get
+      (= "POST" request-method) :post
+      (= "PUT" request-method) :put
+      (= "DELETE" request-method) :delete)))
+
+(defn
+#^{ :doc "Returns the actions map for the given controller." }
+  controller-actions [controller]
+  (deref
+    (deref 
+      (ns-resolve 
+        (ns-utils/get-ns 
+          (symbol (controller-namespace controller))) 
+        'actions))))
+
+(defn
 #^{ :doc "Returns the action function for the controller and action listed in the given request-map." }
   find-action-fn [request-map]
-  (ns-resolve 
-    (ns-utils/get-ns (symbol (controller-namespace (:controller request-map))))
-    (symbol (:action request-map))))
+  (let [actions-map (controller-actions (:controller request-map))]
+    (get
+      (or (get actions-map (method-key request-map)) (get actions-map :all))
+      (keyword (:action request-map)))))
 
 (defn
 #^{ :doc "Calls the given controller with the given request map returning the response." }

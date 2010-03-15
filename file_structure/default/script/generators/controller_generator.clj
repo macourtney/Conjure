@@ -16,7 +16,7 @@
 (defn
 #^{ :doc "Generates the action function for the given action." }
   generate-action-function [action]
-  (str "(defn " action " [request-map]
+  (str "(defaction " action "
   (render-view request-map))"))
   
 (defn
@@ -36,6 +36,8 @@
   ([controller controller-content requires]
     (str "(ns " (util/controller-namespace controller) "
   (:use [conjure.controller.base])" (if requires (str "\n  (:require " requires ")")) ")
+
+(defcontroller)
 
 " controller-content)))
 

@@ -9,11 +9,10 @@
 (def action-name "blah")
 
 (defn setup-all [function]
-  (controller-generator/generate-controller-file 
-    { :controller controller-name, :silent true })
-  (function)
-  (controller-destroyer/destroy-all-dependencies 
-    { :controller controller-name, :silent true }))
+  (let [generator-map { :controller controller-name, :actions [action-name], :silent true }]
+    (controller-generator/generate-controller-file generator-map)
+    (function)
+    (controller-destroyer/destroy-all-dependencies generator-map)))
         
 (use-fixtures :once setup-all)
   
@@ -84,3 +83,20 @@
   (is (= nil (fully-qualified-action { :controller controller-name })))
   (is (= nil (fully-qualified-action { })))
   (is (= nil (fully-qualified-action nil))))
+
+(deftest test-method-key
+  (is (= :get (method-key { :request { :method "GET" } })))
+  (is (= :post (method-key { :request { :method "POST" } })))
+  (is (= :put (method-key { :request { :method "PUT" } })))
+  (is (= :delete (method-key { :request { :method "DELETE" } }))))
+
+(deftest test-controller-actions
+  (let [home-actions (controller-actions controller-name)]
+    (is home-actions)
+    (is (map? home-actions))))
+
+(deftest test-find-action-fn
+  (is (find-action-fn { :controller controller-name, :action action-name, :request { :method "GET" } })))
+
+(deftest test-call-controller
+  (is (call-controller { :controller controller-name, :action action-name, :request { :method "GET" } })))
