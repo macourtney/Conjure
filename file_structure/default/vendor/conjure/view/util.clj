@@ -9,6 +9,8 @@
             [clojure.contrib.seq-utils :as seq-utils]
             session-config))
 
+(def loaded-views (atom {}))
+
 (defn 
 #^{:doc "Finds the views directory which contains all of the files which describe the html pages of the app."}
   find-views-directory []
@@ -16,7 +18,7 @@
     (. (loading-utils/get-classpath-dir-ending-with "app") listFiles)))
   
 (defn
-#^{:doc "Finds a controller directory for the given controller in the given view directory."}
+#^{ :doc "Finds a controller directory for the given controller in the given view directory." }
   find-controller-directory 
   ([controller] (find-controller-directory (find-views-directory) controller))
   ([view-directory controller]
@@ -24,17 +26,40 @@
       (file-utils/find-directory view-directory (loading-utils/dashes-to-underscores controller)))))
   
 (defn
-#^{:doc "Finds a view file with the given controller-directory and action."}
+#^{ :doc "Finds a view file with the given controller-directory and action." }
   find-view-file [controller-directory action]
   (if (and controller-directory action)
     (file-utils/find-file controller-directory (loading-utils/symbol-string-to-clj-file action))))
+
+(defn
+#^{ :doc "Adds the given action to the given loaded action set." }
+  add-loaded-action [loaded-action-set action]
+  (let [action-key (keyword action)]
+    (if loaded-action-set
+      (if (not (contains? loaded-action-set action-key))
+        (conj loaded-action-set action-key)
+        loaded-action-set)
+      #{ action-key })))
+
+(defn
+#^{ :doc "Adds the given controller and action to the given loaded views map." }
+  assoc-loaded-views [loaded-view-map controller action]
+  (let [controller-key (keyword controller)]
+    (assoc loaded-view-map controller-key 
+      (add-loaded-action (get loaded-view-map controller-key) action))))
+
+(defn
+#^{ :doc "Loads the view corresponding to the values in the given request map." }
+  load-view [{ controller :controller, action :action }]
+  (loading-utils/load-resource 
+    (str "views/" (loading-utils/dashes-to-underscores controller)) 
+    (str (loading-utils/dashes-to-underscores action) ".clj"))
+  (reset! loaded-views (assoc-loaded-views @loaded-views controller action)))
   
 (defn
-#^{:doc "Loads the view corresponding to the values in the given request map."}
-  load-view [request-map]
-  (loading-utils/load-resource 
-    (str "views/" (loading-utils/dashes-to-underscores (:controller request-map))) 
-    (str (loading-utils/dashes-to-underscores (:action request-map)) ".clj")))
+#^{ :doc "Returns true if the view corresponding to the given request-map is already loaded." }
+  view-loaded? [{ controller :controller, action :action }]
+  (get (get @loaded-views controller) action))
 
 (defn
 #^{:doc "Returns the view namespace request map."}
@@ -60,7 +85,8 @@
 (defn
 #^{ :doc "Returns the rendered view from the given request-map." }
   render-view [request-map & params]
-  (load-view request-map)
+  (if (not (view-loaded? request-map))
+    (load-view request-map))
   (let [view-namespace (request-view-namespace request-map)]
     (logging/debug (str "Rendering view: " view-namespace))
     (apply
