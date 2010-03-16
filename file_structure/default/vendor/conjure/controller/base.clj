@@ -1,5 +1,6 @@
 (ns conjure.controller.base
-  (:require [conjure.controller.util :as controller-util]
+  (:require [clojure.contrib.str-utils :as str-utils]
+            [conjure.controller.util :as controller-util]
             [conjure.view.util :as view-util]
             [conjure.util.html-utils :as html-utils]
             [conjure.util.string-utils :as string-utils]))
@@ -57,23 +58,27 @@ render-type? to determine :request-map or :parameters." }
         (redirect-to-full-url (view-util/url-for request-map (dissoc params :status)) status)
         (redirect-to-full-url (view-util/url-for request-map params))))))
 
-(defmacro defcontroller []
-  `(def ~'actions (atom {})))
+(defn
+#^{ :doc "Adds the given action function to the list of action functions to call." }
+  add-action-function [action-function params]
+  (controller-util/add-action-function action-function params))
 
 (defn
-#^{ :doc "Returns a new map with the given action function added to the given actions-map based on the given 
-parameters." }
-  assoc-action [actions-map action-function { :keys [action-name method] :or { method :all } }]
-  (assoc actions-map method (assoc (get actions-map method) (keyword action-name) action-function)))
+  controller-from-namespace [namespace-name]
+  (string-utils/strip-ending 
+    (last (str-utils/re-split #"\." namespace-name)) 
+    controller-util/controller-namespace-ending))
 
 (defmacro defaction [action-name & body]
-  (let [attributes (first body)]
+  (let [attributes (first body)
+        controller (controller-from-namespace (name (ns-name *ns*)))
+        params { :action (str action-name), :controller controller }]
     (if (map? attributes)
-      `(reset! ~'actions 
-        (assoc-action (deref ~'actions) 
+      (let [new-params (merge params attributes)]
+        `(add-action-function 
           (fn [~'request-map] ~@(rest body)) 
-          (merge { :action-name ~(str action-name) } ~attributes)))
-      `(reset! ~'actions 
-        (assoc-action (deref ~'actions) 
-          (fn [~'request-map] ~@body) 
-          { :action-name ~(str action-name) })))))
+          ~new-params))
+      `(add-action-function 
+        (fn [~'request-map] ~@body) 
+        ~params))))
+

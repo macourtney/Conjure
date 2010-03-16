@@ -11,6 +11,8 @@
 (def controller-file-name-ending "_controller.clj")
 (def controller-namespace-ending "-controller")
 
+(def controller-actions (atom {}))
+
 (defn 
 #^{ :doc "Finds the controller directory." }
   find-controllers-directory []
@@ -64,8 +66,10 @@
 
 (defn
 #^{ :doc "Loads the given controller file." }
-  load-controller [controller-filename]
-  (loading-utils/load-resource controllers-dir controller-filename))
+  load-controller [controller]
+  (let [controller-filename (controller-file-name-string controller)]
+    (when (and controller-filename (controller-exists? controller-filename))
+      (loading-utils/load-resource controllers-dir controller-filename))))
 
 (defn
 #^{ :doc "Returns fully qualified action generated from the given request map." }
@@ -75,7 +79,6 @@
           action (:action request-map)]
       (if (and controller action)
         (str (controller-namespace controller) "/" action)))))
-
 (defn
 #^{ :doc "Returns a keyword for the request method." }
   method-key [request-map]
@@ -88,29 +91,68 @@
 
 (defn
 #^{ :doc "Returns the actions map for the given controller." }
-  controller-actions [controller]
-  (deref
-    (deref 
-      (ns-resolve 
-        (ns-utils/get-ns 
-          (symbol (controller-namespace controller))) 
-        'actions))))
+  actions-map [controller]
+  (get @controller-actions (keyword controller)))
+
+(defn
+#^{ :doc "Returns the methods map for the given controller and action." }
+  methods-map [controller action]
+  (get (actions-map controller) (keyword action)))
+  
+(defn
+#^{ :doc "Returns the action function for the given controller, action, and method. If method is not given or nil, then
+the method is assumed to be :all. If no matching method is found, then nil is returned." }
+  action-function 
+  ([controller action] (action-function controller action nil))
+  ([controller action method]
+    (let [all-methods (methods-map controller action)]
+      (or (get all-methods method) (get all-methods :all)))))
 
 (defn
 #^{ :doc "Returns the action function for the controller and action listed in the given request-map." }
-  find-action-fn [request-map]
-  (let [actions-map (controller-actions (:controller request-map))]
-    (get
-      (or (get actions-map (method-key request-map)) (get actions-map :all))
-      (keyword (:action request-map)))))
+  find-action-fn [{ controller :controller, action :action, :as request-map }]
+  (action-function controller action (method-key request-map)))
+
+(defn
+#^{ :doc "Attempts to run the action requested in request-map. If the action is successful, it's response is returned, 
+otherwise nil is returned." }
+  run-action [request-map]
+  (let [action-fn (find-action-fn request-map)]
+    (when action-fn
+      (logging/debug (str "Running action: " (fully-qualified-action request-map)))
+      (action-fn request-map))))
 
 (defn
 #^{ :doc "Calls the given controller with the given request map returning the response." }
   call-controller [request-map]
-  (let [controller-file (controller-file-name request-map)]
-    (when (and controller-file (controller-exists? controller-file))
-      (logging/debug (str "Running action: " (fully-qualified-action request-map)))
-      (load-controller controller-file)
-      (let [action-fn (find-action-fn request-map)]
-        (if action-fn
-          (action-fn request-map))))))
+  (or 
+    (run-action request-map)
+    (do
+      (load-controller (:controller request-map))
+      (run-action request-map))))
+
+(defn 
+#^{ :doc "adds the given action function into the given methods map and returns the result." }
+  assoc-methods [methods-map { action-function :action-function, methods :methods, :or { methods [:all] } }]
+  (reduce #(assoc %1 %2 action-function) methods-map methods))
+  
+(defn
+#^{ :doc "adds the given action function into the given actions map and returns the result." }
+  assoc-actions [actions-map { action-function :action-function, action :action, methods :methods, :as params }]
+  (let [action-key (keyword action)]
+    (assoc actions-map action-key 
+      (assoc-methods (get actions-map action-key) params))))
+  
+(defn
+#^{ :doc "adds the given action function into the given controllers map and returns the result." }
+  assoc-controllers [controllers-map { controller :controller, :as params }]
+  (let [controller-key (keyword controller)]
+    (assoc controllers-map controller-key 
+      (assoc-actions (get controllers-map controller-key) params))))
+
+(defn
+#^{ :doc "Adds the given action function to the list of action functions to call." }
+  add-action-function [action-function params]
+  (reset! controller-actions
+    (assoc-controllers @controller-actions 
+      (assoc params :action-function action-function))))

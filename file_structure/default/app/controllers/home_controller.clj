@@ -2,8 +2,6 @@
   (:use conjure.controller.base
         helpers.home-helper))
 
-(defcontroller)
-
 (defaction index [request-map]
   (render-view (home-request-map request-map)))
 

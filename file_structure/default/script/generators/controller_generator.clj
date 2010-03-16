@@ -37,8 +37,6 @@
     (str "(ns " (util/controller-namespace controller) "
   (:use [conjure.controller.base])" (if requires (str "\n  (:require " requires ")")) ")
 
-(defcontroller)
-
 " controller-content)))
 
 (defn
