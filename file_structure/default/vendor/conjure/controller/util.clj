@@ -60,6 +60,10 @@
       (. (find-controllers-directory) listFiles))))
 
 (defn
+  all-controller-namespaces []
+  (map #(symbol (controller-namespace %)) (all-controllers)))
+
+(defn
 #^{ :doc "Returns true if the given controller exists." }
   controller-exists? [controller-file-name]
   (loading-utils/resource-exists? (str controllers-dir "/" controller-file-name)))

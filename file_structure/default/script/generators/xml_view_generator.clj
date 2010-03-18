@@ -30,7 +30,7 @@ inner-content is added to the body of the xml view code."}
   generate-file-content
     ([xml-view-file controller] (generate-file-content xml-view-file controller nil))
     ([xml-view-file controller xml-content]
-      (let [xml-view-namespace (util/view-namespace controller xml-view-file)
+      (let [xml-view-namespace (util/view-namespace xml-view-file)
             xml-view-content (str (if xml-content xml-content (generate-standard-content xml-view-namespace (str "[:p \"You can change this text in app/views/" (loading-utils/dashes-to-underscores controller) "/" (. xml-view-file getName) "\"]"))))]
         (file-utils/write-file-content xml-view-file xml-view-content))))
 

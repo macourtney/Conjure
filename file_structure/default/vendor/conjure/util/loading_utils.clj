@@ -103,15 +103,21 @@
 #^{:doc "Converts all slashes to periods in string."}
   slashes-to-dots [string]
   (if string
-    (clojure-str-utils/re-gsub #"/|\\" "." string) ; "\" Fixing a bug with syntax highlighting
+    (clojure-str-utils/re-gsub #"/|\\" ; "\" Fixing a bug with syntax highlighting
+       "." string) 
     string))
     
 (defn
-#^{:doc "Converts all periods to slashes in string."}
+#^{ :doc "Converts all periods to slashes in string." }
   dots-to-slashes [string]
   (if string
     (. string replace "." (file-separator))
     string))
+
+(defn
+#^{ :doc "Returns true if the given file is a clojure file." }
+  clj-file? [file]
+  (and (.isFile file) (.endsWith (.getName file) ".clj")))
 
 (defn
 #^{:doc "Converts the given clj file name to a symbol string. For example: \"loading_utils.clj\" would get converted into \"loading-utils\""}
@@ -127,7 +133,23 @@
       dashed-name)))
 
 (defn
-#^{:doc "Returns a string for the namespace of the given file in the given directory."}
+#^{ :doc "Returns the namespace of the given file assuming the classpath include the given classpath parent 
+directory." }
+  file-namespace [classpath-parent-directory file]
+  (if file
+    (string-utils/strip-ending
+      (clojure-str-utils/str-join "." 
+        (map underscores-to-dashes 
+          (string-utils/tokenize 
+            (if classpath-parent-directory
+              (.substring (.getPath file)
+                (.length (.getPath classpath-parent-directory))) 
+              (.getPath file))
+            "\\/")))
+      ".clj")))
+
+(defn
+#^{ :doc "Returns a string for the namespace of the given file in the given directory." }
   namespace-string-for-file [directory file-name]
   (if file-name
     (if (and directory (> (. (. directory trim) length) 0))
@@ -136,3 +158,4 @@
         (str (slashes-to-dots (underscores-to-dashes slash-trimmed-directory)) "." (clj-file-to-symbol-string file-name)))
       (clj-file-to-symbol-string file-name))
     file-name))
+

@@ -27,6 +27,21 @@
     (is (not (nil? models-dirctory)))
     (is (instance? File models-dirctory))
     (is (= "models" (. models-dirctory getName)))))
+
+(deftest test-model-files
+  (doseq [model-file (model-files)]
+    (is (.isFile model-file))
+    (is (.endsWith (.getName model-file) ".clj"))))
+
+(deftest test-model-file-namespace
+  (is (= "models.test-model" (model-file-namespace (new File (find-models-directory) "test_model.clj"))))
+  (is (= "models.submodel.test-model" (model-file-namespace (new File (find-models-directory) "submodel/test_model.clj"))))
+  (is (nil? (model-file-namespace nil))))
+
+(deftest test-all-model-namespaces
+  (doseq [model-namespace (all-model-namespaces)]
+    (is model-namespace)
+    (is (symbol? model-namespace))))
     
 (deftest test-model-file-name-string
   (is (= (str model-name ".clj") (model-file-name-string model-name)))

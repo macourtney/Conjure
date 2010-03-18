@@ -7,16 +7,23 @@
             [clojure.contrib.logging :as logging]
             [clojure.contrib.ns-utils :as ns-utils]
             [clojure.contrib.seq-utils :as seq-utils]
+            [clojure.contrib.str-utils :as str-utils]
+            environment
             session-config))
 
 (def loaded-views (atom {}))
 
 (defn 
-#^{:doc "Finds the views directory which contains all of the files which describe the html pages of the app."}
+#^{ :doc "Finds the views directory which contains all of the files which describe the html pages of the app." }
   find-views-directory []
   (seq-utils/find-first (fn [directory] (. (. directory getPath) endsWith "views"))
     (. (loading-utils/get-classpath-dir-ending-with "app") listFiles)))
-  
+
+(defn
+#^{ :doc "Returns all of the view files in all of the directories in the view directory." }
+  view-files []
+  (filter loading-utils/clj-file? (file-seq (find-views-directory))))
+
 (defn
 #^{ :doc "Finds a controller directory for the given controller in the given view directory." }
   find-controller-directory 
@@ -78,14 +85,19 @@
 
 (defn
 #^{ :doc "Returns the view namespace for the given view file." }
-  view-namespace [controller view-file]
-  (if (and controller view-file)
-    (view-namespace-by-action controller (loading-utils/clj-file-to-symbol-string (. view-file getName)))))
+  view-namespace 
+  [view-file]
+  (loading-utils/file-namespace (.getParentFile (find-views-directory)) view-file))
+
+(defn
+#^{ :doc "Returns a sequence of all view namespaces." }
+  all-view-namespaces []
+  (map #(symbol (view-namespace %)) (view-files)))
 
 (defn
 #^{ :doc "Returns the rendered view from the given request-map." }
   render-view [request-map & params]
-  (if (not (view-loaded? request-map))
+  (when (or environment/reload-files (not (view-loaded? request-map)))
     (load-view request-map))
   (let [view-namespace (request-view-namespace request-map)]
     (logging/debug (str "Rendering view: " view-namespace))

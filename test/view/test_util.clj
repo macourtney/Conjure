@@ -18,7 +18,12 @@
 
 (deftest test-find-views-directory
   (test-directory (find-views-directory) "views"))
-    
+
+(deftest test-view-files
+  (doseq [view-file (view-files)]
+    (is (.isFile view-file))
+    (is (.endsWith (.getName view-file) ".clj"))))
+
 (deftest test-find-controller-directory
   (test-directory (find-controller-directory (find-views-directory) controller-name) controller-name)
   (test-directory (find-controller-directory controller-name) controller-name)
@@ -50,15 +55,16 @@
   (is (nil? (request-view-namespace nil))))
   
 (deftest test-view-namespace
-  (is (= (str "views." controller-name "." action-name)
-         (view-namespace controller-name (new File (str action-name ".clj")))))
-  (is (= "views.test-foo.show-foo"
-         (view-namespace "test-foo" (new File "show-foo.clj"))))
-  (is (= "views.test-foo.show-foo"
-         (view-namespace "test_foo" (new File "show_foo.clj"))))
-  (is (nil? (view-namespace controller-name nil)))
-  (is (nil? (view-namespace nil (new File "show-foo.clj"))))
-  (is (nil? (view-namespace nil nil))))
+  (is (nil? (view-namespace nil)))
+  (is (= (str "views." controller-name "." action-name) 
+         (view-namespace (new File (find-views-directory) (str controller-name "/" action-name ".clj")))))
+  (is (= (str "views.my-controller.action-view") 
+         (view-namespace (new File (find-views-directory) "my_controller/action_view.clj")))))
+
+(deftest test-all-view-namespaces
+  (doseq [view-namespace (all-view-namespaces)]
+    (is view-namespace)
+    (is (symbol? view-namespace))))
   
 (deftest test-merge-url-for-params
   (is (= 

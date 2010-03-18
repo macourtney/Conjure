@@ -20,3 +20,7 @@
   (.setLevel (. Level ALL))
   (.addAppender file-appender)
   (.addAppender console-appender))
+
+(in-ns 'environment)
+
+(def reload-files false)

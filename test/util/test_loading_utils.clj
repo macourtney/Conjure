@@ -2,7 +2,8 @@
   (:import [java.io File Reader]
            [java.io ByteArrayInputStream])
   (:use clojure.contrib.test-is
-        conjure.util.loading-utils))
+        conjure.util.loading-utils)
+  (:require [conjure.util.file-utils :as file-utils]))
         
 (deftest test-system-class-loader
   (let [test-class-loader (system-class-loader)]
@@ -73,6 +74,11 @@
   (is (= (dots-to-slashes "foo") "foo"))
   (is (= (dots-to-slashes "") ""))
   (is (= (dots-to-slashes nil) nil)))
+  
+(deftest test-clj-file?
+  (is (clj-file? (new File (file-utils/user-directory) "app/controllers/home_controller.clj")))
+  (is (not (clj-file? (new File "test.txt"))))
+  (is (not (clj-file? (new File "test/")))))
 
 (deftest test-clj-file-to-symbol-string
   (is (= (clj-file-to-symbol-string "test.clj") "test"))
@@ -92,7 +98,16 @@
   (is (= (symbol-string-to-clj-file "parent.test-this") (str "parent" (file-separator) "test_this.clj")))
   (is (= (symbol-string-to-clj-file "") ""))
   (is (= (symbol-string-to-clj-file nil) nil)))
-  
+
+(deftest test-file-namespace
+  (let [classpath-parent-dir (new File "app")]
+    (is (= "views.home.index" 
+      (file-namespace classpath-parent-dir (new File classpath-parent-dir "views/home/index.clj"))))
+    (is (= "views.test-controller.test-view" 
+      (file-namespace classpath-parent-dir (new File classpath-parent-dir "views/test_controller/test_view.clj"))))
+    (is (nil? (file-namespace classpath-parent-dir nil)))
+    (is (= "app.views.home.index" (file-namespace nil (new File classpath-parent-dir "views/home/index.clj"))))))
+
 (deftest test-namespace-string-for-file
   (is (= (namespace-string-for-file "test/util" "test_loading_utils.clj") "test.util.test-loading-utils"))
   (is (= (namespace-string-for-file nil "test_loading_utils.clj") "test-loading-utils"))

@@ -39,7 +39,7 @@ content." }
   generate-file-content
     ([view-file controller] (generate-file-content view-file controller nil))
     ([view-file controller content]
-      (let [view-namespace (util/view-namespace controller view-file)
+      (let [view-namespace (util/view-namespace view-file)
             view-content (str (if content 
                                 content 
                                 (generate-standard-content 

@@ -62,6 +62,7 @@
     (do
       (dosync
         (ref-set initialized? true))
+      (environment/init)
       (logging/info "Initializing server...")
       (database/ensure-conjure-db)
       ((:init session-config/session-store))
