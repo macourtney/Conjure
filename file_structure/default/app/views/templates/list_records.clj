@@ -29,7 +29,7 @@
             { :name "record",
               :action "ajax-add",
               :update '(addFormSuccess "#list-table" "#add-link" "#add-form") }
-            (str 
+            (list 
               (record-form/render-view request-map table-metadata {})
               (form-button "Create")
               "&nbsp;"

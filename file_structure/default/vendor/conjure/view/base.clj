@@ -50,7 +50,7 @@ function." }
 #^{ :doc "Returns an image tag for the given source and with the given options." }
   image-tag 
   ([source] (image-tag source {}))
-  ([source html-options] (htmli [:img (merge { :src (image-path source) } html-options)])))
+  ([source html-options] [:img (merge { :src (image-path source) } html-options)]))
 
 (defn
 #^{ :doc "Returns the full path to the given stylesheet source." }
@@ -69,19 +69,18 @@ function." }
 (defmethod stylesheet-link-tag clojure.lang.PersistentVector
   ([sources] (stylesheet-link-tag sources {}))
   ([sources html-options]
-    (apply str (map stylesheet-link-tag sources (repeat html-options)))))
+    (map stylesheet-link-tag sources (repeat html-options))))
   
 (defmethod stylesheet-link-tag String
   ([source] (stylesheet-link-tag source {}))
   ([source html-options]
-    (htmli
-      [:link 
-        (merge 
-          { :href (stylesheet-path source), 
-            :media "screen", 
-            :rel "stylesheet", 
-            :type "text/css" } 
-          html-options)])))
+    [:link 
+      (merge 
+        { :href (stylesheet-path source), 
+          :media "screen", 
+          :rel "stylesheet", 
+          :type "text/css" } 
+        html-options)]))
 
 (defn
 #^{ :doc "Returns the full path to the given javascript source." }
@@ -95,17 +94,16 @@ function." }
 (defmethod javascript-include-tag clojure.lang.PersistentVector
   ([sources] (javascript-include-tag sources {}))
   ([sources html-options]
-    (apply str (map javascript-include-tag sources (repeat html-options)))))
+    (map javascript-include-tag sources (repeat html-options))))
 
 (defmethod javascript-include-tag String
   ([source] (javascript-include-tag source {}))
   ([source html-options]
-    (htmli
-      [:script
-        (merge 
-          { :src (javascript-path source),
-            :type "text/javascript" } 
-          html-options) ""])))
+    [:script
+      (merge 
+        { :src (javascript-path source),
+          :type "text/javascript" } 
+        html-options) ""]))
 
 (defn
 #^{ :doc "Returns a jquery javascript include tag with the optional given options." } 
@@ -140,12 +138,11 @@ function." }
             (:name mail-options) 
             (conjure-str-utils/str-replace-if address { "@" (:replace-at mail-options), "." (:replace-dot mail-options) }))
          mailto-params (html-utils/url-param-str (select-keys mail-options [:cc :bcc :subject :body]))]
-     (htmli
-       [:a
-         (merge
-           { :href (str "mailto:" address mailto-params) }
-           (:html-options mail-options))
-         display-name])))
+     [:a
+       (merge
+         { :href (str "mailto:" address mailto-params) }
+         (:html-options mail-options))
+       display-name]))
          
 (defn
 #^{ :doc "Returns an xml header tag with the given html-options. If no html-options are given, then the tag is created 

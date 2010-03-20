@@ -92,7 +92,7 @@ and params, text is called with request-map and params merged (not all keys used
           id (or (:id html-options) (str "id-" (rand-int 1000000)))
           id-string (str "#" id)
           ajax-function (ajax-map request-map)]
-      (htmli 
+      (list
         [:a 
           (merge html-options 
             { :href (or (:href html-options) "#")
@@ -125,9 +125,8 @@ and params, text is called with request-map and params merged (not all keys used
           id-string (str "#" id)
           ajax-function (ajax-map request-map)
           form-for-options (assoc request-map :html-options (merge html-options { :id id }))]
-      (str 
+      (list
         (form-for form-for-options body)
-        (htmli
-          [:script { :type "text/javascript" } 
-            (scriptjure/js
-              (ajaxSubmit (clj id-string) (clj ajax-function)))])))))
+        [:script { :type "text/javascript" } 
+          (scriptjure/js
+            (ajaxSubmit (clj id-string) (clj ajax-function)))]))))

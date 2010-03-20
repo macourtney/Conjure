@@ -24,7 +24,7 @@ and params, text is called with request-map and params merged (not all keys used
   link-to
   ([text request-map params] (link-to text (view-utils/merge-url-for-params request-map params)))
   ([text request-map]
-    (htmli [:a (a-attributes request-map) (evaluate-if-fn text request-map)])))
+    [:a (a-attributes request-map) (evaluate-if-fn text request-map)]))
 
 (defn
 #^{:doc "If condition is true, then call link-to with the given text, request-map and params. If condition is false, 

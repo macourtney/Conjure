@@ -16,7 +16,7 @@
                 { :name "ajax-save", 
                   :action "ajax-save", 
                   :update (success-fn row-id :replace) }
-              (str
+              (list
                 (hidden-field record :record :id)
                 (record-form/render-view request-map table-metadata record)
                 (form-button "Save")
