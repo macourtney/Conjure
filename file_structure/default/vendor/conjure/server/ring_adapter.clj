@@ -1,5 +1,6 @@
 (ns conjure.server.ring-adapter
-  (:import [java.io File])
+  (:import [java.io File]
+           [java.util Date])
   (:require [clojure.contrib.logging :as logging]
             [conjure.controller.util :as controller-util]
             [conjure.helper.util :as helper-util]
@@ -11,22 +12,10 @@
             [ring.middleware.stacktrace :as ring-stacktrace]))
 
 (defn
-#^{ :doc "If reload-files is set, then this function reloads all of the controllers, views, models and helpers." }
-  reload []
-  (if environment/reload-files
-    (apply require :reload 
-      (concat 
-        (controller-util/all-controller-namespaces) 
-        (view-util/all-view-namespaces) 
-        (model-util/all-model-namespaces)
-        (helper-util/all-helper-namespaces)))))
-
-(defn
 #^{ :doc "The ring function which actually calls the conjure server and returns a properly formatted 
 request map." }
   call-server [req]
   (try
-    (reload)
 		(server/process-request { :request req })
     (catch Throwable throwable
       (do
@@ -34,6 +23,17 @@ request map." }
         (throw throwable)))))
 
 (defn
+  wrap-response-time [app]
+  (fn [req]
+    (let [start-time (new Date)
+          response (app req)]
+      (logging/debug (str "Response time: " (- (.getTime (new Date)) (.getTime start-time)) " ms"))
+      response)))
+
+(defn
 #^{ :doc "A Ring adapter function for Conjure." }
   conjure [req]
-  ((ring-file/wrap-file (ring-stacktrace/wrap-stacktrace call-server) (new File environment/assets-dir)) req))
+  ((ring-file/wrap-file 
+    (ring-stacktrace/wrap-stacktrace (wrap-response-time call-server)) 
+    (new File environment/assets-dir)) 
+    req))

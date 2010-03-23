@@ -2,9 +2,6 @@
   (:use conjure.view.base)
   (:require [clj-html.core :as html]
             [com.reasonr.scriptjure :as scriptjure]
-            [conjure.view.util :as view-util]
-            [conjure.controller.util :as controller-util]
-            [conjure.util.string-utils :as string-utils]
             [views.layouts.templates.breadcrumbs :as breadcrumbs]
             [views.layouts.templates.header :as header]
             [views.layouts.templates.links-sidebar :as links-sidebar]

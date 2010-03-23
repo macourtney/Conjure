@@ -1,6 +1,8 @@
 (ns conjure.util.loading-utils
   (:import [java.io File])
   (:require [clojure.contrib.classpath :as classpath]
+            [clojure.contrib.logging :as logging]
+            [clojure.contrib.ns-utils :as ns-utils]
             [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.str-utils :as clojure-str-utils]
             [clojure.contrib.java-utils :as java-utils]
@@ -154,8 +156,50 @@ directory." }
   (if file-name
     (if (and directory (> (. (. directory trim) length) 0))
       (let [trimmed-directory (. directory trim)
-            slash-trimmed-directory (if (or (. trimmed-directory startsWith "/") (. trimmed-directory startsWith "\\")) (. trimmed-directory substring 1) trimmed-directory)]
+            slash-trimmed-directory (if (or (. trimmed-directory startsWith "/") 
+                                            (. trimmed-directory startsWith "\\")) ;" Fix highlight issue.
+                                            (. trimmed-directory substring 1) trimmed-directory)]
         (str (slashes-to-dots (underscores-to-dashes slash-trimmed-directory)) "." (clj-file-to-symbol-string file-name)))
       (clj-file-to-symbol-string file-name))
     file-name))
 
+(defn
+#^{ :doc "Returns true if the given var-name is in a conjure namespace (controller, helper, model or view)." }
+  conjure-namespace? [var-name]
+  (or 
+    (.startsWith var-name "#'controllers.")
+    (.startsWith var-name "controllers.")
+    (.startsWith var-name "#'helpers.")
+    (.startsWith var-name "helpers.")
+    (.startsWith var-name "#'models.")
+    (.startsWith var-name "models.")
+    (.startsWith var-name "#'views.")
+    (.startsWith var-name "views.")))
+
+(defn
+#^{ :doc "Returns a set of conjure namespaces (controllers, models, helpers and views) used by the given controller." }
+  conjure-namespaces [namespace-name]
+  (let [namespace-to-search (ns-utils/get-ns (symbol namespace-name))]
+    (reduce
+      (fn [namespace-set var-name] 
+        (conj namespace-set 
+          (if (.startsWith var-name "#'") 
+            (.substring var-name 2 (.indexOf var-name "/"))
+            var-name)))
+      #{}
+      (filter 
+        conjure-namespace?
+        (map 
+          str 
+          (concat (vals (ns-aliases namespace-to-search)) (vals (ns-refers namespace-to-search))))))))
+
+(defn
+#^{ :doc "Reloads all of the given namespaces." }
+  reload-namespaces [namespaces]
+  (doseq [ns-to-load namespaces]
+    (require :reload (symbol ns-to-load))))
+
+(defn
+#^{ :doc "Reloads all of the conjure namespaces refered to by the namespace with the given name." }
+  reload-conjure-namespaces [namespace-name]
+  (reload-namespaces (conjure-namespaces namespace-name)))

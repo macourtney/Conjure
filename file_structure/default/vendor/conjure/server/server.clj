@@ -99,25 +99,15 @@ one." }
 #^{ :doc "Initializes the server if necessary and runs the controller based on the given request-map and returns a 
 response map.. If the request-map is nil, this function does nothing and returns nil." }
   respond-to [request-map]
-  (when request-map
-    (init)
-    (logging/debug (str "Requested uri: " (:uri (:request request-map))))
-    (call-controller (update-request-map request-map))))
+  (throw (new RuntimeException "Respond-to is deprecated. Please use process-request instead.")))
 
 (defn
 #^{ :doc "Takes the given path and calls the correct controller and action for it." }
   process-request [request-map]
-  (let [start-time (new Date)
-        response (respond-to request-map)]
-    (logging/debug (str "Response time: " (- (.getTime (new Date)) (.getTime start-time)) " ms"))
-    response))
-
-(defn
-#^{ :doc "A function for simplifying the loading of views." }
-  render-view [request-map & params]
-  (throw (new RuntimeException "server/render-view is deprecated."))
-  (view-util/load-view request-map)
-  (apply (read-string (controller-util/fully-qualified-action request-map)) request-map params))
+  (when request-map
+    (init)
+    (logging/debug (str "Requested uri: " (:uri (:request request-map))))
+    (call-controller (update-request-map request-map))))
 
 (defn
 #^{ :doc "Gets the user configured http properties." }

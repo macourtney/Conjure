@@ -39,36 +39,6 @@
     (file-utils/find-file controller-directory (loading-utils/symbol-string-to-clj-file action))))
 
 (defn
-#^{ :doc "Adds the given action to the given loaded action set." }
-  add-loaded-action [loaded-action-set action]
-  (let [action-key (keyword action)]
-    (if loaded-action-set
-      (if (not (contains? loaded-action-set action-key))
-        (conj loaded-action-set action-key)
-        loaded-action-set)
-      #{ action-key })))
-
-(defn
-#^{ :doc "Adds the given controller and action to the given loaded views map." }
-  assoc-loaded-views [loaded-view-map controller action]
-  (let [controller-key (keyword controller)]
-    (assoc loaded-view-map controller-key 
-      (add-loaded-action (get loaded-view-map controller-key) action))))
-
-(defn
-#^{ :doc "Loads the view corresponding to the values in the given request map." }
-  load-view [{ controller :controller, action :action }]
-  (loading-utils/load-resource 
-    (str "views/" (loading-utils/dashes-to-underscores controller)) 
-    (str (loading-utils/dashes-to-underscores action) ".clj"))
-  (reset! loaded-views (assoc-loaded-views @loaded-views controller action)))
-  
-(defn
-#^{ :doc "Returns true if the view corresponding to the given request-map is already loaded." }
-  view-loaded? [{ controller :controller, action :action }]
-  (get (get @loaded-views controller) action))
-
-(defn
 #^{:doc "Returns the view namespace request map."}
   request-view-namespace [request-map]
   (if request-map
@@ -95,12 +65,41 @@
   (map #(symbol (view-namespace %)) (view-files)))
 
 (defn
+#^{ :doc "Adds the given action to the given loaded action set." }
+  add-loaded-action [loaded-action-set action]
+  (let [action-key (keyword action)]
+    (if loaded-action-set
+      (if (not (contains? loaded-action-set action-key))
+        (conj loaded-action-set action-key)
+        loaded-action-set)
+      #{ action-key })))
+
+(defn
+#^{ :doc "Adds the given controller and action to the given loaded views map." }
+  assoc-loaded-views [loaded-view-map controller action]
+  (let [controller-key (keyword controller)]
+    (assoc loaded-view-map controller-key 
+      (add-loaded-action (get loaded-view-map controller-key) action))))
+
+(defn
+#^{ :doc "Loads the view corresponding to the values in the given request map." }
+  load-view [{ controller :controller, action :action, :as request-map }]
+  (let [view-namespace (request-view-namespace request-map)]
+    (require :reload (symbol view-namespace))
+    (reset! loaded-views (assoc-loaded-views @loaded-views controller action))
+    (loading-utils/reload-conjure-namespaces view-namespace)))
+
+(defn
+#^{ :doc "Returns true if the view corresponding to the given request-map is already loaded." }
+  view-loaded? [{ controller :controller, action :action }]
+  (get (get @loaded-views controller) action))
+
+(defn
 #^{ :doc "Returns the rendered view from the given request-map." }
   render-view [request-map & params]
   (when (or environment/reload-files (not (view-loaded? request-map)))
     (load-view request-map))
   (let [view-namespace (request-view-namespace request-map)]
-    (logging/debug (str "Rendering view: " view-namespace))
     (apply
       (ns-resolve (ns-utils/get-ns (symbol view-namespace)) (symbol "render-view"))
       request-map params)))

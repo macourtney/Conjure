@@ -4,7 +4,7 @@
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.string-utils :as string-utils]
-            [clojure.contrib.ns-utils :as ns-utils]))
+            environment))
 
 (def controllers-dir "controllers")
 (def controllers-namespace controllers-dir)
@@ -69,11 +69,17 @@
   (loading-utils/resource-exists? (str controllers-dir "/" controller-file-name)))
 
 (defn
+#^{ :doc "Reloads all conjure namespaces referenced by the given controller." }
+  reload-conjure-namespaces [controller]
+  (loading-utils/reload-conjure-namespaces (controller-namespace controller)))
+
+(defn
 #^{ :doc "Loads the given controller file." }
   load-controller [controller]
   (let [controller-filename (controller-file-name-string controller)]
     (when (and controller-filename (controller-exists? controller-filename))
-      (loading-utils/load-resource controllers-dir controller-filename))))
+      (require :reload (symbol (controller-namespace controller)))
+      (reload-conjure-namespaces controller))))
 
 (defn
 #^{ :doc "Returns fully qualified action generated from the given request map." }
@@ -129,11 +135,15 @@ otherwise nil is returned." }
 (defn
 #^{ :doc "Calls the given controller with the given request map returning the response." }
   call-controller [request-map]
-  (or 
-    (run-action request-map)
-    (do
+  (if environment/reload-files
+    (do 
       (load-controller (:controller request-map))
-      (run-action request-map))))
+      (run-action request-map))
+    (or 
+      (run-action request-map)
+      (do
+        (load-controller (:controller request-map))
+        (run-action request-map)))))
 
 (defn 
 #^{ :doc "adds the given action function into the given methods map and returns the result." }
@@ -142,7 +152,7 @@ otherwise nil is returned." }
   
 (defn
 #^{ :doc "adds the given action function into the given actions map and returns the result." }
-  assoc-actions [actions-map { action-function :action-function, action :action, methods :methods, :as params }]
+  assoc-actions [actions-map { action :action, :as params }]
   (let [action-key (keyword action)]
     (assoc actions-map action-key 
       (assoc-methods (get actions-map action-key) params))))
