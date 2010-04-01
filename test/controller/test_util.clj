@@ -94,11 +94,13 @@
 
 (deftest test-actions-map
   (is (actions-map controller-name))
-  (is (nil? (actions-map "fail"))))
+  (is (nil? (actions-map "fail")))
+  (is (nil? (actions-map nil))))
 
 (deftest test-methods-map
   (is (methods-map controller-name action-name))
   (is (nil? (methods-map "fail" action-name)))
+  (is (nil? (methods-map nil action-name)))
   (is (nil? (methods-map controller-name "fail"))))
 
 (deftest test-action-function

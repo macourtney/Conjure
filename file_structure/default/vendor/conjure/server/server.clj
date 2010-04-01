@@ -49,6 +49,7 @@
 (defn
 #^{ :doc "Gets a route map for use by conjure to call the correct methods." }
   update-request-map [request-map]
+  (logging/debug (str "request-map: " request-map))
   (session-utils/update-request-session 
     (merge request-map 
       (augment-params 
@@ -94,12 +95,6 @@ one." }
     (if response
       (create-response-map response request-map)
       (controller-util/call-controller { :controller "home", :action "error-404" }))))
-
-(defn
-#^{ :doc "Initializes the server if necessary and runs the controller based on the given request-map and returns a 
-response map.. If the request-map is nil, this function does nothing and returns nil." }
-  respond-to [request-map]
-  (throw (new RuntimeException "Respond-to is deprecated. Please use process-request instead.")))
 
 (defn
 #^{ :doc "Takes the given path and calls the correct controller and action for it." }

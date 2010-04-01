@@ -16,8 +16,14 @@
       { :action action-name, :controller controller-name, :params {} }
       (route-fn (str "/" controller-name "/" action-name))))
     (is (=
+      { :action action-name, :controller controller-name, :params {} }
+      (route-fn (str "/" controller-name "/" action-name "/"))))
+    (is (=
       { :action "index", :controller controller-name, :params {} }
       (route-fn (str "/" controller-name))))
+    (is (=
+      { :action "index", :controller controller-name, :params {} }
+      (route-fn (str "/" controller-name "/"))))
     (is (=
       { :action "index", :controller "home", :params {} }
       (route-fn "/")))))

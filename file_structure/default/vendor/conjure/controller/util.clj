@@ -102,12 +102,14 @@
 (defn
 #^{ :doc "Returns the actions map for the given controller." }
   actions-map [controller]
-  (get @controller-actions (keyword controller)))
+  (when controller
+    (get @controller-actions (keyword controller))))
 
 (defn
 #^{ :doc "Returns the methods map for the given controller and action." }
   methods-map [controller action]
-  (get (actions-map controller) (keyword action)))
+  (when action
+    (get (actions-map controller) (keyword action))))
   
 (defn
 #^{ :doc "Returns the action function for the given controller, action, and method. If method is not given or nil, then

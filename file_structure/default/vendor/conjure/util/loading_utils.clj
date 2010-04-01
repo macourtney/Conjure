@@ -6,6 +6,7 @@
             [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.str-utils :as clojure-str-utils]
             [clojure.contrib.java-utils :as java-utils]
+            [clojure.set :as clj-set]
             [conjure.util.string-utils :as string-utils]))
 
 (defn
@@ -167,13 +168,9 @@ directory." }
 #^{ :doc "Returns true if the given var-name is in a conjure namespace (controller, helper, model or view)." }
   conjure-namespace? [var-name]
   (or 
-    (.startsWith var-name "#'controllers.")
     (.startsWith var-name "controllers.")
-    (.startsWith var-name "#'helpers.")
     (.startsWith var-name "helpers.")
-    (.startsWith var-name "#'models.")
     (.startsWith var-name "models.")
-    (.startsWith var-name "#'views.")
     (.startsWith var-name "views.")))
 
 (defn
@@ -183,15 +180,18 @@ directory." }
     (reduce
       (fn [namespace-set var-name] 
         (conj namespace-set 
-          (if (.startsWith var-name "#'") 
-            (.substring var-name 2 (.indexOf var-name "/"))
-            var-name)))
+          (let [slash-index (.indexOf var-name "/")]
+            (if (> slash-index 0) 
+              (.substring var-name 0 slash-index)
+              var-name))))
       #{}
       (filter 
         conjure-namespace?
-        (map 
-          str 
-          (concat (vals (ns-aliases namespace-to-search)) (vals (ns-refers namespace-to-search))))))))
+        (concat 
+          (map str (vals (ns-aliases namespace-to-search)))
+          (map #(.substring (str %) 2) 
+            (filter #(not (.startsWith (str %) "#'clojure"))
+              (vals (ns-refers namespace-to-search)))))))))
 
 (defn
 #^{ :doc "Reloads all of the given namespaces." }
@@ -201,5 +201,11 @@ directory." }
 
 (defn
 #^{ :doc "Reloads all of the conjure namespaces refered to by the namespace with the given name." }
-  reload-conjure-namespaces [namespace-name]
-  (reload-namespaces (conjure-namespaces namespace-name)))
+  reload-conjure-namespaces
+  ([namespace-name] (reload-conjure-namespaces namespace-name #{}))
+  ([namespace-name loaded-namespaces]
+    (let [namespaces-to-load (filter #(not (contains? loaded-namespaces %)) (conjure-namespaces namespace-name))]
+      (when (not-empty namespaces-to-load)
+        (reload-namespaces namespaces-to-load)
+        (doseq [child-namespace namespaces-to-load]
+          (reload-conjure-namespaces child-namespace (clj-set/union loaded-namespaces (set namespaces-to-load))))))))
