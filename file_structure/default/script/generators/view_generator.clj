@@ -76,5 +76,5 @@ content." }
         
 (defn 
 #^{:doc "Generates a migration file for the migration name given in params."}
-  generate-view [params]
+  generate [params]
   (generate-view-file { :controller (first params), :action (second params) }))

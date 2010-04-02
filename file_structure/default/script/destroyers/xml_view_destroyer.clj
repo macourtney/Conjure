@@ -30,7 +30,7 @@
 
 (defn
 #^{:doc "Destroys an xml view file for the view name given in params."}
-  destroy-xml-view [params]
+  destroy [params]
   (destroy-view-file (first params) (second params)))
 
 (defn

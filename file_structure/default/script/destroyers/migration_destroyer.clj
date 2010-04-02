@@ -24,7 +24,7 @@
 
 (defn
 #^{:doc "Destroys a migration file for the migration name given in params."}
-  destroy-migration [params]
+  destroy [params]
   (destroy-migration-file (first params)))
 
 (defn

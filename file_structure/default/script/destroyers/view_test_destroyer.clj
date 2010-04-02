@@ -11,7 +11,7 @@
   (println "Usage: ./run.sh script/destroy.clj view-test <controller> <action>"))
 
 (defn
-#^{:doc "Destroys the controller file from the given controller."}
+#^{:doc "Destroys the view test file from the given controller."}
   destroy-view-test-file 
   ([controller action])
   ([controller action silent]
@@ -31,8 +31,8 @@
       (usage))))
 
 (defn
-#^{:doc "Destroys a controller test file for the controller name given in params."}
-  destroy-view-test [params]
+#^{:doc "Destroys a view test file for the controller name given in params."}
+  destroy [params]
   (destroy-view-test-file (first params) (second params)))
 
 (defn

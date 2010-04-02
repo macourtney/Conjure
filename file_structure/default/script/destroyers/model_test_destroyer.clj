@@ -29,7 +29,7 @@
 
 (defn
 #^{:doc "Destroys a model test file for the model name given in params."}
-  destroy-model-test [params]
+  destroy [params]
   (destroy-model-test-file (first params)))
 
 (defn

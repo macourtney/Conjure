@@ -37,5 +37,5 @@
 
 (defn 
 #^{:doc "Generates a model test file for the model name in params."}
-  generate-model-test [params]
+  generate [params]
   (generate-unit-test (first params)))

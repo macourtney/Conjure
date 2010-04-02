@@ -78,5 +78,5 @@
         
 (defn 
 #^{:doc "Generates a model file for the model name in params."}
-  generate-model [params]
+  generate [params]
   (generate-model-file (first params)))

@@ -19,12 +19,6 @@
         
 (use-fixtures :once setup-all)
 
-(deftest test-render-view
-  (let [view (render-view { :controller controller-name :action action-name })]
-    (is (not (nil? view)))
-    (is (instance? String view))
-    (is (not (empty view)))))
-
 (defn
 #^{:doc "Returns a redirect response map based on the given url and status, for use when testing."}
   redirect-map 

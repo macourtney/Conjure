@@ -49,7 +49,6 @@
 (defn
 #^{ :doc "Gets a route map for use by conjure to call the correct methods." }
   update-request-map [request-map]
-  (logging/debug (str "request-map: " request-map))
   (session-utils/update-request-session 
     (merge request-map 
       (augment-params 

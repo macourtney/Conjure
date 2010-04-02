@@ -1,6 +1,7 @@
 (ns conjure.controller.util
   (:require [clojure.contrib.logging :as logging]
             [clojure.contrib.seq-utils :as seq-utils]
+            [clojure.contrib.str-utils :as str-utils]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.string-utils :as string-utils]
@@ -172,3 +173,10 @@ otherwise nil is returned." }
   (reset! controller-actions
     (assoc-controllers @controller-actions 
       (assoc params :action-function action-function))))
+
+(defn
+#^{ :doc "Returns the controller from the given namespace. The controller is assumed to be the last part of the 
+namespace." }
+  controller-from-namespace [namespace-name]
+  (string-utils/strip-ending 
+    (last (str-utils/re-split #"\." namespace-name)) controller-namespace-ending))

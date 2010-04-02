@@ -20,38 +20,16 @@
   (println (str "Unknown command: " command))
   (print-usage))
 
-(defn
-#^{:doc "Determines which command was passed and calls the appropriate destroy method."}
-  destroy [command params]
-  (cond 
-    (. command equals "migration")
-      (migration-destroyer/destroy-migration params)
-      
-    (. command equals "view")
-      (view-destroyer/destroy-view params)
+(defn print-invalid-destroyer [destroyer-namspace]
+  (println (str "Invalid destroyer: " destroyer-namspace ". The destroyer must implement a destroy function.")))
 
-    (. command equals "view-test")
-      (view-test-destroyer/destroy-view-test params)
-      
-    (. command equals "controller")
-      (controller-destroyer/destroy-controller params)
-      
-    (. command equals "controller-test")
-      (controller-test-destroyer/destroy-controller-test params)
-      
-    (. command equals "model")
-      (model-destroyer/destroy-model params)
-
-    (. command equals "model-test")
-      (model-test-destroyer/destroy-model-test params)
-
-    (. command equals "fixture")
-      (fixture-destroyer/destroy-fixture params)
-
-    (. command equals "xml-view")
-      (xml-view-destroyer/destroy-xml-view params)
-      
-    true ; Default condition.
+(defn destroy [command params]
+  (let [destroyer-namespace (find-ns (symbol (str "destroyers." command)))]
+    (if destroyer-namespace)
+      (let [destroyer-fn (ns-resolve destroyer-namespace 'destroy)]
+        (if destroyer-fn
+          (destroyer-fn params)
+          (print-invalid-destroyer destroyer-namespace)))
       (print-unknown-command command)))
 
 (let [destroy-command (first *command-line-args*)

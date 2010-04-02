@@ -28,7 +28,7 @@
 
 (defn
 #^{:doc "Destroys a fixture file for the model given in params."}
-  destroy-fixture [params]
+  destroy [params]
   (destroy-fixture-file (first params)))
 
 (defn

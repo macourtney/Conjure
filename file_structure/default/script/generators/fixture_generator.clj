@@ -33,5 +33,5 @@
 
 (defn 
 #^{:doc "Generates a fixture file for the model name in params."}
-  generate-fixture [params]
+  generate [params]
   (generate-fixture-file (first params) false))

@@ -10,6 +10,7 @@
 (def unit-view-dir-name "view")
 (def unit-model-dir-name "model")
 (def fixture-dir-name "fixture")
+(def unit-binding-dir-name "binding")
 
 (defn
 #^{:doc "Finds the test directory."}
@@ -47,6 +48,22 @@
   ([controller view-unit-test-directory]
    (if (and controller view-unit-test-directory)
      (file-utils/find-directory view-unit-test-directory (loading-utils/dashes-to-underscores controller)))))
+
+(defn
+#^{:doc "Finds the view test directory."}
+ find-binding-unit-test-directory 
+ ([] (find-binding-unit-test-directory (find-unit-test-directory)))
+ ([unit-test-directory]
+   (if unit-test-directory
+     (file-utils/find-directory unit-test-directory unit-binding-dir-name))))
+
+(defn
+#^{:doc "Finds the binding controller test directory."}
+  find-controller-binding-unit-test-directory
+  ([controller] (find-controller-binding-unit-test-directory controller (find-binding-unit-test-directory)))
+  ([controller binding-unit-test-directory]
+   (if (and controller binding-unit-test-directory)
+     (file-utils/find-directory binding-unit-test-directory (loading-utils/dashes-to-underscores controller)))))
 
 (defn
 #^{:doc "Finds the model test directory."}
@@ -87,6 +104,12 @@
   fixture-file-name [model]
   (if (and model (> (. model length) 0))
     (str (loading-utils/dashes-to-underscores model) ".clj")))
+
+(defn
+#^{:doc "Returns the view test file name for the given action name."}
+  binding-unit-test-file-name [action]
+  (if (and action (> (. action length) 0))
+    (str (loading-utils/dashes-to-underscores action) "_binding_test.clj")))
     
 (defn
 #^{:doc "Returns the functional test file for the given controller name."}
@@ -97,7 +120,7 @@
       (new File functional-test-directory (functional-test-file-name controller)))))
 
 (defn
-#^{:doc "Returns the functional test file for the given controller name."}
+#^{:doc "Returns the view unit test file for the given controller name."}
   view-unit-test-file
   ([controller action] (view-unit-test-file controller action (find-controller-view-unit-test-directory controller)))
   ([controller action controller-view-unit-test-dir]
@@ -107,7 +130,7 @@
         (new File controller-view-unit-test-dir (view-unit-test-file-name action-str))))))
 
 (defn
-#^{:doc "Returns the functional test file for the given controller name."}
+#^{:doc "Returns the model unit test file for the given controller name."}
   model-unit-test-file
   ([model] (model-unit-test-file model (find-model-unit-test-directory)))
   ([model model-unit-test-dir]
@@ -123,6 +146,16 @@
       (new File fixture-directory (fixture-file-name model)))))
 
 (defn
+#^{:doc "Returns the binding unit test file for the given controller and actoin."}
+  binding-unit-test-file
+  ([controller action] (binding-unit-test-file controller action (find-controller-binding-unit-test-directory controller)))
+  ([controller action controller-binding-unit-test-dir]
+    (let [controller-str (conjure-str-utils/str-keyword controller)
+          action-str (conjure-str-utils/str-keyword action)]
+      (if (and controller-str (> (. controller-str length) 0) action-str (> (. action-str length) 0) controller-binding-unit-test-dir)
+        (new File controller-binding-unit-test-dir (binding-unit-test-file-name action-str))))))
+
+(defn
 #^{:doc "Returns the functional test namespace for the given controller."}
   functional-test-namespace [controller]
   (if (and controller (> (. controller length) 0))
@@ -135,7 +168,7 @@
         action-str (conjure-str-utils/str-keyword action)]
     (if (and controller-str (> (. controller-str length) 0) action-str (> (. action-str length) 0))
       (str 
-        "unit.view." 
+        "unit." unit-view-dir-name "." 
         (loading-utils/underscores-to-dashes controller-str) 
         "." 
         (loading-utils/underscores-to-dashes action-str) 
@@ -145,10 +178,23 @@
 #^{:doc "Returns the model test namespace for the given model."}
   model-unit-test-namespace [model]
   (if (and model (> (. model length) 0))
-    (str "unit.model." (loading-utils/underscores-to-dashes model) "-model-test")))
+    (str "unit." unit-model-dir-name "." (loading-utils/underscores-to-dashes model) "-model-test")))
 
 (defn
 #^{:doc "Returns the fixture namespace for the given model."}
   fixture-namespace [model]
   (if (and model (> (. model length) 0))
     (str "fixture." (loading-utils/underscores-to-dashes model))))
+
+(defn
+#^{:doc "Returns the binding test namespace for the given controller and action."}
+  binding-unit-test-namespace [controller action]
+  (let [controller-str (conjure-str-utils/str-keyword controller)
+        action-str (conjure-str-utils/str-keyword action)]
+    (if (and controller-str (> (. controller-str length) 0) action-str (> (. action-str length) 0))
+      (str 
+        "unit." unit-binding-dir-name "." 
+        (loading-utils/underscores-to-dashes controller-str) 
+        "." 
+        (loading-utils/underscores-to-dashes action-str) 
+        "-binding-test"))))

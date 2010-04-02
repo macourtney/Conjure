@@ -1,5 +1,6 @@
 (ns generate 
   (:require [conjure.server.server :as server]
+            [generators.binding-generator :as binding-generator]
             [generators.controller-generator :as controller-generator]
             [generators.controller-test-generator :as controller-test-generator]
             [generators.fixture-generator :as fixture-generator]
@@ -18,39 +19,16 @@
   (println (str "Unknown command: " command))
   (print-usage))
 
-(defn generate [command params]
-  (cond 
-    (. command equals "migration")
-      (migration-generator/generate-migration params)
-      
-    (. command equals "view")
-      (view-generator/generate-view params)
-      
-    (. command equals "view-test")
-      (view-test-generator/generate-view-test params)
-      
-    (. command equals "controller")
-      (controller-generator/generate-controller params)
-      
-    (. command equals "controller-test")
-      (controller-test-generator/generate-controller-test params)
-      
-    (. command equals "model")
-      (model-generator/generate-model params)
+(defn print-invalid-generator [generator-namspace]
+  (println (str "Invalid generator: " generator-namspace ". The generator must implement a generate function.")))
 
-    (. command equals "model-test")
-      (model-test-generator/generate-model-test params)
-      
-    (. command equals "fixture")
-      (fixture-generator/generate-fixture params)
-      
-    (. command equals "xml-view")
-      (xml-view-generator/generate-view params)
-      
-    (. command equals "scaffold")
-      (scaffold-generator/generate params)
-      
-    true ; Default condition.
+(defn generate [command params]
+  (let [generator-namespace (find-ns (symbol (str "generators." command)))]
+    (if generator-namespace)
+      (let [generator-fn (ns-resolve generator-namespace 'generate)]
+        (if generator-fn
+          (generator-fn params)
+          (print-invalid-generator generator-namespace)))
       (print-unknown-command command)))
 
 (server/init)

@@ -28,7 +28,7 @@
 
 (defn
 #^{:doc "Destroys a controller test file for the controller name given in params."}
-  destroy-controller-test [params]
+  destroy [params]
   (destroy-controller-test-file (first params) false))
 
 (defn

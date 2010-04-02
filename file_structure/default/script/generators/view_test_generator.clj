@@ -11,7 +11,7 @@
   (println "Usage: ./run.sh script/generate.clj view-test <controller> <action>"))
 
 (defn
-#^{:doc "Generates the functional test file for the given controller and actions."}
+#^{:doc "Generates the view unit test file for the given controller and action."}
   generate-unit-test 
   ([controller action] (generate-unit-test controller action false))
   ([controller action silent] (generate-unit-test controller action silent nil))
@@ -35,5 +35,5 @@
 
 (defn 
 #^{:doc "Generates a controller file for the controller name and actions in params."}
-  generate-view-test [params]
+  generate [params]
   (generate-unit-test (first params) (second params)))

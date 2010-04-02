@@ -46,5 +46,5 @@
 
 (defn 
 #^{:doc "Generates a migration file for the migration name given in params."}
-  generate-migration [params]
+  generate [params]
   (generate-migration-file (first params)))

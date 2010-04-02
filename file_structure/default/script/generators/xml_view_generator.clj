@@ -56,5 +56,5 @@ inner-content is added to the body of the xml view code."}
         
 (defn 
 #^{:doc "Generates a migration file for the migration name given in params."}
-  generate-view [params]
+  generate [params]
   (generate-xml-view-file (first params) (second params) false))

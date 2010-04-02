@@ -41,5 +41,5 @@
         
 (defn 
 #^{:doc "Generates a controller file for the controller name and actions in params."}
-  generate-controller-test [params]
+  generate [params]
   (generate-functional-test (first params) (rest params)))

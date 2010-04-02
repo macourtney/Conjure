@@ -2,7 +2,7 @@
   (:require [clojure.contrib.logging :as logging]
             [conjure.controller.util :as util]
             [destroyers.controller-test-destroyer :as controller-test-destroyer]
-            [destroyers.view-destroyer :as view-destroyer]))
+            [destroyers.binding-destroyer :as binding-destroyer]))
 
 (defn
 #^{:doc "Prints out how to use the destroy controller command."}
@@ -28,7 +28,7 @@
 
 (defn
 #^{:doc "Destroys a controller file for the controller name given in params."}
-  destroy-controller [params]
+  destroy [params]
   (destroy-controller-file (first params)))
 
 (defn
@@ -36,5 +36,6 @@
   destroy-all-dependencies
   [{ :keys [controller actions silent] :or { actions (), silent false } }]
     (destroy-controller-file controller silent)
-    (doall (map #(view-destroyer/destroy-all-dependencies controller % silent) actions))
+    (doseq [action actions]
+      (binding-destroyer/destroy-all-dependencies controller action silent))
     (controller-test-destroyer/destroy-all-dependencies controller silent))

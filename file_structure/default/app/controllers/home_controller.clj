@@ -2,14 +2,14 @@
   (:use conjure.controller.base
         helpers.home-helper))
 
-(defaction index [request-map]
-  (render-view (home-request-map request-map)))
+(defaction index
+  (bind request-map))
 
-(defaction list-records [request-map]
+(defaction list-records
   (redirect-to request-map { :action "index" }))
   
-(defaction add [request-map]
+(defaction add
   (redirect-to request-map { :action "index" }))
   
-(defaction error-404 [request-map]
-  (render-view (home-request-map request-map)))
+(defaction error-404
+  (bind request-map))
