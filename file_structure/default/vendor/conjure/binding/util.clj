@@ -108,13 +108,13 @@ result." }
   find-binding-fn [controller action]
   (let [all-actions (actions-map controller)]
     (when all-actions
-      (get all-actions action))))
+      (get all-actions (keyword action)))))
 
 (defn
 #^{ :doc "Returns fully qualified binding generated from the given request map." }
   fully-qualified-binding [controller action]
   (if (and controller action)
-    (str (binding-namespace controller) "." action)))
+    (str (binding-namespace controller action))))
 
 (defn
 #^{ :doc "Attempts to run the binding requested in request-map. If the binding is successful, it's response is returned, 

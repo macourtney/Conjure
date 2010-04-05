@@ -1,5 +1,5 @@
 (ns bindings.home.error-404
-  (:use conjure.bind.base
+  (:use conjure.binding.base
         helpers.home-helper))
 
 (defbinding [request-map]

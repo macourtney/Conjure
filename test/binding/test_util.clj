@@ -8,12 +8,13 @@
 
 (def controller-name "test")
 (def action-name "blah")
+(def request-map { :controller controller-name, :action action-name })
 
 (defn setup-all [function]
-  (binding-generator/generate-binding-file { :controller controller-name, :actions [action-name], :silent true })
+  (binding-generator/generate-binding-file { :controller controller-name, :action action-name, :silent true })
   (load-binding controller-name action-name)
   (function)
-  (binding-destroyer/destroy-all-dependencies controller-name, action-name true))
+  (binding-destroyer/destroy-all-dependencies controller-name action-name true))
         
 (use-fixtures :once setup-all)
   
@@ -25,7 +26,7 @@
 (deftest test-binding-file-name-string
   (let [binding-file-name (binding-file-name-string action-name)]
     (is (not (nil? binding-file-name)))
-    (is (= "test.clj" binding-file-name)))
+    (is (= "blah.clj" binding-file-name)))
   (let [binding-file-name (binding-file-name-string "test-name")]
     (is (not (nil? binding-file-name)))
     (is (= "test_name.clj" binding-file-name)))
@@ -42,7 +43,8 @@
   (let [binding-ns (binding-namespace controller-name "test_name")]
     (is (not (nil? binding-ns)))
     (is (= "bindings.test.test-name" binding-ns)))
-  (is (nil? (binding-namespace nil))))
+  (is (nil? (binding-namespace nil action-name)))
+  (is (nil? (binding-namespace controller-name nil))))
 
 (deftest test-binding-exists?
   (is (binding-exists? controller-name action-name))
@@ -61,13 +63,13 @@
   (is (find-binding-fn controller-name action-name)))
 
 (deftest test-run-binding
-  (is (run-binding controller-name action-name)))
+  (is (run-binding controller-name action-name [request-map])))
 
 (deftest test-call-binding
-  (is (call-binding controller-name action-name))
+  (is (call-binding controller-name action-name [request-map]))
   (let [initial-bindings @bindings]
     (reset! bindings {})
-    (is (call-binding controller-name action-name))
+    (is (call-binding controller-name action-name [request-map]))
     (reset! bindings initial-bindings)))
 
 (deftest test-assoc-action

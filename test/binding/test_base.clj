@@ -12,7 +12,7 @@
 
 (defn setup-all [function]
   (binding-generator/generate-binding-file 
-    { :controller controller-name, :actions [action-name], :silent true })
+    { :controller controller-name, :action action-name, :silent true })
   (function)
   (binding-destroyer/destroy-all-dependencies controller-name action-name true))
         

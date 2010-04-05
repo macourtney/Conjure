@@ -1,5 +1,5 @@
 (ns bindings.home.index
-  (:use conjure.bind.base
+  (:use conjure.binding.base
         helpers.home-helper))
 
 (defbinding [request-map]
