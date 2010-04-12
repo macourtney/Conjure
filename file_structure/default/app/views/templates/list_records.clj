@@ -22,19 +22,20 @@
         [:tr
           (map header-name table-metadata)
           [:th]]
-        (map #(record-row/render-view request-map table-metadata %) records)]
+        (map #(record-row/render-view request-map model-name table-metadata %) records)]
       [:div { :id "add" }
         [:div { :id "add-form", :style "display: none" }
           (ajax-form-for request-map 
             { :name "record",
               :action "ajax-add",
+              :controller model-name,
               :update '(addFormSuccess "#list-table" "#add-link" "#add-form") }
             (list 
               (record-form/render-view request-map table-metadata {})
               (form-button "Create")
               "&nbsp;"
               (link-to "Cancel" request-map { :action "list-records", :html-options { :id "add-cancel" } } )))]
-        (link-to "Add" request-map { :action "add", :html-options { :id "add-link" } } )]]
+        (link-to "Add" request-map { :action "add", :controller model-name, :html-options { :id "add-link" } } )]]
     [:script { :type "text/javascript" } 
       (scriptjure/js
         (initListAddLink "#add-link" "#add-form"))]))

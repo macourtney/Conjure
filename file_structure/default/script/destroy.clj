@@ -24,13 +24,13 @@
   (println (str "Invalid destroyer: " destroyer-namspace ". The destroyer must implement a destroy function.")))
 
 (defn destroy [command params]
-  (let [destroyer-namespace (find-ns (symbol (str "destroyers." command)))]
-    (if destroyer-namespace)
+  (let [destroyer-namespace (find-ns (symbol (str "destroyers." command "-destroyer")))]
+    (if destroyer-namespace
       (let [destroyer-fn (ns-resolve destroyer-namespace 'destroy)]
         (if destroyer-fn
           (destroyer-fn params)
           (print-invalid-destroyer destroyer-namespace)))
-      (print-unknown-command command)))
+      (print-unknown-command command))))
 
 (let [destroy-command (first *command-line-args*)
       destroy-type-params (rest *command-line-args*)]

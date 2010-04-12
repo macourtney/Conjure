@@ -23,13 +23,13 @@
   (println (str "Invalid generator: " generator-namspace ". The generator must implement a generate function.")))
 
 (defn generate [command params]
-  (let [generator-namespace (find-ns (symbol (str "generators." command)))]
-    (if generator-namespace)
+  (let [generator-namespace (find-ns (symbol (str "generators." command "-generator")))]
+    (if generator-namespace
       (let [generator-fn (ns-resolve generator-namespace 'generate)]
         (if generator-fn
           (generator-fn params)
           (print-invalid-generator generator-namespace)))
-      (print-unknown-command command)))
+      (print-unknown-command command))))
 
 (server/init)
 

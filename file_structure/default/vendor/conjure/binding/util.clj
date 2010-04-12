@@ -4,6 +4,7 @@
             [clojure.contrib.str-utils :as str-utils]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.loading-utils :as loading-utils]
+            [conjure.util.string-utils :as conjure-str-utils]
             environment))
 
 (def bindings-dir "bindings")
@@ -128,12 +129,14 @@ otherwise nil is returned." }
 (defn
 #^{ :doc "Calls the given binding with the given request map returning the response." }
   call-binding [controller action params]
-  (if environment/reload-files
-    (do 
-      (load-binding controller action)
-      (run-binding controller action params))
-    (or 
-      (run-binding controller action params)
-      (do
-        (load-binding controller action)
-        (run-binding controller action params)))))
+  (let [controller-str (conjure-str-utils/str-keyword controller)
+        action-str (conjure-str-utils/str-keyword action)]
+    (if environment/reload-files
+      (do 
+        (load-binding controller-str action-str)
+        (run-binding controller-str action-str params))
+      (or 
+        (run-binding controller-str action-str params)
+        (do
+          (load-binding controller-str action-str)
+          (run-binding controller-str action-str params))))))

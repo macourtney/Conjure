@@ -5,7 +5,7 @@
             [conjure.util.string-utils :as conjure-str-utils]
             [conjure.view.util :as view-utils]))
 
-(defview [record record-key]
+(defview [model-name record record-key]
   (let [record-id (:id record)]
     (html/htmli
       (if (= :id record-key)
@@ -13,10 +13,11 @@
           (ajax-link-to (helpers/h record-id) request-map 
             { :update (success-fn (str "row-" record-id) :replace)
               :action "ajax-show"
+              :controller model-name,
               :params { :id record-id }
               :html-options
                 { :href (view-utils/url-for request-map  
-                          { :action "show", :params { :id (:id record) } }) } })]
+                          { :action "show", :controller model-name, :params { :id (:id record) } }) } })]
         (let [record-key-str (conjure-str-utils/str-keyword record-key)]
           (if (. record-key-str endsWith "_id")
             (let [belongs-to-model (conjure-str-utils/strip-ending record-key-str "_id")

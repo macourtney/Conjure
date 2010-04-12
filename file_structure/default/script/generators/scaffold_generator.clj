@@ -100,14 +100,8 @@ table metadata as params." }
 #^{ :doc "Returns the content for list in the action map." }
   create-list-records-action [model]
     { :controller (str "(defaction list-records
-  (render-view request-map \"" model "\" (" model "/table-metadata) (" model "/find-records [true])))")
-      :view 
-        { :params "model-name table-metadata records", 
-          :content "(list-records/render-view request-map model-name table-metadata records)" 
-          :requires "[views.templates.list-records :as list-records]" }
-      :view-test 
-        (create-view-test model "list-records" 
-          (str "\"" model "\" (model/table-metadata) fixture/records") true) })
+  (bind-by-controller-action :generic :list-records [request-map \"" model "\"]))")
+      :view nil })
   
 (defn
 #^{ :doc "Returns the content for list in the action map." }
@@ -115,26 +109,16 @@ table metadata as params." }
     { :controller (str "(defaction show
   (let [id (:id (:params request-map))]
     (if id
-      (render-view request-map \"" model "\" (" model "/table-metadata) (" model "/get-record id))
+      (bind-by-controller-action :generic :show [request-map \"" model "\"])
       (redirect-to request-map { :action \"list-records\", :params {} }))))")
-      :view 
-        { :params "model-name table-metadata record", 
-          :content "(show/render-view request-map model-name table-metadata record)" 
-          :requires "[views.templates.show :as show]" }
-      :view-test (create-view-test-with-model-and-one-record model "show") })
+      :view nil })
   
 (defn
 #^{ :doc "Returns the content for add in the action map." }
   create-add-action [model]
     { :controller (str "(defaction add
-  (render-view request-map \"" model "\" (" model "/table-metadata)))")
-      :view 
-        { :params "model-name table-metadata", 
-          :content "(add/render-view request-map model-name table-metadata)"
-          :requires "[views.templates.add :as add]" }
-      :view-test 
-        (create-view-test model "add" 
-          (str "\"" model "\" (model/table-metadata)") false) })
+  (bind-by-controller-action :generic :add [request-map \"" model "\"]))")
+      :view nil })
       
 (defn
 #^{ :doc "Returns the content for add in the action map." }
@@ -152,13 +136,9 @@ table metadata as params." }
     { :controller (str "(defaction edit
   (let [id (:id (:params request-map))]
     (if id
-      (render-view request-map (" model "/table-metadata) (" model "/get-record id))
+      (bind-by-controller-action :generic :edit [request-map \"" model "\"])
       (redirect-to request-map { :action \"list-records\", :params {} }))))")
-      :view 
-        { :params "table-metadata record", 
-          :content "(edit/render-view request-map table-metadata record)"
-          :requires "[views.templates.edit :as edit]" }
-      :view-test (create-view-test-with-one-record model "edit") })
+      :view nil })
 
 (defn
 #^{ :doc "Returns the content for add in the action map." }
@@ -174,13 +154,8 @@ table metadata as params." }
 #^{ :doc "Returns the content for delete in the action map." }
   create-delete-warning-action [model]
     { :controller (str "(defaction delete-warning
-  (let [id (:id (:params request-map))]
-    (render-view request-map (" model "/table-metadata) (if id (" model "/get-record id)))))")
-      :view 
-        { :params "table-metadata record", 
-          :content "(delete-warning/render-view request-map table-metadata record)"
-          :requires "[views.templates.delete-warning :as delete-warning]" }
-      :view-test (create-view-test-with-one-record model "delete-warning") })
+  (bind-by-controller-action :generic :delete-warning [request-map \"" model "\"]))")
+      :view nil })
 
 (defn
 #^{ :doc "Returns the content for delete in the action map." }
@@ -199,9 +174,8 @@ table metadata as params." }
   (let [delete-id (:id (:params request-map))]
     (do
       (if delete-id (" model "/destroy-record { :id delete-id }))
-      (render-view { :layout nil } request-map))))")
-      :view { :content "(empty/render-view request-map)"
-              :requires "[views.templates.empty :as empty]" } })
+      (bind-by-controller-action :generic :ajax-direct [(merge request-map { :controller \"templates\", :action \"empty\" })]))))")
+      :view nil })
 
 (defn
 #^{ :doc "Returns the content for the ajax add in the action map." }
@@ -212,59 +186,29 @@ table metadata as params." }
       (do
         (" model "/insert record)
         (let [created-record ("model"/find-record record)]
-          (render-view { :layout nil } request-map (" model "/table-metadata) created-record))))))")
-      :view 
-        { :params "table-metadata record"
-          :content "(record-row/render-view request-map table-metadata record)"
-          :requires "[views.templates.record-row :as record-row]" }
-      :view-test (create-view-test-with-one-record model "ajax-add") })
+          (bind-by-controller-action :generic :ajax-add [request-map \"" model "\" created-record]))))))")
+      :view nil })
     
 (defn
 #^{ :doc "Returns the content for the ajax show in the action map." }
   create-ajax-show [model]
   { :controller (str "(defaction ajax-show
-  (let [id (:id (:params request-map))]
-    (if id
-      (render-view { :layout nil } request-map \"" model "\"
-        (" model "/table-metadata) 
-        (" model "/get-record id)))))")
-      :view 
-        { :params "model-name table-metadata record",
-          :content "(ajax-show/render-view request-map 
-    model-name table-metadata record (inc (count table-metadata)))" 
-          :requires "[views.templates.ajax-show :as ajax-show]" }
-      :view-test (create-view-test-with-model-and-one-record model "ajax-show") })
+  (bind-by-controller-action :generic :ajax-show [request-map \"" model "\"]))")
+      :view nil })
           
 (defn
 #^{ :doc "Returns the content for the ajax row in the action map." }
   create-ajax-row [model]
   { :controller (str "(defaction ajax-row
-  (let [id (:id (:params request-map))]
-    (if id
-      (render-view { :layout nil } request-map
-        (" model "/table-metadata)
-        (" model "/get-record id)))))")
-      :view 
-        { :params "table-metadata record",
-          :content "(record-row/render-view request-map table-metadata record)" 
-          :requires "[views.templates.record-row :as record-row]" }
-      :view-test (create-view-test-with-one-record model "ajax-row") })
+  (bind-by-controller-action :generic :ajax-row [request-map \"" model "\"]))")
+    :view nil })
 
 (defn
 #^{ :doc "Returns the content for the ajax show in the action map." }
   create-ajax-edit [model]
   { :controller (str "(defaction ajax-edit
-  (let [id (:id (:params request-map))]
-    (if id
-      (render-view { :layout nil } request-map \"" model "\"
-        (" model "/table-metadata) 
-        (" model "/get-record id)))))")
-      :view 
-        { :params "model-name table-metadata record",
-          :content "(ajax-edit/render-view request-map 
-    model-name table-metadata record (inc (count table-metadata)))" 
-          :requires "[views.templates.ajax-edit :as ajax-edit]" }
-      :view-test (create-view-test-with-model-and-one-record model "ajax-edit") })
+  (bind-by-controller-action :generic :ajax-edit [request-map \"" model "\"]))")
+    :view nil })
     
 (defn
 #^{ :doc "Returns the content for the ajax row in the action map." }
@@ -274,14 +218,8 @@ table metadata as params." }
     (if record
       (do
         (" model "/update record)
-        (render-view { :layout nil } request-map
-          (" model "/table-metadata)
-          record)))))")
-      :view 
-        { :params "table-metadata record",
-          :content "(record-row/render-view request-map table-metadata record)" 
-          :requires "[views.templates.record-row :as record-row]" }
-      :view-test (create-view-test-with-one-record model "ajax-save") })
+        (bind-by-controller-action :generic :ajax-save [request-map \"" model "\" record])))))")
+    :view nil })
     
 (defn
 #^{ :doc "Returns a map which links action names to content and such." }

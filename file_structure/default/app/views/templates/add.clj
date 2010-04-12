@@ -9,9 +9,9 @@
   (html/html
     [:div { :class "article" }
       [:h2 (str "Add a " (conjure-str-utils/human-title-case model-name))]
-      (form-for request-map { :name "create", :action "create" }
+      (form-for request-map { :name "create", :action "create", :controller model-name }
         (list
           (record-form/render-view request-map table-metadata {})
           (form-button "Create")
           "&nbsp;"
-          (link-to "Cancel" request-map { :action "list-records" } )))]))
+          (link-to "Cancel" request-map { :action "list-records", :controller model-name } )))]))

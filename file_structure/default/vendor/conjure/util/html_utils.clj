@@ -175,5 +175,6 @@ part is also a multipart, then data is a mulipart form map built by multipart-fo
 (defn
 #^{ :doc "Converts the given multipart form data into a tree of maps." }
   multipart-form-data [string boundary]
-  (map multipart-form-part 
-    (drop 1 (split-multipart-form string boundary))))
+  (when (and string boundary)
+    (map multipart-form-part 
+      (drop 1 (split-multipart-form string boundary)))))

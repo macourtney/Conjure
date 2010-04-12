@@ -16,9 +16,11 @@
             (ajax-link-to "Edit" request-map
               { :update (success-fn row-id :replace)
                 :action "ajax-edit"
+                :controller model-name
                 :params { :id record } })
             "&nbsp;"
             (ajax-link-to "Hide" request-map
               { :update (success-fn row-id :replace)
                 :action "ajax-row"
+                :controller model-name
                 :params { :id record } })]]])))
