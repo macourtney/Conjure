@@ -108,10 +108,5 @@
   (let [model "dog"]
     (is (create-controller-content model (create-action-map model)))))
 
-(deftest test-create-view-content
-  (let [model "dog"]
-    (is (create-view-content model :list-records (create-action-map model)))
-    (is (create-view-content model :show))))
-
 (deftest test-extra-model-content
   (is (extra-model-content)))
