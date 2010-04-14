@@ -1,20 +1,48 @@
 ;; This file is used to route requests to the appropriate controller and action.
 
 (ns routes
-  (:require [conjure.util.loading-utils :as loading-utils]
+  (:require [conjure.controller.util :as controller-util]
+            [conjure.util.loading-utils :as loading-utils]
             [clojure.contrib.logging :as logging]
             [clojure.contrib.str-utils :as contrib-str-utils]))
 
-(defn draw []
-  [ (fn [path]
-      (if path
-        (let [path-groups (re-matches #"/?(([^/]+)/?(([^/]+)/?([^/]+)?)?)?" path)]
-          (if path-groups
-            (let [controller (or (nth path-groups 2 nil) "home")
-                  action (or (nth path-groups 4 nil) "index")
-                  id (nth path-groups 5 nil)]
-    
-              (logging/debug "Using default router.")
-              { :controller (loading-utils/underscores-to-dashes controller)
-                :action (loading-utils/underscores-to-dashes action)
-                :params (if id {:id id} {}) })))))])
+(defn
+#^{ :doc "Given a path, this function returns the controller, action and id in a map." }
+  parse-path [path]
+  (when path
+    (let [path-groups (re-matches #"/?(([^/]+)/?(([^/]+)/?([^/]+)?)?)?" path)]
+      (when path-groups
+        (let [controller (or (nth path-groups 2 nil) "home")
+              action (or (nth path-groups 4 nil) "index")
+              id (nth path-groups 5 nil)
+              path-map { :controller (loading-utils/underscores-to-dashes controller)
+                         :action (loading-utils/underscores-to-dashes action) }]
+          (if id
+            (assoc path-map :id id)
+            path-map))))))
+
+(defn
+#^{ :doc "Returns the params for the given request-map and id. If id is nil, then this function simply returns the 
+params from the given request-map." }
+  create-params [request-map id]
+  (let [request-params (or (:params request-map) {})]
+    (if id 
+      (merge request-params { :id id })
+      request-params)))
+
+(defn
+#^{ :doc "Calls the controller action specified in the given path-map. Path-map must contain :controller and :action 
+keys, and may contain optional :id key. The controller, action and id will be appropriately merged into the given
+request-map before calling the controller action." }
+  call-controller [request-map path-map]
+  (controller-util/call-controller 
+    (merge request-map (select-keys path-map [:controller :action])
+      { :params (create-params request-map (:id path-map)) })))
+
+(defn
+#^{ :doc "Given a request-map, this function calls the appropriate controller and action." }
+  route-request [request-map]
+  (let [path-map (parse-path (:uri (:request request-map)))]
+    (when path-map
+      (logging/debug "Using default router.")
+      (call-controller request-map path-map))))

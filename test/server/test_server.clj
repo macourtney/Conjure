@@ -85,65 +85,13 @@
   (is (= {} (parse-params {} ))))
 
 (deftest test-update-request-map
-  (let [headers { "cookie" "SID=blah" }]
-    (let [uri (str "/" controller-name "/" action-name "/1")]
-      (is (= 
-        { :controller controller-name,
-          :action action-name,
-          :params { :id "1" }
-          :request 
-          { :uri uri,
-            :headers headers } }
-        (update-request-map 
-          { :request 
-            { :uri uri, 
-              :headers headers } }))))
-            
-    (let [uri (str "/" controller-name "/" action-name)]
-      (is (= 
-        { :controller controller-name,
-          :action action-name,
-          :params {}
-          :request 
-          { :uri uri
-            :headers headers } }
-        (update-request-map 
-          { :request 
-            { :uri uri
-              :headers headers } }))))
-      
-    (is (= 
-        { :params {}, 
-          :action "index", 
-          :controller "test", 
-          :request 
-          { :uri "test"
-            :headers headers } }
-        (update-request-map 
-          { :request 
-            { :uri controller-name
-              :headers headers } })))
-          
-    (is (= 
-      { :params {}, 
-        :action "index", 
-        :controller "home", 
-        :request 
-        { :uri ""
-          :headers headers } } 
-      (update-request-map 
-        { :request 
-          { :uri ""
-            :headers headers } })))
-        
+  (let [headers { "cookie" "SID=blah" }]                
     (let [request-map (update-request-map nil)]
-      (is (= {} (:params request-map)))
+      (is (= nil (:params request-map)))
       (is (contains? request-map :temp-session)))
       
     (is (=
       { :params { :foo "bar" },
-        :action "index",
-        :controller "home",
         :request 
         { :uri "",
           :query-string "foo=bar"
@@ -156,9 +104,7 @@
           
     (let [uri (str "/" controller-name "/" action-name "/1")]
       (is (= 
-        { :controller controller-name, 
-          :action action-name, 
-          :params { :id "1", :foo "bar" }, 
+        { :params { :foo "bar" }, 
           :request 
           { :uri uri, 
             :query-string "foo=bar"

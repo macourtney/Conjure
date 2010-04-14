@@ -20,11 +20,10 @@
 (defn
 #^{ :doc "Merges the params value of the given request-map with params" }
   augment-params [request-map params]
-  (if request-map
-    (let [output-params (request-map :params)]
-      (if (and output-params params (not-empty params))
-        (assoc request-map :params (merge output-params params))
-        request-map))))
+  (if request-map 
+    (if (and params (not-empty params))
+      (assoc request-map :params (merge (:params request-map) params))
+      request-map)))
 
 (defn
 #^{ :doc "Returns a parameter map generated from the post content." }
@@ -50,10 +49,7 @@
 #^{ :doc "Gets a route map for use by conjure to call the correct methods." }
   update-request-map [request-map]
   (session-utils/update-request-session 
-    (merge request-map 
-      (augment-params 
-        (or (some identity (map #(% (:uri (:request request-map))) (routes/draw))) { :params {} }) 
-        (parse-params request-map)))))
+    (augment-params request-map (parse-params request-map))))
 
 (defn
 #^{ :doc "Initializes the conjure server." }
@@ -83,14 +79,14 @@ one." }
     request-map
     (if (map? response)
       response
-      {:status  200
-       :headers {"Content-Type" "text/html"}
-       :body    response})))
+      { :status  200
+        :headers { "Content-Type" "text/html" }
+        :body    response })))
      
 (defn
 #^{ :doc "Calls the given controller with the given request map returning the response." }
   call-controller [request-map]
-  (let [response (controller-util/call-controller request-map)]
+  (let [response (routes/route-request request-map)]
     (if response
       (create-response-map response request-map)
       (controller-util/call-controller { :controller "home", :action "error-404" }))))

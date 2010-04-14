@@ -6,24 +6,36 @@
 (def action-name "show")
 (def id "1")
 
-(deftest test-draw
-  (let [routes-seq (draw)
-        route-fn (first routes-seq)]
-    (is (=
-      { :action action-name, :controller controller-name, :params { :id id } }
-      (route-fn (str "/" controller-name "/" action-name "/" id))))
-    (is (=
-      { :action action-name, :controller controller-name, :params {} }
-      (route-fn (str "/" controller-name "/" action-name))))
-    (is (=
-      { :action action-name, :controller controller-name, :params {} }
-      (route-fn (str "/" controller-name "/" action-name "/"))))
-    (is (=
-      { :action "index", :controller controller-name, :params {} }
-      (route-fn (str "/" controller-name))))
-    (is (=
-      { :action "index", :controller controller-name, :params {} }
-      (route-fn (str "/" controller-name "/"))))
-    (is (=
-      { :action "index", :controller "home", :params {} }
-      (route-fn "/")))))
+(deftest test-parse-path
+  (is (=
+    { :action action-name, :controller controller-name, :id id }
+    (parse-path (str "/" controller-name "/" action-name "/" id))))
+  (is (=
+    { :action action-name, :controller controller-name }
+    (parse-path (str "/" controller-name "/" action-name))))
+  (is (=
+    { :action action-name, :controller controller-name }
+    (parse-path (str "/" controller-name "/" action-name "/"))))
+  (is (=
+    { :action "index", :controller controller-name }
+    (parse-path (str "/" controller-name))))
+  (is (=
+    { :action "index", :controller controller-name }
+    (parse-path (str "/" controller-name "/"))))
+  (is (=
+    { :action "index", :controller "home" }
+    (parse-path "/"))))
+
+(deftest test-create-params
+  (is (= { :id "1", :foo "bar" } (create-params { :params { :foo "bar" } } "1")))
+  (is (= { :id "1" } (create-params {} "1")))
+  (is (= { :id "1" } (create-params nil "1")))
+  (is (= { :foo "bar" } (create-params { :params { :foo "bar" } } nil)))
+  (is (= {} (create-params {} nil)))
+  (is (= {} (create-params nil nil))))
+
+(deftest test-call-controller
+  (is (call-controller {} { :controller "home", :action "index" })))
+
+(deftest test-route-request
+  (is (route-request { :request { :uri "/home/index" } })))
