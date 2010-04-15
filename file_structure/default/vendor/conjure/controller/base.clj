@@ -59,9 +59,14 @@ render-type? to determine :request-map or :parameters." }
   add-action-function [action-function params]
   (controller-util/add-action-function action-function params))
 
+(defn
+#^{ :doc "Returns the controller from the given controller namespace." }
+  controller-from-namespace [namespace]
+  (controller-util/controller-from-namespace (name (ns-name namespace))))
+
 (defmacro defaction [action-name & body]
   (let [attributes (first body)
-        controller (controller-util/controller-from-namespace (name (ns-name *ns*)))
+        controller (controller-from-namespace *ns*)
         params { :action (str action-name), :controller controller }]
     (if (map? attributes)
       (let [new-params (merge params attributes)]
@@ -72,3 +77,10 @@ render-type? to determine :request-map or :parameters." }
         (fn [~'request-map] ~@body) 
         ~params))))
 
+(defmacro add-interceptor
+  ([interceptor] 
+    (let [controller (controller-from-namespace *ns*)]
+      `(controller-util/add-interceptor interceptor controller nil nil))) 
+  ([interceptor params]
+    (let [controller (controller-from-namespace *ns*)]
+      `(controller-util/add-interceptor interceptor controller (:excludes params) (:includes params)))))

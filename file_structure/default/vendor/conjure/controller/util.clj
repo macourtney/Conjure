@@ -14,6 +14,9 @@
 
 (def controller-actions (atom {}))
 
+(def action-interceptors (atom {}))
+(def controller-interceptors (atom {}))
+
 (defn 
 #^{ :doc "Finds the controller directory." }
   find-controllers-directory []
@@ -126,28 +129,6 @@ the method is assumed to be :all. If no matching method is found, then nil is re
   find-action-fn [{ controller :controller, action :action, :as request-map }]
   (action-function controller action (method-key request-map)))
 
-(defn
-#^{ :doc "Attempts to run the action requested in request-map. If the action is successful, it's response is returned, 
-otherwise nil is returned." }
-  run-action [request-map]
-  (let [action-fn (find-action-fn request-map)]
-    (when action-fn
-      (logging/debug (str "Running action: " (fully-qualified-action request-map)))
-      (action-fn request-map))))
-
-(defn
-#^{ :doc "Calls the given controller with the given request map returning the response." }
-  call-controller [request-map]
-  (if environment/reload-files
-    (do 
-      (load-controller (:controller request-map))
-      (run-action request-map))
-    (or 
-      (run-action request-map)
-      (do
-        (load-controller (:controller request-map))
-        (run-action request-map)))))
-
 (defn 
 #^{ :doc "adds the given action function into the given methods map and returns the result." }
   assoc-methods [methods-map { action-function :action-function, methods :methods, :or { methods [:all] } }]
@@ -180,3 +161,128 @@ namespace." }
   controller-from-namespace [namespace-name]
   (string-utils/strip-ending 
     (last (str-utils/re-split #"\." namespace-name)) controller-namespace-ending))
+
+(defn
+#^{ :doc "Chains all of the given interceptors together. If any interceptor is nil, it is simply ignored. If all 
+interceptors are nil, then this function returns nil." }
+  chain-interceptors
+  ([interceptor] interceptor) 
+  ([parent-interceptor child-interceptor]
+    (if parent-interceptor
+      (if child-interceptor
+        (fn [request-map action-fn] 
+          (parent-interceptor request-map #(child-interceptor %1 action-fn)))
+        parent-interceptor)
+      child-interceptor))
+  ([parent-interceptor child-interceptor & more]
+    (reduce chain-interceptors (chain-interceptors parent-interceptor child-interceptor) more)))
+
+(defn
+#^{ :doc "Adds the given action interceptor to the given controller interceptor map." }
+  assoc-action-interceptors [controller-interceptor-map action-interceptor action]
+  (let [action-key (keyword action)]
+    (assoc controller-interceptor-map action-key
+      (chain-interceptors action-interceptor (get controller-interceptor-map action-key)))))
+
+(defn
+#^{ :doc "Adds the given action interceptor to the given action interceptor map." }
+  assoc-controller-interceptors [action-interceptor-map action-interceptor controller action]
+  (let [controller-key (keyword controller)]
+    (assoc action-interceptor-map controller-key
+      (assoc-action-interceptors (get action-interceptor-map controller-key) action-interceptor action))))
+
+(defn
+#^{ :doc "Adds the given action interceptor to the list of action interceptors to call." }
+  add-action-interceptor [action-interceptor controller action]
+  (reset! action-interceptors
+    (assoc-controller-interceptors @action-interceptors action-interceptor controller action)))
+
+(defn
+#^{ :doc "Adds the given excludes interceptor map with the given controller interceptor and excludes set." }
+  update-exclude-interceptor-list [exclude-interceptor-list controller-interceptor excludes]
+  (let [exclude-map { :interceptor controller-interceptor }]
+    (cons 
+      (if excludes 
+        (assoc exclude-map :excludes excludes) 
+        exclude-map)
+      exclude-interceptor-list)))
+
+(defn
+#^{ :doc "Adds the given controller interceptor to the given controller interceptor map." }
+  assoc-controller-excludes-interceptors [controller-interceptor-map controller-interceptor controller excludes]
+  (let [controller-key (keyword controller)]
+    (assoc controller-interceptor-map controller-key
+      (update-exclude-interceptor-list (get controller-interceptor-map controller-key) controller-interceptor excludes))))
+
+(defn
+#^{ :doc "Adds the given controller interceptor to the list of controller interceptors to call, excluding the 
+interceptor if any of the actions in excludes is called.." }
+  add-controller-interceptor [controller-interceptor controller excludes]
+  (reset! controller-interceptors
+    (assoc-controller-excludes-interceptors @controller-interceptors controller-interceptor controller excludes)))
+
+(defn
+#^{ :doc "Adds the given interceptor to the given controller, including or excluding the given actions. Note, adding
+includes will completely ignore excludes." }
+  add-interceptor [interceptor controller excludes includes]
+  (when (and interceptor controller)
+    (if (and includes (not-empty includes))
+      (doseq [include-action includes]
+        (add-action-interceptor interceptor controller include-action))
+      (add-controller-interceptor interceptor controller excludes))))
+
+(defn
+#^{ :doc "Returns the action interceptor for the given controller and action." }
+  find-action-interceptor [controller action]
+  (get (get @action-interceptors (keyword controller)) (keyword action)))
+
+(defn
+#^{ :doc "Returns the controller interceptors for the given controller and action." }
+  find-controller-interceptors [controller action]
+  (let [action-key (keyword action)]
+    (filter identity 
+      (map 
+        (fn [exclude-interceptor-map]
+          (let [excludes (:excludes exclude-interceptor-map)]
+            (when (not (and excludes (contains? excludes action-key)))
+              (:interceptor exclude-interceptor-map)))) 
+        (get @controller-interceptors (keyword controller))))))
+
+(defn
+#^{ :doc "Returns a single interceptor created by chaining all of the interceptors which apply to the given controller
+and action. If no interceptors apply to the given controller and action, a simple pass through interceptor is created." }
+  create-interceptor-chain [controller action]
+  (or 
+    (apply chain-interceptors 
+      (find-action-interceptor controller action) 
+      (find-controller-interceptors controller action))
+    (fn [request-map action-fn]
+      (action-fn request-map))))
+
+(defn
+#^{ :doc "Runs all interceptors passing the given request-map and action function. If there are no interceptors for the
+given action and controller, then this function simply runs the action function passing request-map to it.." }
+  run-interceptors [{ :keys [controller action] :as request-map } action-fn]
+  ((create-interceptor-chain controller action) request-map action-fn))
+
+(defn
+#^{ :doc "Attempts to run the action requested in request-map. If the action is successful, it's response is returned, 
+otherwise nil is returned." }
+  run-action [request-map]
+  (let [action-fn (find-action-fn request-map)]
+    (when action-fn
+      (logging/debug (str "Running action: " (fully-qualified-action request-map)))
+      (run-interceptors request-map action-fn))))
+
+(defn
+#^{ :doc "Calls the given controller with the given request map returning the response." }
+  call-controller [request-map]
+  (if environment/reload-files
+    (do 
+      (load-controller (:controller request-map))
+      (run-action request-map))
+    (or 
+      (run-action request-map)
+      (do
+        (load-controller (:controller request-map))
+        (run-action request-map)))))

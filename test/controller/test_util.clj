@@ -113,16 +113,6 @@
 (deftest test-find-action-fn
   (is (find-action-fn { :controller controller-name, :action action-name, :request { :method "GET" } })))
 
-(deftest test-run-action
-  (is (run-action { :controller controller-name, :action action-name, :request { :method "GET" } })))
-
-(deftest test-call-controller
-  (is (call-controller { :controller controller-name, :action action-name, :request { :method "GET" } }))
-  (let [initial-controller-actions @controller-actions]
-    (reset! controller-actions {})
-    (is (call-controller { :controller controller-name, :action action-name, :request { :method "GET" } }))
-    (reset! controller-actions initial-controller-actions)))
-
 (deftest test-assoc-methods
   (let [test-action (fn [request-map] nil)
         params { :action-function test-action }]
@@ -169,4 +159,146 @@
     (reset! controller-actions {})
     (add-action-function test-action params)
     (is (= controller-map @controller-actions))
+    (reset! controller-actions initial-controller-actions)))
+
+(defn create-stack-interceptor [value]
+  (fn [request-map action-fn]
+    (cons value (action-fn request-map))))
+
+(defn list-action [request-map]
+  (list))
+
+(deftest test-chain-interceptors
+  (is (= '("one") ((chain-interceptors (create-stack-interceptor "one")) {} list-action)))
+  (is (= '("one" "two")
+    ((chain-interceptors
+      (create-stack-interceptor "one")
+      (create-stack-interceptor "two"))
+    {} list-action)))
+  (is (= '("two") 
+    ((chain-interceptors 
+      nil 
+      (create-stack-interceptor "two"))
+    {} list-action)))
+  (is (= '("one")
+    ((chain-interceptors
+      (create-stack-interceptor "one")
+      nil)
+    {} list-action)))
+  
+  (is (= '("one" "two" "three")
+    ((chain-interceptors
+      (create-stack-interceptor "one")
+      (create-stack-interceptor "two")
+      (create-stack-interceptor "three"))
+    {} list-action)))
+  (is (= '("one" "two" "three" "four")
+    ((chain-interceptors
+      (create-stack-interceptor "one")
+      (create-stack-interceptor "two")
+      (create-stack-interceptor "three")
+      (create-stack-interceptor "four"))
+    {} list-action)))
+  (is (= '("one" "two" "three" "four")
+    ((chain-interceptors
+      (create-stack-interceptor "one")
+      nil
+      (create-stack-interceptor "two")
+      nil
+      (create-stack-interceptor "three")
+      nil
+      nil
+      (create-stack-interceptor "four"))
+    {} list-action)))
+  (is (nil? (chain-interceptors nil)))
+  (is (nil? (chain-interceptors nil nil))))
+
+(defn pass-interceptor [request-map action-fn]
+  (action-fn request-map))
+
+(deftest test-assoc-action-interceptors
+  (is (= { :show pass-interceptor } (assoc-action-interceptors {} pass-interceptor :show)))
+  (is (= '("one" "two")
+    ((:show 
+      (assoc-action-interceptors { :show (create-stack-interceptor "two") } 
+        (create-stack-interceptor "one") :show))
+      {} list-action))))
+
+(deftest test-assoc-controller-interceptors
+  (is (= { :test { :show pass-interceptor } } (assoc-controller-interceptors {} pass-interceptor :test :show)))
+  (is (= { :test { :show pass-interceptor, :hide pass-interceptor } } 
+    (assoc-controller-interceptors { :test { :hide pass-interceptor } } pass-interceptor :test :show)))
+  (is (= '("one" "two")
+    ((:show (:test 
+      (assoc-controller-interceptors { :test { :show (create-stack-interceptor "two") } } 
+        (create-stack-interceptor "one") :test :show)))
+      {} list-action))))
+
+(deftest test-add-action-interceptor
+  (let [initial-action-interceptors @action-interceptors]
+    (reset! action-interceptors {})
+    (add-action-interceptor pass-interceptor :test :show)
+    (is (= { :test { :show pass-interceptor } } @action-interceptors))
+    (reset! action-interceptors initial-action-interceptors)))
+
+(deftest test-update-exclude-interceptor-list
+  (is (= [{ :interceptor pass-interceptor }] (update-exclude-interceptor-list [] pass-interceptor nil)))
+  (is (= [{ :interceptor pass-interceptor, :excludes #{} }] (update-exclude-interceptor-list [] pass-interceptor #{})))
+  (is (= [{ :interceptor pass-interceptor, :excludes #{ :show } }] 
+    (update-exclude-interceptor-list [] pass-interceptor #{ :show })))
+  (is (= [{ :interceptor pass-interceptor, :excludes #{ :show } } { :interceptor pass-interceptor }] 
+    (update-exclude-interceptor-list [{ :interceptor pass-interceptor }] pass-interceptor #{ :show }))))
+
+(deftest test-assoc-controller-excludes-interceptors
+  (is (= { :test [{ :interceptor pass-interceptor }]}
+    (assoc-controller-excludes-interceptors {} pass-interceptor :test nil)))
+  (is (= { :test [{ :interceptor pass-interceptor } { :interceptor pass-interceptor }]}
+    (assoc-controller-excludes-interceptors { :test [{ :interceptor pass-interceptor }] } pass-interceptor :test nil))))
+
+(deftest test-add-controller-interceptor
+  (let [initial-controller-interceptors @controller-interceptors]
+    (reset! controller-interceptors {})
+    (add-controller-interceptor pass-interceptor :test #{ :show })
+    (is (= { :test [{ :excludes #{ :show }, :interceptor pass-interceptor }] } @controller-interceptors))
+    (reset! controller-interceptors initial-controller-interceptors)))
+
+(deftest test-add-interceptor
+  (let [initial-action-interceptors @action-interceptors
+        initial-controller-interceptors @controller-interceptors]
+    (reset! action-interceptors {})
+    (reset! controller-interceptors {})
+    (add-interceptor pass-interceptor :test nil [ :show ])
+    (is (= { :test { :show pass-interceptor } } @action-interceptors))
+    (is (= {} @controller-interceptors))
+    (reset! action-interceptors {})
+    (add-interceptor pass-interceptor :test #{ :show } nil)
+    (is (= {} @action-interceptors))
+    (is (= { :test [{ :excludes #{ :show }, :interceptor pass-interceptor }] } @controller-interceptors))
+    (reset! action-interceptors initial-action-interceptors)
+    (reset! controller-interceptors initial-controller-interceptors)))
+
+(deftest test-find-action-interceptor
+  (let [initial-action-interceptors @action-interceptors]
+    (reset! action-interceptors {})
+    (add-action-interceptor pass-interceptor :test :show)
+    (is (= pass-interceptor (find-action-interceptor :test :show)))
+    (is (nil? (find-action-interceptor :test :hide)))
+    (reset! action-interceptors initial-action-interceptors)))
+
+(deftest test-find-controller-interceptors
+  (let [initial-controller-interceptors @controller-interceptors]
+    (reset! controller-interceptors {})
+    (add-controller-interceptor pass-interceptor :test #{ :show })
+    (is (= [pass-interceptor] (find-controller-interceptors :test :hide)))
+    (is (= [] (find-controller-interceptors :test :show)))
+    (reset! controller-interceptors initial-controller-interceptors)))
+
+(deftest test-run-action
+  (is (run-action { :controller controller-name, :action action-name, :request { :method "GET" } })))
+
+(deftest test-call-controller
+  (is (call-controller { :controller controller-name, :action action-name, :request { :method "GET" } }))
+  (let [initial-controller-actions @controller-actions]
+    (reset! controller-actions {})
+    (is (call-controller { :controller controller-name, :action action-name, :request { :method "GET" } }))
     (reset! controller-actions initial-controller-actions)))
