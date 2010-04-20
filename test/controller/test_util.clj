@@ -277,6 +277,35 @@
     (reset! action-interceptors initial-action-interceptors)
     (reset! controller-interceptors initial-controller-interceptors)))
 
+(deftest test-app-interceptor-map
+  (is (= 
+    { :interceptor pass-interceptor, :excludes { :test #{ :show } } } 
+    (app-interceptor-map pass-interceptor { :test #{ :show } })))
+  (is (= 
+    { :interceptor pass-interceptor, :excludes { :test #{} } } 
+    (app-interceptor-map pass-interceptor { :test #{} }))))
+
+(deftest test-add-app-interceptor-to-list
+  (is (= 
+    [{ :interceptor pass-interceptor, :excludes { :test #{ :show } } }]
+    (add-app-interceptor-to-list [] pass-interceptor { :test #{ :show } })))
+  (is (= 
+    [ { :interceptor pass-interceptor, :excludes { :test2 #{} } }
+      { :interceptor pass-interceptor, :excludes { :test #{ :show } } } ]
+    (add-app-interceptor-to-list 
+      [ { :interceptor pass-interceptor, :excludes { :test #{ :show } } } ] 
+      pass-interceptor 
+      { :test2 #{} }))))
+
+(deftest test-add-app-interceptor
+  (let [initial-app-interceptors @app-interceptors]
+    (reset! app-interceptors [])
+    (add-app-interceptor pass-interceptor { :test #{ :show } })
+    (is (= 
+      [ { :interceptor pass-interceptor, :excludes { :test #{ :show } } } ]
+      @app-interceptors))
+    (reset! app-interceptors initial-app-interceptors)))
+
 (deftest test-find-action-interceptor
   (let [initial-action-interceptors @action-interceptors]
     (reset! action-interceptors {})
@@ -292,6 +321,46 @@
     (is (= [pass-interceptor] (find-controller-interceptors :test :hide)))
     (is (= [] (find-controller-interceptors :test :show)))
     (reset! controller-interceptors initial-controller-interceptors)))
+
+(deftest test-call-app-interceptor?
+  (is (call-app-interceptor? { :excludes { :test #{ :hide } } } :test :show))
+  (is (not (call-app-interceptor? { :excludes { :test #{ :show } } } :test :show)))
+  (is (not (call-app-interceptor? { :excludes { :test #{} } } :test :show)))
+  (is (not (call-app-interceptor? { :excludes { :test :blah } } :test :show)))
+  (is (call-app-interceptor? { :excludes { } } :test :show)))
+
+(deftest test-valid-app-interceptors
+  (is (= [pass-interceptor] (valid-app-interceptors [{ :interceptor pass-interceptor, :excludes {} }] :test :show)))
+  (is (= [] (valid-app-interceptors [{ :interceptor pass-interceptor, :excludes { :test #{ :show } } }] :test :show)))
+  (is (= 
+    [pass-interceptor] 
+    (valid-app-interceptors 
+      [ { :interceptor pass-interceptor, :excludes { :test #{ :show } } } 
+        { :interceptor pass-interceptor, :excludes {} } ]
+      :test
+      :show)))
+  (is (= 
+    [pass-interceptor] 
+    (valid-app-interceptors 
+      [ { :interceptor pass-interceptor, :excludes { :test #{ :hide } } } 
+        { :interceptor pass-interceptor, :excludes { :test #{} } } ]
+      :test
+      :show)))
+  (is (= 
+    [pass-interceptor pass-interceptor] 
+    (valid-app-interceptors 
+      [ { :interceptor pass-interceptor, :excludes { :test #{ :hide } } } 
+        { :interceptor pass-interceptor, :excludes {} } ]
+      :test
+      :show))))
+
+(deftest test-find-app-interceptors
+  (let [initial-app-interceptors @app-interceptors]
+    (reset! app-interceptors [])
+    (add-app-interceptor pass-interceptor { :test #{ :hide } })
+    (is (= [pass-interceptor] (find-app-interceptors :test :show)))
+    (is (= [] (find-app-interceptors :test :hide)))
+    (reset! app-interceptors initial-app-interceptors)))
 
 (deftest test-run-action
   (is (run-action { :controller controller-name, :action action-name, :request { :method "GET" } })))

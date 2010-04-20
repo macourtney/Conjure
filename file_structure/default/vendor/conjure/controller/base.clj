@@ -84,3 +84,11 @@ render-type? to determine :request-map or :parameters." }
   ([interceptor params]
     (let [controller (controller-from-namespace *ns*)]
       `(controller-util/add-interceptor interceptor controller (:excludes params) (:includes params)))))
+
+(defn 
+#^{ :doc "Adds the given interceptor as an app interceptor. The interceptor will be run for every controller and action
+unless it is explicitly escluded in the given params." }
+  add-app-interceptor 
+  ([interceptor] (add-app-interceptor interceptor {}))
+  ([interceptor { :keys [excludes] :or { excludes {} }}]
+    (controller-util/add-app-interceptor interceptor excludes)))

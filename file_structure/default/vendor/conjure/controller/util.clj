@@ -16,6 +16,7 @@
 
 (def action-interceptors (atom {}))
 (def controller-interceptors (atom {}))
+(def app-interceptors (atom []))
 
 (defn 
 #^{ :doc "Finds the controller directory." }
@@ -60,7 +61,10 @@
   all-controllers []
   (map controller-from-file 
     (filter 
-      #(. (. % getName) endsWith controller-file-name-ending) 
+      #(let [file-name (. % getName)] 
+        (and 
+          (not (= file-name "app_controller.clj")) 
+          (. file-name endsWith controller-file-name-ending))) 
       (. (find-controllers-directory) listFiles))))
 
 (defn
@@ -163,6 +167,14 @@ namespace." }
     (last (str-utils/re-split #"\." namespace-name)) controller-namespace-ending))
 
 (defn
+#^{ :doc "If the given interceptor is a function, then this function returns it. Otherwise, this function throws an 
+exception showing what the interceptor is." }
+  check-inteceptor-fn? [interceptor interceptor-name]
+  (if (or (nil? interceptor) (fn? interceptor))
+    interceptor
+    (throw (new RuntimeException (str interceptor-name " is not a function. " interceptor-name ": " interceptor)))))
+
+(defn
 #^{ :doc "Chains all of the given interceptors together. If any interceptor is nil, it is simply ignored. If all 
 interceptors are nil, then this function returns nil." }
   chain-interceptors
@@ -170,10 +182,13 @@ interceptors are nil, then this function returns nil." }
   ([parent-interceptor child-interceptor]
     (if parent-interceptor
       (if child-interceptor
-        (fn [request-map action-fn] 
-          (parent-interceptor request-map #(child-interceptor %1 action-fn)))
-        parent-interceptor)
-      child-interceptor))
+        (do
+          (check-inteceptor-fn? parent-interceptor "parent-interceptor")
+          (check-inteceptor-fn? child-interceptor "child-interceptor")
+          (fn [request-map action-fn] 
+            (parent-interceptor request-map #(child-interceptor %1 action-fn))))
+        (check-inteceptor-fn? parent-interceptor "parent-interceptor"))
+      (check-inteceptor-fn? child-interceptor "child-interceptor")))
   ([parent-interceptor child-interceptor & more]
     (reduce chain-interceptors (chain-interceptors parent-interceptor child-interceptor) more)))
 
@@ -232,6 +247,23 @@ includes will completely ignore excludes." }
       (add-controller-interceptor interceptor controller excludes))))
 
 (defn
+#^{ :doc "Creates the interceptor map for the given app interceptor." }
+  app-interceptor-map [interceptor excludes]
+  { :interceptor interceptor, :excludes excludes })
+
+(defn
+#^{ :doc "Adds the given interceptor and excludes map to the given list of app interceptors." }
+  add-app-interceptor-to-list [app-interceptors interceptor excludes]
+  (cons (app-interceptor-map interceptor excludes) app-interceptors))
+
+(defn
+#^{ :doc "Adds the given interceptor to the list of app interceptors, including or excluding the given controllers and 
+actions." }
+  add-app-interceptor [interceptor excludes]
+  (reset! app-interceptors
+    (add-app-interceptor-to-list @app-interceptors interceptor excludes)))
+
+(defn
 #^{ :doc "Returns the action interceptor for the given controller and action." }
   find-action-interceptor [controller action]
   (get (get @action-interceptors (keyword controller)) (keyword action)))
@@ -249,13 +281,36 @@ includes will completely ignore excludes." }
         (get @controller-interceptors (keyword controller))))))
 
 (defn
+#^{ :doc "Returns true if the app interceptor in the given interceptor map should be called for the given controller 
+and action." }
+  call-app-interceptor? [interceptor-map controller action]
+  (let [action-set (get (:excludes interceptor-map) (keyword controller))]
+    (if action-set
+      (when (and (set? action-set) (not-empty action-set))
+        (not (contains? action-set (keyword action))))
+      true)))
+
+(defn
+#^{ :doc "Returns the app interceptors in app-interceptors to call for the given controller and action." }
+  valid-app-interceptors [app-interceptors controller action]
+  (map :interceptor
+    (filter #(call-app-interceptor? % controller action) app-interceptors)))
+
+(defn
+#^{ :doc "Returns the app interceptors to call for the given controller and action." }
+  find-app-interceptors [controller action]
+  (valid-app-interceptors @app-interceptors controller action))
+
+(defn
 #^{ :doc "Returns a single interceptor created by chaining all of the interceptors which apply to the given controller
 and action. If no interceptors apply to the given controller and action, a simple pass through interceptor is created." }
   create-interceptor-chain [controller action]
-  (or 
-    (apply chain-interceptors 
-      (find-action-interceptor controller action) 
-      (find-controller-interceptors controller action))
+  (or
+    (apply chain-interceptors
+      (find-action-interceptor controller action)
+      (concat 
+        (find-controller-interceptors controller action)
+        (find-app-interceptors controller action)))
     (fn [request-map action-fn]
       (action-fn request-map))))
 
