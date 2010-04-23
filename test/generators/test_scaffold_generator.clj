@@ -56,6 +56,3 @@
 
 (deftest test-create-controller-content
   (is (create-controller-content "dog")))
-
-(deftest test-extra-model-content
-  (is (extra-model-content)))

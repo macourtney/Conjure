@@ -64,14 +64,6 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
     "[controllers.template-controller :as template-controller]"))
 
 (defn
-#^{ :doc "Creates the extra model functions for generated models." }
-  extra-model-content []
-  "(defn
-#^{ :doc \"Returns the metadata for the table associated with this model.\" }
-  table-metadata []
-    (doall (find-by-sql [(str \"SHOW COLUMNS FROM \" (table-name))])))")
-
-(defn
 #^{ :doc "Creates the controller file associated with the given controller." }
   generate-scaffold
     ([model fields]
@@ -84,7 +76,7 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
           (model-generator/create-model-file 
             model 
             (model-builder/create-model-file (model-util/find-models-directory) model)
-            (model-generator/model-file-content model (extra-model-content)))
+            (model-generator/model-file-content model))
           (model-test-generator/generate-unit-test model)
             (controller-generator/create-controller-files 
               { :controller model, :controller-content (create-controller-content model) }))
