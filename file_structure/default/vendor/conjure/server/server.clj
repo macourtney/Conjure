@@ -4,7 +4,7 @@
             [clojure.contrib.logging :as logging]
             [clojure.contrib.str-utils :as str-utils]
             [conjure.controller.util :as controller-util]
-            [controllers.app-controller :as app-controller] ; Not actually used, but needs to be loaded in order to load app interceptors.
+            [controllers.app :as app] ; Not actually used, but needs to be loaded in order to load app interceptors.
             [conjure.model.database :as database]
             [conjure.util.html-utils :as html-utils]
             [conjure.util.loading-utils :as loading-utils]

@@ -16,6 +16,17 @@
 #^{ :doc "Returns the model namespace for the given model." }
   model-namespace [model]
   (if model (str "models." model)))
+  
+(defn
+#^{ :doc "Loads the namespace for the given model." }
+  load-model [model]
+  (require (symbol (model-namespace model))))
+
+(defn
+#^{ :doc "Runs the given function in the given model with the given parameters." }
+  run-model-fn [model function & params]
+  (load-model model)
+  (apply (ns-resolve (find-ns (symbol (model-namespace model))) (symbol function)) params))
 
 (defn 
 #^{ :doc "Finds the models directory." }
@@ -65,4 +76,4 @@
 (defn
 #^{ :doc "Returns the model name for the given belongs to column." }
   to-model-name [belongs-to-column]
-    (string-utils/strip-ending belongs-to-column "-id"))
+  (string-utils/strip-ending belongs-to-column "-id"))

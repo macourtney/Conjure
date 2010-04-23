@@ -92,3 +92,15 @@ unless it is explicitly escluded in the given params." }
   ([interceptor] (add-app-interceptor interceptor {}))
   ([interceptor { :keys [excludes] :or { excludes {} }}]
     (controller-util/add-app-interceptor interceptor excludes)))
+
+(defmacro
+#^{ :doc "Copies the actions from the given controller into this one. If a filter map is given, then the actions from 
+the from controller are filtered based on the includes and excludes keys of the filter map. Includes and excludes must
+be sets of action name keywords." } 
+  copy-actions 
+  ([from-controller]
+    (let [to-controller (controller-from-namespace *ns*)]
+      `(controller-util/copy-actions ~to-controller ~from-controller)))
+  ([from-controller filter-map]
+    (let [to-controller (controller-from-namespace *ns*)]
+      `(controller-util/copy-actions ~to-controller ~from-controller ~filter-map))))

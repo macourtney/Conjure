@@ -1,4 +1,4 @@
-(ns bindings.generic.direct
+(ns bindings.templates.direct
   (:use conjure.binding.base))
 
 (defbinding [request-map & params]

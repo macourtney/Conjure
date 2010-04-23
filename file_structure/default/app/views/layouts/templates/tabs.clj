@@ -20,7 +20,7 @@
         tab-controller (string-utils/str-keyword (or (:controller (:url-for tab-map)) location-controller))]
     (if 
       (or 
-        (:is-active tab-map) 
+        (:is-active tab-map)
         (and tab-controller location-controller (= tab-controller location-controller)))
       "active")))
 
@@ -40,7 +40,7 @@
 (defn
 #^{ :doc "Returns a sequence of tab maps generated from the controllers." }
   controller-tabs []
-  (map controller-tab (controller-util/all-controllers)))
+  (map controller-tab (filter #(not (= % "template")) (controller-util/all-controllers))))
 
 (defn
 #^{ :doc "Gets or generates all of the tab maps for use by generate-tab." }

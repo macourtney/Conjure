@@ -14,7 +14,8 @@
     (controller-generator/generate-controller-file generator-map)
     (load-controller controller-name)
     (function)
-    (controller-destroyer/destroy-all-dependencies generator-map)))
+    (controller-destroyer/destroy-all-dependencies generator-map)
+    (reset! action-interceptors {})))
         
 (use-fixtures :once setup-all)
   
@@ -113,6 +114,35 @@
 (deftest test-find-action-fn
   (is (find-action-fn { :controller controller-name, :action action-name, :request { :method "GET" } })))
 
+(deftest test-find-actions
+  (is (not-empty (find-actions controller-name)))
+  (is (not-empty (find-actions controller-name { :includes #{ (keyword action-name) } })))
+  (is (not-empty (find-actions controller-name { :excludes #{ :fail } })))
+  (is (empty? (find-actions controller-name { :excludes #{ (keyword action-name) } })))
+  (is (empty? (find-actions controller-name { :includes #{ :fail } })))
+  (is (empty? (find-actions controller-name { :includes #{ :fail }, :excludes #{ :fail } })))
+  (is (not-empty (find-actions controller-name 
+    { :includes #{ (keyword action-name) }, :excludes #{ (keyword action-name) } }))))
+
+(defn
+#^{ :doc "A simple action for use when testing." }
+  test-action [request-map]
+  "")
+  
+(defn
+#^{ :doc "A simple action for use when testing." }
+  test-action2 [request-map]
+  "")
+
+(deftest test-action-fn-method-map
+  (is (= { test-action [ :all ] } (action-fn-method-map { :all test-action })))
+  (is (= { test-action [ :get :post ] } (action-fn-method-map { :get test-action, :post test-action })))
+  (is (= 
+    { test-action [ :get ], test-action2 [ :post ] } 
+    (action-fn-method-map { :get test-action, :post test-action2 })))
+  (is (= {} (action-fn-method-map {})))
+  (is (= {} (action-fn-method-map nil))))
+
 (deftest test-assoc-methods
   (let [test-action (fn [request-map] nil)
         params { :action-function test-action }]
@@ -159,6 +189,20 @@
     (reset! controller-actions {})
     (add-action-function test-action params)
     (is (= controller-map @controller-actions))
+    (reset! controller-actions initial-controller-actions)))
+
+(deftest test-copy-actions
+  (let [initial-controller-actions @controller-actions
+        params { :controller controller-name, :action action-name }]
+    (reset! controller-actions {})
+    (add-action-function test-action (assoc params :methods [:all]))
+    (copy-actions "test2" "test")
+    (is (= { (keyword action-name) { :all test-action } } (:test2 @controller-actions)))
+    (reset! controller-actions {})
+    
+    (add-action-function test-action (assoc params :methods [:all]))
+    (copy-actions "test2" "test" { :includes #{ (keyword action-name) } })
+    (is (= { (keyword action-name) { :all test-action } } (:test2 @controller-actions)))
     (reset! controller-actions initial-controller-actions)))
 
 (defn create-stack-interceptor [value]

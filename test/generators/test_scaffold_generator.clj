@@ -54,59 +54,8 @@
     (text \"description\"))" 
     (create-migration-up-content "dog" ["name:string" "count:integer" "description:text"]))))
 
-(deftest test-create-list-records-action
-  (is (create-list-records-action "dog"))
-  (is (create-list-records-action nil)))
-
-(deftest test-create-show-action
-    (is (create-show-action "dog"))
-    (is (create-show-action nil)))
-
-(deftest test-create-add-action
-  (is (create-add-action "dog"))
-  (is (create-add-action nil)))
-
-(deftest test-create-create-action
-  (is (create-create-action "dog")))
-  (is (create-create-action nil))
-
-(deftest test-create-edit-action
-  (is (create-edit-action "dog"))
-  (is (create-edit-action nil)))
-
-(deftest test-create-save-action
-  (is (create-save-action "dog")))
-  (is (create-save-action nil))
-
-(deftest test-create-delete-warning-action
-    (is (create-delete-warning-action "dog"))
-    (is (create-delete-warning-action nil)))
-
-(deftest test-create-delete-action
-  (is (create-delete-action "dog")))
-  (is (create-delete-action nil))
-
-(deftest test-create-action-map
-  (let [action-map (create-action-map "dog")]
-    (is (:index action-map))
-    (is (:list-records action-map))
-    (is (:show action-map))
-    (is (:add action-map))
-    (is (:create action-map))
-    (is (:edit action-map))
-    (is (:save action-map))
-    (is (:delete-warning action-map))
-    (is (:delete action-map))
-    (is (:ajax-delete action-map))
-    (is (:ajax-add action-map))
-    (is (:ajax-show action-map))
-    (is (:ajax-row action-map))
-    (is (:ajax-edit action-map))
-    (is (:ajax-save action-map))))
-
 (deftest test-create-controller-content
-  (let [model "dog"]
-    (is (create-controller-content model (create-action-map model)))))
+  (is (create-controller-content "dog")))
 
 (deftest test-extra-model-content
   (is (extra-model-content)))

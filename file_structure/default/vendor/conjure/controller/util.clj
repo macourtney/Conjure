@@ -61,10 +61,7 @@
   all-controllers []
   (map controller-from-file 
     (filter 
-      #(let [file-name (. % getName)] 
-        (and 
-          (not (= file-name "app_controller.clj")) 
-          (. file-name endsWith controller-file-name-ending))) 
+      #(. (. % getName) endsWith controller-file-name-ending) 
       (. (find-controllers-directory) listFiles))))
 
 (defn
@@ -97,6 +94,7 @@
           action (:action request-map)]
       (if (and controller action)
         (str (controller-namespace controller) "/" action)))))
+
 (defn
 #^{ :doc "Returns a keyword for the request method." }
   method-key [request-map]
@@ -133,6 +131,28 @@ the method is assumed to be :all. If no matching method is found, then nil is re
   find-action-fn [{ controller :controller, action :action, :as request-map }]
   (action-function controller action (method-key request-map)))
 
+(defn
+#^{ :doc "Returns all of the action method-map pairs for the given controller filtered by the given map. Both includes 
+and excludes must be sets of action name keywords. If includes is given, then excludes is ignored." }
+  find-actions 
+  ([controller] (find-actions controller {}))
+  ([controller { :keys [includes excludes], :or { includes nil, excludes #{} } }]
+    (filter 
+      (fn [[action methods-map]]
+        (if includes
+          (contains? includes action)
+          (not (contains? excludes action))))
+      (actions-map controller))))
+
+(defn
+#^{ :doc "Returns a map from all the action functions in the given methods-map to the associated methods." }
+  action-fn-method-map [methods-map]
+  (reduce 
+    (fn [output [method action-fn]]
+      (assoc output action-fn (conj (or (get output action-fn) []) method)))
+    {} 
+    methods-map))
+
 (defn 
 #^{ :doc "adds the given action function into the given methods map and returns the result." }
   assoc-methods [methods-map { action-function :action-function, methods :methods, :or { methods [:all] } }]
@@ -158,6 +178,16 @@ the method is assumed to be :all. If no matching method is found, then nil is re
   (reset! controller-actions
     (assoc-controllers @controller-actions 
       (assoc params :action-function action-function))))
+
+(defn
+#^{ :doc "Copies all of the actions from the given controller." }
+  copy-actions
+  ([to-controller from-controller] (copy-actions to-controller from-controller {}))
+  ([to-controller from-controller { :keys [includes excludes], :or { includes nil, excludes #{} }, :as filter-map }]
+    (doseq [[action methods-map] (find-actions from-controller filter-map)]
+      (doseq [[action-fn methods] (action-fn-method-map methods-map)]
+        (add-action-function action-fn 
+          { :action action, :controller to-controller, :methods methods })))))
 
 (defn
 #^{ :doc "Returns the controller from the given namespace. The controller is assumed to be the last part of the 

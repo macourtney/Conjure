@@ -34,7 +34,7 @@
               (record-form/render-view request-map table-metadata {})
               (form-button "Create")
               "&nbsp;"
-              (link-to "Cancel" request-map { :action "list-records", :html-options { :id "add-cancel" } } )))]
+              (link-to "Cancel" request-map { :action "list-records", :controller model-name, :html-options { :id "add-cancel" } } )))]
         (link-to "Add" request-map { :action "add", :controller model-name, :html-options { :id "add-link" } } )]]
     [:script { :type "text/javascript" } 
       (scriptjure/js

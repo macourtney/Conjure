@@ -1,4 +1,4 @@
-(ns bindings.generic.ajax-direct
+(ns bindings.templates.ajax-direct
   (:use conjure.binding.base))
 
 (defbinding [request-map & params]

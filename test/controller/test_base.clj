@@ -1,23 +1,12 @@
 (ns test.controller.test-base
   (:use clojure.contrib.test-is
         conjure.controller.base)
-  (:require [conjure.model.database :as database]
+  (:require [conjure.controller.util :as controller-util]
+            [conjure.model.database :as database]
             [conjure.util.session-utils :as session-utils]
             [destroyers.controller-destroyer :as controller-destroyer]
             [destroyers.view-destroyer :as view-destroyer]
             [generators.controller-generator :as controller-generator]))
-
-(def controller-name "test")
-(def action-name "show")
-
-(defn setup-all [function]
-  (controller-generator/generate-controller-file 
-    { :controller controller-name, :actions [action-name], :silent true })
-  (function)
-  (controller-destroyer/destroy-all-dependencies 
-    { :controller controller-name, :actions [action-name], :silent true }))
-        
-(use-fixtures :once setup-all)
 
 (defn
 #^{:doc "Returns a redirect response map based on the given url and status, for use when testing."}
