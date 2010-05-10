@@ -13,12 +13,12 @@
 (defn
 #^{ :doc "Generates the install function." }
   generate-install-function []
-  (str "(defn install [])"))
+  (str "(defn install [arguments])"))
 
 (defn
 #^{ :doc "Generates the uninstall function." }
   generate-uninstall-function []
-  (str "(defn uninstall [])"))
+  (str "(defn uninstall [arguments])"))
 
 (defn
 #^{ :doc "Generates the initialize function." }

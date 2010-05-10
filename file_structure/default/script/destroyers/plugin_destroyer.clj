@@ -1,8 +1,7 @@
-(ns destroyers.binding-destroyer
+(ns destroyers.plugin-destroyer
   (:require [clojure.contrib.logging :as logging]
             [conjure.plugin.util :as plugin-util]
-            [destroyers.binding-test-destroyer :as binding-test-destroyer]
-            [destroyers.view-destroyer :as view-destroyer]))
+            [conjure.util.file-utils :as file-utils]))
 
 (defn
 #^{:doc "Prints out how to use the destroy plugin command."}
@@ -11,12 +10,12 @@
   (println "Usage: ./run.sh script/destroy.clj plugin <name>"))
 
 (defn
-#^{:doc "Destroys the binding file for the given controller and action."}
-  destroy-plugin [plugin-name]
+#^{:doc "Destroys the plugin directory for the given plugin name."}
+  destroy-plugin [plugin-name silent]
   (if plugin-name
-    (let [plugin-directory (plugin-util/plugin-directory)]
+    (let [plugin-directory (plugin-util/plugin-directory plugin-name)]
       (if (and plugin-directory (.exists plugin-directory))
-        (let [is-deleted (.delete plugin-directory)] 
+        (let [is-deleted (file-utils/recursive-delete plugin-directory)] 
           (logging/info (str "Plugin " (.getName plugin-directory) (if is-deleted " destroyed." " not destroyed."))))
         (do
           (logging/error (str "Could not find plugin directory.: " plugin-directory))
@@ -24,6 +23,6 @@
     (if (not silent) (usage))))
 
 (defn
-#^{:doc "Destroys a controller file for the controller and action given in params."}
+#^{:doc "Destroys a plugin directory for the given plugin name."}
   destroy [params]
-  (destroy-plugin (first params)))
+  (destroy-plugin (first params) false))

@@ -57,8 +57,8 @@ Note: this method prints a bunch of stuff to standard out."}
         (logging/error "You must pass in a base directory.")))))
 
 (defn
-#^{:doc "Creates and returns the given file if it does not already exist. If it does exist, the method simply prints to
-standard out and returns nil"}
+#^{ :doc "Creates and returns the given file if it does not already exist. If it does exist, the method simply prints to
+standard out and returns nil" }
   create-file 
   ([file] (create-file file false))
   ([file silent]
@@ -70,13 +70,23 @@ standard out and returns nil"}
         file))))
 
 (defn
-#^{:doc "Deletes the given directory if it contains no files or subdirectories."}
+#^{ :doc "Deletes the given directory if it contains no files or subdirectories." }
   delete-if-empty [directory]
   (when-not (empty? (file-seq directory))
     (. directory delete)
     true))
 
 (defn
-#^{:doc "Deletes if empty all of the given directories in order."}
+#^{ :doc "Deletes if empty all of the given directories in order." }
   delete-all-if-empty [& directories]
   (reduce (fn [deleted directory] (if deleted (delete-if-empty directory))) true directories))
+
+(defn
+#^{ :doc "Deletes the given directory even if it contains files or subdirectories. This function will attempt to delete
+all of the files and directories in the given directory first, before deleting the directory. If the directory cannot be
+deleted, this function aborts and returns nil. If the delete finishes successfully, then this function returns true." }
+  recursive-delete [directory]
+  (if (.isDirectory directory) 
+    (when (reduce #(and %1 (recursive-delete %2)) true (.listFiles directory))
+      (.delete directory))
+    (.delete directory)))

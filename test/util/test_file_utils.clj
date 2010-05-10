@@ -42,3 +42,8 @@
       (is (= test-file-content-str test-content))
       (. test-file-reader close))
     (. test-file delete)))
+
+(deftest test-recursive-delete
+  (let [test-dir (new File (user-directory) "delete-test")]
+    (.mkdirs (new File test-dir "blah/foo"))
+    (is (recursive-delete test-dir))))
