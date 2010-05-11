@@ -18,3 +18,6 @@
 
 (deftest test-uninstall
   (uninstall plugin-name []))
+
+(deftest test-test-plugin
+  (test-plugin plugin-name []))

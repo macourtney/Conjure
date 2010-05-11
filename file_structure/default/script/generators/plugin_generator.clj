@@ -1,4 +1,5 @@
 (ns generators.plugin-generator
+  (:import [java.io File])
   (:require [clojure.contrib.logging :as logging]
             [conjure.plugin.builder :as plugin-builder]
             [conjure.plugin.util :as plugin-util]
@@ -26,7 +27,7 @@
   (str "(defn initialize [])"))
 
 (defn
-#^{ :doc "Generates the content of the given binding file." }
+#^{ :doc "Generates the content of the plugin.clj file." }
   generate-plugin-content
   ([plugin-name] 
     (generate-plugin-content
@@ -44,6 +45,21 @@
 " initialize-function)))
 
 (defn
+#^{ :doc "Returns the file of the generic plugin test." }
+  test-file [plugin-name]
+  (File. (plugin-util/plugin-directory plugin-name) "/test/test_plugin.clj"))
+
+(defn
+#^{ :doc "Generates the content of the test file." }
+  generate-test-content [plugin-name]
+  (str "(ns " (plugin-util/test-namespace-name plugin-name "test-plugin") "
+  (use clojure.contrib.test-is
+      " (plugin-util/plugin-namespace-name plugin-name) "))
+
+(deftest test-initialize
+  (initialize))"))
+
+(defn
 #^{ :doc "Creates a plugin directory with a default plugin.clj file." }
   create-plugin-files 
   [{ :keys [name content silent] :or { silent false } }]
@@ -52,7 +68,8 @@
         (do
           (let [plugin-file (plugin-builder/create-plugin-files { :name name, :silent silent })]
             (when plugin-file
-              (file-utils/write-file-content plugin-file (or content (generate-plugin-content name))))))
+              (file-utils/write-file-content plugin-file (or content (generate-plugin-content name)))
+              (file-utils/write-file-content (test-file name) (generate-test-content name)))))
         (logging/error (str "Could not find plugins directory: " plugins-directory)))))
 
 (defn

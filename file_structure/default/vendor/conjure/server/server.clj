@@ -6,6 +6,7 @@
             [conjure.controller.util :as controller-util]
             [controllers.app :as app] ; Not actually used, but needs to be loaded in order to load app interceptors.
             [conjure.model.database :as database]
+            [conjure.plugin.util :as plugin-util]
             [conjure.util.html-utils :as html-utils]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.session-utils :as session-utils]
@@ -63,7 +64,10 @@
       (logging/info "Initializing server...")
       (database/ensure-conjure-db)
       ((:init session-config/session-store))
-      (logging/info "Server Initialized."))))
+      (logging/info "Server Initialized.")
+      (logging/info "Initializing plugins...")
+      (plugin-util/initialize-all-plugins)
+      (logging/info "Plugins initialized."))))
 
 (defn 
 #^{ :doc "Manages the session cookie in the response map." }

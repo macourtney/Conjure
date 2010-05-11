@@ -15,3 +15,9 @@
   (is (generate-plugin-content "test-plugin"))
   (is (generate-plugin-content "test-plugin" (generate-install-function) (generate-uninstall-function) 
         (generate-initialize-function))))
+
+(deftest test-test-file
+  (is (test-file "test-plugin")))
+
+(deftest test-generate-test-content
+  (is (generate-test-content "test-plugin")))
