@@ -2,7 +2,9 @@
   (:import [java.io File FileNotFoundException])
   (:require [clojure.contrib.logging :as logging]
             [clojure.contrib.seq-utils :as seq-utils]
+            [clojure.contrib.str-utils :as str-utils]
             [clojure.contrib.test-is :as test-is]
+            [conjure.util.file-utils :as file-utils]
             [conjure.util.loading-utils :as loading-utils]))
 
 (def plugins-dir "plugins")
@@ -30,6 +32,11 @@ returns nil." }
       (find-ns plugin-namspace-symbol)
       (catch FileNotFoundException e
         nil))))
+
+(defn
+#^{ :doc "Returns the plugin name from the given plugin namespace." }
+  plugin-name-from-namespace [plugin-namespace]
+  (second (str-utils/re-split #"\." plugin-namespace)))
 
 (defn
   #^{ :doc "Returns the install function for the plugin with the given name or nil if the install function could not be
@@ -63,7 +70,7 @@ be found." }
 #^{ :doc "Returns a list of all plugins in the app." }
   all-plugins []
   (map #(loading-utils/underscores-to-dashes (.getName %1))
-    (filter #(.isDirectory %1)  (.listFiles (find-plugins-directory)))))
+    (filter #(.isDirectory %1) (.listFiles (find-plugins-directory)))))
 
 (defn
 #^{ :doc "Returns a sequence of all of the initialize functions for all plugins in the app." }

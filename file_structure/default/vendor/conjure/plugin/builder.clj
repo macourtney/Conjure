@@ -10,7 +10,7 @@
   [plugin-name]
   (when plugin-name
     (let [plugin-dir (plugin-util/plugin-directory plugin-name)]
-      (when (not (.exists plugin-dir))
+      (when (not (and plugin-dir (.exists plugin-dir)))
         (logging/info (str "Creating plugin directory " (.getName plugin-dir) "..."))
         (.mkdirs plugin-dir))
       plugin-dir)))

@@ -29,6 +29,9 @@
   (is (plugin-ns plugin-name))
   (is (not (plugin-ns "fail"))))
 
+(deftest test-plugin-name-from-namespace
+  (is (= "test-plugin" (plugin-name-from-namespace "plugins.test-plugin.plugin"))))
+
 (deftest test-install-fn
   (is (install-fn plugin-name))
   (is (not (install-fn "fail"))))

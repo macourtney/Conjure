@@ -22,16 +22,16 @@
               model-namespace (util/model-namespace model)
               fixture-namespace (test-util/fixture-namespace model)
               test-content (str "(ns " test-namespace "
-    (:use clojure.contrib.test-is
-          " model-namespace "
-          " fixture-namespace "))
-  
-  (def model \"" model "\")
-  
-  (use-fixtures :once fixture)
-  
-  (deftest test-first-record
-    (is (get-record 1)))")]
+  (:use clojure.contrib.test-is
+        " model-namespace "
+        " fixture-namespace "))
+
+(def model \"" model "\")
+
+(use-fixtures :once fixture)
+
+(deftest test-first-record
+  (is (get-record 1)))")]
           (file-utils/write-file-content unit-test-file test-content)
           (fixture-generator/generate-fixture-file model silent))))))
 

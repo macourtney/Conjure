@@ -18,7 +18,7 @@
     (is (nil? (find-file parent-dir "fail.txt")))
     (is (nil? (find-file (new File "fail-dir") "test_file_utils.clj")))
     (is (thrown? NullPointerException (find-file parent-dir nil)))
-    (is (thrown? NullPointerException (find-file nil "test_file_utils.clj")))))
+    (is (nil? (find-file nil "test_file_utils.clj")))))
     
 (deftest test-find-directory
   (let [parent-dir (new File (user-directory) "test")]
@@ -29,7 +29,7 @@
     (is (nil? (find-directory parent-dir "fail")))
     (is (nil? (find-directory (new File "fail-dir") "util")))
     (is (thrown? NullPointerException (find-directory parent-dir nil)))
-    (is (thrown? NullPointerException (find-directory nil "util")))))
+    (is (nil? (find-directory nil "util")))))
     
 (deftest test-write-file-content
   (let [test-content "Test content."
