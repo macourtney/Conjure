@@ -30,7 +30,7 @@
                    :action view-name } )
 
 (deftest test-view
-  (render-view request-map))"))]
+  (is (render-view request-map)))"))]
         (file-utils/write-file-content unit-test-file test-content))))))
 
 (defn 

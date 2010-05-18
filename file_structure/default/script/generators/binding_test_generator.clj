@@ -25,9 +25,10 @@
 
 (def controller-name \"" controller "\")
 (def action-name \"" action "\")
+(def request-map { :controller controller-name, :action action-name})
 
 (deftest test-view
-  (bind-util/call-binding controller-name action-name))"))]
+  (is (bind-util/call-binding controller-name action-name [request-map])))"))]
         (file-utils/write-file-content unit-test-file test-content))))))
         
 (defn 

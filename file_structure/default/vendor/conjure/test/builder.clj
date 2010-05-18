@@ -40,16 +40,27 @@
 (defn
 #^{:doc "Finds (or creates if not found) the model unit test directory."}
   find-or-create-model-unit-test-directory [silent]
-    (let [test-directory (util/find-test-directory)] 
+  (let [test-directory (util/find-test-directory)] 
+    (if test-directory
+      (file-utils/create-dirs [test-directory util/unit-dir-name util/unit-model-dir-name] silent)
+      (logging/error "You must pass in a test directory."))))
+
+(defn
+#^{:doc "Finds (or creates if not found) the bindings test directory."}
+  find-or-create-binding-unit-test-directory
+  [silent]
+    (let [test-directory (util/find-test-directory)]
       (if test-directory
-        (file-utils/create-dirs [test-directory util/unit-dir-name util/unit-model-dir-name] silent)
-        (logging/error "You must pass in a test directory."))))
+        (file-utils/create-dirs [test-directory util/unit-dir-name util/unit-binding-dir-name] silent)
+        (logging/error "Test directory not found."))))
 
 (defn
 #^{:doc "Finds (or creates if not found) the bindings test directory."}
   find-or-create-controller-binding-unit-test-directory
   [{ :keys [controller test-directory silent] :or { test-directory (util/find-test-directory), silent false} }]
-    (file-utils/create-dirs [test-directory util/unit-dir-name util/unit-binding-dir-name (loading-utils/dashes-to-underscores controller)] silent))
+    (file-utils/create-dirs 
+      [test-directory util/unit-dir-name util/unit-binding-dir-name (loading-utils/dashes-to-underscores controller)]
+      silent))
       
 (defn
 #^{:doc "Finds (or creates if not found) the fixture directory."}

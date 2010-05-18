@@ -14,7 +14,7 @@
 (defn
   generate-action-test-function [action]
   (str "(deftest test-" action "
-  (controller-util/call-controller { :controller controller-name :action \"" action "\" }))"))
+  (is (controller-util/call-controller { :controller controller-name :action \"" action "\" })))"))
 
 (defn
 #^{:doc "Generates the action functions block for a functional test file."}
