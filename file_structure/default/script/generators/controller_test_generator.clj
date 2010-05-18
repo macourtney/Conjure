@@ -14,7 +14,7 @@
 (defn
   generate-action-test-function [action]
   (str "(deftest test-" action "
-  (" action " { :controller controller-name :action \"" action "\" }))"))
+  (controller-util/call-controller { :controller controller-name :action \"" action "\" }))"))
 
 (defn
 #^{:doc "Generates the action functions block for a functional test file."}
@@ -32,7 +32,8 @@
               controller-namespace (util/controller-namespace controller)
               test-content (str "(ns " test-namespace "
   (:use clojure.contrib.test-is
-        " controller-namespace "))
+        " controller-namespace ")
+  (:require [conjure.controller.util :as controller-util]))
 
 (def controller-name \"" controller "\")
 

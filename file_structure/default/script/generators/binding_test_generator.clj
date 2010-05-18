@@ -16,7 +16,7 @@
   ([controller action] (generate-unit-test controller action false))
   ([controller action silent] (generate-unit-test controller action silent nil))
   ([controller action silent incoming-content]
-  (let [unit-test-file (test-builder/create-view-unit-test controller action silent)]
+  (let [unit-test-file (test-builder/create-binding-unit-test controller action silent)]
     (if unit-test-file
       (let [test-namespace (test-util/binding-unit-test-namespace controller action)
             test-content (or incoming-content (str "(ns " test-namespace "

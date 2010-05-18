@@ -9,6 +9,7 @@
 (def unit-dir-name "unit")
 (def unit-view-dir-name "view")
 (def unit-model-dir-name "model")
+(def unit-binding-dir-name "binding")
 (def fixture-dir-name "fixture")
 (def unit-binding-dir-name "binding")
 
@@ -98,6 +99,12 @@
   model-unit-test-file-name [model]
   (if (and model (> (. model length) 0))
     (str (loading-utils/dashes-to-underscores model) "_model_test.clj")))
+
+(defn
+#^{:doc "Returns the binding test file name for the given action name."}
+  binding-unit-test-file-name [action]
+  (if (and action (not-empty action))
+    (str (loading-utils/dashes-to-underscores action) "_binding_test.clj")))
 
 (defn
 #^{:doc "Returns the fixture file name for the given model name."}
