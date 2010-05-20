@@ -66,7 +66,15 @@ an optional option map for the html options." }
   ([record record-name key-name] (text-field record record-name key-name {})) 
   ([record record-name key-name html-options]
     (input :text record record-name key-name html-options)))
-            
+
+(defn
+#^{:doc "Creates an input tag of type password for a field of name key-name in record of the given name. You can pass 
+along an optional option map for the html options." }
+  password-field
+  ([record record-name key-name] (password-field record record-name key-name {}))
+  ([record record-name key-name html-options]
+    (input :password record record-name key-name html-options)))
+
 (defn
 #^{:doc "Creates a text area tag for a field of name key-name in record of the given name. You can pass along
 an optional option map for the html options." }

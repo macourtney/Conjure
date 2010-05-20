@@ -80,14 +80,16 @@ render-type? to determine :request-map or :parameters." }
 (defmacro add-interceptor
   ([interceptor] 
     (let [controller (controller-from-namespace *ns*)]
-      `(controller-util/add-interceptor interceptor controller nil nil))) 
+      `(controller-util/add-interceptor ~interceptor ~controller nil nil))) 
   ([interceptor params]
-    (let [controller (controller-from-namespace *ns*)]
-      `(controller-util/add-interceptor interceptor controller (:excludes params) (:includes params)))))
+    (let [controller (controller-from-namespace *ns*)
+          excludes (:excludes params)
+          includes (:includes params)]
+      `(controller-util/add-interceptor ~interceptor ~controller ~excludes ~includes))))
 
 (defn 
 #^{ :doc "Adds the given interceptor as an app interceptor. The interceptor will be run for every controller and action
-unless it is explicitly escluded in the given params." }
+unless it is explicitly excluded in the given params." }
   add-app-interceptor 
   ([interceptor] (add-app-interceptor interceptor {}))
   ([interceptor { :keys [excludes] :or { excludes {} }}]
