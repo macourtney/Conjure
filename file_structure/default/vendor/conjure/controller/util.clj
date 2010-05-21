@@ -208,6 +208,7 @@ exception showing what the interceptor is." }
 #^{ :doc "Chains all of the given interceptors together. If any interceptor is nil, it is simply ignored. If all 
 interceptors are nil, then this function returns nil." }
   chain-interceptors
+  ([] nil)
   ([interceptor] interceptor) 
   ([parent-interceptor child-interceptor]
     (if parent-interceptor
@@ -223,58 +224,65 @@ interceptors are nil, then this function returns nil." }
     (reduce chain-interceptors (chain-interceptors parent-interceptor child-interceptor) more)))
 
 (defn
+#^{ :doc "Adds the given action interceptor to the given action interceptor map." }
+  assoc-name-interceptors [action-interceptor-map action-interceptor interceptor-name]
+  (let [name-key (keyword interceptor-name)]
+    (assoc action-interceptor-map name-key action-interceptor)))
+
+(defn
 #^{ :doc "Adds the given action interceptor to the given controller interceptor map." }
-  assoc-action-interceptors [controller-interceptor-map action-interceptor action]
+  assoc-action-interceptors [controller-interceptor-map action-interceptor interceptor-name action]
   (let [action-key (keyword action)]
     (assoc controller-interceptor-map action-key
-      (chain-interceptors action-interceptor (get controller-interceptor-map action-key)))))
+      (assoc-name-interceptors (get controller-interceptor-map action-key) action-interceptor interceptor-name))))
 
 (defn
 #^{ :doc "Adds the given action interceptor to the given action interceptor map." }
-  assoc-controller-interceptors [action-interceptor-map action-interceptor controller action]
+  assoc-controller-interceptors [action-interceptor-map action-interceptor interceptor-name controller action]
   (let [controller-key (keyword controller)]
     (assoc action-interceptor-map controller-key
-      (assoc-action-interceptors (get action-interceptor-map controller-key) action-interceptor action))))
+      (assoc-action-interceptors (get action-interceptor-map controller-key) action-interceptor interceptor-name action))))
 
 (defn
 #^{ :doc "Adds the given action interceptor to the list of action interceptors to call." }
-  add-action-interceptor [action-interceptor controller action]
+  add-action-interceptor [action-interceptor interceptor-name controller action]
   (reset! action-interceptors
-    (assoc-controller-interceptors @action-interceptors action-interceptor controller action)))
+    (assoc-controller-interceptors @action-interceptors action-interceptor interceptor-name controller action)))
 
 (defn
 #^{ :doc "Adds the given excludes interceptor map with the given controller interceptor and excludes set." }
-  update-exclude-interceptor-list [exclude-interceptor-list controller-interceptor excludes]
+  update-exclude-interceptor-list [exclude-interceptor-map controller-interceptor interceptor-name excludes]
   (let [exclude-map { :interceptor controller-interceptor }]
-    (cons 
+    (assoc exclude-interceptor-map (keyword interceptor-name)
       (if excludes 
         (assoc exclude-map :excludes excludes) 
-        exclude-map)
-      exclude-interceptor-list)))
+        exclude-map))))
 
 (defn
 #^{ :doc "Adds the given controller interceptor to the given controller interceptor map." }
-  assoc-controller-excludes-interceptors [controller-interceptor-map controller-interceptor controller excludes]
+  assoc-controller-excludes-interceptors [controller-interceptor-map controller-interceptor interceptor-name controller excludes]
   (let [controller-key (keyword controller)]
     (assoc controller-interceptor-map controller-key
-      (update-exclude-interceptor-list (get controller-interceptor-map controller-key) controller-interceptor excludes))))
+      (update-exclude-interceptor-list (get controller-interceptor-map controller-key) controller-interceptor
+        interceptor-name excludes))))
 
 (defn
 #^{ :doc "Adds the given controller interceptor to the list of controller interceptors to call, excluding the 
 interceptor if any of the actions in excludes is called.." }
-  add-controller-interceptor [controller-interceptor controller excludes]
+  add-controller-interceptor [controller-interceptor interceptor-name controller excludes]
   (reset! controller-interceptors
-    (assoc-controller-excludes-interceptors @controller-interceptors controller-interceptor controller excludes)))
+    (assoc-controller-excludes-interceptors @controller-interceptors controller-interceptor interceptor-name controller
+      excludes)))
 
 (defn
 #^{ :doc "Adds the given interceptor to the given controller, including or excluding the given actions. Note, adding
 includes will completely ignore excludes." }
-  add-interceptor [interceptor controller excludes includes]
+  add-interceptor [interceptor interceptor-name controller excludes includes]
   (when (and interceptor controller)
     (if (and includes (not-empty includes))
       (doseq [include-action includes]
-        (add-action-interceptor interceptor controller include-action))
-      (add-controller-interceptor interceptor controller excludes))))
+        (add-action-interceptor interceptor interceptor-name controller include-action))
+      (add-controller-interceptor interceptor interceptor-name controller excludes))))
 
 (defn
 #^{ :doc "Creates the interceptor map for the given app interceptor." }
@@ -295,8 +303,8 @@ actions." }
 
 (defn
 #^{ :doc "Returns the action interceptor for the given controller and action." }
-  find-action-interceptor [controller action]
-  (get (get @action-interceptors (keyword controller)) (keyword action)))
+  find-action-interceptors [controller action]
+  (vals (get (get @action-interceptors (keyword controller)) (keyword action))))
 
 (defn
 #^{ :doc "Returns the controller interceptors for the given controller and action." }
@@ -308,7 +316,7 @@ actions." }
           (let [excludes (:excludes exclude-interceptor-map)]
             (when (not (and excludes (contains? excludes action-key)))
               (:interceptor exclude-interceptor-map)))) 
-        (get @controller-interceptors (keyword controller))))))
+        (vals (get @controller-interceptors (keyword controller)))))))
 
 (defn
 #^{ :doc "Returns true if the app interceptor in the given interceptor map should be called for the given controller 
@@ -337,8 +345,8 @@ and action. If no interceptors apply to the given controller and action, a simpl
   create-interceptor-chain [controller action]
   (or
     (apply chain-interceptors
-      (find-action-interceptor controller action)
-      (concat 
+      (concat
+        (find-action-interceptors controller action)
         (find-controller-interceptors controller action)
         (find-app-interceptors controller action)))
     (fn [request-map action-fn]

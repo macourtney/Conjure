@@ -51,3 +51,15 @@ created to wrap it, and simply inverse the result of condition." }
   link-to-unless
     ([condition text request-map params] (link-to-if (inverse-condition condition) text request-map params))
     ([condition text request-map] (link-to-if (inverse-condition condition) text request-map)))
+
+(defn
+#^{ :doc "Returns the url for the page the user navigated from. Or nil if there is no referrer." }
+  back-url [request-map]
+  (:refererr (:headers (:request request-map))))
+
+(defn
+#^{ :doc "Links to the page the user navigated from." }
+  link-back
+  ([text request-map] (link-back text request-map {}))
+  ([text request-map html-options]
+    [:a (merge { :href (or (back-url request-map) "#") } html-options) (evaluate-if-fn text request-map)]))

@@ -261,49 +261,64 @@
   (action-fn request-map))
 
 (deftest test-assoc-action-interceptors
-  (is (= { :show pass-interceptor } (assoc-action-interceptors {} pass-interceptor :show)))
-  (is (= '("one" "two")
-    ((:show 
-      (assoc-action-interceptors { :show (create-stack-interceptor "two") } 
-        (create-stack-interceptor "one") :show))
-      {} list-action))))
+  (is (= { :show { :pass-interceptor pass-interceptor } } 
+        (assoc-action-interceptors {} pass-interceptor :pass-interceptor :show)))
+  (let [one-interceptor (create-stack-interceptor "one")
+        two-interceptor (create-stack-interceptor "two")] 
+    (is (= { :show { :one one-interceptor, :two two-interceptor }}
+      (assoc-action-interceptors { :show { :two two-interceptor } } one-interceptor :one :show)))))
 
 (deftest test-assoc-controller-interceptors
-  (is (= { :test { :show pass-interceptor } } (assoc-controller-interceptors {} pass-interceptor :test :show)))
-  (is (= { :test { :show pass-interceptor, :hide pass-interceptor } } 
-    (assoc-controller-interceptors { :test { :hide pass-interceptor } } pass-interceptor :test :show)))
-  (is (= '("one" "two")
-    ((:show (:test 
-      (assoc-controller-interceptors { :test { :show (create-stack-interceptor "two") } } 
-        (create-stack-interceptor "one") :test :show)))
-      {} list-action))))
+  (is (= { :test { :show { :pass-interceptor pass-interceptor } } } 
+        (assoc-controller-interceptors {} pass-interceptor :pass-interceptor :test :show)))
+  (is (= { :test { :show { :pass-interceptor pass-interceptor }, :hide { :pass-interceptor pass-interceptor } } } 
+        (assoc-controller-interceptors { :test { :hide { :pass-interceptor pass-interceptor } } } 
+          pass-interceptor :pass-interceptor :test :show)))
+  (let [interceptor-one (create-stack-interceptor "one")
+        interceptor-two (create-stack-interceptor "two")]
+    (is (= { :test { :show { :one interceptor-one, :two interceptor-two } } }
+          (assoc-controller-interceptors { :test { :show { :two interceptor-two } } } 
+            interceptor-one :one :test :show)))))
 
 (deftest test-add-action-interceptor
   (let [initial-action-interceptors @action-interceptors]
     (reset! action-interceptors {})
-    (add-action-interceptor pass-interceptor :test :show)
-    (is (= { :test { :show pass-interceptor } } @action-interceptors))
+    (add-action-interceptor pass-interceptor :pass-interceptor :test :show)
+    (is (= { :test { :show { :pass-interceptor pass-interceptor} } } @action-interceptors))
     (reset! action-interceptors initial-action-interceptors)))
 
 (deftest test-update-exclude-interceptor-list
-  (is (= [{ :interceptor pass-interceptor }] (update-exclude-interceptor-list [] pass-interceptor nil)))
-  (is (= [{ :interceptor pass-interceptor, :excludes #{} }] (update-exclude-interceptor-list [] pass-interceptor #{})))
-  (is (= [{ :interceptor pass-interceptor, :excludes #{ :show } }] 
-    (update-exclude-interceptor-list [] pass-interceptor #{ :show })))
-  (is (= [{ :interceptor pass-interceptor, :excludes #{ :show } } { :interceptor pass-interceptor }] 
-    (update-exclude-interceptor-list [{ :interceptor pass-interceptor }] pass-interceptor #{ :show }))))
+  (is (= { :pass-interceptor { :interceptor pass-interceptor } }
+        (update-exclude-interceptor-list {} pass-interceptor :pass-interceptor nil)))
+  (is (= { :pass-interceptor { :interceptor pass-interceptor, :excludes #{} } } 
+        (update-exclude-interceptor-list {} pass-interceptor :pass-interceptor #{})))
+  (is (= { :pass-interceptor { :interceptor pass-interceptor, :excludes #{ :show } } } 
+    (update-exclude-interceptor-list {} pass-interceptor :pass-interceptor #{ :show })))
+  (is (= { :pass-interceptor { :interceptor pass-interceptor, :excludes #{ :show } } 
+           :pass-interceptor2 { :interceptor pass-interceptor } } 
+        (update-exclude-interceptor-list { :pass-interceptor2 { :interceptor pass-interceptor } } 
+          pass-interceptor :pass-interceptor #{ :show }))))
 
 (deftest test-assoc-controller-excludes-interceptors
-  (is (= { :test [{ :interceptor pass-interceptor }]}
-    (assoc-controller-excludes-interceptors {} pass-interceptor :test nil)))
-  (is (= { :test [{ :interceptor pass-interceptor } { :interceptor pass-interceptor }]}
-    (assoc-controller-excludes-interceptors { :test [{ :interceptor pass-interceptor }] } pass-interceptor :test nil))))
+  (is (= { :test { :pass-interceptor { :interceptor pass-interceptor } } }
+    (assoc-controller-excludes-interceptors {} pass-interceptor :pass-interceptor :test nil)))
+  (is (= { :test { :pass-interceptor { :interceptor pass-interceptor } } }
+    (assoc-controller-excludes-interceptors { :test { :pass-interceptor { :interceptor pass-interceptor } } }
+      pass-interceptor :pass-interceptor :test nil)))
+  (is (= { :test { :pass-interceptor { :interceptor pass-interceptor } 
+                   :pass-interceptor2 { :interceptor pass-interceptor } } }
+    (assoc-controller-excludes-interceptors 
+      { :test 
+        { :pass-interceptor { :interceptor pass-interceptor } 
+          :pass-interceptor2 { :interceptor pass-interceptor } } }
+      pass-interceptor :pass-interceptor2 :test nil))))
 
 (deftest test-add-controller-interceptor
   (let [initial-controller-interceptors @controller-interceptors]
     (reset! controller-interceptors {})
-    (add-controller-interceptor pass-interceptor :test #{ :show })
-    (is (= { :test [{ :excludes #{ :show }, :interceptor pass-interceptor }] } @controller-interceptors))
+    (add-controller-interceptor pass-interceptor :pass-interceptor :test #{ :show })
+    (is (= { :test { :pass-interceptor { :excludes #{ :show }, :interceptor pass-interceptor } } }
+          @controller-interceptors))
     (reset! controller-interceptors initial-controller-interceptors)))
 
 (deftest test-add-interceptor
@@ -311,13 +326,13 @@
         initial-controller-interceptors @controller-interceptors]
     (reset! action-interceptors {})
     (reset! controller-interceptors {})
-    (add-interceptor pass-interceptor :test nil [ :show ])
-    (is (= { :test { :show pass-interceptor } } @action-interceptors))
+    (add-interceptor pass-interceptor :pass-interceptor :test nil [ :show ])
+    (is (= { :test { :show { :pass-interceptor pass-interceptor } } } @action-interceptors))
     (is (= {} @controller-interceptors))
     (reset! action-interceptors {})
-    (add-interceptor pass-interceptor :test #{ :show } nil)
+    (add-interceptor pass-interceptor :pass-interceptor :test #{ :show } nil)
     (is (= {} @action-interceptors))
-    (is (= { :test [{ :excludes #{ :show }, :interceptor pass-interceptor }] } @controller-interceptors))
+    (is (= { :test { :pass-interceptor { :excludes #{ :show }, :interceptor pass-interceptor } } } @controller-interceptors))
     (reset! action-interceptors initial-action-interceptors)
     (reset! controller-interceptors initial-controller-interceptors)))
 
@@ -353,15 +368,15 @@
 (deftest test-find-action-interceptor
   (let [initial-action-interceptors @action-interceptors]
     (reset! action-interceptors {})
-    (add-action-interceptor pass-interceptor :test :show)
-    (is (= pass-interceptor (find-action-interceptor :test :show)))
-    (is (nil? (find-action-interceptor :test :hide)))
+    (add-action-interceptor pass-interceptor :pass-interceptor :test :show)
+    (is (= pass-interceptor (first (find-action-interceptors :test :show))))
+    (is (empty? (find-action-interceptors :test :hide)))
     (reset! action-interceptors initial-action-interceptors)))
 
 (deftest test-find-controller-interceptors
   (let [initial-controller-interceptors @controller-interceptors]
     (reset! controller-interceptors {})
-    (add-controller-interceptor pass-interceptor :test #{ :show })
+    (add-controller-interceptor pass-interceptor :pass-interceptor :test #{ :show })
     (is (= [pass-interceptor] (find-controller-interceptors :test :hide)))
     (is (= [] (find-controller-interceptors :test :show)))
     (reset! controller-interceptors initial-controller-interceptors)))

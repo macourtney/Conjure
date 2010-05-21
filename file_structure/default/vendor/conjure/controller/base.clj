@@ -77,15 +77,22 @@ render-type? to determine :request-map or :parameters." }
         (fn [~'request-map] ~@body) 
         ~params))))
 
+(defn
+#^{ :doc "Returns the name of the interceptor based on the given interceptor symbol." }
+  interceptor-name [interceptor-symbol]
+  (name interceptor-symbol))
+
 (defmacro add-interceptor
   ([interceptor] 
-    (let [controller (controller-from-namespace *ns*)]
-      `(controller-util/add-interceptor ~interceptor ~controller nil nil))) 
+    (let [controller (controller-from-namespace *ns*)
+          interceptor-name (interceptor-name interceptor)]
+      `(controller-util/add-interceptor ~interceptor ~interceptor-name ~controller nil nil))) 
   ([interceptor params]
     (let [controller (controller-from-namespace *ns*)
+          interceptor-name (interceptor-name interceptor)
           excludes (:excludes params)
           includes (:includes params)]
-      `(controller-util/add-interceptor ~interceptor ~controller ~excludes ~includes))))
+      `(controller-util/add-interceptor ~interceptor ~interceptor-name ~controller ~excludes ~includes))))
 
 (defn 
 #^{ :doc "Adds the given interceptor as an app interceptor. The interceptor will be run for every controller and action
