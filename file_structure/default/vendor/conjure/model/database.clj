@@ -27,7 +27,7 @@ that key in the db-flavor"}
   db-flavor 
   ([] (:flavor (ensure-conjure-db)))
   ([flavor-key] (get (db-flavor) flavor-key)))
-  
+
 (defmacro
 #^{:doc "Given the type-key of a function in the database flavor, define a function named type-key which calls the 
 database flavor function with the current db spec and any arguments"}
