@@ -79,19 +79,17 @@ render-type? to determine :request-map or :parameters." }
 
 (defn
 #^{ :doc "Returns the name of the interceptor based on the given interceptor symbol." }
-  interceptor-name [interceptor-symbol]
+  interceptor-name-from [interceptor-symbol]
   (name interceptor-symbol))
 
 (defmacro add-interceptor
   ([interceptor] 
     (let [controller (controller-from-namespace *ns*)
-          interceptor-name (interceptor-name interceptor)]
+          interceptor-name (interceptor-name-from interceptor)]
       `(controller-util/add-interceptor ~interceptor ~interceptor-name ~controller nil nil))) 
-  ([interceptor params]
+  ([interceptor { :keys [includes excludes interceptor-name] }]
     (let [controller (controller-from-namespace *ns*)
-          interceptor-name (interceptor-name interceptor)
-          excludes (:excludes params)
-          includes (:includes params)]
+          interceptor-name (or interceptor-name (interceptor-name-from interceptor))]
       `(controller-util/add-interceptor ~interceptor ~interceptor-name ~controller ~excludes ~includes))))
 
 (defn 

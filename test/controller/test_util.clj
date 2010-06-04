@@ -384,8 +384,8 @@
 (deftest test-call-app-interceptor?
   (is (call-app-interceptor? { :excludes { :test #{ :hide } } } :test :show))
   (is (not (call-app-interceptor? { :excludes { :test #{ :show } } } :test :show)))
-  (is (not (call-app-interceptor? { :excludes { :test #{} } } :test :show)))
-  (is (not (call-app-interceptor? { :excludes { :test :blah } } :test :show)))
+  (is (call-app-interceptor? { :excludes { :test #{} } } :test :show))
+  (is (call-app-interceptor? { :excludes { :test :blah } } :test :show))
   (is (call-app-interceptor? { :excludes { } } :test :show)))
 
 (deftest test-valid-app-interceptors
@@ -399,7 +399,7 @@
       :test
       :show)))
   (is (= 
-    [pass-interceptor] 
+    [pass-interceptor pass-interceptor] 
     (valid-app-interceptors 
       [ { :interceptor pass-interceptor, :excludes { :test #{ :hide } } } 
         { :interceptor pass-interceptor, :excludes { :test #{} } } ]

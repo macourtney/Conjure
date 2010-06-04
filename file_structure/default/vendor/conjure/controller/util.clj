@@ -323,9 +323,8 @@ actions." }
 and action." }
   call-app-interceptor? [interceptor-map controller action]
   (let [action-set (get (:excludes interceptor-map) (keyword controller))]
-    (if action-set
-      (when (and (set? action-set) (not-empty action-set))
-        (not (contains? action-set (keyword action))))
+    (if (and action-set (set? action-set) (not-empty action-set))
+      (not (contains? action-set (keyword action)))
       true)))
 
 (defn
