@@ -29,7 +29,7 @@
 (defn
 #^{:doc "Destroys a controller file for the controller and action given in params."}
   destroy [params]
-  (destroy-binding-file (first params) (second params)))
+  (destroy-binding-file (first params) (second params) false))
 
 (defn
 #^{:doc "Destroys all of the files created by the binding_generator."}

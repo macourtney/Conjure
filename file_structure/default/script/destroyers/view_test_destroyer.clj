@@ -13,7 +13,7 @@
 (defn
 #^{:doc "Destroys the view test file from the given controller."}
   destroy-view-test-file 
-  ([controller action])
+  ([controller action] (destroy-view-test-file controller action false))
   ([controller action silent]
     (if (and controller action)
       (let [controller-view-unit-test-dir (util/find-controller-view-unit-test-directory controller)]

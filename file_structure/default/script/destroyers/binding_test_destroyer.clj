@@ -13,7 +13,7 @@
 (defn
 #^{:doc "Destroys the binding test file from the given controller."}
   destroy-binding-test-file 
-  ([controller action])
+  ([controller action] (destroy-binding-test-file controller action false))
   ([controller action silent]
     (if (and controller action)
       (let [controller-binding-unit-test-dir (util/find-controller-binding-unit-test-directory controller)]
@@ -33,7 +33,7 @@
 (defn
 #^{:doc "Destroys a binding test file for the controller name given in params."}
   destroy [params]
-  (destroy-binding-test-file (first params) false))
+  (destroy-binding-test-file (first params) (second params)))
 
 (defn
 #^{:doc "Destroys all of the files created by the binding_test_generator."}

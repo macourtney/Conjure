@@ -29,7 +29,7 @@
 (defn
 #^{:doc "Destroys a controller file for the controller name given in params."}
   destroy [params]
-  (destroy-controller-file (first params)))
+  (destroy-controller-file (first params) false))
 
 (defn
 #^{:doc "Destroys all of the files created by the controller_generator."}

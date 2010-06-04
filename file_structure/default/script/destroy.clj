@@ -1,13 +1,5 @@
 (ns generate 
-  (:require [destroyers.fixture-destroyer :as fixture-destroyer]
-            [destroyers.migration-destroyer :as migration-destroyer]
-            [destroyers.view-destroyer :as view-destroyer]
-            [destroyers.controller-destroyer :as controller-destroyer]
-            [destroyers.controller-test-destroyer :as controller-test-destroyer]
-            [destroyers.model-destroyer :as model-destroyer]
-            [destroyers.model-test-destroyer :as model-test-destroyer]
-            [destroyers.view-test-destroyer :as view-test-destroyer]
-            [destroyers.xml-view-destroyer :as xml-view-destroyer]))
+  (:require [conjure.server.server :as server]))
 
 (defn
 #^{:doc "Prints the usage information to standard out."}
@@ -24,13 +16,17 @@
   (println (str "Invalid destroyer: " destroyer-namspace ". The destroyer must implement a destroy function.")))
 
 (defn destroy [command params]
-  (let [destroyer-namespace (find-ns (symbol (str "destroyers." command "-destroyer")))]
-    (if destroyer-namespace
-      (let [destroyer-fn (ns-resolve destroyer-namespace 'destroy)]
-        (if destroyer-fn
-          (destroyer-fn params)
-          (print-invalid-destroyer destroyer-namespace)))
-      (print-unknown-command command))))
+  (let [destroyer-namespace-symbol (symbol (str "destroyers." command "-destroyer"))]
+    (require destroyer-namespace-symbol)
+    (let [destroyer-namespace (find-ns destroyer-namespace-symbol)]
+      (if destroyer-namespace
+        (let [destroyer-fn (ns-resolve destroyer-namespace 'destroy)]
+          (if destroyer-fn
+            (destroyer-fn params)
+            (print-invalid-destroyer destroyer-namespace)))
+        (print-unknown-command command)))))
+
+(server/init)
 
 (let [destroy-command (first *command-line-args*)
       destroy-type-params (rest *command-line-args*)]
