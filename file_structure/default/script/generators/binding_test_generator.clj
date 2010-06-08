@@ -34,4 +34,4 @@
 (defn 
 #^{:doc "Generates a binding test file for the controller and action in params."}
   generate [params]
-  (generate-unit-test (first params) (rest params)))
+  (generate-unit-test (first params) (second params)))
