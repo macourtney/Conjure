@@ -3,13 +3,13 @@
         helpers.home-helper))
 
 (defaction index
-  (bind request-map))
+  (bind))
 
 (defaction list-records
-  (redirect-to request-map { :action "index" }))
+  (redirect-to { :action "index" }))
   
 (defaction add
-  (redirect-to request-map { :action "index" }))
+  (redirect-to { :action "index" }))
   
 (defaction error-404
-  (bind request-map))
+  (bind))

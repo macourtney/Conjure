@@ -2,6 +2,7 @@
   (:require [clojure.contrib.logging :as logging]
             [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.str-utils :as str-utils]
+            [conjure.server.request :as request]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.string-utils :as string-utils]
@@ -32,8 +33,8 @@
 
 (defn
 #^{ :doc "Returns the controller file name generated from the given request map." }
-  controller-file-name [request-map]
-  (controller-file-name-string (:controller request-map)))
+  controller-file-name []
+  (controller-file-name-string (request/controller)))
   
 (defn
 #^{ :doc "Returns the controller name for the given controller file." }
@@ -80,25 +81,26 @@
 
 (defn
 #^{ :doc "Loads the given controller file." }
-  load-controller [controller]
-  (let [controller-filename (controller-file-name-string controller)]
-    (when (and controller-filename (controller-exists? controller-filename))
-      (require :reload (symbol (controller-namespace controller)))
-      (reload-conjure-namespaces controller))))
+  load-controller
+  ([] (load-controller (request/controller)))
+  ([controller]
+    (let [controller-filename (controller-file-name-string controller)]
+      (when (and controller-filename (controller-exists? controller-filename))
+        (require :reload (symbol (controller-namespace controller)))
+        (reload-conjure-namespaces controller)))))
 
 (defn
 #^{ :doc "Returns fully qualified action generated from the given request map." }
-  fully-qualified-action [request-map]
-  (if request-map
-    (let [controller (:controller request-map)
-          action (:action request-map)]
-      (if (and controller action)
-        (str (controller-namespace controller) "/" action)))))
+  fully-qualified-action []
+  (let [controller (request/controller)
+        action (request/action)]
+    (if (and controller action)
+      (str (controller-namespace controller) "/" action))))
 
 (defn
 #^{ :doc "Returns a keyword for the request method." }
-  method-key [request-map]
-  (let [request-method (:method (:request request-map))]
+  method-key []
+  (let [request-method (request/method)]
     (cond
       (= "GET" request-method) :get
       (= "POST" request-method) :post
@@ -127,9 +129,9 @@ the method is assumed to be :all. If no matching method is found, then nil is re
       (or (get all-methods method) (get all-methods :all)))))
 
 (defn
-#^{ :doc "Returns the action function for the controller and action listed in the given request-map." }
-  find-action-fn [{ controller :controller, action :action, :as request-map }]
-  (action-function controller action (method-key request-map)))
+#^{ :doc "Returns the action function for the controller and action listed in the request-map." }
+  find-action-fn []
+  (action-function (request/controller) (request/action) (method-key)))
 
 (defn
 #^{ :doc "Returns all of the action method-map pairs for the given controller filtered by the given map. Both includes 
@@ -216,8 +218,8 @@ interceptors are nil, then this function returns nil." }
         (do
           (check-inteceptor-fn? parent-interceptor "parent-interceptor")
           (check-inteceptor-fn? child-interceptor "child-interceptor")
-          (fn [request-map action-fn] 
-            (parent-interceptor request-map #(child-interceptor %1 action-fn))))
+          (fn [action-fn] 
+            (parent-interceptor #(child-interceptor action-fn))))
         (check-inteceptor-fn? parent-interceptor "parent-interceptor"))
       (check-inteceptor-fn? child-interceptor "child-interceptor")))
   ([parent-interceptor child-interceptor & more]
@@ -348,33 +350,33 @@ and action. If no interceptors apply to the given controller and action, a simpl
         (find-action-interceptors controller action)
         (find-controller-interceptors controller action)
         (find-app-interceptors controller action)))
-    (fn [request-map action-fn]
-      (action-fn request-map))))
+    (fn [action-fn]
+      (action-fn))))
 
 (defn
-#^{ :doc "Runs all interceptors passing the given request-map and action function. If there are no interceptors for the
-given action and controller, then this function simply runs the action function passing request-map to it.." }
-  run-interceptors [{ :keys [controller action] :as request-map } action-fn]
-  ((create-interceptor-chain controller action) request-map action-fn))
+#^{ :doc "Runs all interceptors passing the given action function. If there are no interceptors for the
+given action and controller, then this function simply runs the action function." }
+  run-interceptors [action-fn]
+  ((create-interceptor-chain (request/controller) (request/action)) action-fn))
 
 (defn
-#^{ :doc "Attempts to run the action requested in request-map. If the action is successful, it's response is returned, 
-otherwise nil is returned." }
-  run-action [request-map]
-  (let [action-fn (find-action-fn request-map)]
+#^{ :doc "Attempts to run the action requested in the request-map. If the action is successful, its response is 
+returned, otherwise nil is returned." }
+  run-action []
+  (let [action-fn (find-action-fn)]
     (when action-fn
-      (logging/debug (str "Running action: " (fully-qualified-action request-map)))
-      (run-interceptors request-map action-fn))))
+      (logging/debug (str "Running action: " (fully-qualified-action)))
+      (run-interceptors action-fn))))
 
 (defn
 #^{ :doc "Calls the given controller with the given request map returning the response." }
-  call-controller [request-map]
+  call-controller []
   (if environment/reload-files
     (do 
-      (load-controller (:controller request-map))
-      (run-action request-map))
+      (load-controller)
+      (run-action))
     (or 
-      (run-action request-map)
+      (run-action)
       (do
-        (load-controller (:controller request-map))
-        (run-action request-map)))))
+        (load-controller)
+        (run-action)))))

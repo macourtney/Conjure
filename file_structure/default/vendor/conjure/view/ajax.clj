@@ -2,7 +2,9 @@
 
 (in-ns 'conjure.view.base)
 
+(require ['clojure.contrib.logging :as 'logging])
 (require ['com.reasonr.scriptjure :as 'scriptjure])
+(require ['conjure.server.request :as 'request])
 
 (defn-
 #^{ :doc "Returns the position function for the given position." }
@@ -52,13 +54,13 @@ id based on position. Position can be one of the following:
               success. If it is a map, then the scriptjure function value of :success is called when the ajax request 
               returns successfully, and the scriptjure function value of :error is called when the ajax request fails.
     :confirm - A scriptjure function to call to confirm the action before the ajax call is executed." }
-  ajax-map [request-map]
-  (let [ajax-type (or (:method request-map) "POST")
-        url (or (:ajax-url request-map) (view-utils/url-for request-map))
-        update (:update request-map)
+  ajax-map []
+  (let [ajax-type (or (:method (request/html-options)) (:method request/request-map) (request/method) "POST")
+        url (or (request/ajax-url) (view-utils/url-for))
+        update (request/update)
         success-fn (if (map? update) (:success update) update)
         error-fn (if (and (map? update) (contains? update :error)) (:error update) (error-fn))
-        confirm-fn (:confirm request-map)]
+        confirm-fn (request/confirm)]
 
     (scriptjure/quasiquote 
       { :type (clj ajax-type)
@@ -86,21 +88,22 @@ plus:
 If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
 and params, text is called with request-map and params merged (not all keys used from request-map)." }
   ajax-link-to
-  ([text request-map params] (ajax-link-to text (view-utils/merge-url-for-params request-map params)))
-  ([text request-map]
-    (let [html-options (or (:html-options request-map) {})
-          id (or (:id html-options) (str "id-" (rand-int 1000000)))
-          id-string (str "#" id)
-          ajax-function (ajax-map request-map)]
-      (list
-        [:a 
-          (merge html-options 
-            { :href (or (:href html-options) "#")
-              :id id })
-          (evaluate-if-fn text request-map)]
-        [:script { :type "text/javascript" } 
-          (scriptjure/js
-            (ajaxClick (clj id-string) (clj ajax-function)))]))))
+  ([text] (ajax-link-to text {}))
+  ([text params]
+    (request/with-request-map-fn #(view-utils/merge-url-for-params % params)
+      (let [html-options (or (request/html-options) {})
+            id (or (:id html-options) (str "id-" (rand-int 1000000)))
+            id-string (str "#" id)
+            ajax-function (ajax-map)]
+        (list
+          [:a 
+            (merge html-options 
+              { :href (or (:href html-options) "#")
+                :id id })
+            (evaluate-if-fn text)]
+          [:script { :type "text/javascript" } 
+            (scriptjure/js
+              (ajaxClick (clj id-string) (clj ajax-function)))])))))
 
 (defn
 #^{ :doc 
@@ -117,16 +120,16 @@ plus:
 If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
 and params, text is called with request-map and params merged (not all keys used from request-map)." }
   ajax-form-for
-  ([request-map options body] 
-    (ajax-form-for (view-utils/merge-url-for-params request-map options) body))
-  ([request-map body]
-    (let [html-options (or (:html-options request-map) {})
-          id (or (:id html-options) (str "id-" (rand-int 1000000)))
-          id-string (str "#" id)
-          ajax-function (ajax-map request-map)
-          form-for-options (assoc request-map :html-options (merge html-options { :id id }))]
-      (list
-        (form-for form-for-options body)
-        [:script { :type "text/javascript" } 
-          (scriptjure/js
-            (ajaxSubmit (clj id-string) (clj ajax-function)))]))))
+  ([body] (ajax-form-for {} body))
+  ([options body]
+    (request/with-request-map-fn #(merge % options)
+      (let [html-options (or (request/html-options) {})
+            id (or (:id html-options) (str "id-" (rand-int 1000000)))
+            id-string (str "#" id)
+            ajax-function (ajax-map)]
+        (request/with-request-map-fn #(assoc % :html-options (merge html-options { :id id }))
+          (list
+            (form-for body)
+            [:script { :type "text/javascript" } 
+              (scriptjure/js
+                (ajaxSubmit (clj id-string) (clj ajax-function)))]))))))

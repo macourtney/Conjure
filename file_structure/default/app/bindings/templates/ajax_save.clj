@@ -2,9 +2,7 @@
   (:use conjure.binding.base)
   (:require [helpers.template-helper :as template-helper]))
 
-(defbinding [request-map model-name record]
-  (if record
-    (render-view { :layout nil } (template-helper/template-request-map request-map "record-row")
-      model-name
-      (template-helper/table-metadata model-name)
-      record)))
+(defbinding [model-name record]
+  (when record
+    (template-helper/with-template-action-request-map "ajax-record-row"
+      (render-view model-name (template-helper/table-metadata model-name) record))))

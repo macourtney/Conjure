@@ -3,6 +3,7 @@
         clojure.contrib.test-is
         conjure.model.database-session-store)
   (:require [conjure.model.database :as database]
+            [conjure.server.request :as request]
             [conjure.util.session-utils :as session-utils]))
 
 (def test-session-id "blah")
@@ -18,23 +19,23 @@
     (init)
     (is (database/table-exists? session-table))
     
-    (let [request-map { :params { :session-id test-session-id } }]
-      (create-session request-map "foo" "bar")
-      (is (= (retrieve request-map) { "foo" "bar" }))
+    (request/set-request-map { :params { :session-id test-session-id } }
+      (create-session "foo" "bar")
+      (is (= (retrieve) { "foo" "bar" }))
   
-      (delete request-map "foo")
-      (is (= (retrieve request-map) {})))
+      (delete "foo")
+      (is (= (retrieve) {})))
     
-    (let [request-map { :request { :headers { "cookie" (str session-utils/session-id-name "=" test-session-id) } } }]
-      (save request-map :foo "bar")
-      (is (= (retrieve request-map) { :foo "bar" }))
+    (request/set-request-map { :request { :headers { "cookie" (str session-utils/session-id-name "=" test-session-id) } } }
+      (save :foo "bar")
+      (is (= (retrieve) { :foo "bar" }))
       
-      (delete request-map :foo)
-      (is (= (retrieve request-map) {})))
+      (delete :foo)
+      (is (= (retrieve) {})))
     
-    (let [request-map { :temp-session test-session-id }]
-      (drop-session request-map)
-      (is (nil? (retrieve request-map))))
+    (request/set-request-map { :temp-session test-session-id }
+      (drop-session)
+      (is (nil? (retrieve))))
     
     (database/drop-table session-table)
     (is (not (database/table-exists? session-table)))

@@ -2,8 +2,8 @@
   (:use clojure.contrib.test-is
         conjure.view.xml-base))
 
-(defxml [message]
-  message)
+(defxml []
+  [:test])
 
 (deftest test-defxml
-  (is (= { :status 200, :headers { "Content-Type" "text/xml" }, :body "test" } (render-view {} "test"))))
+  (is (= { :status 200, :headers { "Content-Type" "text/xml" }, :body "<test/>" } (render-view))))

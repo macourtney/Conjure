@@ -3,6 +3,7 @@
         conjure.controller.base)
   (:require [conjure.controller.util :as controller-util]
             [conjure.model.database :as database]
+            [conjure.server.request :as request]
             [conjure.util.session-utils :as session-utils]
             [destroyers.controller-destroyer :as controller-destroyer]
             [destroyers.view-destroyer :as view-destroyer]
@@ -24,16 +25,17 @@
 
 (deftest test-redirect-to
   (is (= (redirect-map "http://www.conjureapp.com") (redirect-to "http://www.conjureapp.com")))
-  (is (= 
-    (redirect-map "http://www.conjureapp.com/home/welcome") 
-    (redirect-to { :scheme :http, :server-name "www.conjureapp.com" } "/home/welcome")))
-  (let [request-map { :request { :scheme :http, :server-name "www.conjureapp.com" } :controller "home" :action "welcome" }]
+  (request/set-request-map { :scheme :http, :server-name "www.conjureapp.com" }
+    (is (= 
+      (redirect-map "/home/welcome") 
+      (redirect-to "/home/welcome"))))
+  (request/set-request-map { :request { :scheme :http, :server-name "www.conjureapp.com" } :controller "home" :action "welcome" }
     (is (= 
       (redirect-map "http://www.conjureapp.com/home/welcome") 
-      (redirect-to request-map)))
+      (redirect-to {})))
     (is (= 
       (redirect-map "http://www.conjureapp.com/home/goodbye") 
-      (redirect-to request-map { :controller "home", :action "goodbye" } )))
+      (redirect-to { :controller "home", :action "goodbye" } )))
     (is (= 
       (redirect-map "http://www.conjureapp.com/home/goodbye" 301)
-      (redirect-to request-map { :controller "home", :action "goodbye", :status 301 })))))
+      (redirect-to { :controller "home", :action "goodbye", :status 301 })))))

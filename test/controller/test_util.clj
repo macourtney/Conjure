@@ -2,9 +2,10 @@
   (:import [java.io File])
   (:use clojure.contrib.test-is
         conjure.controller.util)
-  (:require [generators.controller-generator :as controller-generator]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.server.request :as request]
             [destroyers.controller-destroyer :as controller-destroyer]
-            [clojure.contrib.logging :as logging]))
+            [generators.controller-generator :as controller-generator]))
 
 (def controller-name "test")
 (def action-name "blah")
@@ -35,10 +36,13 @@
   (is (nil? (controller-file-name-string ""))))
 
 (deftest test-controller-file-name
-  (is (= (str controller-name "_controller.clj") (controller-file-name { :controller controller-name })))
-  (is (nil? (controller-file-name { :controller "" })))
-  (is (nil? (controller-file-name { :controller nil })))
-  (is (nil? (controller-file-name {}))))
+  (request/set-request-map { :controller controller-name }
+    (is (= (str controller-name "_controller.clj") (controller-file-name))))
+  (request/set-request-map { :controller "" }
+    (is (nil? (controller-file-name))))
+  (request/set-request-map { :controller nil }
+    (is (nil? (controller-file-name))))
+  (is (nil? (controller-file-name))))
   
 (deftest test-controller-from-file
   (let [controller-file (new File "test_controller.clj")
@@ -75,23 +79,33 @@
   (is (nil? (controller-namespace nil))))
 
 (deftest test-controller-exists?
-  (is (controller-exists? (controller-file-name { :controller controller-name })))
-  (is (not (controller-exists? (controller-file-name { :controller "fail" })))))
+  (request/set-request-map { :controller controller-name }
+    (is (controller-exists? (controller-file-name))))
+  (request/set-request-map { :controller "fail" }
+    (is (not (controller-exists? (controller-file-name))))))
 
 (deftest test-load-controller
   (load-controller controller-name))
 
 (deftest test-fully-qualified-action
-  (is (= (str "controllers." controller-name "-controller/" action-name) (fully-qualified-action { :controller controller-name, :action action-name })))
-  (is (= nil (fully-qualified-action { :controller controller-name })))
-  (is (= nil (fully-qualified-action { })))
-  (is (= nil (fully-qualified-action nil))))
+  (request/set-request-map { :controller controller-name, :action action-name }
+    (is (= (str "controllers." controller-name "-controller/" action-name) (fully-qualified-action))))
+  (request/set-request-map { :controller controller-name }
+    (is (nil? (fully-qualified-action))))
+  (request/set-request-map { }
+    (is (nil? (fully-qualified-action))))
+  (request/set-request-map nil
+    (is (nil? (fully-qualified-action)))))
 
 (deftest test-method-key
-  (is (= :get (method-key { :request { :method "GET" } })))
-  (is (= :post (method-key { :request { :method "POST" } })))
-  (is (= :put (method-key { :request { :method "PUT" } })))
-  (is (= :delete (method-key { :request { :method "DELETE" } }))))
+  (request/set-request-map { :request { :method "GET" } }
+    (is (= :get (method-key))))
+  (request/set-request-map { :request { :method "POST" } }
+    (is (= :post (method-key))))
+  (request/set-request-map { :request { :method "PUT" } }
+    (is (= :put (method-key))))
+  (request/set-request-map { :request { :method "DELETE" } }
+    (is (= :delete (method-key)))))
 
 (deftest test-actions-map
   (is (actions-map controller-name))
@@ -112,7 +126,8 @@
   (is (nil? (action-function "fail" action-name :all))))
 
 (deftest test-find-action-fn
-  (is (find-action-fn { :controller controller-name, :action action-name, :request { :method "GET" } })))
+  (request/set-request-map { :controller controller-name, :action action-name, :request { :method "GET" } }
+    (is (find-action-fn))))
 
 (deftest test-find-actions
   (is (not-empty (find-actions controller-name)))
@@ -206,43 +221,43 @@
     (reset! controller-actions initial-controller-actions)))
 
 (defn create-stack-interceptor [value]
-  (fn [request-map action-fn]
-    (cons value (action-fn request-map))))
+  (fn [action-fn]
+    (cons value (action-fn))))
 
-(defn list-action [request-map]
+(defn list-action []
   (list))
 
 (deftest test-chain-interceptors
-  (is (= '("one") ((chain-interceptors (create-stack-interceptor "one")) {} list-action)))
+  (is (= '("one") ((chain-interceptors (create-stack-interceptor "one")) list-action)))
   (is (= '("one" "two")
     ((chain-interceptors
       (create-stack-interceptor "one")
       (create-stack-interceptor "two"))
-    {} list-action)))
+      list-action)))
   (is (= '("two") 
     ((chain-interceptors 
       nil 
       (create-stack-interceptor "two"))
-    {} list-action)))
+      list-action)))
   (is (= '("one")
     ((chain-interceptors
       (create-stack-interceptor "one")
       nil)
-    {} list-action)))
+      list-action)))
   
   (is (= '("one" "two" "three")
     ((chain-interceptors
       (create-stack-interceptor "one")
       (create-stack-interceptor "two")
       (create-stack-interceptor "three"))
-    {} list-action)))
+      list-action)))
   (is (= '("one" "two" "three" "four")
     ((chain-interceptors
       (create-stack-interceptor "one")
       (create-stack-interceptor "two")
       (create-stack-interceptor "three")
       (create-stack-interceptor "four"))
-    {} list-action)))
+      list-action)))
   (is (= '("one" "two" "three" "four")
     ((chain-interceptors
       (create-stack-interceptor "one")
@@ -253,7 +268,7 @@
       nil
       nil
       (create-stack-interceptor "four"))
-    {} list-action)))
+      list-action)))
   (is (nil? (chain-interceptors nil)))
   (is (nil? (chain-interceptors nil nil))))
 
@@ -422,11 +437,14 @@
     (reset! app-interceptors initial-app-interceptors)))
 
 (deftest test-run-action
-  (is (run-action { :controller controller-name, :action action-name, :request { :method "GET" } })))
+  (request/set-request-map { :controller controller-name, :action action-name, :request { :method "GET" } }
+    (is (run-action))))
 
 (deftest test-call-controller
-  (is (call-controller { :controller controller-name, :action action-name, :request { :method "GET" } }))
+  (request/set-request-map { :controller controller-name, :action action-name, :request { :method "GET" } }
+    (is (call-controller)))
   (let [initial-controller-actions @controller-actions]
     (reset! controller-actions {})
-    (is (call-controller { :controller controller-name, :action action-name, :request { :method "GET" } }))
+    (request/set-request-map { :controller controller-name, :action action-name, :request { :method "GET" } }
+      (is (call-controller)))
     (reset! controller-actions initial-controller-actions)))

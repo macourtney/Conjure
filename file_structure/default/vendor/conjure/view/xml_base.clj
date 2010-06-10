@@ -1,14 +1,27 @@
-(ns conjure.view.xml-base)
+(ns conjure.view.xml-base
+  (:import [java.io StringWriter])
+  (:require [clojure.contrib.prxml :as prxml]))
 
 (defn
 #^{ :doc "Creates an xml response using the given body. Body should be a string containing the xml contents." }
-  xml-response [body]
+  xml-response []
   { :status  200
-    :headers {"Content-Type" "text/xml"}
-    :body body })
+    :headers {"Content-Type" "text/xml"} })
 
 (defmacro
-#^{:doc "Defines an xml view. This macro should be used in an xml view file to define the parameters used in the view."}
+#^{ :doc "Defines a view. This macro should be used in a view file to define the parameters used in the view." }
   defxml [params & body]
-  `(defn ~'render-view [~'request-map ~@params]
-    (xml-response ~@body)))
+  (let [def-params (if (map? params) params {})
+        view-params (if (map? params) (first body)  params)
+        response-map (or (:response-map def-params) (xml-response))]
+   `(do
+      (defn ~'render-body [~@view-params]
+        ~@body)
+      (defn ~'render-str [~@view-params]
+        (with-open [string-writer# (new StringWriter)] 
+          (binding [*out* string-writer#]
+            (prxml/prxml
+              (~'render-body ~@view-params)))
+          (.toString string-writer#)))
+      (defn ~'render-view [~@view-params]
+        (assoc ~response-map :body (~'render-str ~@view-params))))))

@@ -2,10 +2,12 @@
 
 (in-ns 'conjure.view.base)
 
-(require ['conjure.model.util :as 'model-util])
 (require ['clj-html.helpers :as 'helpers])
-(require ['conjure.view.util :as 'view-utils])
+(require ['clojure.contrib.logging :as 'logging])
+(require ['conjure.model.util :as 'model-util])
+(require ['conjure.server.request :as 'request])
 (require ['conjure.util.map-utils :as 'map-utils])
+(require ['conjure.view.util :as 'view-utils])
 
 (defn
 #^{:doc "Returns the name value for the given record name and key name. Note, both record-name-str and key-name-str must 
@@ -20,24 +22,25 @@ be strings." }
 "Creates a form tag block from the given options and with the given body. If options is given, it is merged into
 the request-map.
 
-If body is a function, it is passed the request-map after being merged with the given options.
+The request-map for the body will be merged with the given options.
 
 Options has the same options as url-for plus the following options:    
     :name - The key for the params map passed to the target url. If name is not given, then the value of :controller in
-        the url map is used. If :controller is not given in the url map, then \"record\" is used. 
+        the request map is used. If :controller is not given in the request map, then \"record\" is used. 
     :html-options - The html attributes for the form tag." }
   form-for 
-  ([request-map options body] (form-for (view-utils/merge-url-for-params request-map options) body))
-  ([request-map body]
-    (let [html-options (:html-options request-map)
-          action (or (:action html-options) (view-utils/url-for request-map))]
-      [:form 
-        (merge 
-          html-options
-          { :method (or (:method html-options) "post"), 
-            :action action,
-            :name (or (:name request-map) (:controller request-map) "record") })
-        (evaluate-if-fn body request-map)])))
+  ([body] (form-for {} body))
+  ([options body]
+    (request/with-request-map-fn #(merge % options)
+      (let [html-options (request/html-options)
+            action (or (:action html-options) (view-utils/url-for))]
+        [:form 
+          (merge 
+            html-options
+            { :method (or (:method html-options) "post"), 
+              :action action,
+              :name (or (request/form-name) (request/controller) "record") })
+          (evaluate-if-fn body)]))))
 
 (defn-
 #^{:doc "Returns the id value for the given record name and key name. Note, both record-name-str and key-name-str must 
@@ -137,7 +140,9 @@ nothing if a check box is not checked, therefore this function also creates a hi
 Supported options:
   :html-options - The html options of the button." }
   button-to 
-  ([text request-map params] (button-to text (view-utils/merge-url-for-params request-map params)))
-  ([text request-map]
-    (form-for (dissoc request-map :html-options)
-      (form-button (evaluate-if-fn text request-map) (:html-options request-map)))))
+  ([text] (button-to text {}))
+  ([text params]
+    (let [html-options (request/html-options)]
+      (request/with-request-map-fn #(dissoc (view-utils/merge-url-for-params % params) :html-options)
+        (form-for
+          (form-button (evaluate-if-fn text) html-options))))))

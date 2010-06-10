@@ -2,52 +2,58 @@
   (:use clj-html.core
         clojure.contrib.test-is
         conjure.view.base)
-  (require [com.reasonr.scriptjure :as scriptjure]))
+  (require [com.reasonr.scriptjure :as scriptjure]
+           [conjure.server.request :as request]))
 
-(defview [message]
-  message)
+(defview [view-message]
+  view-message)
 
 (deftest test-defview
-  (is (= "test" (render-view {} "test"))))
+  (is (= "test" (render-body "test")))
+  (request/with-controller-action "test" "test"
+    (is (string? (render-str "test")))
+    (is (map? (render-view "test")))))
 
 (deftest test-link-to
   (is (= 
     [:a { :href "/hello/show" } "view"]
     (link-to "view" { :controller "hello" :action "show" })))
-  (is (= 
-    [:a { :href "/hello/show" } "view"]
-    (link-to "view" { :controller "hello" :action "add" } { :action "show" })))
+  (request/with-controller-action "hello" "add"
+    (is (= 
+      [:a { :href "/hello/show" } "view"]
+      (link-to "view" { :action "show" }))))
   (is (= 
     [:a { :href "/hello/show", :id "foo", :class "bar" } "view"]
     (link-to "view" { :controller "hello" :action "show" :html-options { :id "foo" :class "bar" } })))
   (is (= 
     [:a { :href "/hello/show" } "show"]
-    (link-to #(:action %) { :controller "hello" :action "show" })))
-  (is (= 
-    [:a { :href "/home/index" } "view"]
-    (link-to "view" { :controller "hello" :action "show" } { :html-options { :href "/home/index" } } ))))
+    (link-to #(request/action) { :controller "hello" :action "show" })))
+  (request/with-controller-action "hello" "show"
+    (is (= 
+      [:a { :href "/home/index" } "view"]
+      (link-to "view" { :html-options { :href "/home/index" } } )))))
 
 (deftest test-link-to-if
   (is (= 
     [:a { :href "/hello/show" } "view"]
     (link-to-if true "view" { :controller "hello" :action "show" })))
   (is (= "view" (link-to-if false "view" { :controller "hello" :action "show" })))
-  (is (= "show" (link-to-if false #(:action %) { :controller "hello" :action "show" })))
+  (is (= "show" (link-to-if false #(request/action) { :controller "hello" :action "show" })))
   (is (= 
     [:a { :href "/hello/show" } "view"]
-    (link-to-if #(= (:action %) "show") "view" { :controller "hello" :action "show" })))
-  (is (= "view" (link-to-if #(= (:action %) "add") "view" { :controller "hello" :action "show" }))))
+    (link-to-if #(= (request/action) "show") "view" { :controller "hello" :action "show" })))
+  (is (= "view" (link-to-if #(= (request/action) "add") "view" { :controller "hello" :action "show" }))))
   
 (deftest test-link-to-unless
   (is (= "view" (link-to-unless true "view" { :controller "hello" :action "show" })))
   (is (= 
     [:a { :href "/hello/show" } "view"]
     (link-to-unless false "view" { :controller "hello" :action "show" })))
-  (is (= "show" (link-to-unless true #(:action %) { :controller "hello" :action "show" })))
-  (is (= "view" (link-to-unless #(= (:action %) "show") "view" { :controller "hello" :action "show" })))
+  (is (= "show" (link-to-unless true #(request/action) { :controller "hello" :action "show" })))
+  (is (= "view" (link-to-unless #(= (request/action) "show") "view" { :controller "hello" :action "show" })))
   (is (= 
     [:a { :href "/hello/show" } "view"]
-    (link-to-unless #(= (:action %) "add") "view" { :controller "hello" :action "show" }))))
+    (link-to-unless #(= (request/action) "add") "view" { :controller "hello" :action "show" }))))
 
 (deftest test-form-for
   (is (= 
@@ -58,7 +64,7 @@
     (form-for { :controller "hello", :action "create" } "Blah")))
   (is (= 
     [:form { :name "create", :action "/hello/create", :method "post" } "create"]
-    (form-for { :name "create", :controller "hello", :action "create" } #(:action %))))
+    (form-for { :name "create", :controller "hello", :action "create" } #(request/action))))
   (is (= 
     [:form { :name "create", :method "post", :action "/home/index" } "Blah"]
     (form-for { :name "create", :controller "hello", :action "create", :html-options { :action "/home/index" } } "Blah"))))
@@ -465,7 +471,9 @@
         [:script { :type "text/javascript" }
          (scriptjure/js 
            (ajaxSubmit "#test-id" (clj (assoc ajax-map :type "GET"))))]]
-      (ajax-form-for (assoc form-for-options :method "GET") form-for-body)))
+      (ajax-form-for 
+        (assoc form-for-options :method "GET")
+        form-for-body)))
     (is (=
       [ form-tag 
         [:script { :type "text/javascript" }

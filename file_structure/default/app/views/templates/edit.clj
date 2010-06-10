@@ -5,13 +5,12 @@
             [views.templates.record-form :as record-form]))
 
 (defview [model-name table-metadata record]
-  (html/html
-    [:div { :class "article" }
-      [:h2 (str "Editing " (helpers/h (or (:name record) (:id record) " a record")))]
-      (form-for request-map { :name "save", :action "save", :controller model-name }
-        (list
-          (hidden-field record :record :id)
-          (record-form/render-view request-map table-metadata record)
-          (form-button "Save")
-          "&nbsp;"
-          (link-to "Cancel" request-map { :action "show", :controller model-name, :params { :id record } } )))]))
+  [:div { :class "article" }
+    [:h2 (str "Editing " (helpers/h (or (:name record) (:id record) " a record")))]
+    (form-for { :name "save", :action "save", :controller model-name }
+      (list
+        (hidden-field record :record :id)
+        (record-form/render-body table-metadata record)
+        (form-button "Save")
+        "&nbsp;"
+        (link-to "Cancel" { :action "show", :controller model-name, :params { :id record } } )))])

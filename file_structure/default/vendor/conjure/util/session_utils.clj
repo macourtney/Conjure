@@ -1,6 +1,7 @@
 (ns conjure.util.session-utils
   (:import [java.util Calendar Date])
   (:require [clojure.contrib.str-utils :as str-utils]
+            [conjure.server.request :as request]
             [conjure.util.html-utils :as html-utils]
             [conjure.util.string-utils :as conjure-str-utils]))
 
@@ -16,41 +17,50 @@
 
 (defn
 #^{ :doc "Returns the temp session id from the given request map if it exists." }
-  temp-session-id [request-map]
-  (:temp-session request-map))
+  temp-session-id 
+  ([] (temp-session-id request/request-map))
+  ([request-map]
+    (:temp-session request-map)))
 
 (defn
 #^{ :doc "Returns the session id from the given request map." }
-  session-id [request-map]
-  (let [params (:params request-map)
-        params-session-id (or (if params (:session-id params)) (temp-session-id request-map))]
-    (if params-session-id
-      params-session-id
-      (let [headers (:headers (:request request-map))]
-        (get
-          (conjure-str-utils/str-to-map 
-            (if headers (get headers "cookie") ""))
-          session-id-name)))))
+  session-id 
+  ([] (session-id request/request-map))
+  ([request-map]
+    (let [params (:params request-map)
+          params-session-id (or (if params (:session-id params)) (temp-session-id request-map))]
+      (if params-session-id
+        params-session-id
+        (let [headers (:headers (:request request-map))]
+          (get
+            (conjure-str-utils/str-to-map 
+              (if headers (get headers "cookie") ""))
+            session-id-name))))))
 
 (defn
 #^{ :doc "Creates a temp session for the given request-map if one does not already exist." }
   update-request-session [request-map]
   (if (not (session-id request-map))
-    (merge request-map { :temp-session (create-session-id) })
+    (assoc request-map :temp-session (create-session-id))
     request-map))
-          
+
+(defmacro
+#^{ :doc "Adds a temp session to the request-map for body." }
+  with-request-session [& body]
+  `(request/with-request-map-fn update-request-session ~@body))
+
 (defn
 #^{ :doc "Returns true if a session has already been created." }
-  session-created? [request-map response-map]
+  session-created? [response-map]
   (or 
-    (get (:headers (:request request-map)) "cookie")
-    (:session-id (:params request-map))
+    (get (request/headers) "cookie")
+    (:session-id (request/parameters))
     (get (:headers response-map) "Set-Cookie")))
 
 (defn
 #^{ :doc "Updates the response map with a session cookie if necessary." }
-  manage-session [request-map response-map]
-  (if (not (session-created? request-map response-map))
+  manage-session [response-map]
+  (if (not (session-created? response-map))
     (let [tomorrow (doto (. Calendar getInstance)
                      (.add (. Calendar DATE) 1))]
       (assoc
@@ -62,7 +72,7 @@
               (str 
                 session-id-name
                 "=" 
-                (or (temp-session-id request-map) (create-session-id))
+                (or (temp-session-id) (create-session-id))
                 "; expires=" 
                 (html-utils/format-cookie-date (. tomorrow getTime))
                 "; path=/") })))

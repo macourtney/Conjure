@@ -1,14 +1,39 @@
 (ns conjure.view.base
   (:use clj-html.core)
-  (:require [clojure.contrib.str-utils :as str-utils]
+  (:require [clj-html.core :as html]
+            [clojure.contrib.str-utils :as str-utils]
+            [conjure.server.request :as request]
             [conjure.util.string-utils :as conjure-str-utils]
             [conjure.util.html-utils :as html-utils]
+            [conjure.view.util :as view-util]
             environment))
+
+(defn default-response-map []
+  { :status  200
+    :headers { "Content-Type" "text/html" } })
 
 (defmacro
 #^{ :doc "Defines a view. This macro should be used in a view file to define the parameters used in the view." }
   defview [params & body]
-  `(defn ~'render-view [~'request-map ~@params]
+  (let [def-params (if (map? params) params {})
+        view-params (if (map? params) (first body)  params)
+        layout-name (or (:layout def-params) "application")
+        layout-info (or (:layout-info def-params) {})
+        response-map (or (:response-map def-params) (default-response-map))]
+   `(do
+      (defn ~'render-body [~@view-params]
+        ~@body)
+      (defn ~'render-str [~@view-params]
+        (request/with-request-map-fn (fn [request-map#] (assoc request-map# :layout-info ~layout-info))
+          (html/html
+            (view-util/render-layout ~layout-name (~'render-body ~@view-params)))))
+      (defn ~'render-view [~@view-params]
+        (assoc ~response-map :body (~'render-str ~@view-params))))))
+
+(defmacro
+#^{ :doc "Defines a layout. This macro should be used in a layout view file to define a layout." }
+  deflayout [& body]
+  `(defn ~'render-body [~'body]
     ~@body))
 
 (defn- 
@@ -44,7 +69,7 @@ function." }
 (defn
 #^{ :doc "Returns the full path to the given image source." }
   image-path [source]
-    (compute-public-path source environment/images-dir))
+  (compute-public-path source environment/images-dir))
   
 (defn
 #^{ :doc "Returns an image tag for the given source and with the given options." }
@@ -55,7 +80,7 @@ function." }
 (defn
 #^{ :doc "Returns the full path to the given stylesheet source." }
   stylesheet-path [source]
-    (compute-public-path source environment/stylesheets-dir "css"))
+  (compute-public-path source environment/stylesheets-dir "css"))
 
 (defn-
 #^{ :doc "Returns the type of the first parameter." }

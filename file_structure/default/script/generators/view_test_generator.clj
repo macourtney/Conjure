@@ -22,7 +22,8 @@
             view-namespace (util/view-namespace-by-action controller action)
             test-content (or incoming-content (str "(ns " test-namespace "
   (:use clojure.contrib.test-is
-        " view-namespace "))
+        " view-namespace ")
+  (:require [conjure.server.request :as request]))
 
 (def controller-name \"" controller "\")
 (def view-name \"" action "\")
@@ -30,7 +31,8 @@
                    :action view-name } )
 
 (deftest test-view
-  (is (render-view request-map)))"))]
+  (request/set-request-map request-map
+    (is (render-view))))"))]
         (file-utils/write-file-content unit-test-file test-content))))))
 
 (defn 

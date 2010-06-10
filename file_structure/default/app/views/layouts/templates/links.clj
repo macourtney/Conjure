@@ -1,6 +1,7 @@
 (ns views.layouts.templates.links
   (:use conjure.view.base)
   (:require [clj-html.core :as html]
+            [conjure.server.request :as request]
             [conjure.util.string-utils :as string-utils]
             [conjure.view.util :as view-util]))
 
@@ -20,7 +21,7 @@
   (or 
     (:url link-map) 
     (if (:url-for link-map) 
-      (view-util/url-for original-request-map (:url-for link-map)))))
+      (view-util/url-for (view-util/merge-url-for-params original-request-map (:url-for link-map))))))
 
 (defn
 #^{ :doc "Returns the id for a link or nil if no id should be set for the link." }
@@ -51,10 +52,10 @@
           (:text link-map)])]))
 
 (defview [title links]
-  (html/html
+  (list
     [:h3 [:span title]]
 
     [:ul { :id "links" }
-      (html/htmli (map #(generate-link % (:layout-info request-map)) links))]
+      (map #(generate-link % (request/layout-info)) links)]
       
     [:hr { :class "noscreen" }]))

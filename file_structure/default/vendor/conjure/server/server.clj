@@ -2,56 +2,19 @@
   (:import [java.util Date])
   (:require [clojure.contrib.java-utils :as java-utils]
             [clojure.contrib.logging :as logging]
-            [clojure.contrib.str-utils :as str-utils]
             [conjure.controller.util :as controller-util]
             [controllers.app :as app] ; Not actually used, but needs to be loaded in order to load app interceptors.
             [conjure.model.database :as database]
             [conjure.plugin.util :as plugin-util]
-            [conjure.util.html-utils :as html-utils]
-            [conjure.util.loading-utils :as loading-utils]
+            [conjure.server.request :as request]
             [conjure.util.session-utils :as session-utils]
             [conjure.util.string-utils :as conjure-str-utils]
-            [conjure.view.util :as view-util]
             environment
             http-config
             routes
             session-config))
 
 (def initialized? (ref false))
-
-(defn
-#^{ :doc "Merges the params value of the given request-map with params" }
-  augment-params [request-map params]
-  (if request-map 
-    (if (and params (not-empty params))
-      (assoc request-map :params (merge (:params request-map) params))
-      request-map)))
-
-(defn
-#^{ :doc "Returns a parameter map generated from the post content." }
-  parse-post-params [request-map]
-  (let [request (:request request-map)
-        content-type (:content-type request)]
-    (if 
-      (and 
-        (= (:request-method request) :post)
-        content-type
-        (.startsWith content-type "application/x-www-form-urlencoded"))
-  
-      (html-utils/parse-query-params 
-        (loading-utils/string-input-stream (:body request) (:content-length request)))
-      {})))
-
-(defn
-#^{ :doc "Parses all of the params from the given request map." }
-  parse-params [request-map]
-  (merge (parse-post-params request-map) (html-utils/parse-query-params (:query-string (:request request-map)))))
-
-(defn
-#^{ :doc "Gets a route map for use by conjure to call the correct methods." }
-  update-request-map [request-map]
-  (session-utils/update-request-session 
-    (augment-params request-map (parse-params request-map))))
 
 (defn
 #^{ :doc "Initializes the conjure server." }
@@ -71,17 +34,16 @@
 
 (defn 
 #^{ :doc "Manages the session cookie in the response map." }
-  manage-session [request-map response-map]
+  manage-session [response-map]
   (if (and session-config/use-session-cookie)
-    (session-utils/manage-session request-map response-map)
+    (session-utils/manage-session response-map)
     response-map))
 
 (defn
 #^{ :doc "Converts the given response to a response map if it is not already 
 one." }
-  create-response-map [response request-map]
-  (manage-session 
-    request-map
+  create-response-map [response]
+  (manage-session
     (if (map? response)
       response
       { :status  200
@@ -90,19 +52,22 @@ one." }
      
 (defn
 #^{ :doc "Calls the given controller with the given request map returning the response." }
-  call-controller [request-map]
-  (let [response (routes/route-request request-map)]
+  call-controller []
+  (let [response (routes/route-request)]
     (if response
-      (create-response-map response request-map)
-      (controller-util/call-controller { :controller "home", :action "error-404" }))))
+      (create-response-map response)
+      (request/set-request-map { :controller "home", :action "error-404" }
+        (controller-util/call-controller)))))
 
 (defn
 #^{ :doc "Takes the given path and calls the correct controller and action for it." }
   process-request [request-map]
   (when request-map
     (init)
-    (logging/debug (str "Requested uri: " (:uri (:request request-map))))
-    (call-controller (update-request-map request-map))))
+    (request/with-updated-request-map request-map
+      (logging/debug (str "Requested uri: " (request/uri)))
+      (session-utils/with-request-session
+        (call-controller)))))
 
 (defn
 #^{ :doc "Gets the user configured http properties." }

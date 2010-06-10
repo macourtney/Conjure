@@ -1,11 +1,13 @@
 (ns bindings.templates.ajax-row
   (:use conjure.binding.base)
-  (:require [helpers.template-helper :as template-helper]))
+  (:require [helpers.template-helper :as template-helper]
+            [conjure.server.request :as request]))
 
-(defbinding [request-map model-name]
-  (let [id (:id (:params request-map))]
-    (if id
-      (render-view { :layout nil } (template-helper/template-request-map request-map "record-row")
-        model-name
-        (template-helper/table-metadata model-name)
-        (template-helper/get-record model-name id)))))
+(defbinding [model-name]
+  (let [id (request/id)]
+    (when id
+      (template-helper/with-template-action-request-map "ajax-record-row"
+        (render-view
+          model-name
+          (template-helper/table-metadata model-name)
+          (template-helper/get-record model-name id))))))

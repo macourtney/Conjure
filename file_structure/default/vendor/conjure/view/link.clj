@@ -2,15 +2,16 @@
   
 (in-ns 'conjure.view.base)
 
+(require ['conjure.server.request :as 'request])
 (require ['conjure.view.util :as 'view-utils])
 
 (defn
-#^{ :doc "Returns the attributes for the link tag (\"a\" tag) from the given request-map." }
-  a-attributes [request-map]
-  (let [html-options (or (:html-options request-map) {})]
+#^{ :doc "Returns the attributes for the link tag (\"a\" tag) from the request-map." }
+  a-attributes []
+  (let [html-options (or (request/html-options) {})]
     (if (:href html-options)
       html-options
-      (assoc html-options :href (view-utils/url-for request-map)))))
+      (assoc html-options :href (view-utils/url-for)))))
 
 (defn
 #^{ :doc 
@@ -22,20 +23,22 @@
 If text is a function, then it is called passing params. If link-to is called with text a function and both request-map
 and params, text is called with request-map and params merged (not all keys used from request-map)." }
   link-to
-  ([text request-map params] (link-to text (view-utils/merge-url-for-params request-map params)))
-  ([text request-map]
-    [:a (a-attributes request-map) (evaluate-if-fn text request-map)]))
+  ([text] (link-to text {}))
+  ([text params]
+    (request/with-request-map-fn #(view-utils/merge-url-for-params % params)
+      [:a (a-attributes) (evaluate-if-fn text)])))
 
 (defn
 #^{:doc "If condition is true, then call link-to with the given text, request-map and params. If condition is false, 
 then just return text. If condition is a function, it is evaluated with params merged with request-map. If text is a 
 function, it is evaluated with params merged with request-map (just like link-to)." }
   link-to-if
-  ([condition text request-map params] (link-to-if condition text (view-utils/merge-url-for-params request-map params)))
-  ([condition text request-map]
-    (if (evaluate-if-fn condition request-map)
-      (link-to text request-map)
-      (evaluate-if-fn text request-map))))
+  ([condition text] (link-to-if condition text {}))
+  ([condition text params]
+    (request/with-request-map-fn #(view-utils/merge-url-for-params % params)
+      (if (evaluate-if-fn condition)
+        (link-to text)
+        (evaluate-if-fn text)))))
 
 (defn-
 #^{:doc "Inverses the results of condition. If condition is a function, then this method creates a new function which 
@@ -49,17 +52,17 @@ wraps condition, forwarding any parameters to it, but inversing the result." }
 #^{:doc "Simply calls link-to-if with the inverse of condition. If condition is a function then a new function is 
 created to wrap it, and simply inverse the result of condition." }
   link-to-unless
-    ([condition text request-map params] (link-to-if (inverse-condition condition) text request-map params))
-    ([condition text request-map] (link-to-if (inverse-condition condition) text request-map)))
+    ([condition text params] (link-to-if (inverse-condition condition) text params))
+    ([condition text] (link-to-if (inverse-condition condition) text)))
 
 (defn
 #^{ :doc "Returns the url for the page the user navigated from. Or nil if there is no referrer." }
-  back-url [request-map]
-  (:refererr (:headers (:request request-map))))
+  back-url []
+  (request/referrer))
 
 (defn
 #^{ :doc "Links to the page the user navigated from." }
   link-back
-  ([text request-map] (link-back text request-map {}))
-  ([text request-map html-options]
-    [:a (merge { :href (or (back-url request-map) "#") } html-options) (evaluate-if-fn text request-map)]))
+  ([text] (link-back text {}))
+  ([text html-options]
+    [:a (merge { :href (or (back-url) "#") } html-options) (evaluate-if-fn text)]))

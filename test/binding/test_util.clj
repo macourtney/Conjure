@@ -2,9 +2,10 @@
   (:import [java.io File])
   (:use clojure.contrib.test-is
         conjure.binding.util)
-  (:require [generators.binding-generator :as binding-generator]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.server.request :as request]
             [destroyers.binding-destroyer :as binding-destroyer]
-            [clojure.contrib.logging :as logging]))
+            [generators.binding-generator :as binding-generator]))
 
 (def controller-name "test")
 (def action-name "blah")
@@ -63,13 +64,16 @@
   (is (find-binding-fn controller-name action-name)))
 
 (deftest test-run-binding
-  (is (run-binding controller-name action-name [request-map])))
+  (request/set-request-map request-map
+    (is (run-binding controller-name action-name []))))
 
 (deftest test-call-binding
-  (is (call-binding controller-name action-name [request-map]))
+  (request/set-request-map request-map
+    (is (call-binding controller-name action-name [])))
   (let [initial-bindings @bindings]
     (reset! bindings {})
-    (is (call-binding controller-name action-name [request-map]))
+    (request/set-request-map request-map
+      (is (call-binding controller-name action-name [])))
     (reset! bindings initial-bindings)))
 
 (deftest test-assoc-action

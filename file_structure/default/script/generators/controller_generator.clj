@@ -17,7 +17,7 @@
 #^{ :doc "Generates the action function for the given action." }
   generate-action-function [action]
   (str "(defaction " action "
-  (bind request-map))"))
+  (bind))"))
   
 (defn
 #^{ :doc "Generates the action functions block for a controller file." }

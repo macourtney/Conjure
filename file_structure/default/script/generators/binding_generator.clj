@@ -15,8 +15,8 @@
 (defn
 #^{ :doc "Generates the action function for the given action." }
   generate-binding-function []
-  (str "(defbinding [request-map]
-  (render-view request-map))"))
+  (str "(defbinding []
+  (render-view))"))
 
 (defn
 #^{ :doc "Generates the view file for the given action." }

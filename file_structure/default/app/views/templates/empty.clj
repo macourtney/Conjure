@@ -3,4 +3,4 @@
   (:require [clj-html.core :as html]))
 
 (defview []
-  (html/html))
+  "")

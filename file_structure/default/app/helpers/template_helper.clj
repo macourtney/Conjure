@@ -27,7 +27,7 @@
   (model-util/load-model model-name)
   (clj-record-core/get-record model-name id))
 
-(defn
+(defn-
   template-tabs [request-map]
   (map 
     (fn [tab-map]
@@ -38,7 +38,8 @@
     (layout-tabs/all-tabs request-map)))
 
 (defn
-#^{ :doc "Returns the record from the given model with the given id." }
+#^{ :doc "Creates a request-map from the given request map which points to the templates controller with the given 
+action or the action in the given request-map" }
   template-request-map 
   ([request-map] (template-request-map request-map (:action request-map)))
   ([request-map action]
@@ -48,3 +49,11 @@
         { :controller "templates", 
           :action action,
           :layout-info { :tabs (template-tabs request-map) } }))))
+
+(defmacro
+  with-template-request-map [& body]
+  `(with-request-map-fn template-request-map ~@body))
+
+(defmacro
+  with-template-action-request-map [action & body]
+  `(with-request-map-fn (fn [request-map#] (template-request-map request-map# ~action)) ~@body))

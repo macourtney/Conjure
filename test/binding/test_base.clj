@@ -2,6 +2,7 @@
   (:use clojure.contrib.test-is
         conjure.binding.base)
   (:require [conjure.model.database :as database]
+            [conjure.server.request :as request]
             [conjure.util.session-utils :as session-utils]
             [destroyers.binding-destroyer :as binding-destroyer]
             [destroyers.view-destroyer :as view-destroyer]
@@ -19,7 +20,7 @@
 (use-fixtures :once setup-all)
 
 (deftest test-render-view
-  (let [view (render-view { :controller controller-name :action action-name })]
-    (is (not (nil? view)))
-    (is (instance? String view))
-    (is (not (empty view)))))
+  (request/with-controller-action controller-name action-name
+    (let [view (render-view)]
+      (is (not (nil? view)))
+      (is (map? view)))))

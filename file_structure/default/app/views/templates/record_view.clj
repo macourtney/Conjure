@@ -6,7 +6,7 @@
 
 (defn
 #^{ :doc "Creates a view row for the table column in the given record." }
-  view-row [request-map record table-column]
+  view-row [record table-column]
   (let [record-key-str (. (:column_name table-column) toLowerCase)
         record-key (keyword record-key-str)]
     (if (. record-key-str endsWith "_id")
@@ -14,12 +14,11 @@
             field-name (conjure-str-utils/human-title-case belongs-to-model)
             belongs-to-id (helpers/h (get record record-key))]
         [:p [:strong field-name] ": " 
-          (link-to belongs-to-id request-map 
+          (link-to belongs-to-id
             { :controller belongs-to-model, 
               :action "show", 
               :params { :id belongs-to-id } })])
       [:p [:strong (conjure-str-utils/human-title-case record-key-str)] ": " (helpers/h (get record record-key))])))
 
 (defview [table-metadata record]
-  (html/html
-    (map #(view-row request-map record %) table-metadata)))
+  (map #(view-row record %) table-metadata))

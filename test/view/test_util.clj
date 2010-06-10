@@ -3,8 +3,10 @@
   (:use test-helper
         clojure.contrib.test-is
         conjure.view.util)
-  (:require [generators.view-generator :as view-generator]
-            [destroyers.view-destroyer :as view-destroyer]))
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.server.request :as request]
+            [destroyers.view-destroyer :as view-destroyer]
+            [generators.view-generator :as view-generator]))
 
 (def action-name "show")
 (def controller-name "test")
@@ -39,20 +41,21 @@
     (is (nil? (find-view-file nil nil)))))
     
 (deftest test-load-view
-  (load-view { :controller controller-name
-               :action action-name }))
+  (request/with-controller-action controller-name action-name
+    (load-view))
+  (load-view controller-name action-name))
 
 (deftest test-request-view-namespace
+  (request/with-controller-action controller-name action-name
+    (is (= (str "views." controller-name "." action-name) 
+         (request-view-namespace))))
   (is (= (str "views." controller-name "." action-name) 
-         (request-view-namespace { :controller controller-name
-                                   :action action-name })))
+         (request-view-namespace controller-name action-name)))
   (is (= "views.test-foo.show-foo" 
-         (request-view-namespace { :controller "test-foo"
-                                   :action "show-foo" })))
+         (request-view-namespace "test-foo" "show-foo")))
   (is (= "views.test-foo.show-foo" 
-         (request-view-namespace { :controller "test_foo"
-                                   :action "show_foo" })))
-  (is (nil? (request-view-namespace nil))))
+         (request-view-namespace "test_foo" "show_foo")))
+  (is (nil? (request-view-namespace nil nil))))
   
 (deftest test-view-namespace
   (is (nil? (view-namespace nil)))
@@ -73,30 +76,43 @@
       { :controller "hello", :action "show", :params { :id 1 } } 
       { :action "edit", :params { :id 0 } })))
   (is (= 
-    { :controller "hello", :action "edit" } 
+    { :controller "hello", :action "edit", :params { :id 1 } } 
     (merge-url-for-params 
       { :controller "hello", :action "show", :params { :id 1 } } 
       { :action "edit" })))
   (is (= 
-    { :controller "hello", :action "edit", :id 0 } 
+    { :controller "hello", :action "edit", :params { :id 0 } } 
     (merge-url-for-params 
       { :controller "hello", :action "show", :params { :id 1, :text "blah" } } 
-      { :action "edit", :id 0 }))))
+      { :action "edit", :params { :id 0 } }))))
 
 (deftest test-url-for
-  (is (= "/hello/show" (url-for { :controller "hello", :action "show" })))
-  (is (= "/hello/show/1" (url-for { :controller "hello", :action "show", :params { :id 1 }})))
-  (is (= "/hello/show/1" (url-for { :controller "hello", :action "show", :params { :id { :id 1 } } })))
-  (is (= "/hello/show/#message" (url-for { :controller "hello", :action "show", :anchor "message"})))
-  (is (= "/hello/show/1/#message" (url-for { :controller "hello", :action "show", :params { :id 1 }, :anchor "message"})))
-  (is (= "/hello/show/1" (url-for { :controller "hello", :action "show" } { :params { :id 1 } })))
-  (is (= "/hello/show/1" (url-for { :controller "hello", :action "add" } { :action "show", :params { :id 1 } })))
+  (request/set-request-map { :controller "hello", :action "show" }
+    (is (= "/hello/show" (url-for))))
+  (request/set-request-map { :controller "hello", :action "show", :params { :id 1 } }
+    (is (= "/hello/show/1" (url-for))))
+  (request/set-request-map { :controller "hello", :action "show", :params { :id { :id 1 } } }
+    (is (= "/hello/show/1" (url-for))))
+  (request/set-request-map { :controller "hello", :action "show", :anchor "message"}
+    (is (= "/hello/show/#message" (url-for))))
+  (request/set-request-map { :controller "hello", :action "show", :params { :id 1 }, :anchor "message"}
+    (is (= "/hello/show/1/#message" (url-for))))
+  (request/set-request-map { :controller "hello", :action "show" }
+    (is (= "/hello/show/1" (url-for { :params { :id 1 } }))))
+  (request/set-request-map { :controller "hello", :action "add" }
+    (is (= "/hello/show/1" (url-for { :action "show", :params { :id 1 } }))))
   (let [params { :controller "hello", :action "show", :params { :id 1 } }]
-    (is (= "http://localhost/hello/show/1" (url-for { :request { :server-name "localhost" } } params)))
-    (is (= "http://localhost:8080/hello/show/1" (url-for { :request { :server-name "localhost" :server-port 8080 } } params)))
-    (is (= "ftp://localhost/hello/show/1" (url-for { :request { :server-name "localhost" :scheme :ftp } } params)))
-    (is (= "http://localhost:8080/hello/show/1" (url-for { :request { :server-name "localhost" } } (merge params { :port 8080}))))
-    (is (= "http://foo:bar@localhost/hello/show/1" (url-for { :request { :server-name "localhost" } } (merge params { :user "foo", :password "bar"})))))
+    (request/set-request-map { :request { :server-name "localhost" } }
+      (is (= "http://localhost/hello/show/1" (url-for params))))
+    (request/set-request-map { :request { :server-name "localhost" :server-port 8080 } }
+      (is (= "http://localhost:8080/hello/show/1" (url-for params))))
+    (request/set-request-map { :request { :server-name "localhost" :scheme :ftp } }
+      (is (= "ftp://localhost/hello/show/1" (url-for params))))
+    (request/set-request-map { :request { :server-name "localhost" } }
+      (is (= "http://localhost:8080/hello/show/1" (url-for (merge params { :port 8080})))))
+    (request/set-request-map { :request { :server-name "localhost" } }
+      (is (= "http://foo:bar@localhost/hello/show/1" (url-for (merge params { :user "foo", :password "bar"}))))))
   (let [params { :controller "hello", :action "show", :params { :id 1, :session-id "blah" } }]
     (binding [session-config/use-session-cookie false]
-      (is (= "http://localhost/hello/show/1?session-id=blah" (url-for { :request { :server-name "localhost" } } params))))))
+      (request/set-request-map { :request { :server-name "localhost" } }
+        (is (= "http://localhost/hello/show/1?session-id=blah" (url-for params)))))))

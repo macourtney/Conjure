@@ -1,8 +1,9 @@
 (ns views.layouts.templates.links-sidebar
   (:use conjure.view.base)
   (:require [clj-html.core :as html]
-            [views.layouts.templates.links :as links]
-            [conjure.view.util :as view-util]))
+            [conjure.server.request :as request]
+            [conjure.view.util :as view-util]
+            [views.layouts.templates.links :as links]))
 
 (defn
 #^{ :doc "Creates a list link for use in the link sidebar." }
@@ -17,11 +18,10 @@
       :html-options { :id "add-action-link" } })
 
 (defview []
-  (let [layout-info (:layout-info request-map)
+  (let [layout-info (request/layout-info)
         links (:links layout-info)]
-    (html/html
-      (links/render-view request-map "Actions"
+      (links/render-body "Actions"
         (if links
           links
           [ (list-link layout-info)
-            (add-link layout-info)])))))
+            (add-link layout-info)]))))

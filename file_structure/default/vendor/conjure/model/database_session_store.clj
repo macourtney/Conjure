@@ -22,56 +22,54 @@
 (defn
 #^{ :doc "Creates a row in the database for a new session and returns the session id. If a value is given, it is saved 
 in the database." }
-  create-session 
-  ([request-map key-name value]
+  create-session
+  ([key-name value]
     (database/insert-into session-table 
       { created-at-column (database/format-date-time (new Date)), 
-        session-id-column (session-utils/session-id request-map), 
+        session-id-column (session-utils/session-id), 
         data-column (conjure-str-utils/form-str { key-name value }) })))
       
 (defn
-#^{ :doc "Deletes the row in the database for the given session-id, or the session id from the given request-map." }
+#^{ :doc "Deletes the row in the database for the given session-id, or the session id from the request-map." }
   drop-session 
-  ([request-map] (drop-session request-map (session-utils/session-id request-map)))
-  ([request-map session-id]
+  ([] (drop-session (session-utils/session-id)))
+  ([session-id]
     (database/delete session-table [ (str (conjure-str-utils/str-keyword session-id-column) " = ?") session-id ])))
 
 (defn-
 #^{ :doc "Replaces the map stored in the session table with the given store-map." }
-  save-map [request-map store-map]
+  save-map [store-map]
   (database/update 
     session-table 
-    [(str (conjure-str-utils/str-keyword session-id-column) " = ?") (session-utils/session-id request-map)] 
+    [(str (conjure-str-utils/str-keyword session-id-column) " = ?") (session-utils/session-id)] 
     { data-column (conjure-str-utils/form-str store-map) }))
 
 (defn
-#^{ :doc "Retrieves the value stored in the database for the given session id or the id in the given request-map." }
+#^{ :doc "Retrieves the value stored in the database for the given session id or the id in the request-map." }
   retrieve 
-  ([request-map] (retrieve request-map (session-utils/session-id request-map)))
-  ([request-map session-id]
-    (let [ row-values (database/sql-find 
+  ([] (retrieve (session-utils/session-id)))
+  ([session-id]
+    (when-let [ row-values (database/sql-find 
           { :table session-table, 
             :select (conjure-str-utils/str-keyword data-column), 
             :where (str (conjure-str-utils/str-keyword session-id-column) " = '" session-id "'")  })]
-      (if row-values
-        (let [data (get (first row-values) data-column)]
-          (if data
-            (read-string data)))))))
+      (when-let [data (get (first row-values) data-column)]
+        (read-string data)))))
 
 (defn
 #^{ :doc "Deletes the given key-name from the session store." }
-  delete [request-map key-name]
-  (let [ stored-map (retrieve request-map)]
+  delete [key-name]
+  (let [ stored-map (retrieve)]
     (if stored-map
-      (save-map request-map (dissoc stored-map key-name)))))
+      (save-map (dissoc stored-map key-name)))))
 
 (defn
-#^{ :doc "Stores the given value in the session in the given request-map." }
-  save [request-map key-name value] 
-  (let [ stored-map (retrieve request-map)]
+#^{ :doc "Stores the given value in the session from the request-map." }
+  save [key-name value] 
+  (let [ stored-map (retrieve)]
     (if stored-map
-      (save-map request-map (assoc stored-map key-name value))
-      (create-session request-map key-name value))))
+      (save-map (assoc stored-map key-name value))
+      (create-session key-name value))))
 
 (def session-store 
   { :init init, 
