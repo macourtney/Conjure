@@ -12,19 +12,28 @@
   { :status  200
     :headers { "Content-Type" "text/html" } })
 
+(defn update-layout-info-with [layout-info] 
+  (fn [request-map] 
+    (assoc request-map :layout-info 
+      (merge (:layout-info request-map) layout-info))))
+
+(defn layout-name [def-view-params]
+  (when (not (:no-layout def-view-params))
+    (or (:layout def-view-params) "application")))
+
 (defmacro
 #^{ :doc "Defines a view. This macro should be used in a view file to define the parameters used in the view." }
-  defview [params & body]
+  def-view [params & body]
   (let [def-params (if (map? params) params {})
         view-params (if (map? params) (first body)  params)
-        layout-name (or (:layout def-params) "application")
+        layout-name (layout-name def-params)
         layout-info (or (:layout-info def-params) {})
         response-map (or (:response-map def-params) (default-response-map))]
    `(do
       (defn ~'render-body [~@view-params]
         ~@body)
       (defn ~'render-str [~@view-params]
-        (request/with-request-map-fn (fn [request-map#] (assoc request-map# :layout-info ~layout-info))
+        (request/with-request-map-fn (update-layout-info-with ~layout-info)
           (html/html
             (view-util/render-layout ~layout-name (~'render-body ~@view-params)))))
       (defn ~'render-view [~@view-params]
@@ -32,9 +41,15 @@
 
 (defmacro
 #^{ :doc "Defines a layout. This macro should be used in a layout view file to define a layout." }
-  deflayout [& body]
+  def-layout [& body]
   `(defn ~'render-body [~'body]
     ~@body))
+
+(defmacro
+  def-ajax-view [params & body]
+  (if (map? params)
+    `(def-view (assoc ~params :no-layout true) ~@body)
+    `(def-view { :no-layout true } ~params ~@body)))
 
 (defn- 
 #^{ :doc "If function is a function, then this method evaluates it with the given args. Otherwise, it just returns

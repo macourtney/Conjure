@@ -4,5 +4,5 @@
             [conjure.view.util :as view-utils]
             [views.templates.record-row :as record-row]))
 
-(defview { :layout nil } [model-name table-metadata record]
+(def-ajax-view [model-name table-metadata record]
   (record-row/render-body model-name table-metadata record))

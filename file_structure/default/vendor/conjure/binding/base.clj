@@ -2,7 +2,7 @@
   (:require [conjure.binding.util :as binding-util]
             [conjure.view.util :as view-util]))
 
-(defmacro defbinding [params & body]
+(defmacro def-binding [params & body]
   (let [controller-action-map (binding-util/controller-action-map (name (ns-name *ns*)))]
     `(binding-util/add-bind-function
       (fn ~params ~@body)

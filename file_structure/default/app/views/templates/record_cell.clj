@@ -5,7 +5,7 @@
             [conjure.util.string-utils :as conjure-str-utils]
             [conjure.view.util :as view-utils]))
 
-(defview [model-name record record-key]
+(def-view [model-name record record-key]
   (let [record-id (:id record)]
     (if (= :id record-key)
       [:td 

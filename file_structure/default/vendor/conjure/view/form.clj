@@ -31,16 +31,16 @@ Options has the same options as url-for plus the following options:
   form-for 
   ([body] (form-for {} body))
   ([options body]
-    (request/with-request-map-fn #(merge % options)
-      (let [html-options (request/html-options)
-            action (or (:action html-options) (view-utils/url-for))]
-        [:form 
-          (merge 
-            html-options
-            { :method (or (:method html-options) "post"), 
-              :action action,
-              :name (or (request/form-name) (request/controller) "record") })
-          (evaluate-if-fn body)]))))
+    (let [html-options (:html-options options)
+          action (or (:action html-options) (view-utils/url-for options))]
+      [:form 
+        (merge 
+          html-options
+          { :method (or (:method html-options) "post"), 
+            :action action,
+            :name (or (:name options) (:controller options) (request/controller) "record") })
+        (request/with-request-map-fn #(view-utils/merge-url-for-params % options)
+          (evaluate-if-fn body))])))
 
 (defn-
 #^{:doc "Returns the id value for the given record name and key name. Note, both record-name-str and key-name-str must 
@@ -142,7 +142,5 @@ Supported options:
   button-to 
   ([text] (button-to text {}))
   ([text params]
-    (let [html-options (request/html-options)]
-      (request/with-request-map-fn #(dissoc (view-utils/merge-url-for-params % params) :html-options)
-        (form-for
-          (form-button (evaluate-if-fn text) html-options))))))
+    (form-for (dissoc params :html-options)
+      (form-button (evaluate-if-fn text) (:html-options params)))))

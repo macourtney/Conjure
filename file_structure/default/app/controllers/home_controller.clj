@@ -2,14 +2,14 @@
   (:use conjure.controller.base
         helpers.home-helper))
 
-(defaction index
+(def-action index
   (bind))
 
-(defaction list-records
+(def-action list-records
   (redirect-to { :action "index" }))
   
-(defaction add
+(def-action add
   (redirect-to { :action "index" }))
   
-(defaction error-404
+(def-action error-404
   (bind))

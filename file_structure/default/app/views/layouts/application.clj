@@ -7,7 +7,7 @@
             [views.layouts.templates.links-sidebar :as links-sidebar]
             [views.layouts.templates.tabs :as tabs]))
 
-(deflayout [body]
+(def-layout [body]
   (let [title "Conjure"]
     (xml-header-tag)
     (html-doctype)

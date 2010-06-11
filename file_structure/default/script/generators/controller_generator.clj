@@ -16,7 +16,7 @@
 (defn
 #^{ :doc "Generates the action function for the given action." }
   generate-action-function [action]
-  (str "(defaction " action "
+  (str "(def-action " action "
   (bind))"))
   
 (defn

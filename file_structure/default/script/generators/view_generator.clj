@@ -24,9 +24,8 @@ added to the body of the view code." }
   (:use conjure.view.base)
   (:require [clj-html.core :as html]" (if requires (str "\n" requires)) "))
 
-(defview [" view-params "]
-  (html/html 
-    " inner-content "))")))
+(def-view [" view-params "]
+  " inner-content ")")))
 
 (defn
 #^{ :doc "Returns the content of a view with standard namespace and imports with the given view parameters and inner 

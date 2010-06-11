@@ -24,5 +24,5 @@
     (if (not (= field-name "id")) 
       [:p [:strong (conjure-str-utils/human-title-case field-name)] ": " (editor record field-name)])))
 
-(defview [table-metadata record]
+(def-view [table-metadata record]
   (map #(form-row record %) table-metadata))

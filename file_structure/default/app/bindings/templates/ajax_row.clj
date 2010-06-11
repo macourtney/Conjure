@@ -3,7 +3,7 @@
   (:require [helpers.template-helper :as template-helper]
             [conjure.server.request :as request]))
 
-(defbinding [model-name]
+(def-binding [model-name]
   (let [id (request/id)]
     (when id
       (template-helper/with-template-action-request-map "ajax-record-row"

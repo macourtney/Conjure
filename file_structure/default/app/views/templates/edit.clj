@@ -4,7 +4,7 @@
             [clj-html.helpers :as helpers]
             [views.templates.record-form :as record-form]))
 
-(defview [model-name table-metadata record]
+(def-view [model-name table-metadata record]
   [:div { :class "article" }
     [:h2 (str "Editing " (helpers/h (or (:name record) (:id record) " a record")))]
     (form-for { :name "save", :action "save", :controller model-name }

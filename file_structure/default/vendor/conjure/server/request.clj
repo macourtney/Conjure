@@ -41,26 +41,6 @@
   (:anchor request-map))
 
 (defn
-#^{ :doc "Returns the ajax-url or nil if it is not set." }
-  ajax-url []
-  (:ajax-url request-map))
-
-(defn
-#^{ :doc "Returns update or nil if it is not set. Used by ajax-map." }
-  update []
-  (:update request-map))
-
-(defn
-#^{ :doc "Returns confirm or nil if it is not set. Used by ajax-map." }
-  confirm []
-  (:confirm request-map))
-
-(defn
-#^{ :doc "Returns html-options or nil if it is not set." }
-  html-options []
-  (:html-options request-map))
-
-(defn
 #^{ :doc "Returns name or nil if it is not set." }
   form-name []
   (:name request-map))

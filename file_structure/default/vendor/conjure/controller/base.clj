@@ -60,7 +60,7 @@
   controller-from-namespace [namespace]
   (controller-util/controller-from-namespace (name (ns-name namespace))))
 
-(defmacro defaction [action-name & body]
+(defmacro def-action [action-name & body]
   (let [attributes (first body)
         controller (controller-from-namespace *ns*)
         params { :action (str action-name), :controller controller }]

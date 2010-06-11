@@ -51,11 +51,11 @@
             (:html-options link-map) )
           (:text link-map)])]))
 
-(defview [title links]
+(def-view [title links]
   (list
     [:h3 [:span title]]
 
     [:ul { :id "links" }
-      (map #(generate-link % (request/layout-info)) links)]
+      (doall (map #(generate-link % (request/layout-info)) links))]
       
     [:hr { :class "noscreen" }]))

@@ -5,7 +5,7 @@
             [conjure.util.string-utils :as conjure-str-utils]
             [views.templates.record-view :as record-view]))
 
-(defview [model-name table-metadata record column-count]
+(def-ajax-view [model-name table-metadata record column-count]
   (let [row-id (str "row-" (:id record))]
     [:tr { :id row-id }
       [:td { :colspan column-count }

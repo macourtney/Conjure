@@ -6,7 +6,7 @@
   { :status  404
     :headers { "Content-Type" "text/html" } })
 
-(defview { :response-map response-map } []
+(def-view { :response-map response-map } []
   [:div { :class "article" }
     [:h1 "File Not Found"]
     [:p "The file you requested could not be found. Please check your url and try again."]])

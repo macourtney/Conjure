@@ -1,6 +1,7 @@
 (ns helpers.template-helper
   (:require [clj-record.core :as clj-record-core]
             [conjure.model.util :as model-util]
+            [conjure.server.request :as request]
             [conjure.util.string-utils :as string-utils]
             [views.layouts.templates.tabs :as layout-tabs]))
 
@@ -34,8 +35,9 @@
       (let [tab-controller (string-utils/str-keyword (:controller (:url-for tab-map)))]
         (if (and tab-controller (= tab-controller (:controller request-map)))
           (assoc tab-map :is-active true)
-          tab-map))) 
-    (layout-tabs/all-tabs request-map)))
+          tab-map)))
+    (request/set-request-map request-map
+      (layout-tabs/all-tabs))))
 
 (defn
 #^{ :doc "Creates a request-map from the given request map which points to the templates controller with the given 
@@ -52,8 +54,10 @@ action or the action in the given request-map" }
 
 (defmacro
   with-template-request-map [& body]
-  `(with-request-map-fn template-request-map ~@body))
+  `(request/with-request-map-fn template-request-map ~@body))
 
 (defmacro
   with-template-action-request-map [action & body]
-  `(with-request-map-fn (fn [request-map#] (template-request-map request-map# ~action)) ~@body))
+  `(request/with-request-map-fn 
+     (fn [request-map#] (template-request-map request-map# ~action))
+     ~@body))

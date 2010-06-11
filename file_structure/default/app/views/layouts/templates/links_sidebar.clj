@@ -17,7 +17,7 @@
       :url-for (view-util/merge-url-for-params layout-info { :action "add" }),
       :html-options { :id "add-action-link" } })
 
-(defview []
+(def-view []
   (let [layout-info (request/layout-info)
         links (:links layout-info)]
       (links/render-body "Actions"

@@ -2,6 +2,6 @@
   (:use conjure.binding.base
         helpers.home-helper))
 
-(defbinding []
+(def-binding []
   (with-home-request-map
     (render-view)))

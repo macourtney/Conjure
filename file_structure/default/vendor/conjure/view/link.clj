@@ -7,11 +7,15 @@
 
 (defn
 #^{ :doc "Returns the attributes for the link tag (\"a\" tag) from the request-map." }
-  a-attributes []
-  (let [html-options (or (request/html-options) {})]
+  a-attributes [params]
+  (let [html-options (or (:html-options params) {})]
     (if (:href html-options)
       html-options
-      (assoc html-options :href (view-utils/url-for)))))
+      (assoc html-options :href (view-utils/url-for params)))))
+
+(defn evaluate-if-fn-with-params [params function & fn-params]
+  (request/with-request-map-fn #(view-utils/merge-url-for-params % params)
+    (apply evaluate-if-fn function fn-params)))
 
 (defn
 #^{ :doc 
@@ -24,9 +28,7 @@ If text is a function, then it is called passing params. If link-to is called wi
 and params, text is called with request-map and params merged (not all keys used from request-map)." }
   link-to
   ([text] (link-to text {}))
-  ([text params]
-    (request/with-request-map-fn #(view-utils/merge-url-for-params % params)
-      [:a (a-attributes) (evaluate-if-fn text)])))
+  ([text params] [:a (a-attributes params) (evaluate-if-fn-with-params params text)]))
 
 (defn
 #^{:doc "If condition is true, then call link-to with the given text, request-map and params. If condition is false, 
@@ -35,10 +37,9 @@ function, it is evaluated with params merged with request-map (just like link-to
   link-to-if
   ([condition text] (link-to-if condition text {}))
   ([condition text params]
-    (request/with-request-map-fn #(view-utils/merge-url-for-params % params)
-      (if (evaluate-if-fn condition)
-        (link-to text)
-        (evaluate-if-fn text)))))
+    (if (evaluate-if-fn-with-params params condition)
+      (link-to text params)
+      (evaluate-if-fn-with-params params text))))
 
 (defn-
 #^{:doc "Inverses the results of condition. If condition is a function, then this method creates a new function which 

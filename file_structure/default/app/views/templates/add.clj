@@ -5,10 +5,10 @@
             [conjure.util.string-utils :as conjure-str-utils]
             [views.templates.record-form :as record-form]))
 
-(defview [model-name table-metadata]
+(def-view [model-name table-metadata]
   [:div { :class "article" }
     [:h2 (str "Add a " (conjure-str-utils/human-title-case model-name))]
-    (form-for request-map { :name "create", :action "create", :controller model-name }
+    (form-for { :name "create", :action "create", :controller model-name }
       (list
         (record-form/render-body table-metadata {})
         (form-button "Create")

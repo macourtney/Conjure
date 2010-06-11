@@ -48,7 +48,7 @@
   all-tabs []
   (or (:tabs (request/layout-info)) (controller-tabs)))
 
-(defview []
+(def-view []
   [:div { :id "tabs", :class "noprint" }
     [:h3 { :class "noscreen" } "Navigation"]
     [:ul { :class "box" }

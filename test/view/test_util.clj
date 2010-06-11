@@ -76,7 +76,7 @@
       { :controller "hello", :action "show", :params { :id 1 } } 
       { :action "edit", :params { :id 0 } })))
   (is (= 
-    { :controller "hello", :action "edit", :params { :id 1 } } 
+    { :controller "hello", :action "edit" } 
     (merge-url-for-params 
       { :controller "hello", :action "show", :params { :id 1 } } 
       { :action "edit" })))
@@ -90,15 +90,21 @@
   (request/set-request-map { :controller "hello", :action "show" }
     (is (= "/hello/show" (url-for))))
   (request/set-request-map { :controller "hello", :action "show", :params { :id 1 } }
-    (is (= "/hello/show/1" (url-for))))
+    (is (= "/hello/show" (url-for))))
   (request/set-request-map { :controller "hello", :action "show", :params { :id { :id 1 } } }
-    (is (= "/hello/show/1" (url-for))))
+    (is (= "/hello/show" (url-for))))
   (request/set-request-map { :controller "hello", :action "show", :anchor "message"}
-    (is (= "/hello/show/#message" (url-for))))
+    (is (= "/hello/show" (url-for))))
   (request/set-request-map { :controller "hello", :action "show", :params { :id 1 }, :anchor "message"}
-    (is (= "/hello/show/1/#message" (url-for))))
+    (is (= "/hello/show" (url-for))))
+  (request/set-request-map { :controller "hello", :action "show", :anchor "message"}
+    (is (= "/hello/show/#message" (url-for { :anchor "message" }))))
+  (request/set-request-map { :controller "hello", :action "show" }
+    (is (= "/hello/show/1/#message" (url-for { :params { :id 1 }, :anchor "message" }))))
   (request/set-request-map { :controller "hello", :action "show" }
     (is (= "/hello/show/1" (url-for { :params { :id 1 } }))))
+  (request/set-request-map { :controller "hello", :action "show" }
+    (is (= "/hello/show/1" (url-for { :params { :id { :id 1 } } }))))
   (request/set-request-map { :controller "hello", :action "add" }
     (is (= "/hello/show/1" (url-for { :action "show", :params { :id 1 } }))))
   (let [params { :controller "hello", :action "show", :params { :id 1 } }]

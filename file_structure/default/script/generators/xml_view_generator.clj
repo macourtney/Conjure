@@ -21,7 +21,7 @@ inner-content is added to the body of the xml view code."}
   (:use conjure.view.xml-base)
   (:require [clojure.contrib.prxml :as prxml]))
 
-(defxml []
+(def-xml []
   (prxml/prxml 
     " inner-content "))"))
   

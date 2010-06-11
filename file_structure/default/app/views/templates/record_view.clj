@@ -20,5 +20,5 @@
               :params { :id belongs-to-id } })])
       [:p [:strong (conjure-str-utils/human-title-case record-key-str)] ": " (helpers/h (get record record-key))])))
 
-(defview [table-metadata record]
+(def-view [table-metadata record]
   (map #(view-row record %) table-metadata))

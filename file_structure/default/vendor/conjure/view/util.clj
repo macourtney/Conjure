@@ -188,7 +188,7 @@ exist, then this method returns nil. This method is used by url-for." }
   (merge 
     (select-keys 
       request-map 
-      [:controller :action :request :params :anchor])
+      [:controller :action :request])
     params))
 
 (defn

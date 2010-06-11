@@ -2,7 +2,7 @@
   (:use clojure.contrib.test-is
         conjure.view.xml-base))
 
-(defxml []
+(def-xml []
   [:test])
 
 (deftest test-defxml

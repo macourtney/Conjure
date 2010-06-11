@@ -15,7 +15,7 @@
 (defn
 #^{ :doc "Generates the action function for the given action." }
   generate-binding-function []
-  (str "(defbinding []
+  (str "(def-binding []
   (render-view))"))
 
 (defn

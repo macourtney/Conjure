@@ -1,11 +1,11 @@
 (ns bindings.templates.show
   (:use conjure.binding.base)
-  (:require [helpers.template-helper :as template-helper]
-            [conjure.server.request :as request]))
+  (:require [conjure.server.request :as request]
+            [helpers.template-helper :as template-helper]
+            [views.templates.show :as show]))
 
-(defbinding [model-name]
-  (template-helper/with-template-action-request-map "show"
-    (render-view
-      model-name
-      (template-helper/table-metadata model-name)
-      (template-helper/get-record model-name (request/id)))))
+(def-binding [model-name]
+  (show/render-view
+    model-name
+    (template-helper/table-metadata model-name)
+    (template-helper/get-record model-name (request/id))))

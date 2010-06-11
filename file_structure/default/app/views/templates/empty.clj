@@ -2,5 +2,5 @@
   (:use conjure.view.base)
   (:require [clj-html.core :as html]))
 
-(defview []
+(def-view []
   "")

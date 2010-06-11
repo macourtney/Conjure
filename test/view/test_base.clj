@@ -5,7 +5,7 @@
   (require [com.reasonr.scriptjure :as scriptjure]
            [conjure.server.request :as request]))
 
-(defview [view-message]
+(def-view [view-message]
   view-message)
 
 (deftest test-defview

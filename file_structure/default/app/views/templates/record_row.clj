@@ -4,7 +4,7 @@
             [conjure.view.util :as view-utils]
             [views.templates.record-cell :as record-cell]))
 
-(defview [model-name table-metadata record]
+(def-view [model-name table-metadata record]
   (let [row-id (str "row-" (:id record) )]
     [:tr { :id row-id } 
       (map 
