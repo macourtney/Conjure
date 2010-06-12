@@ -1,0 +1,1 @@
+Place your plugins in this directory. Each plugin should have it's own directory.
