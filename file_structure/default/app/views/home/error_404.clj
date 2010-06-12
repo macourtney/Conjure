@@ -1,6 +1,5 @@
 (ns views.home.error-404
-  (:use conjure.view.base)
-  (:require [clj-html.core :as html]))
+  (:use conjure.view.base))
 
 (def response-map 
   { :status  404

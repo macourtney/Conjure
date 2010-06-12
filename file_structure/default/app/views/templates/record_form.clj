@@ -1,7 +1,6 @@
 (ns views.templates.record-form
   (:use conjure.view.base)
-  (:require [clj-html.core :as html]
-            [conjure.util.string-utils :as conjure-str-utils]
+  (:require [conjure.util.string-utils :as conjure-str-utils]
             [conjure.model.util :as model-util]
             [conjure.util.loading-utils :as loading-utils]))
 

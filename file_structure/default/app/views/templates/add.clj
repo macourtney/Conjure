@@ -1,8 +1,6 @@
 (ns views.templates.add
   (:use conjure.view.base)
-  (:require [clj-html.core :as html]
-            [clj-html.helpers :as helpers]
-            [conjure.util.string-utils :as conjure-str-utils]
+  (:require [conjure.util.string-utils :as conjure-str-utils]
             [views.templates.record-form :as record-form]))
 
 (def-view [model-name table-metadata]

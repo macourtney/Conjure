@@ -22,7 +22,7 @@ added to the body of the view code." }
   ([view-namespace inner-content view-params requires]
     (str "(ns " view-namespace "
   (:use conjure.view.base)
-  (:require [clj-html.core :as html]" (if requires (str "\n" requires)) "))
+  " (when requires (str "(:require " requires ")")) ")
 
 (def-view [" view-params "]
   " inner-content ")")))

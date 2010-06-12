@@ -1,7 +1,6 @@
 (ns views.layouts.templates.links-sidebar
   (:use conjure.view.base)
-  (:require [clj-html.core :as html]
-            [conjure.server.request :as request]
+  (:require [conjure.server.request :as request]
             [conjure.view.util :as view-util]
             [views.layouts.templates.links :as links]))
 

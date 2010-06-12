@@ -1,7 +1,6 @@
 (ns views.layouts.application
   (:use conjure.view.base)
-  (:require [clj-html.core :as html]
-            [com.reasonr.scriptjure :as scriptjure]
+  (:require [com.reasonr.scriptjure :as scriptjure]
             [views.layouts.templates.breadcrumbs :as breadcrumbs]
             [views.layouts.templates.header :as header]
             [views.layouts.templates.links-sidebar :as links-sidebar]

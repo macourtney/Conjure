@@ -9,7 +9,8 @@
             [conjure.view.util :as view-util]
             [environment :as environment]
             [ring.middleware.file :as ring-file]
-            [ring.middleware.stacktrace :as ring-stacktrace]))
+            [ring.middleware.stacktrace :as ring-stacktrace]
+            ))
 
 (defn
 #^{ :doc "The ring function which actually calls the conjure server and returns a properly formatted 
@@ -35,5 +36,5 @@ request map." }
   conjure [req]
   ((ring-file/wrap-file 
     (ring-stacktrace/wrap-stacktrace (wrap-response-time call-server)) 
-    (new File environment/assets-dir)) 
+    environment/assets-dir) 
     req))

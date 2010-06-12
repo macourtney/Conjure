@@ -3,6 +3,7 @@
 (in-ns 'conjure.view.base)
 
 (require ['clojure.contrib.ns-utils :as 'ns-utils])
+(require ['hiccup.core :as 'hiccup])
 
 (defn
 #^{ :doc "Returns the name of the given option. Option can be a keyword, string
@@ -59,9 +60,9 @@ option names to option-tag option maps."}
 
 (defn
   option-from-record [record name-key value-key]
-  (let [value (helpers/h (get record value-key))
+  (let [value (hiccup/h (get record value-key))
         name (get record name-key)]
-    { :name (if name (helpers/h name) value)
+    { :name (if name (hiccup/h name) value)
       :value value }))
 
 (defn
@@ -128,4 +129,4 @@ to the given value." }
   ([record record-name key-name select-options]
     (select-tag
       { :html-options (record-html-options (:html-options select-options) record-name key-name)
-        :options (options-select-value (:options select-options) (helpers/h (get record key-name))) })))
+        :options (options-select-value (:options select-options) (hiccup/h (get record key-name))) })))

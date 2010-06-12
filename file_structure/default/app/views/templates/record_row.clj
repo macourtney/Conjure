@@ -1,7 +1,6 @@
 (ns views.templates.record-row
   (:use conjure.view.base)
-  (:require [clj-html.core :as html]
-            [conjure.view.util :as view-utils]
+  (:require [conjure.view.util :as view-utils]
             [views.templates.record-cell :as record-cell]))
 
 (def-view [model-name table-metadata record]

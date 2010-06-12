@@ -1,7 +1,6 @@
 (ns views.templates.list-records
   (:use conjure.view.base)
-  (:require [clj-html.core :as html]
-            [com.reasonr.scriptjure :as scriptjure]
+  (:require [com.reasonr.scriptjure :as scriptjure]
             [conjure.util.string-utils :as conjure-str-utils]
             [views.templates.record-form :as record-form]
             [views.templates.record-row :as record-row]))

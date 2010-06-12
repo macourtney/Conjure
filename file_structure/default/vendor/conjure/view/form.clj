@@ -2,12 +2,12 @@
 
 (in-ns 'conjure.view.base)
 
-(require ['clj-html.helpers :as 'helpers])
 (require ['clojure.contrib.logging :as 'logging])
 (require ['conjure.model.util :as 'model-util])
 (require ['conjure.server.request :as 'request])
 (require ['conjure.util.map-utils :as 'map-utils])
 (require ['conjure.view.util :as 'view-utils])
+(require ['hiccup.core :as 'hiccup])
 
 (defn
 #^{:doc "Returns the name value for the given record name and key name. Note, both record-name-str and key-name-str must 
@@ -59,7 +59,7 @@ an optional option map for the html options." }
           { :type (conjure-str-utils/str-keyword input-type),
             :id (id-value record-name-str key-name-str), 
             :name (name-value record-name-str key-name-str)
-            :value (helpers/h (get record key-name)) } 
+            :value (hiccup/h (get record key-name)) } 
           html-options)]))
 
 (defn
@@ -92,7 +92,7 @@ an optional option map for the html options." }
           html-options
           { :id (id-value record-name-str key-name-str),
             :name (name-value record-name-str key-name-str) })
-        (helpers/h (get record key-name)) ])))
+        (hiccup/h (get record key-name)) ])))
 
 (defn
 #^{ :doc "Creates an input tag of type \"hidden\" for a field of name key-name in record of the given name. You can pass
@@ -126,11 +126,11 @@ nothing if a check box is not checked, therefore this function also creates a hi
   radio-button 
   ([record record-name key-name value] (radio-button record record-name key-name value {}))
   ([record record-name key-name value html-options]
-    (let [str-value (if value (helpers/h value))]
+    (let [str-value (if value (hiccup/h value))]
       (input :radio record record-name key-name 
         (merge
           (map-utils/drop-nils
-            { :value (if value (helpers/h value)), 
+            { :value (if value (hiccup/h value)), 
               :checked (if (= (get record key-name) value) "checked") })
           html-options)))))
 

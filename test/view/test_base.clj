@@ -1,6 +1,5 @@
 (ns test.view.test-base
-  (:use clj-html.core
-        clojure.contrib.test-is
+  (:use clojure.contrib.test-is
         conjure.view.base)
   (require [com.reasonr.scriptjure :as scriptjure]
            [conjure.server.request :as request]))

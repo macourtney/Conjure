@@ -1,8 +1,7 @@
 (ns views.templates.ajax-edit
   (:use conjure.view.base)
-  (:require [clj-html.core :as html]
-            [clj-html.helpers :as helpers]
-            [conjure.util.string-utils :as conjure-str-utils]
+  (:require [conjure.util.string-utils :as conjure-str-utils]
+            [hiccup.core :as hiccup]
             [views.templates.record-form :as record-form]))
 
 (def-ajax-view [model-name table-metadata record column-count]
@@ -10,7 +9,7 @@
     [:tr { :id row-id }
       [:td { :colspan column-count }
         [:div { :id (str "show-div-" (:id record)) }
-          [:h3 (or (helpers/h (:name record)) (str "Editing a " (conjure-str-utils/human-title-case model-name)))]
+          [:h3 (or (hiccup/h (:name record)) (str "Editing a " (conjure-str-utils/human-title-case model-name)))]
           (ajax-form-for
               { :name "ajax-save", 
                 :action "ajax-save",

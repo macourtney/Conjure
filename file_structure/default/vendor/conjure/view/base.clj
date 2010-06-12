@@ -1,6 +1,5 @@
 (ns conjure.view.base
-  (:use clj-html.core)
-  (:require [clj-html.core :as html]
+  (:require [hiccup.core :as hiccup]
             [clojure.contrib.str-utils :as str-utils]
             [conjure.server.request :as request]
             [conjure.util.string-utils :as conjure-str-utils]
@@ -34,7 +33,7 @@
         ~@body)
       (defn ~'render-str [~@view-params]
         (request/with-request-map-fn (update-layout-info-with ~layout-info)
-          (html/html
+          (hiccup/html
             (view-util/render-layout ~layout-name (~'render-body ~@view-params)))))
       (defn ~'render-view [~@view-params]
         (assoc ~response-map :body (~'render-str ~@view-params))))))

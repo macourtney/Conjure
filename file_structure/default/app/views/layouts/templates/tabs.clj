@@ -1,7 +1,6 @@
 (ns views.layouts.templates.tabs
   (:use conjure.view.base)
-  (:require [clj-html.core :as html]
-            [conjure.controller.util :as controller-util]
+  (:require [conjure.controller.util :as controller-util]
             [conjure.server.request :as request]
             [conjure.util.string-utils :as string-utils]
             [conjure.view.util :as view-util]))
@@ -52,5 +51,5 @@
   [:div { :id "tabs", :class "noprint" }
     [:h3 { :class "noscreen" } "Navigation"]
     [:ul { :class "box" }
-      (html/htmli (map #(generate-tab % (request/layout-info)) (all-tabs)))]
+      (map #(generate-tab % (request/layout-info)) (all-tabs))]
     [:hr { :class "noscreen" }]])

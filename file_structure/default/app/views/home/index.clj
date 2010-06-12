@@ -1,6 +1,5 @@
 (ns views.home.index
-  (:use conjure.view.base)
-  (:require [clj-html.core :as html]))
+  (:use conjure.view.base))
 
 (def-view []
   [:div { :class "article" }

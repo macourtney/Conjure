@@ -1,6 +1,5 @@
 (ns views.layouts.templates.header
-  (:use conjure.view.base)
-  (:require [clj-html.core :as html]))
+  (:use conjure.view.base))
 
 (def-view [title]
   [:div { :id "header" }

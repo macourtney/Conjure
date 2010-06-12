@@ -1,8 +1,7 @@
 (ns views.templates.record-view
   (:use conjure.view.base)
-  (:require [clj-html.core :as html]
-            [clj-html.helpers :as helpers]
-            [conjure.util.string-utils :as conjure-str-utils]))
+  (:require [conjure.util.string-utils :as conjure-str-utils]
+            [hiccup.core :as hiccup]))
 
 (defn
 #^{ :doc "Creates a view row for the table column in the given record." }
@@ -12,13 +11,13 @@
     (if (. record-key-str endsWith "_id")
       (let [belongs-to-model (conjure-str-utils/strip-ending record-key-str "_id")
             field-name (conjure-str-utils/human-title-case belongs-to-model)
-            belongs-to-id (helpers/h (get record record-key))]
+            belongs-to-id (hiccup/h (get record record-key))]
         [:p [:strong field-name] ": " 
           (link-to belongs-to-id
             { :controller belongs-to-model, 
               :action "show", 
               :params { :id belongs-to-id } })])
-      [:p [:strong (conjure-str-utils/human-title-case record-key-str)] ": " (helpers/h (get record record-key))])))
+      [:p [:strong (conjure-str-utils/human-title-case record-key-str)] ": " (hiccup/h (get record record-key))])))
 
 (def-view [table-metadata record]
   (map #(view-row record %) table-metadata))
