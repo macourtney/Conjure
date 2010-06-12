@@ -51,5 +51,5 @@
   [:div { :id "tabs", :class "noprint" }
     [:h3 { :class "noscreen" } "Navigation"]
     [:ul { :class "box" }
-      (map #(generate-tab % (request/layout-info)) (all-tabs))]
+      (doall (map #(generate-tab % (request/layout-info)) (all-tabs)))]
     [:hr { :class "noscreen" }]])
