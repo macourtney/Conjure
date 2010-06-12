@@ -1,5 +1,6 @@
 (ns flavors.mysql
-  (:import [com.mysql.jdbc.jdbc2.optional MysqlDataSource])
+  (:import [com.mysql.jdbc.jdbc2.optional MysqlDataSource]
+           java.text.SimpleDateFormat)
   (:require [clojure.contrib.logging :as logging]
             [clojure.contrib.str-utils :as str-utils]
             [clojure.contrib.sql :as sql]
@@ -53,10 +54,15 @@
         (doall rows)))))
   
 (defn
+#^{:doc "Returns the given string surrounded by backquotes."}
+  backquote [s]
+  (str "`" s "`"))
+  
+(defn
 #^{:doc "Returns the given key or string as valid table name. Basically turns 
 any keyword into a string, and replaces dashes with underscores."}
   table-name [table]
-  (conjure-loading-utils/dashes-to-underscores (conjure-string-utils/str-keyword table)))
+  (backquote (conjure-loading-utils/dashes-to-underscores (conjure-string-utils/str-keyword table))))
   
 (defn
 #^{:doc "Runs an update given the table, where-params and a record.
@@ -129,7 +135,7 @@ any keyword into a string, and replaces dashes with underscores."}
 #^{:doc "Returns the given key or string as valid column name. Basically turns 
 any keyword into a string, and replaces dashes with underscores."}
   column-name [column]
-  (conjure-loading-utils/dashes-to-underscores (conjure-string-utils/str-keyword column)))
+  (backquote (conjure-loading-utils/dashes-to-underscores (conjure-string-utils/str-keyword column))))
 
 (defn
 #^{:doc "Returns a new spec describing an integer with the given column and spec mods map. Use this method with the 
