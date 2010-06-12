@@ -8,7 +8,7 @@
     [:tr { :id row-id } 
       (map 
         #(record-cell/render-body model-name record %) 
-        (map #(keyword (. (get % :column_name) toLowerCase)) table-metadata))
+        (map #(keyword (. (get % :field) toLowerCase)) table-metadata))
       [:td 
         (ajax-link-to "Delete"
           { :update (success-fn row-id :remove)

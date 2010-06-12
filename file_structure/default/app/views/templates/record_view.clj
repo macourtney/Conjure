@@ -6,7 +6,7 @@
 (defn
 #^{ :doc "Creates a view row for the table column in the given record." }
   view-row [record table-column]
-  (let [record-key-str (. (:column_name table-column) toLowerCase)
+  (let [record-key-str (. (:field table-column) toLowerCase)
         record-key (keyword record-key-str)]
     (if (. record-key-str endsWith "_id")
       (let [belongs-to-model (conjure-str-utils/strip-ending record-key-str "_id")

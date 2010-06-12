@@ -10,7 +10,7 @@
   header-name [table-column]
   [:th (conjure-str-utils/human-title-case 
     (conjure-str-utils/strip-ending 
-      (. (:column_name table-column) toLowerCase) 
+      (. (:field table-column) toLowerCase) 
       "_id"))])
 
 (def-view [model-name table-metadata records]

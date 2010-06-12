@@ -19,7 +19,7 @@
 (defn
 #^{ :doc "Creates the form row for the table column in the given record." }
   form-row [record table-column]
-  (let [field-name (.toLowerCase (:column_name table-column))]
+  (let [field-name (.toLowerCase (:field table-column))]
     (if (not (= field-name "id")) 
       [:p [:strong (conjure-str-utils/human-title-case field-name)] ": " (editor record field-name)])))
 
