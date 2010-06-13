@@ -1,5 +1,7 @@
 (ns conjure.view.util
-  (:require [conjure.server.request :as request]
+  (:require [config.environment :as environment]
+            [config.session-config :as session-config]
+            [conjure.server.request :as request]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.html-utils :as html-utils]
             [conjure.util.loading-utils :as loading-utils]
@@ -8,20 +10,18 @@
             [clojure.contrib.logging :as logging]
             [clojure.contrib.ns-utils :as ns-utils]
             [clojure.contrib.seq-utils :as seq-utils]
-            [clojure.contrib.str-utils :as str-utils]
-            [conjure.config.environment :as environment]
-            [conjure.config.session-config :as session-config]))
+            [clojure.contrib.str-utils :as str-utils]))
+            
+(def views-dir "views")
 
 (def loaded-views (atom {}))
 
 (defn 
 #^{ :doc "Finds the views directory which contains all of the files which describe the html pages of the app." }
   find-views-directory []
-  (seq-utils/find-first 
-    (fn [directory]
-      (.endsWith (.getPath directory) "views"))
-    (let [app-dir (loading-utils/get-classpath-dir-ending-with "app")]
-      (if app-dir (file-seq app-dir) '()))))
+  (file-utils/find-directory 
+    (loading-utils/get-classpath-dir-ending-with environment/source-dir)
+    views-dir))
 
 (defn
 #^{ :doc "Returns all of the view files in all of the directories in the view directory." }
@@ -114,7 +114,7 @@
 (defn
   #^{ :doc "Calls the render function with the given symbol in the view for the request-map." }
   render-by-symbol [symbol-name & params]
-  (when (or (environment/reload-files?) (not (view-loaded?)))
+  (when (or environment/reload-files (not (view-loaded?)))
     (load-view))
   (apply
     (ns-resolve (get-view-ns) symbol-name) params))
@@ -231,7 +231,7 @@ exist, then this method returns nil. This method is used by url-for." }
                      (request/id-str)
                      (anchor)]))
               (let [new-session-id 
-                      (if (not (session-config/use-session-cookie?)) (or session-id (session-utils/create-session-id)))
+                      (if (not session-config/use-session-cookie) (or session-id (session-utils/create-session-id)))
                     new-url-params 
                       (if new-session-id (assoc url-params :session-id new-session-id) url-params)]
                 (if (seq new-url-params)

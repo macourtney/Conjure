@@ -2,23 +2,16 @@
   (:use test-helper
         clojure.contrib.test-is
         conjure.migration.runner)
-  (:require [conjure.migration.util :as util]
-            ;[generators.migration-generator :as migration-generator]
-            ;[destroyers.migration-destroyer :as migration-destroyer]
-            ))
+  (:require [conjure.migration.util :as util]))
 
-(def first-migration "create-test")
-(def second-migration "alter-test")
+(def first-migration "create-tests")
+(def second-migration "tests-update")
 
-(defn setup-all [function]
-  ;(migration-generator/generate-migration-file first-migration "" "")
-  ;(migration-generator/generate-migration-file second-migration "" "")
-  (function)
-  ;(migration-destroyer/destroy-all-dependencies second-migration)
-  ;(migration-destroyer/destroy-all-dependencies first-migration)
-  )
-        
-(use-fixtures :once setup-all)
+(defn reset-db [test-fn]
+  (init-server test-fn)
+  (migrate-down-all))
+
+(use-fixtures :once reset-db)
 
 (deftest test-current-db-version
   (is (= 0 (current-db-version))))

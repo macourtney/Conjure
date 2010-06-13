@@ -1,30 +1,24 @@
 (ns conjure.migration.test-util
   (:import [java.io File])
   (:use clojure.contrib.test-is
-        conjure.migration.util)
-  ;(:require [generators.migration-generator :as migration-generator]
-  ;          [destroyers.migration-destroyer :as migration-destroyer])
-  )
-        
-(def migration-name "create-test")
-        
-(defn setup-all [function]
-  ;(migration-generator/generate-migration-file migration-name)
-  (function)
-  ;(migration-destroyer/destroy-all-dependencies migration-name)
-  )
-        
-(use-fixtures :once setup-all)
+        conjure.migration.util
+        test-helper))
+
+(def migration-name "create-tests")
+
+(use-fixtures :once init-server)
         
 (deftest test-find-db-directory
   (let [db-directory (find-db-directory)]
     (is (not (nil? db-directory)))
-    (is (= "db" (. db-directory getName)))))
+    (when db-directory
+      (is (= "db" (.getName db-directory))))))
     
 (deftest test-find-migrate-directory
   (let [migrate-directory (find-migrate-directory)]
     (is (not (nil? migrate-directory)))
-    (is (= "migrate" (. migrate-directory getName)))))
+    (when migrate-directory
+      (is (= "migrate" (.getName migrate-directory))))))
     
 (deftest test-all-migration-files
   (let [all-migrations (all-migration-files (find-migrate-directory))]
@@ -74,16 +68,17 @@
   
 (deftest test-max-migration-number
   (let [max-number (max-migration-number (find-migrate-directory))]
-    (is (= max-number 1)))
+    (is (= max-number 2)))
   (let [max-number (max-migration-number)]
-    (is (= max-number 1)))
+    (is (= max-number 2)))
   (is (nil? (max-migration-number nil))))
   
 (deftest test-find-next-migrate-number
-  (let [next-number (find-next-migrate-number (find-migrate-directory))]
-    (is (= next-number 2)))
-  (let [next-number (find-next-migrate-number)]
-    (is (= next-number 2)))
+  (let [current-number (max-migration-number (find-migrate-directory))]
+    (let [next-number (find-next-migrate-number (find-migrate-directory))]
+      (is (= next-number (inc current-number))))
+    (let [next-number (find-next-migrate-number)]
+      (is (= next-number (inc current-number)))))
   (is (nil? (find-next-migrate-number nil))))
   
 (deftest test-find-migration-file
@@ -98,7 +93,7 @@
 (deftest test-migration-namespace
   (let [migration-ns (migration-namespace (find-migration-file migration-name))]
     (is (not (nil? migration-ns)))
-    (is (= (str "migrate.001-" migration-name) migration-ns)))
+    (is (= (str "db.migrate.001-" migration-name) migration-ns)))
   (is (nil? (migration-namespace nil))))
   
 (deftest test-migration-number-before

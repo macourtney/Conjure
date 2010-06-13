@@ -1,5 +1,6 @@
 (ns conjure.model.database
-  (:require [conjure.config.db-config :as db-config]
+  (:require [clojure.contrib.logging :as logging]
+            [config.db-config :as db-config]
             [conjure.util.string-utils :as string-utils]))
 
 (def conjure-db (ref nil))
@@ -28,13 +29,22 @@ that key in the db-flavor"}
   ([] (:flavor (ensure-conjure-db)))
   ([flavor-key] (get (db-flavor) flavor-key)))
 
+(defn
+  call-db-fn 
+  ([flavor-key db args] (call-db-fn flavor-key (cons db args)))
+  ([flavor-key args]
+    (let [db-flavor-fn (db-flavor flavor-key)]
+      (if db-flavor-fn
+        (apply db-flavor-fn args)
+        (logging/error (str "Could not find flavor function: " flavor-key))))))
+
 (defmacro
 #^{:doc "Given the type-key of a function in the database flavor, define a function named type-key which calls the 
 database flavor function with the current db spec and any arguments"}
   def-db-fn [type-key]
   (let [spec-name (string-utils/str-keyword type-key)]
     `(defn ~(symbol spec-name)
-      ([& args#] (apply (db-flavor ~type-key) db args#)))))
+      ([& args#] (call-db-fn ~type-key db args#)))))
     
 (def-db-fn :table-exists?)
 
@@ -56,7 +66,7 @@ database flavor function passing any arguments."}
   def-column-spec [type-key]
   (let [spec-name (string-utils/str-keyword type-key)]
     `(defn ~(symbol spec-name)
-      ([& args#] (apply (db-flavor ~type-key) args#)))))
+      ([& args#] (call-db-fn ~type-key args#)))))
 
 (def-column-spec :integer)
 
@@ -80,7 +90,7 @@ database flavor function passing any arguments."}
   def-db-forward [type-key]
   (let [spec-name (string-utils/str-keyword type-key)]
     `(defn ~(symbol spec-name)
-      ([& args#] (apply (db-flavor ~type-key) args#)))))
+      ([& args#] (call-db-fn ~type-key args#)))))
 
 (def-db-forward :format-date)
 

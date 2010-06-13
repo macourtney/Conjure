@@ -4,6 +4,7 @@
             [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.str-utils :as str-utils]
             [clojure.contrib.test-is :as test-is]
+            [config.environment :as environment]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.loading-utils :as loading-utils]))
 
@@ -14,8 +15,9 @@
 (defn 
 #^{ :doc "Finds the plugins directory." }
   find-plugins-directory []
-  (seq-utils/find-first (fn [directory] (.. directory (getPath) (endsWith plugins-dir)))
-    (file-seq (loading-utils/get-classpath-dir-ending-with "vendor"))))
+  (file-utils/find-directory 
+    (loading-utils/get-classpath-dir-ending-with environment/source-dir)
+    plugins-dir))
 
 (defn
 #^{ :doc "Returns the namespace string for the plugin.clj file for the plugin with the given name." }
@@ -36,7 +38,10 @@ returns nil." }
 (defn
 #^{ :doc "Returns the plugin name from the given plugin namespace." }
   plugin-name-from-namespace [plugin-namespace]
-  (second (str-utils/re-split #"\." plugin-namespace)))
+  (when plugin-namespace
+    (if (string? plugin-namespace)
+      (second (str-utils/re-split #"\." plugin-namespace))
+      (plugin-name-from-namespace (name (ns-name plugin-namespace))))))
 
 (defn
   #^{ :doc "Returns the install function for the plugin with the given name or nil if the install function could not be
@@ -67,10 +72,21 @@ be found." }
   (File. (find-plugins-directory) (loading-utils/dashes-to-underscores plugin-name)))
 
 (defn
+  is-plugin-namespace? [namespace]
+  (when namespace
+    (if (string? namespace)
+      (and (.startsWith namespace (str plugins-dir ".")) (.endsWith namespace ".plugin"))
+      (is-plugin-namespace? (name (ns-name namespace))))))
+
+(defn
+#^{ :doc "Returns a sequence of all model namespaces." }
+  all-plugin-namespaces []
+  (filter is-plugin-namespace? (all-ns)))
+
+(defn
 #^{ :doc "Returns a list of all plugins in the app." }
   all-plugins []
-  (map #(loading-utils/underscores-to-dashes (.getName %1))
-    (filter #(.isDirectory %1) (.listFiles (find-plugins-directory)))))
+  (map plugin-name-from-namespace (all-plugin-namespaces)))
 
 (defn
 #^{ :doc "Returns a sequence of all of the initialize functions for all plugins in the app." }

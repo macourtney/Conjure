@@ -1,14 +1,19 @@
 (ns conjure.helper.util
   (:import [java.io File])
   (:require [clojure.contrib.str-utils :as contrib-str-utils]
+            [config.environment :as environment]
+            [conjure.util.file-utils :as file-utils]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.string-utils :as conjure-str-utils]))
 
+(def helpers-dir "helpers")
 
 (defn 
 #^{ :doc "Finds the models directory." }
   find-helpers-directory []
-  (new File (loading-utils/get-classpath-dir-ending-with "app") "helpers"))
+  (file-utils/find-directory 
+    (loading-utils/get-classpath-dir-ending-with environment/source-dir)
+    helpers-dir))
 
 (defn
 #^{ :doc "Returns all of the model files in the models directory." }

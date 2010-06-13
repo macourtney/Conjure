@@ -5,7 +5,7 @@
         conjure.util.loading-utils)
   (:require [clojure.contrib.logging :as logging]
             [conjure.util.file-utils :as file-utils]
-            ;[controllers.home-controller :as home-controller]
+            [controllers.home-controller :as home-controller]
             [clojure.contrib.ns-utils :as ns-utils]))
         
 (deftest test-system-class-loader
@@ -79,7 +79,7 @@
   (is (= (dots-to-slashes nil) nil)))
   
 (deftest test-clj-file?
-  (is (clj-file? (new File (file-utils/user-directory) "app/controllers/home_controller.clj")))
+  (is (clj-file? (new File (file-utils/user-directory) "test/controllers/home_controller.clj")))
   (is (not (clj-file? (new File "test.txt"))))
   (is (not (clj-file? (new File "test/")))))
 

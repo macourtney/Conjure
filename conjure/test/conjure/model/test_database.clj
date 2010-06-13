@@ -4,6 +4,8 @@
         conjure.model.database)
   (:require [conjure.model.util :as util]))
 
+(use-fixtures :once init-server)
+
 (def test-table "test_table")
 
 (deftest test-db-flavor

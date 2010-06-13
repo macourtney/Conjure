@@ -1,16 +1,16 @@
 (ns conjure.server.ring-adapter
   (:import [java.io File]
            [java.util Date])
-  (:require [clojure.contrib.logging :as logging]
+  (:require [config.environment :as environment]
+            [clojure.contrib.logging :as logging]
             [conjure.controller.util :as controller-util]
             [conjure.helper.util :as helper-util]
             [conjure.model.util :as model-util]
             [conjure.server.server :as server]
+            [conjure.util.file-utils :as file-utils]
             [conjure.view.util :as view-util]
-            [conjure.config.environment :as environment]
             [ring.middleware.file :as ring-file]
-            [ring.middleware.stacktrace :as ring-stacktrace]
-            ))
+            [ring.middleware.stacktrace :as ring-stacktrace]))
 
 (defn
 #^{ :doc "The ring function which actually calls the conjure server and returns a properly formatted 
@@ -36,5 +36,5 @@ request map." }
   conjure [req]
   ((ring-file/wrap-file 
     (ring-stacktrace/wrap-stacktrace (wrap-response-time call-server)) 
-    (environment/assets-dir))
+    (.getPath (File. (file-utils/user-directory) environment/assets-dir)))
     req))

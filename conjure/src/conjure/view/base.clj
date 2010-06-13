@@ -1,11 +1,11 @@
 (ns conjure.view.base
-  (:require [hiccup.core :as hiccup]
+  (:require [config.environment :as environment]
+            [hiccup.core :as hiccup]
             [clojure.contrib.str-utils :as str-utils]
             [conjure.server.request :as request]
             [conjure.util.string-utils :as conjure-str-utils]
             [conjure.util.html-utils :as html-utils]
-            [conjure.view.util :as view-util]
-            [conjure.config.environment :as environment]))
+            [conjure.view.util :as view-util]))
 
 (defn default-response-map []
   { :status  200
@@ -83,7 +83,7 @@ function." }
 (defn
 #^{ :doc "Returns the full path to the given image source." }
   image-path [source]
-  (compute-public-path source (environment/images-dir)))
+  (compute-public-path source environment/images-dir))
   
 (defn
 #^{ :doc "Returns an image tag for the given source and with the given options." }
@@ -94,7 +94,7 @@ function." }
 (defn
 #^{ :doc "Returns the full path to the given stylesheet source." }
   stylesheet-path [source]
-  (compute-public-path source (environment/stylesheets-dir) "css"))
+  (compute-public-path source environment/stylesheets-dir "css"))
 
 (defn-
 #^{ :doc "Returns the type of the first parameter." }
@@ -124,7 +124,7 @@ function." }
 (defn
 #^{ :doc "Returns the full path to the given javascript source." }
   javascript-path [source]
-    (compute-public-path source (environment/javascripts-dir) "js"))
+    (compute-public-path source environment/javascripts-dir "js"))
 
 (defmulti
 #^{ :doc "Returns a javascript include tag for the given source and with the given options." }
@@ -149,14 +149,14 @@ function." }
   jquery-include-tag
   ([] (jquery-include-tag {}))
   ([html-options]
-    (javascript-include-tag (environment/jquery) html-options)))
+    (javascript-include-tag environment/jquery html-options)))
     
 (defn
 #^{ :doc "Returns a jquery javascript include tag with the optional given options." } 
   conjure-js-include-tag
   ([] (conjure-js-include-tag {}))
   ([html-options]
-    (javascript-include-tag (environment/conjure-js) html-options)))
+    (javascript-include-tag environment/conjure-js html-options)))
 
 (defn
 #^{ :doc "Returns a mailto link with the given mail options. Valid mail options are:

@@ -1,26 +1,15 @@
 (ns conjure.controller.test-util
   (:import [java.io File])
   (:use clojure.contrib.test-is
-        conjure.controller.util)
+        conjure.controller.util
+        test-helper)
   (:require [clojure.contrib.logging :as logging]
-            [conjure.server.request :as request]
-            ;[destroyers.controller-destroyer :as controller-destroyer]
-            ;[generators.controller-generator :as controller-generator]
-            ))
+            [conjure.server.request :as request]))
 
 (def controller-name "test")
-(def action-name "blah")
+(def action-name "show")
 
-(defn setup-all [function]
-  (let [generator-map { :controller controller-name, :actions [action-name], :silent true }]
-    ;(controller-generator/generate-controller-file generator-map)
-    ;(load-controller controller-name)
-    (function)
-    ;(controller-destroyer/destroy-all-dependencies generator-map)
-    ;(reset! action-interceptors {})
-    ))
-        
-(use-fixtures :once setup-all)
+(use-fixtures :once init-server)
   
 (deftest test-find-controllers-directory
   (let [controllers-directory (find-controllers-directory)]

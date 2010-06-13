@@ -2,10 +2,10 @@
   (:import [java.io File])
   (:require [clojure.contrib.logging :as logging]
             [clojure.contrib.str-utils :as str-utils]
+            [config.environment :as environment]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.loading-utils :as loading-utils]
-            [conjure.util.string-utils :as conjure-str-utils]
-            [conjure.config.environment :as environment]))
+            [conjure.util.string-utils :as conjure-str-utils]))
 
 (def bindings-dir "bindings")
 (def bindings-namespace bindings-dir)
@@ -14,8 +14,10 @@
 
 (defn 
 #^{ :doc "Finds the bindings directory." }
-  find-bindings-directory [] 
-  (new File (loading-utils/get-classpath-dir-ending-with "app") bindings-dir))
+  find-bindings-directory []
+  (file-utils/find-directory 
+    (loading-utils/get-classpath-dir-ending-with environment/source-dir)
+    bindings-dir))
   
 (defn 
 #^{ :doc "Finds the controller directory." }
@@ -131,7 +133,7 @@ otherwise nil is returned." }
   call-binding [controller action params]
   (let [controller-str (conjure-str-utils/str-keyword controller)
         action-str (conjure-str-utils/str-keyword action)]
-    (if (environment/reload-files?)
+    (if environment/reload-files
       (do 
         (load-binding controller-str action-str)
         (run-binding controller-str action-str params))

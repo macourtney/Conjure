@@ -1,10 +1,13 @@
 (ns conjure.model.util
-  (:require [clojure.contrib.seq-utils :as seq-utils]
+  (:require [clj-record.util :as clj-record-util]
+            [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.str-utils :as contrib-str-utils]
+            [config.environment :as environment]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.file-utils :as file-utils]
-            [conjure.util.string-utils :as string-utils]
-            [clj-record.util :as clj-record-util]))
+            [conjure.util.string-utils :as string-utils]))
+
+(def models-dir "models")
 
 (defn
 #^{ :doc "Returns the model name for the given model file." }
@@ -31,11 +34,9 @@
 (defn 
 #^{ :doc "Finds the models directory." }
   find-models-directory []
-  (seq-utils/find-first 
-    (fn [directory]
-      (when directory 
-        (.endsWith (.getPath directory) "models")))
-    (file-seq (loading-utils/get-classpath-dir-ending-with "app"))))
+  (file-utils/find-directory 
+    (loading-utils/get-classpath-dir-ending-with environment/source-dir)
+    models-dir))
 
 (comment  
   (defn
@@ -51,9 +52,16 @@
 )
 
 (defn
+  model-namespace? [namespace]
+  (when namespace
+    (if (string? namespace)
+      (.startsWith namespace (str models-dir "."))
+      (model-namespace? (name (ns-name namespace))))))
+
+(defn
 #^{ :doc "Returns a sequence of all model namespaces." }
   all-model-namespaces []
-  (filter #(.startsWith (name %) "model.") (all-ns)))
+  (filter model-namespace? (all-ns)))
 
 (defn
 #^{ :doc "Returns the model file name for the given model name." }

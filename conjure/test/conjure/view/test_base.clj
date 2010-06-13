@@ -2,7 +2,7 @@
   (:use clojure.contrib.test-is
         conjure.view.base)
   (require [com.reasonr.scriptjure :as scriptjure]
-           [conjure.config.environment :as environment]
+           [config.environment :as environment]
            [conjure.server.request :as request]))
 
 (def-view [view-message]
@@ -309,7 +309,7 @@
     
 (deftest test-jquery-include-tag
   (is (= 
-    [:script { :src (str "/javascripts/" (environment/jquery)), :type "text/javascript" } ""]
+    [:script { :src (str "/javascripts/" environment/jquery), :type "text/javascript" } ""]
     (jquery-include-tag))))
 
 (deftest test-mail-to

@@ -2,8 +2,11 @@
   (:use test-helper
         clojure.contrib.test-is
         conjure.model.session-store)
-  (:require [conjure.util.session-utils :as session-utils]
+  (:require [conjure.model.database :as database]
+            [conjure.util.session-utils :as session-utils]
             [conjure.server.request :as request]))
+  
+(use-fixtures :once init-server)
 
 (def test-session-id "blah")
 

@@ -1,18 +1,17 @@
 (ns conjure.server.server
   (:import [java.util Date])
-  (:require [clojure.contrib.java-utils :as java-utils]
+  (:require [config.environment :as environment]
+            [config.http-config :as http-config]
+            [config.routes :as routes]
+            [config.session-config :as session-config]
+            [clojure.contrib.java-utils :as java-utils]
             [clojure.contrib.logging :as logging]
             [conjure.controller.util :as controller-util]
-            ;[controllers.app :as app] ; Not actually used, but needs to be loaded in order to load app interceptors.
             [conjure.model.database :as database]
             [conjure.plugin.util :as plugin-util]
             [conjure.server.request :as request]
             [conjure.util.session-utils :as session-utils]
-            [conjure.util.string-utils :as conjure-str-utils]
-            [conjure.config.environment :as environment]
-            [conjure.config.http-config :as http-config]
-            [conjure.config.routes :as routes]
-            [conjure.config.session-config :as session-config]))
+            [conjure.util.string-utils :as conjure-str-utils]))
 
 (def initialized? (ref false))
 
@@ -26,7 +25,7 @@
       (environment/init)
       (logging/info "Initializing server...")
       (database/ensure-conjure-db)
-      ((:init (session-config/session-store)))
+      ((:init session-config/session-store))
       (logging/info "Server Initialized.")
       (logging/info "Initializing plugins...")
       (plugin-util/initialize-all-plugins)
@@ -41,7 +40,7 @@
 (defn 
 #^{ :doc "Manages the session cookie in the response map." }
   manage-session [response-map]
-  (if (session-config/use-session-cookie?)
+  (if session-config/use-session-cookie
     (session-utils/manage-session response-map)
     response-map))
 
@@ -91,4 +90,4 @@ production, or test." }
   set-mode [mode]
   (if mode 
     (java-utils/set-system-properties 
-      { (environment/conjure-environment-property) (conjure-str-utils/str-keyword mode) })))
+      { environment/conjure-environment-property (conjure-str-utils/str-keyword mode) })))

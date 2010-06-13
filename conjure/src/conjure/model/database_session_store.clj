@@ -12,7 +12,7 @@
 (defn
 #^{ :doc "Makes sure the session table exists in the database. If it doesn't exist, then this method creates it." }
   init []
-  (if (not (database/table-exists? session-table))
+  (when (not (database/table-exists? session-table))
     (database/create-table session-table
       (database/id)
       (database/date-time created-at-column)
@@ -49,10 +49,10 @@ in the database." }
   retrieve 
   ([] (retrieve (session-utils/session-id)))
   ([session-id]
-    (when-let [ row-values (database/sql-find 
-          { :table session-table, 
-            :select (conjure-str-utils/str-keyword data-column), 
-            :where (str (conjure-str-utils/str-keyword session-id-column) " = '" session-id "'")  })]
+    (when-let [row-values (database/sql-find 
+                            { :table (conjure-str-utils/str-keyword session-table), 
+                              :select (conjure-str-utils/str-keyword data-column), 
+                              :where (str (conjure-str-utils/str-keyword session-id-column) " = '" session-id "'")  })]
       (when-let [data (get (first row-values) data-column)]
         (read-string data)))))
 
@@ -65,8 +65,8 @@ in the database." }
 
 (defn
 #^{ :doc "Stores the given value in the session from the request-map." }
-  save [key-name value] 
-  (let [ stored-map (retrieve)]
+  save [key-name value]
+  (let [stored-map (retrieve)]
     (if stored-map
       (save-map (assoc stored-map key-name value))
       (create-session key-name value))))

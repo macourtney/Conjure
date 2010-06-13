@@ -2,10 +2,13 @@
   (:use test-helper
         clojure.contrib.test-is
         conjure.view.builder)
-  (:require [conjure.view.util :as util]))
+  (:require [conjure.view.util :as util]
+            [conjure.util.loading-utils :as loading-utils]))
 
-(def controller "test")
+(def controller "test-builder")
 (def action "show")
+
+(def controller-dir (loading-utils/dashes-to-underscores controller))
 
 (deftest test-find-or-create-controller-directory
   (let [controller-directory 
@@ -13,13 +16,13 @@
           { :views-directory (util/find-views-directory),
             :controller controller,
             :silent true })]
-    (test-directory controller-directory controller)
+    (test-directory controller-directory controller-dir)
     (is (and controller-directory (.delete controller-directory))))
   (let [controller-directory 
          (find-or-create-controller-directory 
          { :controller controller,
            :silent true })]
-    (test-directory controller-directory controller)
+    (test-directory controller-directory controller-dir)
     (is (and controller-directory (.delete controller-directory))))
   (is (nil? (find-or-create-controller-directory 
               { :controller nil

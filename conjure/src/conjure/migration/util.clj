@@ -1,7 +1,11 @@
 (ns conjure.migration.util
   (:require [clojure.contrib.seq-utils :as seq-utils]
+            [config.environment :as environment]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.file-utils :as file-utils]))
+
+(def db-dir "db")
+(def migrate-dir "migrate")
 
 (def schema-info-table "schema_info")
 (def version-column :version)
@@ -9,12 +13,14 @@
 (defn 
 #^{:doc "Finds the db directory which contains all of the files for updating the schema for the database."}
   find-db-directory []
-  (loading-utils/get-classpath-dir-ending-with "db"))
+  (file-utils/find-directory 
+    (loading-utils/get-classpath-dir-ending-with environment/source-dir)
+    db-dir))
 
 (defn
 #^{:doc "Finds the migrate directory."}
   find-migrate-directory []
-  (file-utils/find-directory (find-db-directory) "migrate"))
+  (file-utils/find-directory (find-db-directory) migrate-dir))
   
 (defn 
 #^{:doc "Returns all of the migration files as a collection."}
@@ -85,7 +91,7 @@
   ([] (find-next-migrate-number (find-migrate-directory))) 
   ([migrate-directory]
     (if migrate-directory
-      (+ (max-migration-number migrate-directory) 1))))
+      (inc (max-migration-number migrate-directory)))))
   
 (defn
 #^{:doc "The migration file with the given migration name."}
@@ -104,7 +110,7 @@
 #^{:doc "Returns the migration namespace for the given migration file."}
   migration-namespace [migration-file]
   (if migration-file
-    (loading-utils/namespace-string-for-file "migrate" (. migration-file getName))))
+    (loading-utils/namespace-string-for-file "db.migrate" (. migration-file getName))))
   
 (defn
 #^{:doc "Finds the number of the migration file before the given number"}

@@ -19,9 +19,10 @@
 
 (deftest test-find-plugins-directory
   (let [plugins-directory (find-plugins-directory)]
-    (is (not (nil? plugins-directory)))
+    (is plugins-directory)
     (is (instance? File plugins-directory))
-    (is (.exists plugins-directory))))
+    (when plugins-directory
+      (is (.exists plugins-directory)))))
 
 (deftest test-plugin-namespace-name
   (is (plugin-namespace-name "test"))

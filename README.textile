@@ -19,6 +19,7 @@ Conjure was created by "Matthew Courtney":http://github.com/macourtney, with spe
 
 * "Robert Postill":http://github.com/robertpostill
 * "Stuart Halloway":http://github.com/stuarthalloway
+* "Jimm":http://github.com/jimm
 
 Conjure default web design by "Nuvio":http://www.nuvio.cz/
 

@@ -28,7 +28,8 @@
   (let [models-dirctory (find-models-directory)]
     (is (not (nil? models-dirctory)))
     (is (instance? File models-dirctory))
-    (is (= "models" (. models-dirctory getName)))))
+    (when models-dirctory
+      (is (= "models" (.getName models-dirctory))))))
 
 (comment
   (deftest test-model-files

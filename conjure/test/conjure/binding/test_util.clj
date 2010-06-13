@@ -1,25 +1,16 @@
 (ns conjure.binding.test-util
   (:import [java.io File])
   (:use clojure.contrib.test-is
-        conjure.binding.util)
+        conjure.binding.util
+        test-helper)
   (:require [clojure.contrib.logging :as logging]
-            [conjure.server.request :as request]
-            ;[destroyers.binding-destroyer :as binding-destroyer]
-            ;[generators.binding-generator :as binding-generator]
-            ))
+            [conjure.server.request :as request]))
 
 (def controller-name "test")
-(def action-name "blah")
+(def action-name "show")
 (def request-map { :controller controller-name, :action action-name })
 
-(defn setup-all [function]
-  ;(binding-generator/generate-binding-file { :controller controller-name, :action action-name, :silent true })
-  ;(load-binding controller-name action-name)
-  (function)
-  ;(binding-destroyer/destroy-all-dependencies controller-name action-name true)
-  )
-        
-(use-fixtures :once setup-all)
+(use-fixtures :once init-server)
   
 (deftest test-find-bindings-directory
   (let [bindings-directory (find-bindings-directory)]
@@ -29,7 +20,7 @@
 (deftest test-binding-file-name-string
   (let [binding-file-name (binding-file-name-string action-name)]
     (is (not (nil? binding-file-name)))
-    (is (= "blah.clj" binding-file-name)))
+    (is (= (str action-name ".clj") binding-file-name)))
   (let [binding-file-name (binding-file-name-string "test-name")]
     (is (not (nil? binding-file-name)))
     (is (= "test_name.clj" binding-file-name)))
@@ -39,13 +30,13 @@
 (deftest test-binding-namespace
   (let [binding-ns (binding-namespace controller-name action-name)]
     (is (not (nil? binding-ns)))
-    (is (= "bindings.test.blah" binding-ns)))
+    (is (= (str "bindings." controller-name "." action-name) binding-ns)))
   (let [binding-ns (binding-namespace "test-name" action-name)]
     (is (not (nil? binding-ns)))
-    (is (= "bindings.test-name.blah" binding-ns)))
+    (is (= (str "bindings.test-name." action-name) binding-ns)))
   (let [binding-ns (binding-namespace controller-name "test_name")]
     (is (not (nil? binding-ns)))
-    (is (= "bindings.test.test-name" binding-ns)))
+    (is (= (str "bindings." controller-name ".test-name") binding-ns)))
   (is (nil? (binding-namespace nil action-name)))
   (is (nil? (binding-namespace controller-name nil))))
 

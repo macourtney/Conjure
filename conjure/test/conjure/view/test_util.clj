@@ -4,20 +4,14 @@
         clojure.contrib.test-is
         conjure.view.util)
   (:require [clojure.contrib.logging :as logging]
-            [conjure.config.session-config :as session-config]
-            [conjure.server.request :as request]
-            ;[destroyers.view-destroyer :as view-destroyer]
-            ;[generators.view-generator :as view-generator]
-            ))
+            [config.session-config :as session-config]
+            [conjure.server.request :as request]))
 
 (def action-name "show")
 (def controller-name "test")
 
 (defn setup-all [function]
-  ;(view-generator/generate-view-file { :controller controller-name, :action action-name, :content nil, :silent true })
-  (function)
-  ;(view-destroyer/destroy-all-dependencies controller-name action-name true)
-  )
+  (function))
         
 (use-fixtures :once setup-all)
 
@@ -70,8 +64,7 @@
 (deftest test-all-view-namespaces
   (when-let [view-namespaces (all-view-namespaces)]
     (doseq [view-namespace view-namespaces]
-      (is view-namespace)
-      (is (symbol? view-namespace)))))
+      (is view-namespace))))
   
 (deftest test-merge-url-for-params
   (is (= 
