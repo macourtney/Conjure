@@ -105,7 +105,7 @@ be found." }
 (defn
 #^{ :doc "Returns the test directory for the given plugin. If the test directory does not exist, this function returns
 nil." }
-  test-directory [plugin-name]
+  plugin-test-directory [plugin-name]
   (let [test-dir (File. (plugin-directory plugin-name) test-directory-name)]
     (when (.exists test-dir)
       test-dir)))
@@ -119,7 +119,7 @@ nil." }
 (defn
 #^{ :doc "Returns all of the test clj files for the given plugin." }
   test-files [plugin-name]
-  (let [test-dir (test-directory plugin-name)]
+  (let [test-dir (plugin-test-directory plugin-name)]
     (if test-dir
       (filter #(.isFile %1) (seq-utils/flatten (file-seq test-dir)))
       '())))

@@ -1,20 +1,12 @@
 (ns conjure.model.test-util
   (:import [java.io File])
   (:use clojure.contrib.test-is
-        conjure.model.util)
-  ;(:require [generators.model-generator :as model-generator]
-  ;          [destroyers.model-destroyer :as model-destroyer])
-  )
+        conjure.model.util
+        test-helper))
 
 (def model-name "test")
 
-(defn setup-all [function]
-  ;(model-generator/generate-model-file model-name)
-  (function)
-  ;(model-destroyer/destroy-all-dependencies model-name)
-  )
-        
-(use-fixtures :once setup-all)
+(use-fixtures :once init-server)
 
 (deftest test-model-from-file
   (is (= model-name (model-from-file (new File (str "models/" model-name ".clj")))))

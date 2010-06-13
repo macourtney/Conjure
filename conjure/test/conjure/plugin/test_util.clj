@@ -1,21 +1,13 @@
 (ns conjure.plugin.test-util
   (:import [java.io File])
   (:use clojure.contrib.test-is
-        conjure.plugin.util)
-  (:require [clojure.contrib.logging :as logging]
-            ;[destroyers.plugin-destroyer :as plugin-destroyer]
-            ;[generators.plugin-generator :as plugin-generator]
-            ))
+        conjure.plugin.util
+        test-helper)
+  (:require [clojure.contrib.logging :as logging]))
 
 (def plugin-name "test")
 
-(defn setup-all [function]
-  ;(plugin-generator/generate-plugin-files { :name plugin-name, :silent true })
-  (function)
-  ;(plugin-destroyer/destroy-plugin plugin-name true)
-  )
-        
-(use-fixtures :once setup-all)
+(use-fixtures :once init-server)
 
 (deftest test-find-plugins-directory
   (let [plugins-directory (find-plugins-directory)]
@@ -63,11 +55,11 @@
 (deftest test-initialize-all-plugins
   (initialize-all-plugins))
 
-(deftest test-test-directory
-  (let [test-dir (test-directory plugin-name)]
+(deftest test-plugin-test-directory
+  (let [test-dir (plugin-test-directory plugin-name)]
     (is test-dir)
     (is (instance? File test-dir)))
-  (is (not (test-directory "fail"))))
+  (is (not (plugin-test-directory "fail"))))
 
 (deftest test-test-namespace-name
   (is (= (str "plugins." plugin-name ".test.test-plugin") (test-namespace-name plugin-name "test-plugin"))))
@@ -79,11 +71,11 @@
   (is (empty? (test-files "fail"))))
 
 (deftest test-load-test-file
-  (load-test-file (File. (test-directory plugin-name) "test_plugin.clj")))
+  (load-test-file (File. (plugin-test-directory plugin-name) "test_plugin.clj")))
 
 (deftest test-plugin-file-namespace
   (is (= (symbol (str "plugins." plugin-name ".test.test-plugin")) 
-        (plugin-file-namespace (File. (test-directory plugin-name) "test_plugin.clj")))))
+        (plugin-file-namespace (File. (plugin-test-directory plugin-name) "test_plugin.clj")))))
 
 (deftest test-run-test-list
   (run-test-list [(str "plugins." plugin-name ".test.test-plugin")])
