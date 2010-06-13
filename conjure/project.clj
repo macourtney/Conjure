@@ -11,4 +11,5 @@
                  [ring/ring-devel "0.2.0"]
                  [ring/ring-jetty-adapter "0.2.0"]
                  [ring/ring-servlet "0.2.0"]
-                 [scriptjure "0.1.3"]])
+                 [scriptjure "0.1.3"]]
+  :dev-dependencies [[lein-clojars "0.5.0"]])
