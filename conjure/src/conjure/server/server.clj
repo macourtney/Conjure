@@ -1,9 +1,9 @@
 (ns conjure.server.server
   (:import [java.util Date])
-  (:require [config.environment :as environment]
-            [config.http-config :as http-config]
+  (:require [config.http-config :as http-config]
             [config.routes :as routes]
             [config.session-config :as session-config]
+            [conjure.config.environment :as environment]
             [clojure.contrib.java-utils :as java-utils]
             [clojure.contrib.logging :as logging]
             [conjure.controller.util :as controller-util]
@@ -18,24 +18,20 @@
 (defn
 #^{ :doc "Initializes the conjure server." }
   init []
-  (if (not @initialized?)
-    (do
-      (dosync
-        (ref-set initialized? true))
-      (environment/init)
-      (logging/info "Initializing server...")
-      (database/ensure-conjure-db)
-      ((:init session-config/session-store))
-      (logging/info "Server Initialized.")
-      (logging/info "Initializing plugins...")
-      (plugin-util/initialize-all-plugins)
-      (logging/info "Plugins initialized.")
-      (logging/info "Initializing app controller...")
-      (try
-        (require 'controllers.app)
-        (logging/info "App controller initialized.")
-      (catch Throwable t
-        (logging/error "Failed to initialize app controller." t))))))
+  (when (not @initialized?)
+    (dosync
+      (ref-set initialized? true))
+    ((:init session-config/session-store))
+    (logging/info "Server Initialized.")
+    (logging/info "Initializing plugins...")
+    (plugin-util/initialize-all-plugins)
+    (logging/info "Plugins initialized.")
+    (logging/info "Initializing app controller...")
+    (try
+      (require 'controllers.app)
+      (logging/info "App controller initialized.")
+    (catch Throwable t
+      (logging/error "Failed to initialize app controller." t)))))
 
 (defn 
 #^{ :doc "Manages the session cookie in the response map." }

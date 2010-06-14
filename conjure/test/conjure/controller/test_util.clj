@@ -69,6 +69,24 @@
     (is (= "controllers.test-name-controller" controller-ns)))
   (is (nil? (controller-namespace nil))))
 
+(deftest test-is-controller-namespace?
+  (is (is-controller-namespace? "controllers.test-name-controller"))
+  (is (not (is-controller-namespace? "fail")))
+  (is (not (is-controller-namespace? "")))
+  (is (not (is-controller-namespace? nil))))
+
+(deftest test-all-controller-namespaces
+  (let [controller-namespaces (all-controller-namespaces)]
+    (is (= 1 (count controller-namespaces)))
+    (is (= "controllers.test-controller" (name (ns-name (first controller-namespaces)))))))
+
+(deftest test-controller-from-namespace
+  (is (= "test" (controller-from-namespace "controllers.test-controller")))
+  (is (nil? (controller-from-namespace nil))))
+
+(deftest test-all-controllers
+  (is (= ["test"] (all-controllers))))
+
 (deftest test-controller-exists?
   (request/set-request-map { :controller controller-name }
     (is (controller-exists? (controller-file-name))))

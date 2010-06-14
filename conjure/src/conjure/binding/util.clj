@@ -1,8 +1,9 @@
 (ns conjure.binding.util
   (:import [java.io File])
   (:require [clojure.contrib.logging :as logging]
+            [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.str-utils :as str-utils]
-            [config.environment :as environment]
+            [conjure.config.environment :as environment]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.string-utils :as conjure-str-utils]))
@@ -15,9 +16,7 @@
 (defn 
 #^{ :doc "Finds the bindings directory." }
   find-bindings-directory []
-  (file-utils/find-directory 
-    (loading-utils/get-classpath-dir-ending-with environment/source-dir)
-    bindings-dir))
+  (environment/find-in-source-dir bindings-dir))
   
 (defn 
 #^{ :doc "Finds the controller directory." }
@@ -36,10 +35,10 @@
 #^{ :doc "Finds a binding file with the given controller name." }
   find-binding-file
   ([controller-name action-name] (find-binding-file (find-bindings-directory) controller-name action-name)) 
-  ([controllers-directory controller-name action-name]
+  ([bindings-directory controller-name action-name]
     (if (and controller-name action-name)
       (file-utils/find-file 
-        (new File controllers-directory (loading-utils/dashes-to-underscores controller-name)) 
+        (new File bindings-directory (loading-utils/dashes-to-underscores controller-name)) 
         (binding-file-name-string action-name)))))
 
 (defn
@@ -53,18 +52,26 @@
   (str bindings-dir "/" (bindings-path-to-binding controller action)))
 
 (defn
-#^{ :doc "Returns true if the given controller exists." }
-  binding-exists? [controller action]
-  (if (and controller action)
-    (loading-utils/resource-exists? 
-      (app-path-to-binding controller action))))
-
-(defn
 #^{ :doc "Returns the controller namespace for the given controller." }
   binding-namespace [controller action]
   (if (and controller action)
     (str bindings-namespace "." (loading-utils/underscores-to-dashes controller) "." 
       (loading-utils/underscores-to-dashes action))))
+
+(defn
+  binding-namespace? [namespace]
+  (when namespace
+    (if (string? namespace)
+      (.startsWith namespace (str bindings-namespace "."))
+      (binding-namespace? (name (ns-name namespace))))))
+
+(def all-binding-namespaces (filter binding-namespace? (all-ns)))
+
+(defn
+#^{ :doc "Returns true if a binding exists for the given controller and action." }
+  binding-exists? [controller action]
+  (when (and controller action)
+    (loading-utils/namespace-exists? (binding-namespace controller action))))
 
 (defn
 #^{ :doc "Returns the controller and action from the given binding namespace as a map." }
@@ -133,7 +140,7 @@ otherwise nil is returned." }
   call-binding [controller action params]
   (let [controller-str (conjure-str-utils/str-keyword controller)
         action-str (conjure-str-utils/str-keyword action)]
-    (if environment/reload-files
+    (if (environment/reload-files?)
       (do 
         (load-binding controller-str action-str)
         (run-binding controller-str action-str params))

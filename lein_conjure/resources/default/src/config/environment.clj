@@ -2,10 +2,10 @@
   (:require [clojure.contrib.java-utils :as java-utils]
             [conjure.util.loading-utils :as loading-utils]))
   
-(def conjure-environment-property "conjure.environment")
-(def default-environment "test")
+;(def conjure-environment-property "conjure.environment")
+;(def default-environment "development")
 
-(def source-dir "test") ; Set to test for the testing environment
+;(def source-dir "src")
 
 (def assets-dir "test/public")
 (def javascripts-dir "javascripts")

@@ -4,11 +4,11 @@
         conjure.helper.util))
   
 (deftest test-find-helpers-directory
-  (let [helpers-dirctory (find-helpers-directory)]
-    (is (not (nil? helpers-dirctory)))
-    (is (instance? File helpers-dirctory))
-    (is (= "helpers" (. helpers-dirctory getName)))
-    (is (.exists helpers-dirctory))))
+  (let [helpers-directory (find-helpers-directory)]
+    (is (not (nil? helpers-directory)))
+    (is (instance? File helpers-directory))
+    (is (= "helpers" (. helpers-directory getName)))
+    (is (.exists helpers-directory))))
 
 (deftest test-helper-files
   (doseq [helper-file (helper-files)]
@@ -22,5 +22,4 @@
 
 (deftest test-all-helper-namespaces
   (doseq [helper-namespace (all-helper-namespaces)]
-    (is helper-namespace)
-    (is (symbol? helper-namespace))))
+    (is helper-namespace)))

@@ -1,5 +1,5 @@
 (ns conjure.util.loading-utils
-  (:import [java.io File])
+  (:import [java.io File FileNotFoundException])
   (:require [clojure.contrib.classpath :as classpath]
             [clojure.contrib.logging :as logging]
             [clojure.contrib.ns-utils :as ns-utils]
@@ -12,12 +12,12 @@
 (defn
 #^{ :doc "Gets the system class loader" }
   system-class-loader []
-  (. ClassLoader getSystemClassLoader))
+  (ClassLoader/getSystemClassLoader))
 
 (defn 
 #^{ :doc "Returns a stream for the given resource if it exists. Otherwise, this function returns nil." }
   find-resource [full-file-path]
-  (. (system-class-loader) getResourceAsStream full-file-path))
+  (.getResourceAsStream (system-class-loader) full-file-path))
 
 (defn
  #^{ :doc "Returns true if the given resource exists. False otherwise." }
@@ -216,3 +216,14 @@ cannot be found.." }
     (if ns-found
       (or (ns-resolve ns-found var-sym) default)
       default)))
+
+(defn
+#^{ :doc "Reloads all of the given namespaces." }
+  namespace-exists? [namespace]
+  (if (symbol? namespace)
+    (try
+      (require (symbol namespace))
+      true
+      (catch FileNotFoundException fileNotFound
+        false))
+    (namespace-exists? (symbol (str namespace)))))

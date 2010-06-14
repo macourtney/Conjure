@@ -2,7 +2,7 @@
   (:require [clj-record.util :as clj-record-util]
             [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.str-utils :as contrib-str-utils]
-            [config.environment :as environment]
+            [conjure.config.environment :as environment]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.string-utils :as string-utils]))
@@ -34,9 +34,7 @@
 (defn 
 #^{ :doc "Finds the models directory." }
   find-models-directory []
-  (file-utils/find-directory 
-    (loading-utils/get-classpath-dir-ending-with environment/source-dir)
-    models-dir))
+  (environment/find-in-source-dir models-dir))
 
 (comment  
   (defn
@@ -48,8 +46,7 @@
   #^{ :doc "Returns the model namespace for the given model file." }
     model-file-namespace 
     [model-file]
-    (loading-utils/file-namespace (.getParentFile (find-models-directory)) model-file))
-)
+    (loading-utils/file-namespace (.getParentFile (find-models-directory)) model-file)))
 
 (defn
   model-namespace? [namespace]

@@ -2,7 +2,7 @@
   (:require [clojure.contrib.logging :as logging]
             [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.str-utils :as str-utils]
-            [config.environment :as environment]
+            [conjure.config.environment :as environment]
             [conjure.server.request :as request]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.file-utils :as file-utils]
@@ -22,9 +22,7 @@
 (defn 
 #^{ :doc "Finds the controller directory." }
   find-controllers-directory []
-  (file-utils/find-directory 
-    (loading-utils/get-classpath-dir-ending-with environment/source-dir)
-    controllers-dir))
+  (environment/find-in-source-dir controllers-dir))
 
 (defn
 #^{ :doc "Returns the controller file name for the given controller name." }
@@ -40,9 +38,12 @@
 (defn
 #^{ :doc "Returns the controller name for the given controller file." }
   controller-from-file [controller-file]
-  (if controller-file
-    (let [file-to-symbol (loading-utils/clj-file-to-symbol-string (. controller-file getName))]
-      (string-utils/strip-ending file-to-symbol controller-namespace-ending))))
+  (when controller-file
+    (if (string? controller-file)
+      (string-utils/strip-ending 
+        (loading-utils/clj-file-to-symbol-string controller-file)
+        controller-namespace-ending)
+      (controller-from-file (.getName controller-file)))))
 
 (defn
 #^{ :doc "Finds a controller file with the given controller name." }
@@ -55,7 +56,7 @@
 (defn
 #^{ :doc "Returns the controller namespace for the given controller." }
   controller-namespace [controller]
-  (if controller
+  (when controller
     (str controllers-namespace "." (loading-utils/underscores-to-dashes controller) controller-namespace-ending)))
     
 
@@ -63,7 +64,9 @@
   is-controller-namespace? [namespace]
   (when namespace
     (if (string? namespace)
-      (.startsWith namespace (str controllers-dir "."))
+      (and
+        (.startsWith namespace (str controllers-dir "."))
+        (not (= namespace "controllers.app")))
       (is-controller-namespace? (name (ns-name namespace))))))
 
 (defn
@@ -77,7 +80,8 @@ namespace." }
   (when namespace
     (if (string? namespace)
       (string-utils/strip-ending 
-        (last (str-utils/re-split #"\." namespace)) controller-namespace-ending)
+        (last (str-utils/re-split #"\." namespace))
+        controller-namespace-ending)
       (controller-from-namespace (name (ns-name namespace))))))
 
 (defn
@@ -88,7 +92,7 @@ namespace." }
 (defn
 #^{ :doc "Returns true if the given controller exists." }
   controller-exists? [controller-file-name]
-  (loading-utils/resource-exists? (str controllers-dir "/" controller-file-name)))
+  (loading-utils/namespace-exists? (controller-namespace (controller-from-file controller-file-name))))
 
 (defn
 #^{ :doc "Reloads all conjure namespaces referenced by the given controller." }
@@ -380,7 +384,7 @@ returned, otherwise nil is returned." }
 (defn
 #^{ :doc "Calls the given controller with the given request map returning the response." }
   call-controller []
-  (if environment/reload-files
+  (if (environment/reload-files?)
     (do 
       (load-controller)
       (run-action))

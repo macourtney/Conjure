@@ -4,7 +4,7 @@
             [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.str-utils :as str-utils]
             [clojure.contrib.test-is :as test-is]
-            [config.environment :as environment]
+            [conjure.config.environment :as environment]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.loading-utils :as loading-utils]))
 
@@ -15,9 +15,7 @@
 (defn 
 #^{ :doc "Finds the plugins directory." }
   find-plugins-directory []
-  (file-utils/find-directory 
-    (loading-utils/get-classpath-dir-ending-with environment/source-dir)
-    plugins-dir))
+  (environment/find-in-source-dir plugins-dir))
 
 (defn
 #^{ :doc "Returns the namespace string for the plugin.clj file for the plugin with the given name." }

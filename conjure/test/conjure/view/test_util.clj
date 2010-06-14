@@ -1,8 +1,8 @@
 (ns conjure.view.test-util
   (:import [java.io File])
-  (:use test-helper
-        clojure.contrib.test-is
-        conjure.view.util)
+  (:use clojure.contrib.test-is
+        conjure.view.util
+        test-helper)
   (:require [clojure.contrib.logging :as logging]
             [config.session-config :as session-config]
             [conjure.server.request :as request]))
@@ -10,10 +10,7 @@
 (def action-name "show")
 (def controller-name "test")
 
-(defn setup-all [function]
-  (function))
-        
-(use-fixtures :once setup-all)
+(use-fixtures :once init-server)
 
 (deftest test-find-views-directory
   (test-directory (find-views-directory) "views"))

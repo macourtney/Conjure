@@ -1,6 +1,6 @@
 (ns conjure.view.util
-  (:require [config.environment :as environment]
-            [config.session-config :as session-config]
+  (:require [config.session-config :as session-config]
+            [conjure.config.environment :as environment]
             [conjure.server.request :as request]
             [conjure.util.file-utils :as file-utils]
             [conjure.util.html-utils :as html-utils]
@@ -19,9 +19,7 @@
 (defn 
 #^{ :doc "Finds the views directory which contains all of the files which describe the html pages of the app." }
   find-views-directory []
-  (file-utils/find-directory 
-    (loading-utils/get-classpath-dir-ending-with environment/source-dir)
-    views-dir))
+  (environment/find-in-source-dir views-dir))
 
 (defn
 #^{ :doc "Returns all of the view files in all of the directories in the view directory." }
@@ -114,7 +112,7 @@
 (defn
   #^{ :doc "Calls the render function with the given symbol in the view for the request-map." }
   render-by-symbol [symbol-name & params]
-  (when (or environment/reload-files (not (view-loaded?)))
+  (when (or (environment/reload-files?) (not (view-loaded?)))
     (load-view))
   (apply
     (ns-resolve (get-view-ns) symbol-name) params))

@@ -1,6 +1,6 @@
 (ns conjure.migration.util
   (:require [clojure.contrib.seq-utils :as seq-utils]
-            [config.environment :as environment]
+            [conjure.config.environment :as environment]
             [conjure.util.loading-utils :as loading-utils]
             [conjure.util.file-utils :as file-utils]))
 
@@ -13,9 +13,7 @@
 (defn 
 #^{:doc "Finds the db directory which contains all of the files for updating the schema for the database."}
   find-db-directory []
-  (file-utils/find-directory 
-    (loading-utils/get-classpath-dir-ending-with environment/source-dir)
-    db-dir))
+  (environment/find-in-source-dir db-dir))
 
 (defn
 #^{:doc "Finds the migrate directory."}
