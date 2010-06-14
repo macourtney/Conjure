@@ -84,6 +84,6 @@ one." }
 #^{ :doc "Sets the server mode to the given mode. The given mode must be a keyword or string like development, 
 production, or test." }
   set-mode [mode]
-  (if mode 
+  (when mode 
     (java-utils/set-system-properties 
       { environment/conjure-environment-property (conjure-str-utils/str-keyword mode) })))
