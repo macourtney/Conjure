@@ -1,6 +1,6 @@
 ;; This file is used to route requests to the appropriate controller and action.
 
-(ns routes
+(ns config.routes
   (:require [clojure.contrib.logging :as logging]
             [clojure.contrib.str-utils :as contrib-str-utils]
             [conjure.controller.util :as controller-util]

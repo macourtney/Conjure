@@ -1,4 +1,4 @@
-(ns environments.test
+(ns config.environments.test
   (:import [org.apache.log4j ConsoleAppender FileAppender Level Logger PatternLayout]
            [org.apache.log4j.varia LevelRangeFilter])
   (:require [conjure.util.logging-utils :as logging-utils]))

@@ -1,6 +1,6 @@
 ;; This file is used to configure the http server.
 
-(ns http-config)
+(ns config.http-config)
 
 (defn get-http-config []
   ;; server port

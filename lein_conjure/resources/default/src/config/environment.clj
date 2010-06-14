@@ -3,9 +3,11 @@
             [conjure.util.loading-utils :as loading-utils]))
   
 (def conjure-environment-property "conjure.environment")
-(def default-environment "development")
+(def default-environment "test")
 
-(def assets-dir "public")
+(def source-dir "test") ; Set to test for the testing environment
+
+(def assets-dir "test/public")
 (def javascripts-dir "javascripts")
 (def stylesheets-dir "stylesheets")
 (def images-dir "images")
@@ -26,7 +28,7 @@
     (let [initial-value (java-utils/get-system-property conjure-environment-property nil)]
       (if (not initial-value)
         (java-utils/set-system-properties { conjure-environment-property default-environment })))
-    (loading-utils/load-resource "environments" (str (java-utils/get-system-property conjure-environment-property nil) ".clj"))))
+    (require (symbol (str "config.environments." (java-utils/get-system-property conjure-environment-property nil))))))
 
 (defn
 #^{ :doc "Returns the name of the environment." }
