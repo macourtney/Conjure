@@ -67,7 +67,9 @@ be found." }
 (defn
 #^{ :doc "Returns the directory for the given plugin." }
   plugin-directory [plugin-name]
-  (File. (find-plugins-directory) (loading-utils/dashes-to-underscores plugin-name)))
+  (let [plugins-directory (find-plugins-directory)]
+    (when plugins-directory
+      (File. plugins-directory (loading-utils/dashes-to-underscores plugin-name)))))
 
 (defn
   is-plugin-namespace? [namespace]
@@ -149,9 +151,10 @@ nil." }
 #^{ :doc "Runs all the tests in the given plugin." }
   run-all-plugin-tests [plugin-name]
   (let [all-test-files (test-files plugin-name)]
-    (doseq [test-file all-test-files]
-      (load-test-file test-file))
-    (apply test-is/run-tests (map plugin-file-namespace all-test-files))))
+    (when all-test-files
+      (doseq [test-file all-test-files]
+        (load-test-file test-file))
+      (apply test-is/run-tests (map plugin-file-namespace all-test-files)))))
 
 (defn
 #^{ :doc "Runs all of the tests in the given plugin." }
