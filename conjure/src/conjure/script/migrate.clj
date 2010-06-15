@@ -17,12 +17,15 @@
       version)
     (. Integer MAX_VALUE)))
 
-(command-line/with-command-line *command-line-args*
-  "./run.sh script/migrate.clj [options]"
-  [ [version "The version to migrate to. Example: -version 0 -> migrates to version 2." nil]
-    [mode "The server mode. For example, development, production, or test." nil]
-    remaining]
+(defn
+  run [args]
+  (command-line/with-command-line args
+    "lein conjure migrate [options]"
+    [ [version "The version to migrate to. Example: -version 0 -> migrates to version 2." nil]
+      [mode "The server mode. For example, development, production, or test." nil]
+      remaining]
+  
+    (server/set-mode mode)
+    (server/init)
+    (runner/update-to-version (version-number version))))
 
-  (server/set-mode mode)
-  (server/init)
-  (runner/update-to-version (version-number version)))

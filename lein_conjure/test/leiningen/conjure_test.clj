@@ -2,5 +2,5 @@
   (:use [leiningen.conjure] :reload-all)
   (:use [clojure.test]))
 
-(deftest replace-me ;; FIXME: write
-  (conjure {}))
+(deftest test-conjure
+  (conjure {} "noop"))
