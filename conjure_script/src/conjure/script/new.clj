@@ -21,6 +21,7 @@
 
 (defn
   create-file [entry-file zip-entry]
+  (.mkdirs (.getParentFile entry-file)) 
   (with-open [fileInputStream (BufferedInputStream. (ClassLoader/getSystemResourceAsStream (.getName zip-entry)))]
    (duck-streams/copy fileInputStream entry-file)))
 
