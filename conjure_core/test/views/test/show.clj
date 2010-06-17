@@ -1,7 +1,5 @@
 (ns views.test.show
-  (:use conjure.core.view.base)
-  (:require [clj-html.core :as html]))
+  (:use conjure.core.view.base))
 
-(def-view []
-  (html/html 
-    [:p "You can change this text in app/views/test/show.clj"]))
+(def-view [] 
+  [:p "You can change this text in app/views/test/show.clj"])

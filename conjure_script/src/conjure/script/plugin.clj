@@ -27,15 +27,17 @@
 (defn test-plugin [plugin-name arguments]
   (plugin-util/run-plugin-tests plugin-name arguments))
 
-(server/init)
-
-(let [type-command (first *command-line-args*)
-      plugin-name (second *command-line-args*)
-      arguments (drop 2 *command-line-args*)]
-  (if plugin-name
-    (cond 
-      (= type-command "install") (install plugin-name arguments)
-      (= type-command "uninstall") (uninstall plugin-name arguments)
-      (= type-command "test") (test-plugin plugin-name arguments)
-      true (print-usage))
-    (print-usage)))
+(defn
+  run [args]
+  (server/init)
+  
+  (let [type-command (first args)
+        plugin-name (second args)
+        arguments (drop 2 args)]
+    (if plugin-name
+      (cond 
+        (= type-command "install") (install plugin-name arguments)
+        (= type-command "uninstall") (uninstall plugin-name arguments)
+        (= type-command "test") (test-plugin plugin-name arguments)
+        true (print-usage))
+      (print-usage))))

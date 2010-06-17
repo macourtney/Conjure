@@ -26,10 +26,12 @@
             (print-invalid-destroyer destroyer-namespace)))
         (print-unknown-command command)))))
 
-(server/init)
+(defn
+  run [args]
+  (server/init)
 
-(let [destroy-command (first *command-line-args*)
-      destroy-type-params (rest *command-line-args*)]
-  (if destroy-command
-    (destroy destroy-command destroy-type-params)
-    (print-usage)))
+  (let [destroy-command (first *command-line-args*)
+        destroy-type-params (rest *command-line-args*)]
+    (if destroy-command
+      (destroy destroy-command destroy-type-params)
+      (print-usage))))

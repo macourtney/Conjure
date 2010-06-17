@@ -1,4 +1,4 @@
-(ns conjure.core.script.migrate
+(ns conjure.script.migrate
   (:require [clojure.contrib.command-line :as command-line]
             [conjure.core.migration.runner :as runner]
             [conjure.core.server.server :as server]))

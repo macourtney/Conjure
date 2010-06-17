@@ -227,3 +227,20 @@ cannot be found.." }
       (catch FileNotFoundException fileNotFound
         false))
     (namespace-exists? (symbol (str namespace)))))
+
+(defn
+#^{ :doc "Returns true if the given zip entry is in the given directory." }
+  entry-in-directory? [zip-entry dir-name]
+  (when (and zip-entry dir-name)
+    (let [entry-name (.getName zip-entry)]
+      (and (not (= entry-name dir-name)) (.startsWith entry-name dir-name)))))
+
+(defn
+#^{ :doc "Returns all of the zip entries in the classpath with the given directory name." }
+  directory-zip-entries [jar-file dir-name]
+  (filter #(entry-in-directory? % dir-name) (enumeration-seq (.entries jar-file))))
+
+(defn
+#^{ :doc "Returns all of the zip entries in the classpath with the given directory name." }
+  class-path-zip-entries [dir-name]
+  (mapcat #(directory-zip-entries % dir-name) (classpath/classpath-jarfiles)))

@@ -13,7 +13,7 @@
   (println (str "Invalid script: " script-namspace ". The script must implement a run function.")))
 
 (defn run-script [command params]
-  (let [script-namspace-symbol (symbol (str "conjure.core.script." command))]
+  (let [script-namspace-symbol (symbol (str "conjure.script." command))]
     (try
       (require script-namspace-symbol)
       (catch FileNotFoundException e))

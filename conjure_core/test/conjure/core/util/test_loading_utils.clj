@@ -1,10 +1,12 @@
 (ns conjure.core.util.test-loading-utils
-  (:import [java.io File Reader]
-           [java.io ByteArrayInputStream])
+  (:import [java.io ByteArrayInputStream File Reader]
+           [java.util.zip ZipEntry])
   (:use clojure.contrib.test-is
         conjure.core.util.loading-utils)
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.contrib.classpath :as classpath]
+            [clojure.contrib.logging :as logging]
             [clojure.contrib.ns-utils :as ns-utils]
+            [clojure.contrib.seq-utils :as seq-utils]
             [conjure.core.util.file-utils :as file-utils]
             [controllers.home-controller :as home-controller]))
         
@@ -118,3 +120,25 @@
 
 (deftest test-conjure-namespaces
   (is (= #{"helpers.home-helper"} (conjure-namespaces 'controllers.home-controller))))
+
+(deftest test-entry-in-directory?
+  (is (not (entry-in-directory? (ZipEntry. "foo/bar/baz") "foo/bar/baz")))
+  (is (entry-in-directory? (ZipEntry. "foo/bar/baz") "foo/bar/"))
+  (is (entry-in-directory? (ZipEntry. "foo/bar/baz") "foo/"))
+  (is (entry-in-directory? (ZipEntry. "foo/bar/baz") ""))
+  (is (not (entry-in-directory? nil "foo/bar/")))
+  (is (not (entry-in-directory? (ZipEntry. "foo/bar/baz") nil))))
+
+(defn
+  clojure-jar []
+  (seq-utils/find-first #(.endsWith (.getName %) "clojure-1.1.0.jar") (classpath/classpath-jarfiles)))
+
+(deftest test-directory-zip-entries
+  (let [clojure-entries (directory-zip-entries (clojure-jar) "clojure/xml/")]
+    (is clojure-entries)
+    (is (> (count clojure-entries) 0))))
+
+(deftest test-class-path-zip-entries
+  (let [clojure-entries (class-path-zip-entries "clojure/xml/")]
+    (is clojure-entries)
+    (is (> (count clojure-entries) 0))))

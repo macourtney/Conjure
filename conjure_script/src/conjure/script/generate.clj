@@ -22,10 +22,12 @@
             (print-invalid-generator generator-namespace)))
         (print-unknown-command command)))))
 
-(server/init)
-
-(let [generate-command (first *command-line-args*)
-      generate-type-params (rest *command-line-args*)]
-  (if generate-command
-    (generate generate-command generate-type-params)
-    (print-usage)))
+(defn
+  run [args]
+  (server/init)
+  
+  (let [generate-command (first args)
+        generate-type-params (rest args)]
+    (if generate-command
+      (generate generate-command generate-type-params)
+      (print-usage))))

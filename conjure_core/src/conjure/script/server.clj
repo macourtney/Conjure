@@ -1,4 +1,4 @@
-(ns conjure.core.script.server
+(ns conjure.script.server
   (:require [clojure.contrib.command-line :as command-line]
             [conjure.core.server.server :as conjure-server]
             [conjure.core.server.ring-adapter :as ring-adapter]
