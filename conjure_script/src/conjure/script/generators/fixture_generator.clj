@@ -1,8 +1,8 @@
 (ns conjure.script.generators.fixture-generator
-  (:require [conjure.model.util :as model-util]
-            [conjure.test.builder :as test-builder]
-            [conjure.test.util :as test-util]
-            [conjure.util.file-utils :as file-utils]))
+  (:require [conjure.core.model.util :as model-util]
+            [conjure.core.test.builder :as test-builder]
+            [conjure.core.test.util :as test-util]
+            [conjure.core.util.file-utils :as file-utils]))
 
 (defn
 #^{:doc "Prints out how to use the generate fixture command."}
@@ -19,7 +19,7 @@
         (let [fixture-namespace (test-util/fixture-namespace model)
               table-name (model-util/model-to-table-name model)
               fixture-content (str "(ns " fixture-namespace "
-  (:use conjure.model.database))
+  (:use conjure.core.model.database))
 
 (def records [
   ; Add your test data here.

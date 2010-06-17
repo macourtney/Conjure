@@ -1,5 +1,5 @@
 (ns conjure.script.generate 
-  (:require [conjure.server.server :as server]))
+  (:require [conjure.core.server.server :as server]))
 
 (defn
 #^{:doc "Prints the usage information to standard out."}

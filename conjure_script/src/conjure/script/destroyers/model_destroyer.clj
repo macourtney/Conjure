@@ -1,8 +1,8 @@
 (ns conjure.script.destroyers.model-destroyer
   (:require [clojure.contrib.logging :as logging]
-            [conjure.model.util :as util]
-            [destroyers.migration-destroyer :as migration-destroyer]
-            [destroyers.model-test-destroyer :as model-test-destroyer]))
+            [conjure.core.model.util :as util]
+            [conjure.script.destroyers.migration-destroyer :as migration-destroyer]
+            [conjure.script.destroyers.model-test-destroyer :as model-test-destroyer]))
 
 (defn
 #^{:doc "Prints out how to use the destroy model command."}

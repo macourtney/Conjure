@@ -1,8 +1,8 @@
 (ns conjure.script.generators.binding-test-generator
   (:require [clojure.contrib.str-utils :as str-utils]
-            [conjure.test.builder :as test-builder]
-            [conjure.test.util :as test-util]
-            [conjure.util.file-utils :as file-utils]))
+            [conjure.core.test.builder :as test-builder]
+            [conjure.core.test.util :as test-util]
+            [conjure.core.util.file-utils :as file-utils]))
 
 (defn
 #^{:doc "Prints out how to use the generate test binding command."}
@@ -21,7 +21,7 @@
       (let [test-namespace (test-util/binding-unit-test-namespace controller action)
             test-content (or incoming-content (str "(ns " test-namespace "
   (:use clojure.contrib.test-is)
-  (:require [conjure.binding.util :as bind-util]))
+  (:require [conjure.core.binding.util :as bind-util]))
 
 (def controller-name \"" controller "\")
 (def action-name \"" action "\")

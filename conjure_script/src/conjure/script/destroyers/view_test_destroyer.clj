@@ -1,8 +1,8 @@
 (ns conjure.script.destroyers.view-test-destroyer
   (:require [clojure.contrib.logging :as logging]
-            [conjure.test.util :as util]
-            [conjure.util.file-utils :as file-utils]
-            [conjure.util.loading-utils :as loading-utils]))
+            [conjure.core.test.util :as util]
+            [conjure.core.util.file-utils :as file-utils]
+            [conjure.core.util.loading-utils :as loading-utils]))
 
 (defn
 #^{:doc "Prints out how to use the destroy view test command."}

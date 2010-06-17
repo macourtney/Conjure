@@ -1,5 +1,5 @@
 (ns conjure.script.generate 
-  (:require [conjure.server.server :as server]))
+  (:require [conjure.core.server.server :as server]))
 
 (defn print-usage []
   (println "Usage: ./run.sh script/generate.clj <generate type> <generate params>*"))

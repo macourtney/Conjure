@@ -1,8 +1,8 @@
 (ns conjure.script.destroyers.controller-destroyer
   (:require [clojure.contrib.logging :as logging]
-            [conjure.controller.util :as util]
-            [destroyers.controller-test-destroyer :as controller-test-destroyer]
-            [destroyers.binding-destroyer :as binding-destroyer]))
+            [conjure.core.controller.util :as util]
+            [conjure.script.destroyers.controller-test-destroyer :as controller-test-destroyer]
+            [conjure.script.destroyers.binding-destroyer :as binding-destroyer]))
 
 (defn
 #^{:doc "Prints out how to use the destroy controller command."}

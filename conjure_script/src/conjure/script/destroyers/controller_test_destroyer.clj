@@ -1,7 +1,7 @@
 (ns conjure.script.destroyers.controller-test-destroyer
   (:require [clojure.contrib.logging :as logging]
-            [conjure.test.util :as util]
-            [conjure.util.file-utils :as file-utils]))
+            [conjure.core.test.util :as util]
+            [conjure.core.util.file-utils :as file-utils]))
 
 (defn
 #^{:doc "Prints out how to use the destroy controller test command."}

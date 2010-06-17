@@ -1,5 +1,5 @@
 (ns leiningen.conjure
-  (require [conjure.execute :as execute]))
+  (require [conjure.core.execute :as execute]))
 
 (defn conjure [projects & args]
    (apply execute/-main args))

@@ -1,8 +1,8 @@
 (ns conjure.script.generators.binding-generator
   (:require [clojure.contrib.logging :as logging]
-            [conjure.binding.builder :as bind-builder]
-            [conjure.binding.util :as bind-util]
-            [conjure.util.file-utils :as file-utils]
+            [conjure.core.binding.builder :as bind-builder]
+            [conjure.core.binding.util :as bind-util]
+            [conjure.core.util.file-utils :as file-utils]
             [conjure.script.generators.view-generator :as view-generator]
             [conjure.script.generators.binding-test-generator :as binding-test-generator]))
 
@@ -29,7 +29,7 @@
   ([controller action binding-content] (generate-binding-content controller action binding-content nil))
   ([controller action binding-content requires]
     (str "(ns " (bind-util/binding-namespace controller action) "
-  (:use conjure.binding.base)" (if requires (str "\n  (:require " requires ")")) ")
+  (:use conjure.core.binding.base)" (if requires (str "\n  (:require " requires ")")) ")
 
 " binding-content)))
 

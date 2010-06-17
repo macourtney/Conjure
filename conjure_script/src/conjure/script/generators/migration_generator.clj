@@ -1,9 +1,9 @@
 (ns conjure.script.generators.migration-generator
   (:import [java.io File])
   (:require [clojure.contrib.logging :as logging]
-            [conjure.migration.builder :as builder]
-            [conjure.migration.util :as util]
-            [conjure.util.file-utils :as file-utils]))
+            [conjure.core.migration.builder :as builder]
+            [conjure.core.migration.util :as util]
+            [conjure.core.util.file-utils :as file-utils]))
 
 (defn
 #^{:doc "Prints out how to use the generate migration command."}
@@ -17,7 +17,7 @@
   (let [migration-number (util/migration-number-from-file migration-file)
         migration-namespace (util/migration-namespace migration-file)
         content (str "(ns " migration-namespace "
-  (:use conjure.model.database))
+  (:use conjure.core.model.database))
 
 (defn
 #^{:doc \"Migrates the database up to version " migration-number ".\"}

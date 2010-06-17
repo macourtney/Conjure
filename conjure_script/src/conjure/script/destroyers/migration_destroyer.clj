@@ -1,6 +1,6 @@
 (ns conjure.script.destroyers.migration-destroyer
   (:require [clojure.contrib.logging :as logging]
-            [conjure.migration.util :as util]))
+            [conjure.core.migration.util :as util]))
 
 (defn
 #^{:doc "Prints out how to use the destroy migration command."}

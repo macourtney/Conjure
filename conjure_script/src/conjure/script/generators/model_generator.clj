@@ -1,9 +1,9 @@
 (ns conjure.script.generators.model-generator
   (:require [clojure.contrib.logging :as logging]
-            [conjure.model.builder :as builder]
-            [conjure.model.util :as util]
-            [conjure.util.string-utils :as string-utils]
-            [conjure.util.file-utils :as file-utils]
+            [conjure.core.model.builder :as builder]
+            [conjure.core.model.util :as util]
+            [conjure.core.util.string-utils :as string-utils]
+            [conjure.core.util.file-utils :as file-utils]
             [conjure.script.generators.migration-generator :as migration-generator]
             [conjure.script.generators.model-test-generator :as model-test-generator]))
 
@@ -41,7 +41,7 @@
   ([model extra-content]
     (let [model-namespace (util/model-namespace model)]
       (str "(ns " model-namespace "
-  (:use conjure.model.base
+  (:use conjure.core.model.base
         clj-record.boot))
 
 (clj-record.core/init-model)

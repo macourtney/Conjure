@@ -1,9 +1,9 @@
 (ns conjure.script.generators.controller-test-generator
   (:require [clojure.contrib.str-utils :as str-utils]
-            [conjure.controller.util :as util]
-            [conjure.test.builder :as test-builder]
-            [conjure.test.util :as test-util]
-            [conjure.util.file-utils :as file-utils]))
+            [conjure.core.controller.util :as util]
+            [conjure.core.test.builder :as test-builder]
+            [conjure.core.test.util :as test-util]
+            [conjure.core.util.file-utils :as file-utils]))
 
 (defn
 #^{:doc "Prints out how to use the generate test controller command."}
@@ -33,7 +33,7 @@
               test-content (str "(ns " test-namespace "
   (:use clojure.contrib.test-is
         " controller-namespace ")
-  (:require [conjure.controller.util :as controller-util]))
+  (:require [conjure.core.controller.util :as controller-util]))
 
 (def controller-name \"" controller "\")
 

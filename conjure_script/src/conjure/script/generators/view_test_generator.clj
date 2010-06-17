@@ -1,8 +1,8 @@
 (ns conjure.script.generators.view-test-generator
-  (:require [conjure.test.builder :as test-builder]
-            [conjure.test.util :as test-util]
-            [conjure.util.file-utils :as file-utils]
-            [conjure.view.util :as util]))
+  (:require [conjure.core.test.builder :as test-builder]
+            [conjure.core.test.util :as test-util]
+            [conjure.core.util.file-utils :as file-utils]
+            [conjure.core.view.util :as util]))
 
 (defn
 #^{:doc "Prints out how to use the generate test view command."}
@@ -23,7 +23,7 @@
             test-content (or incoming-content (str "(ns " test-namespace "
   (:use clojure.contrib.test-is
         " view-namespace ")
-  (:require [conjure.server.request :as request]))
+  (:require [conjure.core.server.request :as request]))
 
 (def controller-name \"" controller "\")
 (def view-name \"" action "\")

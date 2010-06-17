@@ -1,8 +1,8 @@
 (ns conjure.script.generators.model-test-generator
-  (:require [conjure.model.util :as util]
-            [conjure.test.builder :as test-builder]
-            [conjure.test.util :as test-util]
-            [conjure.util.file-utils :as file-utils]
+  (:require [conjure.core.model.util :as util]
+            [conjure.core.test.builder :as test-builder]
+            [conjure.core.test.util :as test-util]
+            [conjure.core.util.file-utils :as file-utils]
             [conjure.script.generators.fixture-generator :as fixture-generator]))
 
 (defn

@@ -1,8 +1,8 @@
 (ns conjure.script.destroyers.binding-destroyer
   (:require [clojure.contrib.logging :as logging]
-            [conjure.binding.util :as binding-util]
-            [destroyers.binding-test-destroyer :as binding-test-destroyer]
-            [destroyers.view-destroyer :as view-destroyer]))
+            [conjure.core.binding.util :as binding-util]
+            [conjure.script.destroyers.binding-test-destroyer :as binding-test-destroyer]
+            [conjure.script.destroyers.view-destroyer :as view-destroyer]))
 
 (defn
 #^{:doc "Prints out how to use the destroy binding command."}

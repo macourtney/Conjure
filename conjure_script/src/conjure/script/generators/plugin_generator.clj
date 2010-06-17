@@ -1,9 +1,9 @@
 (ns conjure.script.generators.plugin-generator
   (:import [java.io File])
   (:require [clojure.contrib.logging :as logging]
-            [conjure.plugin.builder :as plugin-builder]
-            [conjure.plugin.util :as plugin-util]
-            [conjure.util.file-utils :as file-utils]))
+            [conjure.core.plugin.builder :as plugin-builder]
+            [conjure.core.plugin.util :as plugin-util]
+            [conjure.core.util.file-utils :as file-utils]))
 
 (defn
 #^{ :doc "Prints out how to use the generate plugin command." }
@@ -37,7 +37,7 @@
       (generate-initialize-function)))
   ([plugin-name install-function uninstall-function initialize-function] 
     (str "(ns " (plugin-util/plugin-namespace-name plugin-name) "
-  (:use conjure.plugin.base))
+  (:use conjure.core.plugin.base))
 
 " install-function "
 

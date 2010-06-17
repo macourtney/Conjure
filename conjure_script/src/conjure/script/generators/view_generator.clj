@@ -1,10 +1,10 @@
 (ns conjure.script.generators.view-generator
   (:import [java.io File])
   (:require [clojure.contrib.logging :as logging]
-            [conjure.view.builder :as builder]
-            [conjure.view.util :as util]
-            [conjure.util.file-utils :as file-utils]
-            [conjure.util.loading-utils :as loading-utils]
+            [conjure.core.view.builder :as builder]
+            [conjure.core.view.util :as util]
+            [conjure.core.util.file-utils :as file-utils]
+            [conjure.core.util.loading-utils :as loading-utils]
             [conjure.script.generators.view-test-generator :as view-test-generator]))
 
 (defn
@@ -21,7 +21,7 @@ added to the body of the view code." }
   ([view-namespace inner-content view-params] (generate-standard-content view-namespace inner-content view-params nil))
   ([view-namespace inner-content view-params requires]
     (str "(ns " view-namespace "
-  (:use conjure.view.base)
+  (:use conjure.core.view.base)
   " (when requires (str "(:require " requires ")")) ")
 
 (def-view [" view-params "]

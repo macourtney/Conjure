@@ -1,6 +1,6 @@
 (ns conjure.script.plugin 
-  (:require [conjure.server.server :as server]
-            [conjure.plugin.util :as plugin-util]))
+  (:require [conjure.core.server.server :as server]
+            [conjure.core.plugin.util :as plugin-util]))
 
 (defn print-usage []
   (println "Usage: ./run.sh script/plugin.clj <install|uninstall> <plugin name> <arguments>"))

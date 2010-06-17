@@ -1,10 +1,10 @@
 (ns conjure.script.generators.xml-view-generator
   (:import [java.io File])
   (:require [clojure.contrib.logging :as logging]
-            [conjure.view.builder :as builder]
-            [conjure.view.util :as util]
-            [conjure.util.file-utils :as file-utils]
-            [conjure.util.loading-utils :as loading-utils]
+            [conjure.core.view.builder :as builder]
+            [conjure.core.view.util :as util]
+            [conjure.core.util.file-utils :as file-utils]
+            [conjure.core.util.loading-utils :as loading-utils]
             [conjure.script.generators.view-test-generator :as view-test-generator]))
 
 (defn
@@ -18,7 +18,7 @@
 inner-content is added to the body of the xml view code."}
   generate-standard-content [xml-namespace inner-content]
   (str "(ns " xml-namespace "
-  (:use conjure.view.xml-base)
+  (:use conjure.core.view.xml-base)
   (:require [clojure.contrib.prxml :as prxml]))
 
 (def-xml []
