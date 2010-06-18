@@ -1,5 +1,8 @@
 (ns leiningen.conjure
-  (require [conjure.core.execute :as execute]))
+  (require [leiningen.compile :as lein-compile]))
 
-(defn conjure [projects & args]
-   (apply execute/-main args))
+(defn conjure [project & args]
+  (lein-compile/eval-in-project project
+    `(do
+      (use ~''conjure.core.execute)
+      (apply conjure.core.execute/-main '~args))))
