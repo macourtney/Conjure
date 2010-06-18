@@ -1,5 +1,5 @@
 (ns bindings.home.index
-  (:use conjure.binding.base
+  (:use conjure.core.binding.base
         helpers.home-helper))
 
 (def-binding []

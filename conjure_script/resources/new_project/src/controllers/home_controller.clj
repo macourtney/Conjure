@@ -1,5 +1,5 @@
 (ns controllers.home-controller
-  (:use conjure.controller.base
+  (:use conjure.core.controller.base
         helpers.home-helper))
 
 (def-action index

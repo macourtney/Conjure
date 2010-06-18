@@ -1,9 +1,9 @@
 ;; This file is used to configure the database and connection.
 
 (ns config.db-config
-  (:require [conjure.db.flavors.h2 :as h2]
-            [clojure.contrib.java-utils :as java-utils]
-            [config.environment :as environment]))
+  (:require [clojure.contrib.java-utils :as java-utils]
+            [conjure.core.config.environment :as environment]
+            [conjure.core.db.flavors.h2 :as h2]))
 
 (defn
 #^{:doc "Returns the database config map which is used by jdbc_connector to connect to the database."}

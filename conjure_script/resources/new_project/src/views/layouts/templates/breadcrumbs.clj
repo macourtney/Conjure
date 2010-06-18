@@ -1,7 +1,7 @@
 (ns views.layouts.templates.breadcrumbs
-  (:use conjure.view.base)
-  (:require [conjure.server.request :as request]
-            [conjure.util.string-utils :as conjure-str-utils]))
+  (:use conjure.core.view.base)
+  (:require [conjure.core.server.request :as request]
+            [conjure.core.util.string-utils :as conjure-str-utils]))
 
 (def-view []
   (list

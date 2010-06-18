@@ -1,7 +1,7 @@
 (ns config.environments.test
   (:import [org.apache.log4j ConsoleAppender FileAppender Level Logger PatternLayout]
            [org.apache.log4j.varia LevelRangeFilter])
-  (:require [conjure.util.logging-utils :as logging-utils]))
+  (:require [conjure.core.util.logging-utils :as logging-utils]))
 
 ; Sets up the logger for test mode.
 (def output-pattern (new PatternLayout "%-5p [%c]: %m%n"))
@@ -20,7 +20,3 @@
   (.setLevel (. Level ALL))
   (.addAppender file-appender)
   (.addAppender console-appender))
-
-(in-ns 'environment)
-
-(def reload-files false)

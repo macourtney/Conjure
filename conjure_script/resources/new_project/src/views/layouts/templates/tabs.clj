@@ -1,9 +1,9 @@
 (ns views.layouts.templates.tabs
-  (:use conjure.view.base)
-  (:require [conjure.controller.util :as controller-util]
-            [conjure.server.request :as request]
-            [conjure.util.string-utils :as string-utils]
-            [conjure.view.util :as view-util]))
+  (:use conjure.core.view.base)
+  (:require [conjure.core.controller.util :as controller-util]
+            [conjure.core.server.request :as request]
+            [conjure.core.util.string-utils :as string-utils]
+            [conjure.core.view.util :as view-util]))
 
 (defn 
 #^{ :doc "Returns the url for a tab." }

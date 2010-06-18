@@ -1,8 +1,8 @@
 (ns views.layouts.templates.links
-  (:use conjure.view.base)
-  (:require [conjure.server.request :as request]
-            [conjure.util.string-utils :as string-utils]
-            [conjure.view.util :as view-util]))
+  (:use conjure.core.view.base)
+  (:require [conjure.core.server.request :as request]
+            [conjure.core.util.string-utils :as string-utils]
+            [conjure.core.view.util :as view-util]))
 
 (defn
 #^{ :doc "Returns the link controller from the given link map." }

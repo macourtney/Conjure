@@ -1,5 +1,5 @@
 (ns views.home.index
-  (:use conjure.view.base))
+  (:use conjure.core.view.base))
 
 (def-view []
   [:div { :class "article" }

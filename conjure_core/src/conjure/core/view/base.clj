@@ -1,7 +1,7 @@
 (ns conjure.core.view.base
-  (:require [config.environment :as environment]
-            [hiccup.core :as hiccup]
+  (:require [hiccup.core :as hiccup]
             [clojure.contrib.str-utils :as str-utils]
+            [conjure.core.config.environment :as environment]
             [conjure.core.server.request :as request]
             [conjure.core.util.string-utils :as conjure-str-utils]
             [conjure.core.util.html-utils :as html-utils]

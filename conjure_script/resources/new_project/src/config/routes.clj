@@ -3,9 +3,9 @@
 (ns config.routes
   (:require [clojure.contrib.logging :as logging]
             [clojure.contrib.str-utils :as contrib-str-utils]
-            [conjure.controller.util :as controller-util]
-            [conjure.server.request :as request]
-            [conjure.util.loading-utils :as loading-utils]))
+            [conjure.core.controller.util :as controller-util]
+            [conjure.core.server.request :as request]
+            [conjure.core.util.loading-utils :as loading-utils]))
 
 (defn
 #^{ :doc "Given a path, this function returns the controller, action and id in a map." }

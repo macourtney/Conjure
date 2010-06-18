@@ -1,5 +1,5 @@
 (ns views.layouts.application
-  (:use conjure.view.base)
+  (:use conjure.core.view.base)
   (:require [com.reasonr.scriptjure :as scriptjure]
             [views.layouts.templates.breadcrumbs :as breadcrumbs]
             [views.layouts.templates.header :as header]

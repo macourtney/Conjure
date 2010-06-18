@@ -2,7 +2,7 @@
   (:use clojure.contrib.test-is
         conjure.core.view.base)
   (require [com.reasonr.scriptjure :as scriptjure]
-           [config.environment :as environment]
+           [conjure.core.config.environment :as environment]
            [conjure.core.server.request :as request]))
 
 (def-view [view-message]

@@ -1,8 +1,8 @@
 (ns config.environments.development
   (:import [org.apache.log4j ConsoleAppender FileAppender Level Logger PatternLayout]
            [org.apache.log4j.varia LevelRangeFilter])
-  (:require [conjure.util.logging-utils :as logging-utils]
-            [clojure.contrib.logging :as logging]))
+  (:require [config.environment :as environment]
+            [conjure.core.util.logging-utils :as logging-utils]))
 
 ; Sets up the logger for development mode.
 (def output-pattern (new PatternLayout "%-5p [%c]: %m%n"))
@@ -22,6 +22,4 @@
   (.addAppender file-appender)
   (.addAppender console-appender))
 
-(in-ns 'environment)
-
-(def reload-files true)
+(swap! environment/properties assoc :reload-files true)

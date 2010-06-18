@@ -1,2 +1,2 @@
 (ns controllers.app
-  (:use conjure.controller.base))
+  (:use conjure.core.controller.base))
