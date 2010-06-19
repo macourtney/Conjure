@@ -1,5 +1,5 @@
 (defproject conjure-core "0.7.0-SNAPSHOT"
-  :description "Conjure is a full stack web framework written entirely in Clojure."
+  :description "Core libraries for Conjure. Conjure is a full stack web framework written entirely in Clojure."
   :dependencies [[commons-lang/commons-lang "2.5"]
                  [com.h2database/h2 "1.1.114"]
                  [hiccup "0.2.5"]

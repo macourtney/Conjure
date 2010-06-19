@@ -23,14 +23,13 @@
   create-file [entry-file zip-entry]
   (.mkdirs (.getParentFile entry-file)) 
   (with-open [fileInputStream (BufferedInputStream. (ClassLoader/getSystemResourceAsStream (.getName zip-entry)))]
-   (duck-streams/copy fileInputStream entry-file)))
+    (duck-streams/copy fileInputStream entry-file)))
 
 (defn
   extract-zip-entry 
   ([directory zip-entry] (extract-zip-entry directory zip-entry new-project-zip-directory))
   ([directory zip-entry zip-directory-name]
     (let [entry-file (entry-file directory zip-entry zip-directory-name)]
-      (println "Creating:" (.getPath entry-file))
       (if (.isDirectory zip-entry)
         (.mkdir entry-file)
         (create-file entry-file zip-entry)))))
