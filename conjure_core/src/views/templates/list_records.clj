@@ -8,9 +8,10 @@
 (defn
 #^{ :doc "Creates the header text from the given table-column." }
   header-name [table-column]
+  (logging/debug (str "table-column: " table-column))
   [:th (conjure-str-utils/human-title-case 
     (conjure-str-utils/strip-ending 
-      (. (:field table-column) toLowerCase) 
+      (.toLowerCase (:field table-column)) 
       "_id"))])
 
 (def-view [model-name table-metadata records]

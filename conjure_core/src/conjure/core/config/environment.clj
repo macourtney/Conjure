@@ -15,7 +15,7 @@
 
 (def source-dir (find-config-env-value :source-dir "src"))
 
-(def assets-dir (find-config-env-value :assets-dir "resources/public"))
+(def assets-dir (find-config-env-value :assets-dir "public"))
 (def javascripts-dir (find-config-env-value :javascripts-dir "javascripts"))
 (def stylesheets-dir (find-config-env-value :stylesheets-dir "stylesheets"))
 (def images-dir (find-config-env-value :images-dir "images"))

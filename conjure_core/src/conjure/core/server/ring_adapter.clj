@@ -38,15 +38,14 @@ request map." }
   wrap-resource-dir [app root-path]
   (fn [request]
     (if (= :get (:request-method request))
-      (let [resource-path (codec/url-decode (:uri request))
-            full-path (str root-path resource-path)
-            body (loading-utils/find-resource full-path)]
-        (logging/debug (str "resource-path: " resource-path))
-        (logging/debug (str "root-path: " root-path))
-        (logging/debug (str "full-path: " full-path))
-        (logging/debug (str "body: " body))
-        (response/response body)
-        (app request))
+      (let [resource-path (codec/url-decode (:uri request))]
+        (if (.endsWith resource-path "/")
+          (app request)
+          (let [full-path (str root-path resource-path)
+                body (loading-utils/find-resource full-path)]
+            (if body
+              (response/response body)
+              (app request)))))
       (app request))))
 
 (defn

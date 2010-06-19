@@ -4,7 +4,7 @@
 
 (def properties
   (atom 
-    { :assets-dir "resources/public"
+    { :assets-dir "public"
       :javascripts-dir "javascripts"
       :stylesheets-dir "stylesheets"
       :images-dir "images"

@@ -14,7 +14,14 @@
     (call-server 
       { :uri uri
         :query-string "foo=bar&baz=biz" })))
-      
+
+(defn noop-app [request]
+  nil)
+
+(deftest test-wrap-resource-dir
+  (is ((wrap-resource-dir noop-app "public") { :request-method :get, :uri "/stylesheets/main.css" }))
+  (is (nil? ((wrap-resource-dir noop-app "public") { :request-method :get, :uri "/" }))))
+
 (deftest test-conjure
   (is
     (conjure 
