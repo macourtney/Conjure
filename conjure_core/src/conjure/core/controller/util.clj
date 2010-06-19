@@ -1,5 +1,6 @@
 (ns conjure.core.controller.util
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.contrib.duck-streams :as duck-streams]
+            [clojure.contrib.logging :as logging]
             [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.str-utils :as str-utils]
             [conjure.core.config.environment :as environment]
@@ -52,13 +53,12 @@
   ([controllers-directory controller-name]
     (if controller-name
       (file-utils/find-file controllers-directory (controller-file-name-string controller-name)))))
-  
+
 (defn
 #^{ :doc "Returns the controller namespace for the given controller." }
   controller-namespace [controller]
   (when controller
     (str controllers-namespace "." (loading-utils/underscores-to-dashes controller) controller-namespace-ending)))
-    
 
 (defn
   is-controller-namespace? [namespace]
@@ -68,10 +68,6 @@
         (.startsWith namespace (str controllers-dir "."))
         (not (= namespace "controllers.app")))
       (is-controller-namespace? (name (ns-name namespace))))))
-
-(defn
-  all-controller-namespaces []
-  (filter is-controller-namespace? (all-ns)))
 
 (defn
 #^{ :doc "Returns the controller from the given namespace. The controller is assumed to be the last part of the 
@@ -85,9 +81,22 @@ namespace." }
       (controller-from-namespace (name (ns-name namespace))))))
 
 (defn
+  controller-file-name? [file-name]
+  (when file-name
+    (.endsWith file-name "_controller.clj")))
+
+(defn
+  controllers-from-resource [controllers-dir-resource]
+  (with-open [controllers-dir-reader (duck-streams/reader controllers-dir-resource)]
+    (map controller-from-file 
+      (filter controller-file-name?
+        (str-utils/re-split #"\s+" 
+          (str-utils/str-join " " (line-seq controllers-dir-reader)))))))
+
+(defn
 #^{ :doc "Returns the names of all of the controllers for this app." }
   all-controllers []
-  (map controller-from-namespace (all-controller-namespaces)))
+  (mapcat controllers-from-resource (loading-utils/find-resources controllers-dir)))
 
 (defn
 #^{ :doc "Returns true if the given controller exists." }
@@ -108,6 +117,21 @@ namespace." }
       (when (and controller-filename (controller-exists? controller-filename))
         (require :reload (symbol (controller-namespace controller)))
         (reload-conjure-namespaces controller)))))
+
+(defn
+  all-controller-namespaces []
+  (map
+    (fn [controller]
+      (let [controller-namespace-str (controller-namespace controller)
+            controller-namespace (find-ns (symbol controller-namespace-str))]
+        (if controller-namespace
+          controller-namespace
+          (do
+            (load-controller controller)
+            (find-ns (symbol controller-namespace-str))))))
+    (all-controllers))
+  ;(filter is-controller-namespace? (all-ns))
+  )
 
 (defn
 #^{ :doc "Returns fully qualified action generated from the given request map." }

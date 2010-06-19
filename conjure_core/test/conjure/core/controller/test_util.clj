@@ -4,6 +4,7 @@
         conjure.core.controller.util
         test-helper)
   (:require [clojure.contrib.logging :as logging]
+            [clojure.contrib.seq-utils :as seq-utils]
             [conjure.core.server.request :as request]))
 
 (def controller-name "test")
@@ -75,17 +76,25 @@
   (is (not (is-controller-namespace? "")))
   (is (not (is-controller-namespace? nil))))
 
+(defn find-first-str [string str-seq]
+  (seq-utils/find-first #(= string %) str-seq))
+
 (deftest test-all-controller-namespaces
   (let [controller-namespaces (all-controller-namespaces)]
-    (is (= 1 (count controller-namespaces)))
-    (is (= "controllers.test-controller" (name (ns-name (first controller-namespaces)))))))
+    (is (= 3 (count controller-namespaces)))
+    (is (find-first-str "controllers.test-controller"
+          (map #(name (ns-name %)) controller-namespaces)))))
 
 (deftest test-controller-from-namespace
   (is (= "test" (controller-from-namespace "controllers.test-controller")))
   (is (nil? (controller-from-namespace nil))))
 
 (deftest test-all-controllers
-  (is (= ["test"] (all-controllers))))
+  (let [controllers (all-controllers)]
+    (is (= 3 (count controllers)))
+    (is (find-first-str "test" controllers))
+    (is (find-first-str "template" controllers))
+    (is (find-first-str "home" controllers))))
 
 (deftest test-controller-exists?
   (request/set-request-map { :controller controller-name }

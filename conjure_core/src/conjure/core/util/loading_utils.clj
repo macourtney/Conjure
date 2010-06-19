@@ -20,6 +20,13 @@
   (.getResourceAsStream (system-class-loader) full-file-path))
 
 (defn
+#^{ :doc "Returns a sequence of streams for the given resource if it exists. Otherwise, this function returns an empty
+sequence." }
+  find-resources [full-file-path]
+  (map #(.openStream %)
+    (enumeration-seq (.findResources (system-class-loader) full-file-path))))
+
+(defn
  #^{ :doc "Returns true if the given resource exists. False otherwise." }
   resource-exists? [full-file-path]
   (if (find-resource full-file-path) true false))
