@@ -79,14 +79,14 @@ be found." }
       (is-plugin-namespace? (name (ns-name namespace))))))
 
 (defn
-#^{ :doc "Returns a sequence of all model namespaces." }
-  all-plugin-namespaces []
-  (filter is-plugin-namespace? (all-ns)))
-
-(defn
 #^{ :doc "Returns a list of all plugins in the app." }
   all-plugins []
-  (map plugin-name-from-namespace (all-plugin-namespaces)))
+  (loading-utils/all-class-path-file-names plugins-dir))
+
+(defn
+#^{ :doc "Returns a sequence of all model namespaces." }
+  all-plugin-namespaces []
+  (map plugin-ns (all-plugins)))
 
 (defn
 #^{ :doc "Returns a sequence of all of the initialize functions for all plugins in the app." }
