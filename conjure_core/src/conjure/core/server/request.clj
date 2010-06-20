@@ -169,7 +169,28 @@ then the scheme set in the ring-request is used." }
 
 (defmacro
   with-request-map-fn [function & body]
-  `(set-request-map (~function request-map) ~@body)) 
+  `(set-request-map (~function request-map) ~@body))
+
+(defn
+#^{ :doc "Merges the two values together. If both values are maps then they are merged together using this function.
+Otherwise, new-value is returned." }
+  map-merge [old-value new-value]
+  (if (map? new-value)
+    (if (map? old-value)
+      (merge-with map-merge old-value new-value)
+      new-value)
+    new-value))
+
+(defn
+#^{ :doc "Returns a new request map which is the merger of the given request map and the new map. All values in new map
+override the values in request-map unless both the request map and new map values are maps, in which case they are
+merged together with new map values always winning." }
+  request-map-merge [request-map new-map]
+  (merge-with map-merge request-map new-map))
+
+(defmacro
+  with-merged-request-map [new-map & body]
+  `(set-request-map (request-map-merge request-map ~new-map) ~@body))
 
 (defmacro
 #^{ :doc "With the given incoming request map which is the raw request map from ring, update the request map using 

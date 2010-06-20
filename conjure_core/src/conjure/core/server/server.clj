@@ -3,7 +3,7 @@
   (:require [clojure.contrib.java-utils :as java-utils]
             [clojure.contrib.logging :as logging]
             [config.http-config :as http-config]
-            [config.routes :as routes]
+            [conjure.core.config.routes-util :as routes-util]
             [config.session-config :as session-config]
             [conjure.core.config.environment :as environment]
             [conjure.core.controller.util :as controller-util]
@@ -65,7 +65,7 @@ one." }
 (defn
 #^{ :doc "Calls the given controller with the given request map returning the response." }
   call-controller []
-  (let [response (routes/route-request)]
+  (let [response (routes-util/route-request)]
     (if response
       (create-response-map response)
       (request/set-request-map { :controller "home", :action "error-404" }

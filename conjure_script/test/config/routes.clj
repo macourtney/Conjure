@@ -1,39 +1,26 @@
 ;; This file is used to route requests to the appropriate controller and action.
 
 (ns config.routes
-  (:require [clojure.contrib.logging :as logging]
-            [clojure.contrib.str-utils :as contrib-str-utils]
-            [conjure.core.controller.util :as controller-util]
-            [conjure.core.server.request :as request]
-            [conjure.core.util.loading-utils :as loading-utils]))
+  (:require [clout.core :as clout]))
 
-(defn
-#^{ :doc "Given a path, this function returns the controller, action and id in a map." }
-  parse-path [path]
-  (when path
-    (let [path-groups (re-matches #"/?(([^/]+)/?(([^/]+)/?([^/]+)?)?)?" path)]
-      (when path-groups
-        (let [controller (or (nth path-groups 2 nil) "home")
-              action (or (nth path-groups 4 nil) "index")
-              id (nth path-groups 5 nil)
-              path-map { :controller (loading-utils/underscores-to-dashes controller)
-                         :action (loading-utils/underscores-to-dashes action) }]
-          (if id
-            (assoc path-map :id id)
-            path-map))))))
+(def routes 
+  {
+    :compiled 
+      [ { :route (clout/route-compile "/:controller/:action/:id")
+          :request-map { :controller 'controller, :action 'action, :params { :id 'id } } }
 
-(defn
-#^{ :doc "Calls the controller action specified in the given path-map. Path-map must contain :controller and :action 
-keys, and may contain optional :id key. The controller, action and id will be appropriately merged into the request-map
-before calling the controller action." }
-  call-controller [{ :keys [controller action id] }]
-  (request/with-controller-action-id controller action id
-    (controller-util/call-controller)))
+        { :route (clout/route-compile "/:controller/:action")
+          :request-map { :controller 'controller, :action 'action } }
 
-(defn
-#^{ :doc "This function calls the appropriate controller and action." }
-  route-request []
-  (let [path-map (parse-path (request/uri))]
-    (when path-map
-      (logging/debug "Using default router.")
-      (call-controller path-map))))
+        { :route (clout/route-compile "/:controller")
+          :request-map { :controller 'controller, :action "index" } }
+
+        { :route (clout/route-compile "/")
+          :request-map { :controller "home", :action "index" } } ]
+
+    ; If you want to use your own route function, uncomment the key below and add your function to the vector. You 
+    ; function should take no arguments, and return a partial request map containing at least the controller and action
+
+    ;:functions []
+     })
+
