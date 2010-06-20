@@ -91,6 +91,7 @@
 
 (deftest test-all-controllers
   (let [controllers (all-controllers)]
+    (println "controllers:" controllers)
     (is (= 3 (count controllers)))
     (is (find-first-str "test" controllers))
     (is (find-first-str "template" controllers))

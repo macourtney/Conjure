@@ -251,3 +251,27 @@ cannot be found.." }
 #^{ :doc "Returns all of the zip entries in the classpath with the given directory name." }
   class-path-zip-entries [dir-name]
   (mapcat #(directory-zip-entries % dir-name) (classpath/classpath-jarfiles)))
+
+(defn
+#^{ :doc "Returns all of the files in the sub directory of the given parent directory, if the full parent and sub 
+directory exists. Otherwise, this function returns nil." }
+  files-in-sub-dir [parent-dir sub-dir]
+  (let [full-dir (File. parent-dir sub-dir)]
+    (when (.exists full-dir)
+      (.listFiles full-dir))))
+
+(defn
+#^{ :doc "Returns all of the file names in the given directory in all of the class path directories." }
+  all-class-path-dir-file-names [dir-name]
+  (map #(.getName %)
+    (mapcat #(files-in-sub-dir % dir-name) (classpath/classpath-directories))))
+
+(defn
+#^{ :doc "Returns all of the file names in the given directory in all of the class path jars." }
+  all-class-path-jar-file-names [dir-name]
+  (map #(.getName (File. (.getName %))) (class-path-zip-entries dir-name)))
+
+(defn
+#^{ :doc "Returns all of the file names in the given directory on the class path." }
+  all-class-path-file-names [dir-name]
+  (concat (all-class-path-dir-file-names dir-name) (all-class-path-jar-file-names dir-name)))

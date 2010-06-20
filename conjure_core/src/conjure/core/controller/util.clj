@@ -86,17 +86,11 @@ namespace." }
     (.endsWith file-name "_controller.clj")))
 
 (defn
-  controllers-from-resource [controllers-dir-resource]
-  (with-open [controllers-dir-reader (duck-streams/reader controllers-dir-resource)]
-    (map controller-from-file 
-      (filter controller-file-name?
-        (str-utils/re-split #"\s+" 
-          (str-utils/str-join " " (line-seq controllers-dir-reader)))))))
-
-(defn
 #^{ :doc "Returns the names of all of the controllers for this app." }
   all-controllers []
-  (mapcat controllers-from-resource (loading-utils/find-resources controllers-dir)))
+  (map controller-from-file
+    (filter controller-file-name?
+      (loading-utils/all-class-path-file-names controllers-dir))))
 
 (defn
 #^{ :doc "Returns true if the given controller exists." }
@@ -119,19 +113,22 @@ namespace." }
         (reload-conjure-namespaces controller)))))
 
 (defn
+#^{ :doc "Returns the namespace for the given controller. This is the namespace object, not the string represenation of
+the namespace. If the namespace is not found, this function attempts to reload the controller then finds the namespace
+again." }
+  find-controller-namespace [controller]
+  (let [controller-namespace-str (controller-namespace controller)
+        controller-namespace (find-ns (symbol controller-namespace-str))]
+    (if controller-namespace
+      controller-namespace
+      (do
+        (load-controller controller)
+        (find-ns (symbol controller-namespace-str))))))
+
+(defn
+#^{ :doc "Returns all of the controller namespaces in the app." }
   all-controller-namespaces []
-  (map
-    (fn [controller]
-      (let [controller-namespace-str (controller-namespace controller)
-            controller-namespace (find-ns (symbol controller-namespace-str))]
-        (if controller-namespace
-          controller-namespace
-          (do
-            (load-controller controller)
-            (find-ns (symbol controller-namespace-str))))))
-    (all-controllers))
-  ;(filter is-controller-namespace? (all-ns))
-  )
+  (map find-controller-namespace (all-controllers)))
 
 (defn
 #^{ :doc "Returns fully qualified action generated from the given request map." }
