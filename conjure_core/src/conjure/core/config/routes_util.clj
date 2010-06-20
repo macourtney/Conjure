@@ -3,7 +3,8 @@
             [clout.core :as clout]
             [config.routes :as routes]
             [conjure.core.controller.util :as controller-util]
-            [conjure.core.server.request :as request]))
+            [conjure.core.server.request :as request]
+            [conjure.core.util.loading-utils :as loading-utils]))
 
 (defn
   function-parse []
@@ -26,13 +27,25 @@
     request-map))
 
 (defn
+  clean-controller-action [request-map]
+  (reduce
+    (fn [output [request-key request-value]]
+      (cond
+        (or (= request-key :controller) (= request-key :action))
+          (assoc output request-key (loading-utils/underscores-to-dashes request-value))
+        true
+          (assoc output request-key request-value)))
+    {}
+    request-map))
+
+(defn
   parse-compiled-route [compiled-route-map]
   (let [route (:route compiled-route-map)
         request-map (:request-map compiled-route-map)]
     (when (and route request-map)
       (let [route-map (clout/route-matches route (request/uri))]
         (when route-map
-          (symbol-replace request-map route-map))))))
+          (clean-controller-action (symbol-replace request-map route-map)))))))
 
 (defn
   compiled-parse []
@@ -56,5 +69,6 @@ before calling the controller action." }
 #^{ :doc "This function calls the appropriate controller and action." }
   route-request []
   (let [path-map (parse-path)]
+    (logging/debug (str "path-map: " path-map))
     (when path-map
       (call-controller path-map))))

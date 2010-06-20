@@ -71,7 +71,13 @@
       { :controller "home", :action "index" }
       (parse-compiled-route 
         { :route (clout/route-compile "/")
-          :request-map { :controller "home", :action "index" } })))))
+          :request-map { :controller "home", :action "index" } }))))
+  (request/set-request-map { :request { :uri "/message/list_records" } }
+    (is (= 
+      { :controller "message", :action "list-records" }
+      (parse-compiled-route 
+        { :route (clout/route-compile "/:controller/:action")
+          :request-map { :controller 'controller, :action 'action } })))))
 
 (deftest test-compiled-parse
   (request/set-request-map { :request { :uri "/home/index/1" } }
