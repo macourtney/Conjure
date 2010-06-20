@@ -46,4 +46,3 @@
     (if base-config
       (((:flavor base-config) :db-map) base-config)
       (throw (new RuntimeException (str "Unknown environment: " environment ". Please check your conjure.environment system property."))))))
-      

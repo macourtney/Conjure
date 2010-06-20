@@ -15,23 +15,34 @@
 
 (def initialized? (ref false))
 
+(def init? (promise))
+
+(defn
+  init-promise-fn []
+  (environment/require-environment)
+  (database/init-database)
+  ((:init session-config/session-store))
+  (logging/info "Server Initialized.")
+  (logging/info "Initializing plugins...")
+  (plugin-util/initialize-all-plugins)
+  (logging/info "Plugins initialized.")
+  (logging/info "Initializing app controller...")
+  (try
+    (require 'controllers.app)
+    (logging/info "App controller initialized.")
+    (deliver init? true)
+  (catch Throwable t
+    (logging/error "Failed to initialize app controller." t)
+    (deliver init? false))))
+
 (defn
 #^{ :doc "Initializes the conjure server." }
   init []
-  (when (not @initialized?)
-    (dosync
-      (ref-set initialized? true))
-    ((:init session-config/session-store))
-    (logging/info "Server Initialized.")
-    (logging/info "Initializing plugins...")
-    (plugin-util/initialize-all-plugins)
-    (logging/info "Plugins initialized.")
-    (logging/info "Initializing app controller...")
-    (try
-      (require 'controllers.app)
-      (logging/info "App controller initialized.")
-    (catch Throwable t
-      (logging/error "Failed to initialize app controller." t)))))
+  (dosync
+    (when (not @initialized?)
+      (ref-set initialized? true)
+      (init-promise-fn)))
+  @init?)
 
 (defn 
 #^{ :doc "Manages the session cookie in the response map." }

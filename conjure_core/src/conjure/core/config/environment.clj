@@ -50,6 +50,4 @@
 (defn
 #^{ :doc "Returns true if Conjure should reload files for every request." }
   reload-files? []
-  (find-config-env-value :reload-files false)) 
-
-(require-environment)
+  (find-config-env-value :reload-files false))

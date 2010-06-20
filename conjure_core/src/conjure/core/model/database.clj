@@ -3,22 +3,30 @@
             [config.db-config :as db-config]
             [conjure.core.util.string-utils :as string-utils]))
 
-(def conjure-db (db-config/load-config))
+(def conjure-db (atom {}))
 
 (defn
-  create-db-map []
-  { :datasource (:datasource conjure-db)
-    :username (:username conjure-db)
-    :password (:password conjure-db)
-    :subprotocol (:subprotocol conjure-db) })
+  create-db-map [_]
+  { :datasource (:datasource @conjure-db)
+    :username (:username @conjure-db)
+    :password (:password @conjure-db)
+    :subprotocol (:subprotocol @conjure-db) })
 
-(def db (create-db-map))
+(def db (atom {}))
+
+(defn
+  update-conjure-db [_]
+  (db-config/load-config))
+
+(defn init-database []
+  (swap! conjure-db update-conjure-db)
+  (swap! db create-db-map))
 
 (defn
 #^{:doc "Returns the db-flavor from the conjure-db map. If a key is pressent, then this method returns the value of 
 that key in the db-flavor"}
   db-flavor 
-  ([] (:flavor conjure-db))
+  ([] (:flavor @conjure-db))
   ([flavor-key] (get (db-flavor) flavor-key)))
 
 (defn
@@ -36,7 +44,7 @@ database flavor function with the current db spec and any arguments"}
   def-db-fn [type-key]
   (let [spec-name (string-utils/str-keyword type-key)]
     `(defn ~(symbol spec-name)
-      ([& args#] (call-db-fn ~type-key db args#)))))
+      ([& args#] (call-db-fn ~type-key (deref db) args#)))))
 
 (def-db-fn :create-table)
 

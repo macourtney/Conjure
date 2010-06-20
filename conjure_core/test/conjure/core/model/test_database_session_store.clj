@@ -2,11 +2,19 @@
   (:use test-helper
         clojure.contrib.test-is
         conjure.core.model.database-session-store)
-  (:require [conjure.core.model.database :as database]
+  (:require [conjure.core.config.environment :as environment]
+            [conjure.core.model.database :as database]
             [conjure.core.server.request :as request]
             [conjure.core.util.session-utils :as session-utils]))
 
 (def test-session-id "blah")
+
+(defn init-database [test-fn]
+  (environment/require-environment)
+  (database/init-database)
+  (test-fn))
+
+(use-fixtures :once init-database)
 
 (deftest test-session-store
   (is (= (:init session-store) init))
