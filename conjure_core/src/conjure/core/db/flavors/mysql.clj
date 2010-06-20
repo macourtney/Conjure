@@ -230,6 +230,12 @@ create-table method.
       (sql/drop-table (table-name table)))))
 
 (defn
+  describe-table [db-spec table]
+  (do
+    (logging/debug (str "Describe table: " table))
+    (execute-query db-spec [(str "SHOW COLUMNS FROM " (table-name table))])))
+
+(defn
 #^{:doc "Deletes rows from the table with the given name."}
   delete [db-spec table where]
   (do
@@ -263,6 +269,7 @@ create-table method.
     :sql-find sql-find
     :create-table create-table
     :drop-table drop-table
+    :describe-table describe-table
     :delete delete
     :integer integer
     :id id

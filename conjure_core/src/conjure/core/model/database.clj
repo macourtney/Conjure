@@ -37,21 +37,23 @@ database flavor function with the current db spec and any arguments"}
   (let [spec-name (string-utils/str-keyword type-key)]
     `(defn ~(symbol spec-name)
       ([& args#] (call-db-fn ~type-key db args#)))))
-    
-(def-db-fn :table-exists?)
-
-(def-db-fn :sql-find)
-
-(def-db-fn :insert-into)
-
-(def-db-fn :update)
 
 (def-db-fn :create-table)
 
+(def-db-fn :delete)
+
+(def-db-fn :describe-table)
+
 (def-db-fn :drop-table)
 
-(def-db-fn :delete)
-   
+(def-db-fn :insert-into)
+
+(def-db-fn :sql-find)
+
+(def-db-fn :table-exists?)
+
+(def-db-fn :update)
+
 (defmacro
 #^{:doc "Given the type-key of a function in the database flavor, define a function named type-key which calls the 
 database flavor function passing any arguments."}
@@ -60,21 +62,21 @@ database flavor function passing any arguments."}
     `(defn ~(symbol spec-name)
       ([& args#] (call-db-fn ~type-key args#)))))
 
+(def-column-spec :belongs-to)
+
+(def-column-spec :date)
+
+(def-column-spec :date-time)
+
+(def-column-spec :id)
+
 (def-column-spec :integer)
 
 (def-column-spec :string)
 
 (def-column-spec :text)
 
-(def-column-spec :belongs-to)
-
-(def-column-spec :id)
-
-(def-column-spec :date)
-
 (def-column-spec :time-type)
-
-(def-column-spec :date-time)
 
 (defmacro
 #^{:doc "Given the type-key of a function in the database flavor, define a function named type-key which calls the 

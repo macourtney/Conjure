@@ -1,5 +1,6 @@
 (ns helpers.template-helper
   (:require [clj-record.core :as clj-record-core]
+            [conjure.core.model.database :as database]
             [conjure.core.model.util :as model-util]
             [conjure.core.server.request :as request]
             [conjure.core.util.string-utils :as string-utils]
@@ -9,7 +10,7 @@
 #^{ :doc "Returns the metadata for the given model." }
   table-metadata [model-name]
   (model-util/load-model model-name)
-  (clj-record-core/find-by-sql model-name [(str "SHOW COLUMNS FROM " (clj-record-core/table-name model-name))]))
+  (database/describe-table (clj-record-core/table-name model-name)))
 
 (defn
 #^{ :doc "Returns the result of a find records call on the given model with the given attributes" }

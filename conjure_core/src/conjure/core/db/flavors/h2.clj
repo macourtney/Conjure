@@ -241,6 +241,17 @@ create-table method.
     (sql/with-connection db-spec
       (sql/drop-table (table-name table)))))
 
+(defn-
+  update-column-desc [column-description]
+  (let [field (:column_name column-description)]
+    (assoc (dissoc column-description :column_name) :field field)))
+
+(defn
+  describe-table [db-spec table]
+  (do
+    (logging/debug (str "Describe table: " table))
+    (map update-column-desc (execute-query db-spec [(str "SHOW COLUMNS FROM " (table-name table))]))))
+
 (defn
 #^{:doc "Deletes rows from the table with the given name."}
   delete [db-spec table where]
@@ -275,6 +286,7 @@ create-table method.
     :sql-find sql-find
     :create-table create-table
     :drop-table drop-table
+    :describe-table describe-table
     :delete delete
     :integer integer
     :id id
