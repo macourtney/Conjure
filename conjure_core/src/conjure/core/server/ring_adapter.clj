@@ -1,7 +1,8 @@
 (ns conjure.core.server.ring-adapter
   (:import [java.io File]
            [java.util Date])
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.contrib.classpath :as classpath]
+            [clojure.contrib.logging :as logging]
             [conjure.core.config.environment :as environment]
             [conjure.core.controller.util :as controller-util]
             [conjure.core.helper.util :as helper-util]

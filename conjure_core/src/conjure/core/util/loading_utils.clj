@@ -1,5 +1,5 @@
 (ns conjure.core.util.loading-utils
-  (:import [java.io File FileNotFoundException])
+  (:import [java.io File FileInputStream FileNotFoundException])
   (:require [clojure.contrib.classpath :as classpath]
             [clojure.contrib.logging :as logging]
             [clojure.contrib.ns-utils :as ns-utils]
@@ -14,17 +14,45 @@
   system-class-loader []
   (ClassLoader/getSystemClassLoader))
 
+(defn
+  user-classpath-var? []
+  (resolve 'user/*classpath*))
+
+(defn
+  classpath-directories []
+  (let [classpath (user-classpath-var?)]
+    (if classpath
+      (filter #(.isDirectory %) (map #(File. %) (.split (var-get classpath) (System/getProperty "path.separator"))))
+      (classpath/classpath-directories))))
+
+(defn
+  find-all-classpath-files [full-file-path]
+  (filter #(.exists %) 
+    (map #(File. % full-file-path) (classpath-directories))))
+
+(defn
+  find-classpath-file [full-file-path]
+  (first (find-all-classpath-files full-file-path)))
+
 (defn 
 #^{ :doc "Returns a stream for the given resource if it exists. Otherwise, this function returns nil." }
   find-resource [full-file-path]
-  (.getResourceAsStream (system-class-loader) full-file-path))
+  (let [resource (.getResourceAsStream (system-class-loader) full-file-path)]
+    (if resource
+      resource
+      (when (user-classpath-var?)
+        (let [file (find-classpath-file full-file-path)]
+          (when file
+            (FileInputStream. file)))))))
 
 (defn
 #^{ :doc "Returns a sequence of streams for the given resource if it exists. Otherwise, this function returns an empty
 sequence." }
   find-resources [full-file-path]
-  (map #(.openStream %)
-    (enumeration-seq (.findResources (system-class-loader) full-file-path))))
+  (let [resource-streams (map #(.openStream %) (enumeration-seq (.findResources (system-class-loader) full-file-path)))]
+    (if (user-classpath-var?)
+      (concat resource-streams (map #(FileInputStream. %) (find-all-classpath-files full-file-path)))
+      resource-streams)))
 
 (defn
  #^{ :doc "Returns true if the given resource exists. False otherwise." }
@@ -264,7 +292,7 @@ directory exists. Otherwise, this function returns nil." }
 #^{ :doc "Returns all of the file names in the given directory in all of the class path directories." }
   all-class-path-dir-file-names [dir-name]
   (map #(.getName %)
-    (mapcat #(files-in-sub-dir % dir-name) (classpath/classpath-directories))))
+    (mapcat #(files-in-sub-dir % dir-name) (classpath-directories))))
 
 (defn
 #^{ :doc "Returns all of the file names in the given directory in all of the class path jars." }
