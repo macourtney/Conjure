@@ -45,7 +45,7 @@
 
 (defn
   set-database 
-  ([database])
+  ([database] (set-database database (file-utils/user-directory)))
   ([database directory]
     (let [db-config-file (File. directory "/src/config/db_config.clj")]
       (duck-streams/spit
@@ -56,14 +56,21 @@
   (println "Conjure Version:" conjure-version))
 
 (defn
+  create-new-project 
+  ([database version?] (create-new-project database version? (file-utils/user-directory)))
+  ([database version? directory]
+    (if version? 
+      (print-version) 
+      (extract-all directory))
+    (when database
+      (set-database database directory)))) 
+
+(defn
   run [args]
   (command-line/with-command-line args
     "./run.sh script/server.clj [options]"
     [[database "What database to use. Currenty valid options are mysql and h2" nil]
      [version? "Prints the current version."] 
      remaining]
-    (if version? 
-      (print-version) 
-      (extract-all))
-    (when database
-      (set-database database))))
+
+    (create-new-project database version?)))

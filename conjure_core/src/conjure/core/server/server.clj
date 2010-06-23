@@ -13,7 +13,7 @@
             [conjure.core.util.session-utils :as session-utils]
             [conjure.core.util.string-utils :as conjure-str-utils]))
 
-(def initialized? (ref false))
+(def initialized? (atom false))
 
 (def init? (promise))
 
@@ -38,10 +38,8 @@
 (defn
 #^{ :doc "Initializes the conjure server." }
   init []
-  (dosync
-    (when (not @initialized?)
-      (ref-set initialized? true)
-      (init-promise-fn)))
+  (when (compare-and-set! initialized? false true)
+    (init-promise-fn))
   @init?)
 
 (defn 

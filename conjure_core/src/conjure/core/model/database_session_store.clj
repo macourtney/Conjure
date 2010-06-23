@@ -1,6 +1,7 @@
 (ns conjure.core.model.database-session-store
   (:import [java.util Calendar Date])
-  (:require [conjure.core.model.database :as database]
+  (:require [clojure.contrib.logging :as logging]
+            [conjure.core.model.database :as database]
             [conjure.core.util.session-utils :as session-utils]
             [conjure.core.util.string-utils :as conjure-str-utils]))
 
@@ -14,10 +15,10 @@
   init []
   (when (not (database/table-exists? session-table))
     (database/create-table session-table
-      (database/id)
-      (database/date-time created-at-column)
-      (database/string session-id-column)
-      (database/text data-column))))
+        (database/id)
+        (database/date-time created-at-column)
+        (database/string session-id-column)
+        (database/text data-column))))
 
 (defn
 #^{ :doc "Creates a row in the database for a new session and returns the session id. If a value is given, it is saved 

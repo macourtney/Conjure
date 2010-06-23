@@ -27,5 +27,5 @@
 
 (defn -main [& args]
   (if (empty? args)
-    (recur "server") 
+    (recur ["server"])
     (run-script (first args) (rest args))))
