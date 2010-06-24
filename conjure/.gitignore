@@ -1,6 +1,6 @@
 pom.xml
-*jar
-lib
 classes
 db
+conjure.jar
+conjure-standalone.jar
 log
