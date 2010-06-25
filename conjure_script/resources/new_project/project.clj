@@ -5,4 +5,4 @@
                  [conjure-core "0.7.0-SNAPSHOT"]]
   :dev-dependencies [[lein-conjure "0.7.0-SNAPSHOT"]]
   
-  :main run-server)
+  :main run)

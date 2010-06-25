@@ -18,6 +18,12 @@
     (. Integer MAX_VALUE)))
 
 (defn
+  migrate [mode version]
+  (server/set-mode mode)
+  (server/init)
+  (runner/update-to-version (version-number version)))
+
+(defn
   run [args]
   (command-line/with-command-line args
     "lein conjure migrate [options]"
@@ -25,7 +31,5 @@
       [mode "The server mode. For example, development, production, or test." nil]
       remaining]
   
-    (server/set-mode mode)
-    (server/init)
-    (runner/update-to-version (version-number version))))
+    (migrate mode version)))
 
