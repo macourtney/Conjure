@@ -6,7 +6,8 @@
             [conjure.core.util.loading-utils :as loading-utils] 
             [conjure.script.new :as conjure-new]))
 
-(def lib-dir-name "lib") 
+(def lib-dir-name "lib")
+(def default-project-name "*my-project*") 
 
 (defn lib-jar-file-names []
   (filter #(.endsWith % ".jar") (loading-utils/all-class-path-file-names lib-dir-name))) 
@@ -27,6 +28,9 @@
      [version? "Prints the current version."] 
      remaining]
 
-    (let [project-directory (loading-utils/dashes-to-underscores (first remaining))]
+    (let [passed-in-project-name (first remaining)
+          project-name (loading-utils/underscores-to-dashes passed-in-project-name)
+          project-directory (loading-utils/dashes-to-underscores passed-in-project-name)]
       (conjure-new/create-new-project database version? project-directory)
-      (copy-libs project-directory))))
+      (copy-libs project-directory)
+      (conjure-new/replace-in-file (java-utils/file project-directory "project.clj") default-project-name project-name))))

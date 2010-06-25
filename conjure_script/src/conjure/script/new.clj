@@ -44,13 +44,16 @@
       (extract-zip-entry directory zip-entry zip-directory-name)))) 
 
 (defn
+  replace-in-file [file target replacement]
+  (duck-streams/spit
+    file 
+    (.replace (duck-streams/slurp* file) target replacement)))
+
+(defn
   set-database 
   ([database] (set-database database (file-utils/user-directory)))
   ([database directory]
-    (let [db-config-file (File. directory "/src/config/db_config.clj")]
-      (duck-streams/spit
-        db-config-file 
-        (.replaceAll (duck-streams/slurp* db-config-file) default-database database)))))
+    (replace-in-file (File. directory "/src/config/db_config.clj") default-database database)))
 
 (defn print-version []
   (println "Conjure Version:" conjure-version))
