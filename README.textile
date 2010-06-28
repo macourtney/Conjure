@@ -4,7 +4,7 @@ Conjure is a Rails like framework for the Clojure programming language. The goal
 
 * "ring":http://github.com/mmcgrana/ring/tree
 * "clj-record":http://github.com/duelinmarkers/clj-record/tree
-* "clj-html":http://github.com/mmcgrana/clj-html/tree
+* "hiccup":http://github.com/weavejester/hiccup
 * and more..
 
 To get started with Conjure, see the "Getting Started":http://wiki.github.com/macourtney/Conjure/getting-started wiki page.

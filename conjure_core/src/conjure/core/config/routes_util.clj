@@ -69,6 +69,5 @@ before calling the controller action." }
 #^{ :doc "This function calls the appropriate controller and action." }
   route-request []
   (let [path-map (parse-path)]
-    (logging/debug (str "path-map: " path-map))
     (when path-map
       (call-controller path-map))))
