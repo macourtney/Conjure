@@ -14,6 +14,8 @@
 (def default-environment (find-config-env-value :default-environment "development"))
 
 (def source-dir (find-config-env-value :source-dir "src"))
+(def test-dir (find-config-env-value :test-dir "test"))
+
 
 (def assets-dir (find-config-env-value :assets-dir "public"))
 (def javascripts-dir (find-config-env-value :javascripts-dir "javascripts"))
@@ -41,6 +43,13 @@
   (or
     (loading-utils/get-classpath-dir-ending-with source-dir)
     (file-utils/find-directory (file-utils/user-directory) source-dir)))
+
+(defn
+#^{ :doc "Returns the test file directory as a File object, if it can be found." }
+  find-test-dir []
+  (or
+    (loading-utils/get-classpath-dir-ending-with test-dir)
+    (file-utils/find-directory (file-utils/user-directory) test-dir))) 
 
 (defn
 #^{ :doc "Returns the given child directory of the source directory if it can be found." }

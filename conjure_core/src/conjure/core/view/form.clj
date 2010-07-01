@@ -140,5 +140,7 @@ Supported options:
   button-to 
   ([text] (button-to text {}))
   ([text params]
-    (form-for (dissoc params :html-options)
-      (form-button (evaluate-if-fn text) (:html-options params)))))
+    (let [options (dissoc params :html-options)
+          button-text (request/with-request-map-fn #(view-utils/merge-url-for-params % options) (evaluate-if-fn text))]
+      (form-for options
+        (form-button button-text (:html-options params))))))

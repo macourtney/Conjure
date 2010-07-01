@@ -1,6 +1,7 @@
 (ns conjure.core.test.util
   (:import [java.io File])
-  (:require [conjure.core.util.file-utils :as file-utils]
+  (:require [conjure.core.config.environment :as environment]
+            [conjure.core.util.file-utils :as file-utils]
             [conjure.core.util.loading-utils :as loading-utils]
             [conjure.core.util.string-utils :as conjure-str-utils]))
 
@@ -14,14 +15,9 @@
 (def unit-binding-dir-name "binding")
 
 (defn
-#^{:doc "Finds the test directory."}
- find-test-directory []
- (loading-utils/get-classpath-dir-ending-with test-dir-name))
- 
-(defn
 #^{:doc "Finds the functional test directory."}
  find-functional-test-directory 
- ([] (find-functional-test-directory (find-test-directory)))
+ ([] (find-functional-test-directory (environment/find-test-dir)))
  ([test-directory]
    (if test-directory
      (file-utils/find-directory test-directory functional-dir-name))))
@@ -29,7 +25,7 @@
 (defn
 #^{:doc "Finds the functional test directory."}
  find-unit-test-directory 
- ([] (find-unit-test-directory (find-test-directory)))
+ ([] (find-unit-test-directory (environment/find-test-dir)))
  ([test-directory]
    (if test-directory
      (file-utils/find-directory test-directory unit-dir-name))))
@@ -77,7 +73,7 @@
 (defn
 #^{:doc "Finds the fixture directory."}
  find-fixture-directory 
- ([] (find-fixture-directory (find-test-directory)))
+ ([] (find-fixture-directory (environment/find-test-dir)))
  ([test-directory]
    (if test-directory
      (file-utils/find-directory test-directory fixture-dir-name))))
