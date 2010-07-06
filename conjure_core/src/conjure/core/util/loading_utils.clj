@@ -57,7 +57,13 @@ sequence." }
 (defn
  #^{ :doc "Returns true if the given resource exists. False otherwise." }
   resource-exists? [full-file-path]
-  (if (find-resource full-file-path) true false))
+  (let [resources (enumeration-seq (.findResources (system-class-loader) full-file-path))]
+    (if (and resources (not-empty resources))
+      true
+      (if (user-classpath-var?)
+        (let [file-resources (find-all-classpath-files full-file-path)]
+          (and file-resources (not-empty file-resources)))
+        false))))
 
 (defn
 #^{ :doc "Loads a given director and filename using the system class loader and returns the reader for it." }

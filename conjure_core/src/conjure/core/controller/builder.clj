@@ -10,9 +10,9 @@
       :or { controllers-directory (util/find-controllers-directory), silent false } }]
     (if (and controllers-directory controller)
       (let [controller-file (new File controllers-directory (util/controller-file-name-string controller))]
-        (if (. controller-file exists)
-          (logging/info (str (. controller-file getName) " already exists. Doing nothing."))
+        (if (.exists controller-file)
+          (logging/info (str (.getName controller-file) " already exists. Doing nothing."))
           (do
-            (logging/info (str "Creating controller file " (. controller-file getName) "..."))
-            (. controller-file createNewFile)
+            (logging/info (str "Creating controller file " (.getName controller-file) "..."))
+            (.createNewFile controller-file)
             controller-file)))))

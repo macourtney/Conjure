@@ -20,7 +20,7 @@ in the database." }
     (dosync
       (alter data-store assoc session-id 
         { created-at-key (new Date), data-key { key-name value } }))))
-      
+
 (defn
 #^{ :doc "Deletes the row in the database for the given session-id, or the session id from the request-map." }
   drop-session 

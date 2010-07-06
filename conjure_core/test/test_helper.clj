@@ -12,7 +12,7 @@
   
 (defn
 #^{:doc "Simply calls test-file on the given directory and name."}
-test-directory [directory expected-directory-name]
+  test-directory [directory expected-directory-name]
   (test-file directory expected-directory-name))
 
 (defn init-server [test-fn]
