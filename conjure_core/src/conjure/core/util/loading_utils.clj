@@ -301,9 +301,19 @@ directory exists. Otherwise, this function returns nil." }
     (mapcat #(files-in-sub-dir % dir-name) (classpath-directories))))
 
 (defn
+#^{ :doc "Returns the direct child directory of parent directory in the given zip-entry." }
+  zip-entry-child-dir [zip-entry parent-dir]
+  (let [parent-dir-count (if (.endsWith parent-dir "/") (count parent-dir) (inc (count parent-dir)))
+        zip-entry-name (.substring (.getName zip-entry) parent-dir-count)
+        dir-separator-index (.indexOf zip-entry-name "/")]
+    (if (> dir-separator-index 0)
+      (.substring zip-entry-name 0 (.indexOf zip-entry-name "/"))
+      zip-entry-name)))
+
+(defn
 #^{ :doc "Returns all of the file names in the given directory in all of the class path jars." }
   all-class-path-jar-file-names [dir-name]
-  (map #(.getName (File. (.getName %))) (class-path-zip-entries dir-name)))
+  (reduce #(conj %1 (zip-entry-child-dir %2 dir-name)) #{} (class-path-zip-entries dir-name)))
 
 (defn
 #^{ :doc "Returns all of the file names in the given directory on the class path." }

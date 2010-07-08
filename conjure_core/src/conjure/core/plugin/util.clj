@@ -74,9 +74,13 @@ be found." }
 (defn
   is-plugin-namespace? [namespace]
   (when namespace
-    (if (string? namespace)
-      (and (.startsWith namespace (str plugins-dir ".")) (.endsWith namespace ".plugin"))
-      (is-plugin-namespace? (name (ns-name namespace))))))
+    (cond
+      (string? namespace)
+        (and (.startsWith namespace (str plugins-dir ".")) (.endsWith namespace ".plugin"))
+      (symbol? namespace)
+        (is-plugin-namespace? (str namespace))
+      true 
+        (is-plugin-namespace? (name (ns-name namespace))))))
 
 (defn
 #^{ :doc "Returns a sequence of all model namespaces." }
@@ -96,69 +100,20 @@ be found." }
 (defn
 #^{ :doc "Runs the initialize function for all plugins in the app." }
   initialize-all-plugins []
-  (doseq [initialize-fn (all-initialize-fns)]
-    (try
-      (initialize-fn)
-      (catch Throwable t
-        (logging/error (str "An error occured when initializing plugin: " initialize-fn) t)))))
-
-(defn
-#^{ :doc "Returns the test directory for the given plugin. If the test directory does not exist, this function returns
-nil." }
-  plugin-test-directory [plugin-name]
-  (let [test-dir (File. (plugin-directory plugin-name) test-directory-name)]
-    (when (.exists test-dir)
-      test-dir)))
-
-(defn
-#^{ :doc "Returns the namespace string for the test with the given name and the plugin with the given name." }
-  test-namespace-name [plugin-name test-name]
-  (str "plugins." (loading-utils/underscores-to-dashes plugin-name) ".test." 
-    (loading-utils/underscores-to-dashes test-name)))
-
-(defn
-#^{ :doc "Returns all of the test clj files for the given plugin." }
-  test-files [plugin-name]
-  (let [test-dir (plugin-test-directory plugin-name)]
-    (if test-dir
-      (filter #(.isFile %1) (seq-utils/flatten (file-seq test-dir)))
-      '())))
-
-(defn
-#^{ :doc "Loads the given test file." }
-  load-test-file [test-file]
-  (load-file (. test-file getPath)))
+  (doseq [plugin-name (all-plugins)]
+    (logging/info (str "Initializing plugin: " plugin-name))
+    (if-let [init-fn (initialize-fn plugin-name)]
+      (try
+        (init-fn)
+        (catch Throwable t
+          (logging/error (str "An error occured when initializing plugin: " initialize-fn) t)))
+      (logging/error (str "Plugin, " plugin-name ", does not have an initialize function.")))))
 
 (defn
 #^{ :doc "Returns the namespace for the given plugin clj file." }
   plugin-file-namespace [plugin-file]
-  (let [app-path (. (find-plugins-directory) getPath)
-        file-parent-path (. plugin-file getParent)]
+  (let [app-path (.getPath (find-plugins-directory))
+        file-parent-path (.getParent plugin-file)]
     (symbol 
       (str "plugins." (loading-utils/namespace-string-for-file
-        (. file-parent-path substring (. app-path length)) (. plugin-file getName))))))
-
-(defn
-#^{ :doc "Runs all the tests in the given tests to run. Tests to run must be a sequence of namespace strings." }
-  run-test-list [tests-to-run]
-  (doseq [test-namespace-str tests-to-run]
-    (let [clj-file (File. (.getParentFile (find-plugins-directory)) (loading-utils/symbol-string-to-clj-file test-namespace-str))]
-      (logging/info (str "clj-file: " (.getPath clj-file)))
-      (load-file (.getPath clj-file))))
-  (apply test-is/run-tests (map symbol tests-to-run)))
-
-(defn
-#^{ :doc "Runs all the tests in the given plugin." }
-  run-all-plugin-tests [plugin-name]
-  (let [all-test-files (test-files plugin-name)]
-    (when all-test-files
-      (doseq [test-file all-test-files]
-        (load-test-file test-file))
-      (apply test-is/run-tests (map plugin-file-namespace all-test-files)))))
-
-(defn
-#^{ :doc "Runs all of the tests in the given plugin." }
-  run-plugin-tests [plugin-name tests-to-run]
-  (if (and tests-to-run (not-empty tests-to-run))
-    (run-test-list tests-to-run)
-    (run-all-plugin-tests plugin-name)))
+        (.substring file-parent-path (.length app-path)) (.getName plugin-file))))))

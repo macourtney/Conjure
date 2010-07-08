@@ -133,6 +133,10 @@
   clojure-jar []
   (seq-utils/find-first #(.endsWith (.getName %) "clojure-1.1.0.jar") (classpath/classpath-jarfiles)))
 
+(defn
+  clojure-contrib-jar []
+  (seq-utils/find-first #(.endsWith (.getName %) "clojure-contrib-1.1.0.jar") (classpath/classpath-jarfiles)))
+
 (deftest test-directory-zip-entries
   (let [clojure-entries (directory-zip-entries (clojure-jar) "clojure/xml/")]
     (is clojure-entries)
@@ -142,3 +146,8 @@
   (let [clojure-entries (class-path-zip-entries "clojure/xml/")]
     (is clojure-entries)
     (is (> (count clojure-entries) 0))))
+
+(deftest test-all-class-path-jar-file-names
+  (let [clojure-contrib-entries (all-class-path-jar-file-names "clojure/contrib/generic")]
+    (is clojure-contrib-entries)
+    (is (> (count clojure-contrib-entries) 0))))

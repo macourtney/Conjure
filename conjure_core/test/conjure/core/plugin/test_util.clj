@@ -55,36 +55,6 @@
 (deftest test-initialize-all-plugins
   (initialize-all-plugins))
 
-(deftest test-plugin-test-directory
-  (let [test-dir (plugin-test-directory plugin-name)]
-    (is test-dir)
-    (is (instance? File test-dir)))
-  (is (not (plugin-test-directory "fail"))))
-
-(deftest test-test-namespace-name
-  (is (= (str "plugins." plugin-name ".test.test-plugin") (test-namespace-name plugin-name "test-plugin"))))
-
-(deftest test-test-files
-  (let [test-file-seq (test-files plugin-name)]
-    (is test-file-seq)
-    (is (= 1 (count test-file-seq))))
-  (is (empty? (test-files "fail"))))
-
-(deftest test-load-test-file
-  (load-test-file (File. (plugin-test-directory plugin-name) "test_plugin.clj")))
-
 (deftest test-plugin-file-namespace
-  (is (= (symbol (str "plugins." plugin-name ".test.test-plugin")) 
-        (plugin-file-namespace (File. (plugin-test-directory plugin-name) "test_plugin.clj")))))
-
-(deftest test-run-test-list
-  (run-test-list [(str "plugins." plugin-name ".test.test-plugin")])
-  (run-test-list []))
-
-(deftest test-run-all-plugin-tests
-  (run-all-plugin-tests plugin-name)
-  (run-all-plugin-tests "fail"))
-
-(deftest test-run-plugin-tests
-  (run-plugin-tests plugin-name [(str "plugins." plugin-name ".test.test-plugin")])
-  (run-plugin-tests plugin-name []))
+  (is (= (symbol (str "plugins." plugin-name ".plugin")) 
+    (plugin-file-namespace (File. (plugin-directory plugin-name) "plugin.clj")))))
