@@ -26,12 +26,6 @@
         (.mkdir lib-dir)))))
 
 (defn
-#^{ :doc "Creates a test directory in the given plugin directory." }
-  create-test-directory
-  [plugin-dir]
-  (create-plugin-subdirectory plugin-dir plugin-util/test-directory-name))
-
-(defn
 #^{ :doc "Creates all of the plugin files and directories and returns the newly created plugin.clj file." }
   create-plugin-files
   [ { :keys [name silent] 
@@ -44,5 +38,4 @@
           (do
             (logging/info (str "Creating plugin file " (.getName plugin-file) "..."))
             (.createNewFile plugin-file)
-            (create-test-directory plugin-dir)
             plugin-file)))))

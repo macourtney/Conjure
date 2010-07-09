@@ -58,3 +58,6 @@
 (deftest test-plugin-file-namespace
   (is (= (symbol (str "plugins." plugin-name ".plugin")) 
     (plugin-file-namespace (File. (plugin-directory plugin-name) "plugin.clj")))))
+
+(deftest test-test-namespace-name
+  (is (= (str "plugins." plugin-name ".test-plugin") (test-namespace-name plugin-name))))

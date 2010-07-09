@@ -10,7 +10,6 @@
 
 (def plugins-dir "plugins")
 (def plugin-file-name "plugin.clj")
-(def test-directory-name "test")
 
 (defn 
 #^{ :doc "Finds the plugins directory." }
@@ -117,3 +116,8 @@ be found." }
     (symbol 
       (str "plugins." (loading-utils/namespace-string-for-file
         (.substring file-parent-path (.length app-path)) (.getName plugin-file))))))
+
+(defn
+#^{ :doc "Returns the namespace string for the test with the given name and the plugin with the given name." }
+  test-namespace-name [plugin-name]
+  (str "plugins." (loading-utils/underscores-to-dashes plugin-name) ".test-plugin"))

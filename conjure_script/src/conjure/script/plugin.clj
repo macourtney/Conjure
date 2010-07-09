@@ -24,9 +24,6 @@
       (uninstall-fn arguments)
       (print-invalid-plugin plugin-name))))
 
-(defn test-plugin [plugin-name arguments]
-  (plugin-util/run-plugin-tests plugin-name arguments))
-
 (defn
   run [args]
   (server/init)
@@ -38,6 +35,5 @@
       (cond 
         (= type-command "install") (install plugin-name arguments)
         (= type-command "uninstall") (uninstall plugin-name arguments)
-        (= type-command "test") (test-plugin plugin-name arguments)
         true (print-usage))
       (print-usage))))

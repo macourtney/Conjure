@@ -16,14 +16,10 @@
 
 (deftest test-plugin-dirs
   (is (plugin-util/find-plugins-directory))
-  (is (plugin-util/plugin-directory plugin-name))
-  (is (plugin-util/test-files plugin-name)))
+  (is (plugin-util/plugin-directory plugin-name)))
 
 (deftest test-install
   (install plugin-name []))
 
 (deftest test-uninstall
   (uninstall plugin-name []))
-
-(deftest test-test-plugin
-  (test-plugin plugin-name []))

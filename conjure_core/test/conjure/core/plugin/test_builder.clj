@@ -30,21 +30,10 @@
     (create-plugin-subdirectory plugin-directory test-subdirectory-name)
     (verify-and-delete test-subdirectory plugin-directory)))
 
-(deftest test-create-test-directory
-  (let [plugin-directory (plugin-util/plugin-directory test-plugin-name)
-        test-directory (File. plugin-directory plugin-util/test-directory-name)]
-    (is (not (.exists plugin-directory)))
-    (find-or-create-plugin-directory test-plugin-name)
-    (is (not (.exists test-directory)))
-    (create-test-directory plugin-directory)
-    (verify-and-delete test-directory plugin-directory)))
-
 (deftest test-create-plugin-files
   (let [plugin-directory (plugin-util/plugin-directory test-plugin-name)
-        test-directory (File. plugin-directory plugin-util/test-directory-name)
         plugin-script-file (File. plugin-directory plugin-util/plugin-file-name)]
     (is (not (.exists plugin-directory)))
-    (is (not (.exists test-directory)))
     (is (not (.exists plugin-script-file)))
     (create-plugin-files { :name test-plugin-name })
-    (verify-and-delete test-directory plugin-script-file plugin-directory)))
+    (verify-and-delete plugin-script-file plugin-directory)))

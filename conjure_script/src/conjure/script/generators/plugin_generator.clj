@@ -1,9 +1,11 @@
 (ns conjure.script.generators.plugin-generator
   (:import [java.io File])
   (:require [clojure.contrib.logging :as logging]
+            [conjure.core.config.environment :as environment]
             [conjure.core.plugin.builder :as plugin-builder]
             [conjure.core.plugin.util :as plugin-util]
-            [conjure.core.util.file-utils :as file-utils]))
+            [conjure.core.util.file-utils :as file-utils]
+            [conjure.core.util.loading-utils :as loading-utils]))
 
 (defn
 #^{ :doc "Prints out how to use the generate plugin command." }
@@ -48,12 +50,12 @@
 (defn
 #^{ :doc "Returns the file of the generic plugin test." }
   test-file [plugin-name]
-  (File. (plugin-util/plugin-directory plugin-name) "/test/test_plugin.clj"))
+  (File. (environment/find-test-dir) (str (loading-utils/dashes-to-underscores plugin-name) "/test_plugin.clj")))
 
 (defn
 #^{ :doc "Generates the content of the test file." }
   generate-test-content [plugin-name]
-  (str "(ns " (plugin-util/test-namespace-name plugin-name "test-plugin") "
+  (str "(ns " (plugin-util/test-namespace-name plugin-name) "
   (use clojure.contrib.test-is
       " (plugin-util/plugin-namespace-name plugin-name) "))
 
