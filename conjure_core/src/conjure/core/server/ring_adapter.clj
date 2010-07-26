@@ -1,5 +1,5 @@
 (ns conjure.core.server.ring-adapter
-  (:import [java.io File]
+  (:import [java.io File FileInputStream]
            [java.util Date])
   (:require [clojure.contrib.classpath :as classpath]
             [clojure.contrib.logging :as logging]
@@ -36,17 +36,28 @@ request map." }
       response)))
 
 (defn
+  find-resource [request full-path]
+  (if-let [body (loading-utils/find-resource full-path)]
+    body
+    (if-let [servlet-context (:servlet-context request)]
+      (when-let [resource-file-path (.getRealPath servlet-context (str "WEB-INF/classes/" full-path))]
+        (let [resource-file (File. resource-file-path)]
+          (when (.exists resource-file)
+            (FileInputStream. resource-file))))
+      (when-let [resource-file (File. (file-utils/user-directory) full-path)]
+        (when (.exists resource-file)
+          (FileInputStream. resource-file))))))
+
+(defn
   wrap-resource-dir [app root-path]
   (fn [request]
     (if (= :get (:request-method request))
       (let [resource-path (codec/url-decode (:uri request))]
         (if (.endsWith resource-path "/")
           (app request)
-          (let [full-path (str root-path resource-path)
-                body (loading-utils/find-resource full-path)]
-            (if body
-              (response/response body)
-              (app request)))))
+          (if-let [body (find-resource request (str root-path resource-path))]
+            (response/response body)
+            (app request))))
       (app request))))
 
 (defn

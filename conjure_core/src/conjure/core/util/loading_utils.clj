@@ -20,10 +20,9 @@
 
 (defn
   classpath-directories []
-  (let [classpath (user-classpath-var?)]
-    (if classpath
-      (filter #(.isDirectory %) (map #(File. %) (.split (var-get classpath) (System/getProperty "path.separator"))))
-      (classpath/classpath-directories))))
+  (if-let [classpath (user-classpath-var?)]
+    (filter #(.isDirectory %) (map #(File. %) (.split (var-get classpath) (System/getProperty "path.separator"))))
+    (classpath/classpath-directories)))
 
 (defn
   find-all-classpath-files [full-file-path]
@@ -37,13 +36,11 @@
 (defn 
 #^{ :doc "Returns a stream for the given resource if it exists. Otherwise, this function returns nil." }
   find-resource [full-file-path]
-  (let [resource (.getResourceAsStream (system-class-loader) full-file-path)]
-    (if resource
-      resource
-      (when (user-classpath-var?)
-        (let [file (find-classpath-file full-file-path)]
-          (when file
-            (FileInputStream. file)))))))
+  (if-let [resource (.getResourceAsStream (system-class-loader) full-file-path)]
+    resource
+    (when (user-classpath-var?)
+      (when-let [file (find-classpath-file full-file-path)]
+        (FileInputStream. file)))))
 
 (defn
 #^{ :doc "Returns a sequence of streams for the given resource if it exists. Otherwise, this function returns an empty

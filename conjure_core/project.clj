@@ -14,4 +14,5 @@
                  [ring/ring-servlet "0.2.5"]
                  [scriptjure "0.1.3"]]
   :dev-dependencies [[lein-clojars "0.5.0"]]
-  :aot [conjure.core.execute])
+  :namespaces [conjure.core.execute
+               conjure.core.server.servlet])
