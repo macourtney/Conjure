@@ -5,7 +5,7 @@
             [conjure.core.util.file-utils :as file-utils]
             [conjure.core.util.loading-utils :as loading-utils]))
 
-(def conjure-version "0.7.0-SNAPSHOT") 
+(def conjure-version "0.8.0-SNAPSHOT") 
 (def default-database "h2")
 
 (def new-project-zip-directory "new_project/") 
