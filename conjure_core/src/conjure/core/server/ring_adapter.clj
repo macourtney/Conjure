@@ -10,6 +10,7 @@
             [conjure.core.server.server :as server]
             [conjure.core.util.file-utils :as file-utils]
             [conjure.core.util.loading-utils :as loading-utils]
+            [conjure.core.util.servlet-utils :as servlet-utils]
             [conjure.core.view.util :as view-util]
             [ring.middleware.file :as ring-file]
             [ring.middleware.stacktrace :as ring-stacktrace]
@@ -36,26 +37,13 @@ request map." }
       response)))
 
 (defn
-  find-resource [request full-path]
-  (if-let [body (loading-utils/find-resource full-path)]
-    body
-    (if-let [servlet-context (:servlet-context request)]
-      (when-let [resource-file-path (.getRealPath servlet-context (str "WEB-INF/classes/" full-path))]
-        (let [resource-file (File. resource-file-path)]
-          (when (.exists resource-file)
-            (FileInputStream. resource-file))))
-      (when-let [resource-file (File. (file-utils/user-directory) full-path)]
-        (when (.exists resource-file)
-          (FileInputStream. resource-file))))))
-
-(defn
   wrap-resource-dir [app root-path]
   (fn [request]
     (if (= :get (:request-method request))
       (let [resource-path (codec/url-decode (:uri request))]
         (if (.endsWith resource-path "/")
           (app request)
-          (if-let [body (find-resource request (str root-path resource-path))]
+          (if-let [body (servlet-utils/find-resource request (str root-path resource-path))]
             (response/response body)
             (app request))))
       (app request))))

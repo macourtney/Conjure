@@ -115,9 +115,9 @@ sequence." }
 #^{:doc "Gets the dir from the class path which ends with the given ending"}
   get-classpath-dir-ending-with [ending]
   (seq-utils/find-first 
-    (fn [directory]
-      (.endsWith (.getPath directory) ending))
-    (classpath/classpath-directories)))
+      (fn [directory]
+        (.endsWith (.getPath directory) ending))
+      (classpath/classpath-directories)))
     
 (defn
 #^{:doc "Converts all dashes to underscores in string."}

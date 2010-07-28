@@ -129,6 +129,14 @@ then the scheme set in the ring-request is used." }
           server-port)))))
 
 (defn
+  servlet []
+  (:servlet (ring-request)))
+
+(defn
+  servlet-context []
+  (:servlet-context (ring-request)))
+
+(defn
 #^{ :doc "Merges the params value of the given request-map with params" }
   augment-params [request-map params]
   (if request-map 

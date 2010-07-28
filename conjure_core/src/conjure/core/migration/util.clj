@@ -1,5 +1,6 @@
 (ns conjure.core.migration.util
-  (:require [clojure.contrib.seq-utils :as seq-utils]
+  (:require [clojure.contrib.logging :as logging]
+            [clojure.contrib.seq-utils :as seq-utils]
             [conjure.core.config.environment :as environment]
             [conjure.core.util.loading-utils :as loading-utils]
             [conjure.core.util.file-utils :as file-utils]))

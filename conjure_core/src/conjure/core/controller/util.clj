@@ -7,6 +7,7 @@
             [conjure.core.server.request :as request]
             [conjure.core.util.loading-utils :as loading-utils]
             [conjure.core.util.file-utils :as file-utils]
+            [conjure.core.util.servlet-utils :as servlet-utils]
             [conjure.core.util.string-utils :as string-utils]))
 
 (def controllers-dir "controllers")
@@ -86,11 +87,16 @@ namespace." }
     (.endsWith file-name "_controller.clj")))
 
 (defn
+  all-controller-file-names []
+  (filter controller-file-name?
+    (concat
+      (loading-utils/all-class-path-file-names controllers-dir)
+      (servlet-utils/all-file-names controllers-dir))))
+
+(defn
 #^{ :doc "Returns the names of all of the controllers for this app." }
   all-controllers []
-  (map controller-from-file
-    (filter controller-file-name?
-      (loading-utils/all-class-path-file-names controllers-dir))))
+  (map controller-from-file (all-controller-file-names)))
 
 (defn
 #^{ :doc "Returns true if the given controller exists." }
