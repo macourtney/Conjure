@@ -3,8 +3,9 @@
             [clojure.contrib.str-utils :as str-utils]
             [conjure.core.config.environment :as environment]
             [conjure.core.server.request :as request]
-            [conjure.core.util.string-utils :as conjure-str-utils]
             [conjure.core.util.html-utils :as html-utils]
+            [conjure.core.util.servlet-utils :as servlet-utils]
+            [conjure.core.util.string-utils :as conjure-str-utils]
             [conjure.core.view.util :as view-util]))
 
 (defn default-response-map []
@@ -68,16 +69,25 @@ function." }
     source))
 
 (defn
+  absolute-source? [source]
+  (or
+    (.startsWith source "http://")
+    (.startsWith source "https://")
+    (.startsWith source "ftp://")))
+
+(defn
+  add-servlet-path [uri]
+  (servlet-utils/add-servlet-path (request/servlet-context) (request/uri) uri))
+
+(defn
 #^{ :doc "Returns a path for the given source in the given base-dir with the given extension (if none is given)." }
   compute-public-path 
   ([source base-dir] (compute-public-path source base-dir nil))
   ([source base-dir extension]
     (replace-extension
-      (if (. source startsWith "/")
+      (if (or (. source startsWith "/") (absolute-source? source))
         source
-        (if (. source startsWith "http://") ; This should probably check for ftp, https, and etc.
-          source
-          (str "/" base-dir "/" source)))
+        (add-servlet-path (str "/" base-dir "/" source)))
       extension)))
 
 (defn

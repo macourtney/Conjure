@@ -37,13 +37,17 @@ request map." }
       response)))
 
 (defn
+  resource-relative-path [request root-path resource-path]
+  (str root-path (servlet-utils/convert-servlet-path (servlet-utils/servlet-context request) resource-path)))
+
+(defn
   wrap-resource-dir [app root-path]
   (fn [request]
     (if (= :get (:request-method request))
       (let [resource-path (codec/url-decode (:uri request))]
         (if (.endsWith resource-path "/")
           (app request)
-          (if-let [body (servlet-utils/find-resource request (str root-path resource-path))]
+          (if-let [body (servlet-utils/find-resource request (resource-relative-path request root-path resource-path))]
             (response/response body)
             (app request))))
       (app request))))

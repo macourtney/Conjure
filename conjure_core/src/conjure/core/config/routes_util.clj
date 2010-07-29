@@ -4,7 +4,8 @@
             [config.routes :as routes]
             [conjure.core.controller.util :as controller-util]
             [conjure.core.server.request :as request]
-            [conjure.core.util.loading-utils :as loading-utils]))
+            [conjure.core.util.loading-utils :as loading-utils]
+            [conjure.core.util.servlet-utils :as servlet-utils]))
 
 (defn
   function-parse []
@@ -39,23 +40,31 @@
     request-map))
 
 (defn
-  parse-compiled-route [compiled-route-map]
+  parse-compiled-route [compiled-route-map uri]
   (let [route (:route compiled-route-map)
         request-map (:request-map compiled-route-map)]
     (when (and route request-map)
-      (let [route-map (clout/route-matches route (request/uri))]
+      (let [route-map (clout/route-matches route uri)]
         (when route-map
           (clean-controller-action (symbol-replace request-map route-map)))))))
 
 (defn
-  compiled-parse []
-  (let [compiled-routes (:compiled routes/routes)]
-    (when compiled-routes
-      (some identity (map parse-compiled-route compiled-routes)))))
+  compiled-parse
+  ([] (compiled-parse (request/uri)))
+  ([uri]
+    (when-let [compiled-routes (:compiled routes/routes)]
+      (some identity (map #(parse-compiled-route % uri) compiled-routes)))))
+
+(defn
+  servlet-parse []
+  (when-let [servlet-context (request/servlet-context)]
+    (let [uri (request/uri)]
+      (when (servlet-utils/servlet-uri? servlet-context uri)
+        (compiled-parse (servlet-utils/servlet-sub-path servlet-context uri))))))
 
 (defn
   parse-path []
-  (or (function-parse) (compiled-parse)))
+  (or (function-parse) (compiled-parse) (servlet-parse)))
 
 (defn
 #^{ :doc "Calls the controller action specified in the given path-map. Path-map must contain :controller and :action 

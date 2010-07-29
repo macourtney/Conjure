@@ -21,6 +21,6 @@
     ; If you want to use your own route function, uncomment the key below and add your function to the vector. You 
     ; function should take no arguments, and return a partial request map containing at least the controller and action
 
-    ;:functions []
-     })
+    ; :functions []
+  })
 

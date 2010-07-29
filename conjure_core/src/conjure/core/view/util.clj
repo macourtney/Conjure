@@ -9,6 +9,7 @@
             [conjure.core.util.file-utils :as file-utils]
             [conjure.core.util.html-utils :as html-utils]
             [conjure.core.util.loading-utils :as loading-utils]
+            [conjure.core.util.servlet-utils :as servlet-utils]
             [conjure.core.util.session-utils :as session-utils]
             [conjure.core.util.string-utils :as conjure-str-utils]))
             
@@ -188,6 +189,12 @@ exist, then this method returns nil. This method is used by url-for." }
       (str "#" anchor))))
 
 (defn
+  servlet-path []
+  (when-let [servlet-context (request/servlet-context)]
+    (when (servlet-utils/servlet-uri? servlet-context (request/uri))
+      (servlet-utils/servlet-uri-path servlet-context))))
+
+(defn
 #^{ :doc "Returns the params merged with the given request-map. Only including the keys from request-map used by url-for" }
   merge-url-for-params [request-map params]
   (merge 
@@ -224,10 +231,11 @@ exist, then this method returns nil. This method is used by url-for." }
               (interleave 
                 (repeat "/") 
                 (filter identity
-                  [(loading-utils/dashes-to-underscores controller)
-                     (loading-utils/dashes-to-underscores action)
-                     (request/id-str)
-                     (anchor)]))
+                  [ (servlet-path)
+                    (loading-utils/dashes-to-underscores controller)
+                    (loading-utils/dashes-to-underscores action)
+                    (request/id-str)
+                    (anchor) ]))
               (let [new-session-id 
                       (if (not session-config/use-session-cookie) (or session-id (session-utils/create-session-id)))
                     new-url-params 

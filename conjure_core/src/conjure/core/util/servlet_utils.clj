@@ -6,9 +6,33 @@
             [conjure.core.util.loading-utils :as loading-utils]))
 
 (defn
+  servlet-uri-path [servlet-context]
+  (when servlet-context
+    (.getName (File. (.getRealPath servlet-context "/"))))) 
+
+(defn
+  servlet-uri? [servlet-context uri]
+  (when-let [servlet-uri-path (servlet-uri-path servlet-context)]
+    (or (= uri (str "/" servlet-uri-path)) (.startsWith uri (str "/" servlet-uri-path "/")))))
+
+(defn
+  servlet-sub-path [servlet-context uri]
+  (let [servlet-uri-path (servlet-uri-path servlet-context)]
+    (if (= uri (str "/" servlet-uri-path))
+      "/" 
+      (.substring uri (inc (count servlet-uri-path))))))
+
+(defn
+  convert-servlet-path [servlet-context uri]
+  (if (servlet-uri? servlet-context uri)
+    (servlet-sub-path servlet-context uri)
+    uri)) 
+
+(defn
   real-path [servlet-context relative-path]
   (when (and servlet-context relative-path)
-    (.getRealPath servlet-context (str "WEB-INF/classes/" relative-path)))) 
+    (let [servlet-path (convert-servlet-path servlet-context relative-path)]
+      (.getRealPath servlet-context (str "WEB-INF/classes/" servlet-path))))) 
 
 (defn
   find-file [servlet-context relative-path]
@@ -19,7 +43,7 @@
 
 (defn
   find-servlet-resource [servlet-context relative-path]
-  (when-let [resource-file (find-file servlet-context  relative-path)]
+  (when-let [resource-file (find-file servlet-context relative-path)]
     (FileInputStream. resource-file)))
 
 (defn
@@ -36,14 +60,13 @@
 
 (defn
   find-resource [servlet-context-or-map relative-path]
-  (let [servlet-context (servlet-context servlet-context-or-map)]
-    (if-let [body (loading-utils/find-resource relative-path)]
-      body
-      (if servlet-context
-        (find-servlet-resource servlet-context relative-path)
-        (when-let [resource-file (File. (file-utils/user-directory) relative-path)]
-          (when (.exists resource-file)
-            (FileInputStream. resource-file)))))))
+  (if-let [body (loading-utils/find-resource relative-path)]
+    body
+    (if-let [servlet-context (servlet-context servlet-context-or-map)]
+      (find-servlet-resource servlet-context relative-path)
+      (when-let [resource-file (File. (file-utils/user-directory) relative-path)]
+        (when (.exists resource-file)
+          (FileInputStream. resource-file))))))
 
 (defn
   find-servlet-directory 
@@ -66,3 +89,9 @@
   ([directory-name servlet-context]
     (when-let [all-files (all-files directory-name servlet-context)]
       (map #(.getName %) all-files))))
+
+(defn
+  add-servlet-path [servlet-context original-uri uri-path]
+  (if (servlet-uri? servlet-context original-uri)
+    (str "/" (servlet-uri-path servlet-context) uri-path) 
+    uri-path))
