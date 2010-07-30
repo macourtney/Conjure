@@ -44,7 +44,8 @@
 (defn
   find-servlet-resource [servlet-context relative-path]
   (when-let [resource-file (find-file servlet-context relative-path)]
-    (FileInputStream. resource-file)))
+    (when (.isFile resource-file)
+      (FileInputStream. resource-file))))
 
 (defn
   servlet [request-map]
