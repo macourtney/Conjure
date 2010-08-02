@@ -9,8 +9,10 @@
 (def initialized (atom false))
 
 (defn
-  find-config-env-value [evironment-key default-value]
-  (get (deref config-env/properties) evironment-key default-value))
+  find-config-env-value
+  ([evironment-key] (find-config-env-value evironment-key nil))
+  ([evironment-key default-value]
+    (get (deref config-env/properties) evironment-key default-value)))
 
 (def conjure-environment-property (find-config-env-value :conjure-environment-property "conjure.environment"))
 (def default-environment (find-config-env-value :default-environment "development"))
@@ -18,7 +20,6 @@
 (def source-dir (find-config-env-value :source-dir "src"))
 (def servlet-source-dir (find-config-env-value :servlet-source-dir "classes")) 
 (def test-dir (find-config-env-value :test-dir "test"))
-
 
 (def assets-dir (find-config-env-value :assets-dir "public"))
 (def javascripts-dir (find-config-env-value :javascripts-dir "javascripts"))
@@ -30,10 +31,10 @@
 
 (defn
   require-environment []
-  (let [initial-value (java-utils/get-system-property conjure-environment-property nil)]
-    (if (not initial-value)
-      (java-utils/set-system-properties { conjure-environment-property default-environment })))
-  (require (symbol (str "config.environments." (java-utils/get-system-property conjure-environment-property nil))))) 
+  (when (not (java-utils/get-system-property conjure-environment-property nil))
+    (java-utils/set-system-properties { conjure-environment-property default-environment }))
+  (let [mode (java-utils/get-system-property conjure-environment-property nil)]
+    (require (symbol (str "config.environments." mode)))))
 
 (defn
 #^{ :doc "Returns the name of the environment." }

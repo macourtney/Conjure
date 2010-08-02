@@ -32,14 +32,13 @@
   create-dir 
   ([base-dir child-dir-name] (create-dir base-dir child-dir-name false))
   ([base-dir child-dir-name silent]
-    (let [child-directory (find-directory base-dir child-dir-name)]
-      (if child-directory
-        child-directory
-        (do
-          (logging/info (str "Creating " child-dir-name " directory in " (. base-dir getName) "..."))
-          (let [child-directory (new File base-dir child-dir-name)]
-            (. child-directory mkdirs)
-            child-directory))))))
+    (if-let [child-directory (find-directory base-dir child-dir-name)]
+      child-directory
+      (do
+        (logging/info (str "Creating " child-dir-name " directory in " (. base-dir getName) "..."))
+        (let [child-directory (new File base-dir child-dir-name)]
+          (.mkdirs child-directory)
+          child-directory)))))
 
 (defn
 #^{:doc "Recursively creates the given child-dirs under the given base-dir.

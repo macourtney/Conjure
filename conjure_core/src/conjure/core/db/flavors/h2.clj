@@ -34,7 +34,7 @@
         subprotocol "h2"
         
         ;; The database path.
-        subname (str "db/data/" dbname)
+        subname (or (:subname db-config) (str "db/data/" dbname))
         
         ;; A datasource for the database.
         datasource (create-datasource (format "jdbc:%s:%s" subprotocol subname))]
