@@ -3,6 +3,7 @@
   :dependencies [[clout "0.2.0"]
                  [commons-lang/commons-lang "2.5"]
                  [com.h2database/h2 "1.2.137"]
+                 [drift "1.0.0-SNAPSHOT"]
                  [hiccup "0.2.6"]
                  [log4j/log4j "1.2.16"]
                  [org.clojars.macourtney/clj-record "1.0.1"]

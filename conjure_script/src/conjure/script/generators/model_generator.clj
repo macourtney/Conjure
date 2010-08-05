@@ -5,6 +5,7 @@
             [conjure.core.util.string-utils :as string-utils]
             [conjure.core.util.file-utils :as file-utils]
             [conjure.script.generators.migration-generator :as migration-generator]
+            [drift.generator :as drift-generator]
             [conjure.script.generators.model-test-generator :as model-test-generator]))
 
 (defn
@@ -29,8 +30,9 @@
   generate-migration-file 
   ([model] (generate-migration-file model (create-migration-up-content model) (create-migration-down-content model)))
   ([model up-content down-content]
-    (migration-generator/generate-migration-file 
-      (util/migration-for-model model) 
+    (drift-generator/generate-migration-file 
+      (util/migration-for-model model)
+      nil
       up-content 
       down-content)))
 

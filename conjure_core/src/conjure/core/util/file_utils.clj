@@ -1,6 +1,7 @@
 (ns conjure.core.util.file-utils
   (:import [java.io File FileWriter])
-  (:require [clojure.contrib.logging :as logging]))
+  (:require [clojure.contrib.duck-streams :as duck-streams]
+            [clojure.contrib.logging :as logging]))
 
 (defn
 #^{:doc "Returns the directory where Conjure is running from."}
@@ -14,7 +15,7 @@
     (let [file (File. (.getPath directory) file-name)]
       (when (and file (.exists file))
         file))))
-      
+
 (defn
 #^{:doc "Returns the file object if the given directory is in the given parent directory, nil otherwise. Simply calls find-file, but this method reads better if you're really looking for a directory."}
   find-directory [parent-directory directory-name]
@@ -24,8 +25,7 @@
 #^{:doc "A convience function for simply writing the given content into the file."}
   write-file-content [file content]
   (when (and file content (.exists (.getParentFile file)))
-    (with-open [file-writer (FileWriter. file)]
-      (.write file-writer content 0 (.length content)))))
+    (duck-streams/spit file content)))
 
 (defn
 #^{:doc "Creates a new child directory under the given base-dir if the child dir does not already exist."}

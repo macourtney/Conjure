@@ -1,130 +1,52 @@
 (ns conjure.core.migration.util
-  (:require [clojure.contrib.logging :as logging]
-            [clojure.contrib.seq-utils :as seq-utils]
-            [conjure.core.config.environment :as environment]
-            [conjure.core.util.loading-utils :as loading-utils]
-            [conjure.core.util.file-utils :as file-utils]))
-
-(def db-dir "db")
-(def migrate-dir "migrate")
+  (:require [clojure.contrib.command-line :as command-line]
+            [clojure.contrib.logging :as logging]
+            [conjure.core.model.database :as database]
+            [conjure.core.server.server :as server]
+            [conjure.core.util.string-utils :as string-utils]))
 
 (def schema-info-table "schema_info")
 (def version-column :version)
 
-(defn 
-#^{:doc "Finds the db directory which contains all of the files for updating the schema for the database."}
-  find-db-directory []
-  (environment/find-in-source-dir db-dir))
-
-(defn
-#^{:doc "Finds the migrate directory."}
-  find-migrate-directory []
-  (file-utils/find-directory (find-db-directory) migrate-dir))
+(defn init [args]
+  (command-line/with-command-line args
+    "lein migrate [options]"
+    [ [version "The version to migrate to. Example: -version 2 -> migrates to version 2." nil]
+      [mode "The server mode. For example, development, production, or test." nil]
+      remaining]
   
-(defn 
-#^{:doc "Returns all of the migration files as a collection."}
-  all-migration-files
-  ([] (all-migration-files (find-migrate-directory)))
-  ([migrate-directory]
-    (if migrate-directory
-      (filter 
-        (fn [migrate-file] 
-          (re-find #"^[0-9]+_.+\.clj$" (. migrate-file getName))) 
-        (. migrate-directory listFiles)))))
-
-(defn 
-#^{:doc "Returns all of the migration file names as a collection."}
-  all-migration-file-names 
-  ([] (all-migration-file-names (find-migrate-directory)))
-  ([migrate-directory]
-    (if migrate-directory
-      (map 
-        (fn [migration-file] (. migration-file getName))
-        (all-migration-files migrate-directory)))))
-    
-(defn
-#^{:doc "Returns the migration number from the given migration file name."}
-  migration-number-from-name [migration-file-name]
-  (. Integer parseInt (re-find #"^[0-9]+" migration-file-name)))
-  
-(defn
-#^{:doc "Returns the migration number from the given migration file."}
-  migration-number-from-file [migration-file]
-  (if migration-file
-    (migration-number-from-name (. migration-file getName))))
-    
-(defn
-#^{:doc "Returns all of the migration file names with numbers between low-number and high-number inclusive."}
-  migration-files-in-range [low-number high-number]
-  (let [migrate-directory (find-migrate-directory)]
-    (filter 
-      (fn [migration-file] 
-        (let [migration-number (migration-number-from-file migration-file)]
-          (and (>= migration-number low-number) (<= migration-number high-number)))) 
-      (all-migration-files migrate-directory))))
-
-(defn 
-#^{:doc "Returns all of the numbers prepended to the migration files."}
-  all-migration-numbers
-  ([] (all-migration-numbers (find-migrate-directory)))
-  ([migrate-directory]
-    (if migrate-directory
-      (map
-        (fn [migration-file-name] (migration-number-from-name migration-file-name)) 
-        (all-migration-file-names migrate-directory)))))
+    (server/set-mode mode)
+    (server/init)))
 
 (defn
-#^{:doc "Returns the maximum number of all migration files."}
-  max-migration-number
-  ([] (max-migration-number (find-migrate-directory)))
-  ([migrate-directory]
-    (if migrate-directory
-      (let [migration-numbers (all-migration-numbers migrate-directory)]
-        (if (> (count migration-numbers) 0) 
-          (eval (cons max migration-numbers))
-          0)))))
+  version-table-is-empty []
+  (logging/info (str schema-info-table " is empty. Setting the initial version to 0."))
+  (database/insert-into schema-info-table { version-column 0 })
+  0)
+
+(defn
+  version-table-exists []
+  (logging/info (str schema-info-table " exists"))
+  (if-let [version-result-map (first (database/sql-find { :table schema-info-table :limit 1 }))]
+    (get version-result-map version-column)
+    (version-table-is-empty)))
+
+(defn
+  version-table-does-not-exist []
+  (logging/info (str schema-info-table " does not exist. Creating table..."))
+  (database/create-table schema-info-table 
+    (database/integer (string-utils/str-keyword version-column) { :not-null true }))
+  (version-table-is-empty))
 
 (defn 
-#^{:doc "Returns the next number to use for a migration file."}
-  find-next-migrate-number
-  ([] (find-next-migrate-number (find-migrate-directory))) 
-  ([migrate-directory]
-    (if migrate-directory
-      (inc (max-migration-number migrate-directory)))))
-  
+#^{:doc "Gets the current db version number. If the schema info table doesn't exist this function creates it. If the 
+schema info table is empty, then it adds a row and sets the version to 0."}
+  current-version []
+  (if (database/table-exists? schema-info-table)
+    (version-table-exists)
+    (version-table-does-not-exist)))
+
 (defn
-#^{:doc "The migration file with the given migration name."}
-  find-migration-file 
-    ([migration-name] (find-migration-file (find-migrate-directory) migration-name))
-    ([migrate-directory migration-name]
-      (let [migration-file-name-to-find (str (loading-utils/dashes-to-underscores migration-name) ".clj")]
-        (seq-utils/find-first 
-          (fn [migration-file] 
-            (re-find 
-              (re-pattern (str "[0-9]+_" migration-file-name-to-find))
-              (. migration-file getName)))
-          (all-migration-files migrate-directory)))))
-          
- (defn
-#^{:doc "Returns the migration namespace for the given migration file."}
-  migration-namespace [migration-file]
-  (if migration-file
-    (loading-utils/namespace-string-for-file "db.migrate" (. migration-file getName))))
-  
-(defn
-#^{:doc "Finds the number of the migration file before the given number"}
-  migration-number-before 
-    ([migration-number] 
-      (if migration-number 
-        (migration-number-before migration-number (all-migration-files))))
-    ([migration-number migration-files]
-      (if migration-number
-        (loop [files migration-files
-               previous-file-number 0]
-          (if (not-empty migration-files)
-            (let [migration-file (first files)
-                  migration-file-number (migration-number-from-file migration-file)]
-              (if (< migration-file-number migration-number)
-                (recur (rest files) migration-file-number)
-                previous-file-number))
-            previous-file-number)))))
+#^{:doc "Updates the version number saved in the schema table in the database."}
+  update-version [new-version]
+  (database/update schema-info-table ["true"] { version-column new-version }))
