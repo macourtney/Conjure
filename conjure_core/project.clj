@@ -2,8 +2,9 @@
   :description "Core libraries for Conjure. Conjure is a full stack web framework written entirely in Clojure."
   :dependencies [[clout "0.2.0"]
                  [commons-lang/commons-lang "2.5"]
+                 [appengine "0.4-SNAPSHOT"]
                  [com.h2database/h2 "1.2.137"]
-                 [drift "1.0.0-SNAPSHOT"]
+                 [drift "1.0.0"]
                  [hiccup "0.2.6"]
                  [log4j/log4j "1.2.16"]
                  [org.clojars.macourtney/clj-record "1.0.1"]
@@ -16,4 +17,6 @@
                  [scriptjure "0.1.3"]]
   :dev-dependencies [[lein-clojars "0.5.0"]]
   :namespaces [conjure.core.execute
-               conjure.core.server.servlet])
+               conjure.core.server.servlet]
+  
+  :repositories { "maven-gae-plugin-repo" "http://maven-gae-plugin.googlecode.com/svn/repository" })

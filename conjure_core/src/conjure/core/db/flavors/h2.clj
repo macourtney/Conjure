@@ -14,11 +14,11 @@
     ([connection-url] (create-datasource connection-url nil nil))
     ([connection-url username password]
       (let [h2-datasource (new JdbcDataSource)]
-      (. h2-datasource setURL connection-url)
-      (if (and username password)
-        (. h2-datasource setUser username)
-        (. h2-datasource setPassword password))
-      h2-datasource)))
+        (. h2-datasource setURL connection-url)
+        (when (and username password)
+          (. h2-datasource setUser username)
+          (. h2-datasource setPassword password))
+        h2-datasource)))
       
 (defn 
 #^{:doc "Returns a map for use in db-config."}
@@ -44,7 +44,7 @@
     :subprotocol subprotocol
     :subname subname 
     :datasource datasource })))
-    
+
 (defn-
 #^{ :doc "Cleans up the given value, loading any clobs into memory." }
   clean-value [value]
