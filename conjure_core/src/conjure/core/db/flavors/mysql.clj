@@ -161,7 +161,7 @@ create-table method.
   belongs-to
   ([model] (belongs-to model {}))
   ([model mods]
-    (integer (str (column-name model) "_id") mods)))
+    (integer (str (conjure-string-utils/str-keyword model) "_id") mods)))
   
 (defn
 #^{:doc "Returns a new spec describing a string with the given column and spec mods map. Use this method with the create-table method.
