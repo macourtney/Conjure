@@ -104,7 +104,10 @@ along an optional option map for the html options." }
 #^{ :doc "Creates an input tag for a submit button with the given value." }
   form-button
   ([value] (form-button value {})) 
-  ([value html-options] [:input (merge html-options { :type "submit", :value value, :name "button" })]))
+  ([value html-options]
+    [:button
+      (merge { :type "submit", :value (conjure-str-utils/str-keyword value), :name "button" } html-options)
+      (conjure-str-utils/str-keyword value)]))
 
 (defn
 #^{ :doc "Returns a check box tag from the given record, record name, and key for the record. Note: browsers will send 

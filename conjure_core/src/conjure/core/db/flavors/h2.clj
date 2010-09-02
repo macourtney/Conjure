@@ -60,7 +60,7 @@
         (assoc new-map (first pair) (clean-value (second pair))))
     {} 
     row))
-  
+
 (defn
 #^{ :doc "Executes an sql string and returns the results as a sequence of maps." }
   execute-query [db-spec sql-vector]
@@ -69,13 +69,13 @@
     (sql/with-connection db-spec
       (sql/with-query-results rows sql-vector
         (doall (map clean-row rows))))))
-  
+
 (defn
 #^{:doc "Returns the given key or string as valid table name. Basically turns 
 any keyword into a string, and replaces dashes with underscores."}
   table-name [table]
   (conjure-loading-utils/dashes-to-underscores (conjure-string-utils/str-keyword table)))
-  
+
 (defn
 #^{:doc "Runs an update given the table, where-params and a record.
 
@@ -107,7 +107,7 @@ any keyword into a string, and replaces dashes with underscores."}
     (let [results (execute-query db-spec [(str "SELECT * FROM " (table-name table) " LIMIT 1")])]
       true)
     (catch Exception e false)))
-    
+
 (defn
 #^{:doc "Runs an sql select statement built from the given select-map. The valid keys are: table - the table to run the select statement on, select - the columns to return, where - the conditions"}
   sql-find [db-spec select-map]

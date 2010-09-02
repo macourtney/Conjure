@@ -448,7 +448,7 @@
 (deftest test-ajax-form-for
   (let [form-map { :name "home", :action "/home/index", :method "post", :id "test-id" }
         form-tag [:form form-map
-                   [:input { :name "button", :value "Submit", :type "submit" } ]]
+                   [:button { :name "button", :value "Submit", :type "submit" } "Submit"]]
         ajax-map { :type "POST"
                    :url "/home/index"
                    :dataType "html"
@@ -482,7 +482,7 @@
       (ajax-form-for (assoc form-for-options :ajax-url "/hello/show") form-for-body)))
     (is (=
       [ [:form { :name "noscript-update", :method "post", :id "test-id", :action "/noscript/update" }
-          [:input { :name "button", :value "Submit", :type "submit" } ]]
+          [:button { :name "button", :value "Submit", :type "submit" } "Submit"]]
         [:script { :type "text/javascript" }
          (scriptjure/js 
            (ajaxSubmit "#test-id" (clj (assoc ajax-map :error 'errorFunction))))]]

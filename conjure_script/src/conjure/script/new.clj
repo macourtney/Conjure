@@ -7,6 +7,9 @@
 
 (def conjure-version "0.8.0-SNAPSHOT") 
 (def default-database "h2")
+(def default-session-store "database-session-store")
+
+(def google-app-engine-session-store "google-app-engine-session-store") 
 
 (def new-project-zip-directory "new_project/") 
 
@@ -53,7 +56,11 @@
   set-database 
   ([database] (set-database database (file-utils/user-directory)))
   ([database directory]
-    (replace-in-file (File. directory "/src/config/db_config.clj") default-database database)))
+    (replace-in-file (File. directory "/src/config/db_config.clj") default-database database)
+    (when (= database "google-app-engine")
+      (replace-in-file (File. directory "/src/config/session_config.clj")
+        default-session-store
+        google-app-engine-session-store))))
 
 (defn print-version []
   (println "Conjure Version:" conjure-version))
@@ -72,7 +79,7 @@
   run [args]
   (command-line/with-command-line args
     "./run.sh script/server.clj [options]"
-    [[database "What database to use. Currenty valid options are mysql and h2" nil]
+    [[database "What database to use. Currenty valid options are mysql, h2, and google-app-engine" nil]
      [version? "Prints the current version."] 
      remaining]
 

@@ -18,6 +18,43 @@
   (. URLDecoder decode string "UTF-8"))
 
 (defn
+#^{ :doc "Xml decodes the given escape string." }
+  xml-unescape [escape-str]
+  (if (.startsWith escape-str "&")
+    (cond
+      (= escape-str "&amp;") "&"
+      (= escape-str "&gt;") ">"
+      (= escape-str "&lt;") "<"
+      (= escape-str "&quote;") "\""
+      (re-matches #"\&\#\d+;" escape-str)
+        (String/valueOf (char (Integer/parseInt (second (re-matches #"\&\#(\d+);" escape-str)))))
+      true (throw (RuntimeException. (str "Unknown xml escape sequence: " escape-str))))
+    escape-str))
+
+(defn
+#^{ :doc "Xml decodes the given string." }
+  xml-decode [string]
+  (str-utils/str-join ""
+    (map xml-unescape (str-utils/re-partition #"\&\#?[a-zA-Z0-9]+;" string))))
+
+(defn
+#^{ :doc "Xml encodes the given character." }
+  xml-encode-character [character]
+  (cond
+    (= character \&) "&amp;"
+    (= character \>) "&gt;"
+    (= character \<) "&lt;"
+    (= character \") "&quote;"
+    (> (int character) (int (first "\u00FF"))) (str "&#" (int character) ";")
+    true character))
+
+(defn
+#^{ :doc "Xml encodes the given string." }
+  xml-encode [string]
+  (str-utils/str-join ""
+    (map xml-encode-character string)))
+
+(defn
 #^{:doc "Returns a sequence of keys to use in update-params to get the lowest map to add a value into. See the doc for
 update-params for more information on how the key-seq is used."}
   key-seq [full-key-str]
@@ -59,7 +96,10 @@ Examples:
 (defn
 #^{:doc "Adds the given query-key-value sequence as a key value pair to the map params."}
   add-param [params query-key-value]
-  (update-params params (key-seq (url-decode (first query-key-value))) (url-decode (second query-key-value))))
+  (update-params
+    params
+    (key-seq (url-decode (first query-key-value)))
+    (xml-decode (url-decode (second query-key-value)))))
 
 (defn
 #^{:doc "Parses the parameters in the given query-string into a parameter map."}

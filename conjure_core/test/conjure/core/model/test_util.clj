@@ -37,8 +37,7 @@
 
 (deftest test-all-model-namespaces
   (doseq [model-namespace (all-model-namespaces)]
-    (is model-namespace)
-    (is (symbol? model-namespace))))
+    (is model-namespace)))
     
 (deftest test-model-file-name-string
   (is (= (str model-name ".clj") (model-file-name-string model-name)))

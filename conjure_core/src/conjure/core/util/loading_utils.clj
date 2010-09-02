@@ -106,10 +106,10 @@ sequence." }
   ([input-stream length] (into-array Byte/TYPE (seq-input-stream input-stream length))))
 
 (defn
-#^{:doc "Converts an input stream to a string."}
+#^{:doc "Converts an input stream to a string using the ISO-8859-1 character encoding."}
   string-input-stream 
-  ([input-stream] (new String (byte-array-input-stream input-stream)))
-  ([input-stream length] (new String (byte-array-input-stream input-stream length))))
+  ([input-stream] (new String (byte-array-input-stream input-stream) "ISO-8859-1"))
+  ([input-stream length] (new String (byte-array-input-stream input-stream length) "ISO-8859-1")))
 
 (defn 
 #^{:doc "Gets the dir from the class path which ends with the given ending"}
@@ -276,7 +276,9 @@ cannot be found.." }
 (defn
 #^{ :doc "Returns all of the zip entries in the classpath with the given directory name." }
   directory-zip-entries [jar-file dir-name]
-  (filter #(entry-in-directory? % dir-name) (enumeration-seq (.entries jar-file))))
+  (when jar-file
+    (filter #(entry-in-directory? % dir-name)
+      (enumeration-seq (.entries jar-file)))))
 
 (defn
 #^{ :doc "Returns all of the zip entries in the classpath with the given directory name." }
