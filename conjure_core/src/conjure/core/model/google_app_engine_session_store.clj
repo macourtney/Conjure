@@ -1,17 +1,17 @@
 (ns conjure.core.model.google-app-engine-session-store
   (:import [java.util Calendar Date])
-  (:require [appengine.datastore :as datastore]
-            [clojure.contrib.logging :as logging]
+  (:require [clojure.contrib.logging :as logging]
             [conjure.core.util.session-utils :as session-utils]
-            [conjure.core.util.string-utils :as conjure-str-utils]))
+            [conjure.core.util.string-utils :as conjure-str-utils])
+  (:use appengine.datastore))
 
 (def session-table :sessions)
 (def created-at-column :created_at)
 (def session-id-column :session_id)
 (def data-column :data)
 
-(datastore/defentity session ()
-  ((session-id :key)
+(defentity Conjure-session ()
+  ((session-id :key identity)
    (created-at)
    (data)))
 
@@ -23,8 +23,8 @@
 #^{ :doc "Creates a new session entity and saves it to the data store." }
   create-session
   ([key-name value]
-    (datastore/save-entity
-      (session
+    (save-entity
+      (conjure-session
         { :session-id (session-utils/session-id),
           :created-at (new Date),
           :data (conjure-str-utils/form-str { key-name value }) }))))
@@ -34,19 +34,19 @@
   drop-session 
   ([] (drop-session (session-utils/session-id)))
   ([session-id]
-    (datastore/delete-entity (datastore/find-entity { :session-id session-id }))))
+    (delete-entity (find-entity { :session-id session-id }))))
 
 (defn-
 #^{ :doc "Replaces the map stored in the data store with the given store-map." }
   save-map [store-map]
-  (datastore/update-entity { :session-id (session-utils/session-id), :data (conjure-str-utils/form-str store-map) }))
+  (update-entity (find-entity { :session-id (session-utils/session-id) }) { :data (conjure-str-utils/form-str store-map) }))
 
 (defn
 #^{ :doc "Retrieves the value stored in the data store for the given session id or the id in the request-map." }
   retrieve 
   ([] (retrieve (session-utils/session-id)))
   ([session-id]
-    (when-let [row-values (datastore/find-entity { :session-id session-id })]
+    (when-let [row-values (find-entity { :session-id session-id })]
       (when-let [data (:data (first row-values))]
         (read-string data)))))
 
