@@ -4,4 +4,4 @@
                  [org.clojure/clojure-contrib "1.2.0"]
                  [conjure-script "0.8.0-SNAPSHOT"]]
   :dev-dependencies [[lein-clojars "0.5.0"]
-                     [leiningen "1.1.0"]])
+                     [leiningen "1.3.1"]])

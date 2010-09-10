@@ -1,5 +1,7 @@
 (ns conjure.core.util.loading-utils
-  (:import [java.io File FileInputStream FileNotFoundException])
+  (:import [java.io File FileInputStream FileNotFoundException]
+           [java.security AccessControlException]
+           [java.util.jar JarFile])
   (:require [clojure.contrib.classpath :as classpath]
             [clojure.contrib.logging :as logging]
             [clojure.contrib.ns-utils :as ns-utils]
@@ -7,6 +9,7 @@
             [clojure.contrib.str-utils :as clojure-str-utils]
             [clojure.contrib.java-utils :as java-utils]
             [clojure.set :as clj-set]
+            [conjure.core.util.file-utils :as file-utils]
             [conjure.core.util.string-utils :as string-utils]))
 
 (defn
@@ -19,24 +22,54 @@
   (resolve 'user/*classpath*))
 
 (defn
+  path-separator []
+  (System/getProperty "path.separator"))
+
+(defn
   classpath-directories []
-  (if-let [classpath (user-classpath-var?)]
-    (filter #(.isDirectory %) (map #(File. %) (.split (var-get classpath) (System/getProperty "path.separator"))))
-    (classpath/classpath-directories)))
+  (filter file-utils/is-directory?
+    (if-let [classpath (user-classpath-var?)]
+      (map #(File. %) (.split (var-get classpath) (path-separator)))
+      (classpath/classpath))))
+
+(defn
+  #^{ :doc "Returns true if the given file is a jar fiel. False otherwise, even if the is file check causes an
+AccessControlException which may happen when running in Google App Engine." }
+  jar-file? [file]
+  (try
+    (and (.isFile file)
+      (or
+        (.endsWith (.getName file) ".jar")
+        (.endsWith (.getName file) ".JAR")))
+    (catch AccessControlException access-control-exception
+      false)))
+
+(defn
+  classpath-jar-files []
+  (map #(JarFile. %) (filter jar-file? (classpath/classpath))))
 
 (defn
   find-all-classpath-files [full-file-path]
-  (filter #(.exists %) 
+  (filter #(.exists %)
     (map #(File. % full-file-path) (classpath-directories))))
 
 (defn
   find-classpath-file [full-file-path]
   (first (find-all-classpath-files full-file-path)))
 
+(defn
+  #^{ :doc "Returns the resource with the given full file path as a stream using the classloader. If an
+AccessControlException occures (for example, when running in google app engine), this method returns nil." }
+  resource-as-stream [full-file-path]
+  (try
+    (.getResourceAsStream (system-class-loader) full-file-path)
+    (catch AccessControlException access-controller-exception
+      nil)))
+
 (defn 
 #^{ :doc "Returns a stream for the given resource if it exists. Otherwise, this function returns nil." }
   find-resource [full-file-path]
-  (if-let [resource (.getResourceAsStream (system-class-loader) full-file-path)]
+  (if-let [resource (resource-as-stream full-file-path)]
     resource
     (when (user-classpath-var?)
       (when-let [file (find-classpath-file full-file-path)]
@@ -283,7 +316,7 @@ cannot be found.." }
 (defn
 #^{ :doc "Returns all of the zip entries in the classpath with the given directory name." }
   class-path-zip-entries [dir-name]
-  (mapcat #(directory-zip-entries % dir-name) (classpath/classpath-jarfiles)))
+  (mapcat #(directory-zip-entries % dir-name) (classpath-jar-files)))
 
 (defn
 #^{ :doc "Returns all of the files in the sub directory of the given parent directory, if the full parent and sub 

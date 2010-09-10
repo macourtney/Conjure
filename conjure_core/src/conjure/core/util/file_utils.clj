@@ -1,5 +1,6 @@
 (ns conjure.core.util.file-utils
-  (:import [java.io File FileWriter])
+  (:import [java.io File FileWriter]
+           [java.security AccessControlException])
   (:require [clojure.contrib.duck-streams :as duck-streams]
             [clojure.contrib.logging :as logging]))
 
@@ -89,3 +90,12 @@ deleted, this function aborts and returns nil. If the delete finishes successful
     (when (reduce #(and %1 (recursive-delete %2)) true (.listFiles directory))
       (.delete directory))
     (.delete directory)))
+
+(defn
+#^{ :doc "Returns true if the given file is a directory. False otherwise, even if the is directory check causes an
+AccessControlException which may happen when running in Google App Engine." }
+  is-directory? [file]
+  (try
+    (.isDirectory file)
+    (catch AccessControlException access-control-exception
+      false)))
