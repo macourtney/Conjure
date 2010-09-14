@@ -3,5 +3,5 @@ classes
 db
 conjure*.jar
 conjure-standalone.jar
-lib/
+lib
 log
