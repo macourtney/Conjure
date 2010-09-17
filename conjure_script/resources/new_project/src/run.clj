@@ -22,7 +22,7 @@
       [mode "The server mode. For example, development, production, or test." "production"]
       remaining]
   
-    (migrate/migrate mode version))) 
+    (migrate/run args))) 
 
 (defn -main [& args]
   (let [action (first args)]
