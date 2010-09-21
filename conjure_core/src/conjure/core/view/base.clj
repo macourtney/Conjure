@@ -10,7 +10,7 @@
 
 (defn default-response-map []
   { :status  200
-    :headers { "Content-Type" "text/html" } })
+    :headers { "Content-Type" "text/html; charset=UTF-8" } })
 
 (defn update-layout-info-with [layout-info] 
   (fn [request-map] 
