@@ -3,7 +3,7 @@
         conjure.core.util.session-utils)
   (:require [conjure.core.model.database :as database]
             [conjure.core.server.request :as request]
-            [conjure.core.util.string-utils :as conjure-str-utils]))
+            [clojure_util.string-utils :as conjure-str-utils]))
   
 (deftest test-create-session-id
   (is (create-session-id))

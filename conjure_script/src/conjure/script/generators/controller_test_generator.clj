@@ -3,7 +3,7 @@
             [conjure.core.controller.util :as util]
             [conjure.core.test.builder :as test-builder]
             [conjure.core.test.util :as test-util]
-            [conjure.core.util.file-utils :as file-utils]))
+            [clojure_util.file-utils :as file-utils]))
 
 (defn
 #^{:doc "Prints out how to use the generate test controller command."}

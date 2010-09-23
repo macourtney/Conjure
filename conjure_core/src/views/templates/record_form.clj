@@ -1,8 +1,8 @@
 (ns views.templates.record-form
   (:use conjure.core.view.base)
-  (:require [conjure.core.util.string-utils :as conjure-str-utils]
-            [conjure.core.model.util :as model-util]
-            [conjure.core.util.loading-utils :as loading-utils]))
+  (:require [clojure_util.loading-utils :as loading-utils]
+            [clojure_util.string-utils :as conjure-str-utils]
+            [conjure.core.model.util :as model-util]))
 
 (defn
   #^{ :doc "Creates the editor for the given field in the given record." }

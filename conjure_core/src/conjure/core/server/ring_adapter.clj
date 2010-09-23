@@ -3,14 +3,15 @@
            [java.util Date])
   (:require [clojure.contrib.classpath :as classpath]
             [clojure.contrib.logging :as logging]
+            [clojure_util.file-utils :as file-utils]
+            [clojure_util.loading-utils :as loading-utils]
+            [clojure_util.servlet-utils :as servlet-utils]
             [conjure.core.config.environment :as environment]
             [conjure.core.controller.util :as controller-util]
             [conjure.core.helper.util :as helper-util]
             [conjure.core.model.util :as model-util]
+            [conjure.core.server.request :as request]
             [conjure.core.server.server :as server]
-            [conjure.core.util.file-utils :as file-utils]
-            [conjure.core.util.loading-utils :as loading-utils]
-            [conjure.core.util.servlet-utils :as servlet-utils]
             [conjure.core.view.util :as view-util]
             [ring.middleware.file :as ring-file]
             [ring.middleware.stacktrace :as ring-stacktrace]
@@ -38,7 +39,7 @@ request map." }
 
 (defn
   resource-relative-path [request root-path resource-path]
-  (str root-path (servlet-utils/convert-servlet-path (servlet-utils/servlet-context request) resource-path)))
+  (str root-path (servlet-utils/convert-servlet-path (request/servlet-context request) resource-path)))
 
 (defn
   wrap-resource-dir [app root-path]
@@ -47,7 +48,7 @@ request map." }
       (let [resource-path (codec/url-decode (:uri request))]
         (if (.endsWith resource-path "/")
           (app request)
-          (if-let [body (servlet-utils/find-resource request (resource-relative-path request root-path resource-path))]
+          (if-let [body (servlet-utils/find-resource (request/servlet-context request) (resource-relative-path request root-path resource-path))]
             (response/response body)
             (app request))))
       (app request))))

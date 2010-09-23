@@ -1,7 +1,7 @@
 (ns views.templates.record-cell
   (:use conjure.core.view.base)
   (:require [hiccup.core :as hiccup]
-            [conjure.core.util.string-utils :as conjure-str-utils]
+            [clojure_util.string-utils :as conjure-str-utils]
             [conjure.core.view.util :as view-utils]))
 
 (def-view [model-name record record-key]

@@ -3,7 +3,7 @@
             [conjure.core.model.database :as database]
             [conjure.core.model.util :as model-util]
             [conjure.core.server.request :as request]
-            [conjure.core.util.string-utils :as string-utils]
+            [clojure_util.string-utils :as string-utils]
             [views.layouts.templates.tabs :as layout-tabs]))
 
 (defn

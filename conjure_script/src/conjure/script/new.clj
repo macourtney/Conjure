@@ -2,8 +2,8 @@
   (:import [java.io BufferedInputStream File])
   (:require [clojure.contrib.command-line :as command-line]
             [clojure.contrib.duck-streams :as duck-streams]
-            [conjure.core.util.file-utils :as file-utils]
-            [conjure.core.util.loading-utils :as loading-utils]))
+            [clojure_util.file-utils :as file-utils]
+            [clojure_util.loading-utils :as loading-utils]))
 
 (def conjure-version "0.8.0-SNAPSHOT") 
 (def default-database "h2")

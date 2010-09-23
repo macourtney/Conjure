@@ -2,9 +2,9 @@
   (:require [clojure.contrib.java-utils :as java-utils]
             [clojure.contrib.logging :as logging] 
             [config.environment :as config-env]
-            [conjure.core.util.file-utils :as file-utils]
-            [conjure.core.util.loading-utils :as loading-utils]
-            [conjure.core.util.servlet-utils :as servlet-utils]))
+            [clojure_util.file-utils :as file-utils]
+            [clojure_util.loading-utils :as loading-utils]
+            [clojure_util.servlet-utils :as servlet-utils]))
 
 (def initialized (atom false))
 

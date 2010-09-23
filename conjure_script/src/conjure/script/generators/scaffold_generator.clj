@@ -2,7 +2,7 @@
   (:require [clojure.contrib.str-utils :as str-utils]
             [conjure.core.model.util :as model-util]
             [conjure.core.model.builder :as model-builder]
-            [conjure.core.util.string-utils :as conjure-str-utils]
+            [clojure_util.string-utils :as conjure-str-utils]
             [conjure.core.test.util :as test-util]
             [conjure.core.view.util :as view-util]
             [conjure.script.generators.controller-generator :as controller-generator]

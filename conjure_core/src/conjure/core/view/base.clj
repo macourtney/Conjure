@@ -3,9 +3,9 @@
             [clojure.contrib.str-utils :as str-utils]
             [conjure.core.config.environment :as environment]
             [conjure.core.server.request :as request]
-            [conjure.core.util.html-utils :as html-utils]
-            [conjure.core.util.servlet-utils :as servlet-utils]
-            [conjure.core.util.string-utils :as conjure-str-utils]
+            [clojure_util.html-utils :as html-utils]
+            [clojure_util.servlet-utils :as servlet-utils]
+            [clojure_util.string-utils :as conjure-str-utils]
             [conjure.core.view.util :as view-util]))
 
 (defn default-response-map []

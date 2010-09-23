@@ -5,10 +5,11 @@
             [clojure.contrib.str-utils :as str-utils]
             [conjure.core.config.environment :as environment]
             [conjure.core.server.request :as request]
-            [conjure.core.util.loading-utils :as loading-utils]
-            [conjure.core.util.file-utils :as file-utils]
-            [conjure.core.util.servlet-utils :as servlet-utils]
-            [conjure.core.util.string-utils :as string-utils]))
+            [clojure_util.loading-utils :as loading-utils]
+            [clojure_util.file-utils :as file-utils]
+            [clojure_util.servlet-utils :as servlet-utils]
+            [clojure_util.string-utils :as string-utils]
+            [conjure.core.util.conjure-utils :as conjure-utils]))
 
 (def controllers-dir "controllers")
 (def controllers-namespace controllers-dir)
@@ -91,7 +92,7 @@ namespace." }
   (filter controller-file-name?
     (concat
       (loading-utils/all-class-path-file-names controllers-dir)
-      (servlet-utils/all-file-names controllers-dir))))
+      (servlet-utils/all-file-names controllers-dir (request/servlet-context)))))
 
 (defn
 #^{ :doc "Returns the names of all of the controllers for this app." }
@@ -106,7 +107,7 @@ namespace." }
 (defn
 #^{ :doc "Reloads all conjure namespaces referenced by the given controller." }
   reload-conjure-namespaces [controller]
-  (loading-utils/reload-conjure-namespaces (controller-namespace controller)))
+  (conjure-utils/reload-conjure-namespaces (controller-namespace controller)))
 
 (defn
 #^{ :doc "Loads the given controller file." }

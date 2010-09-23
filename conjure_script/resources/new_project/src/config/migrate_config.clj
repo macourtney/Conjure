@@ -6,4 +6,5 @@
     :init util/init
     :current-version util/current-version
     :update-version util/update-version
-    :ns-content "\n  (:use conjure.core.model.database)" })
+    :ns-content "\n  (:use conjure.core.model.database)"
+    :migration-namespaces util/migration-namespaces })

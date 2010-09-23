@@ -1,6 +1,6 @@
 (ns views.templates.ajax-edit
   (:use conjure.core.view.base)
-  (:require [conjure.core.util.string-utils :as conjure-str-utils]
+  (:require [clojure_util.string-utils :as conjure-str-utils]
             [hiccup.core :as hiccup]
             [views.templates.record-form :as record-form]))
 

@@ -3,7 +3,7 @@
   (:use clojure.contrib.test-is)
   (:require [conjure.core.config.environment :as environment]
             [conjure.core.server.server :as conjure-server]
-            [conjure.core.util.loading-utils :as loading-utils]
+            [clojure_util.loading-utils :as loading-utils]
             [conjure.core.migration.runner :as runner]
             [clojure.contrib.java-utils :as java-utils]
             [clojure.contrib.seq-utils :as seq-utils]))

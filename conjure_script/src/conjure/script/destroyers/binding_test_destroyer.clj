@@ -1,8 +1,8 @@
 (ns conjure.script.destroyers.binding-test-destroyer
   (:require [clojure.contrib.logging :as logging]
             [conjure.core.test.util :as util]
-            [conjure.core.util.file-utils :as file-utils]
-            [conjure.core.util.loading-utils :as loading-utils]))
+            [clojure_util.file-utils :as file-utils]
+            [clojure_util.loading-utils :as loading-utils]))
 
 (defn
 #^{:doc "Prints out how to use the destroy binding test command."}

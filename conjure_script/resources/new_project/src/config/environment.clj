@@ -1,6 +1,5 @@
 (ns config.environment
-  (:require [clojure.contrib.java-utils :as java-utils]
-            [conjure.core.util.loading-utils :as loading-utils]))
+  (:require [clojure.contrib.java-utils :as java-utils]))
 
 (def properties
   (atom 

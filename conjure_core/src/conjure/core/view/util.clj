@@ -3,15 +3,16 @@
             [clojure.contrib.ns-utils :as ns-utils]
             [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.str-utils :as str-utils]
+            [clojure_util.file-utils :as file-utils]
+            [clojure_util.html-utils :as html-utils]
+            [clojure_util.loading-utils :as loading-utils]
+            [clojure_util.servlet-utils :as servlet-utils]
+            [clojure_util.string-utils :as conjure-str-utils]
             [config.session-config :as session-config]
             [conjure.core.config.environment :as environment]
             [conjure.core.server.request :as request]
-            [conjure.core.util.file-utils :as file-utils]
-            [conjure.core.util.html-utils :as html-utils]
-            [conjure.core.util.loading-utils :as loading-utils]
-            [conjure.core.util.servlet-utils :as servlet-utils]
-            [conjure.core.util.session-utils :as session-utils]
-            [conjure.core.util.string-utils :as conjure-str-utils]))
+            [conjure.core.util.conjure-utils :as conjure-utils]
+            [conjure.core.util.session-utils :as session-utils]))
             
 (def views-dir "views")
 
@@ -96,7 +97,7 @@
     (let [view-namespace (request-view-namespace controller action)]
       (require :reload (symbol view-namespace))
       (reset! loaded-views (assoc-loaded-views @loaded-views controller action))
-      (loading-utils/reload-conjure-namespaces view-namespace))))
+      (conjure-utils/reload-conjure-namespaces view-namespace))))
 
 (defn
 #^{ :doc "Returns true if the view corresponding to the request-map or given controller and action is already loaded." }

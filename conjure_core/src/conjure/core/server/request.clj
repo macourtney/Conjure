@@ -1,7 +1,7 @@
 (ns conjure.core.server.request
-  (:require [conjure.core.util.loading-utils :as loading-utils] 
-            [conjure.core.util.html-utils :as html-utils]
-            [conjure.core.util.string-utils :as conjure-str-utils]))
+  (:require [clojure_util.loading-utils :as loading-utils] 
+            [clojure_util.html-utils :as html-utils]
+            [clojure_util.string-utils :as conjure-str-utils]))
 
 (def request-map {})
 
@@ -133,8 +133,11 @@ then the scheme set in the ring-request is used." }
   (:servlet (ring-request)))
 
 (defn
-  servlet-context []
-  (:servlet-context (ring-request)))
+  servlet-context
+  ([] (servlet-context (ring-request))) 
+  ([ring-request]
+    (:servlet-context ring-request)))
+
 
 (defn
 #^{ :doc "Merges the params value of the given request-map with params" }

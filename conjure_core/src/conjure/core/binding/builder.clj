@@ -2,7 +2,7 @@
   (:import [java.io File])
   (:require [clojure.contrib.logging :as logging]
             [conjure.core.binding.util :as binding-util]
-            [conjure.core.util.loading-utils :as loading-utils]))
+            [clojure_util.loading-utils :as loading-utils]))
 
 (defn 
 #^{:doc "Finds or creates if missing, a controller directory for the given controller in the given bindings directory."}

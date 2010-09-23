@@ -1,7 +1,7 @@
 (ns conjure.core.model.database
   (:require [clojure.contrib.logging :as logging]
             [config.db-config :as db-config]
-            [conjure.core.util.string-utils :as string-utils]))
+            [clojure_util.string-utils :as string-utils]))
 
 (def conjure-db (atom {}))
 

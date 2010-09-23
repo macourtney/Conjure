@@ -1,7 +1,7 @@
 (ns conjure.script.destroyers.model-test-destroyer
   (:require [clojure.contrib.logging :as logging]
             [conjure.core.test.util :as util]
-            [conjure.core.util.file-utils :as file-utils]
+            [clojure_util.file-utils :as file-utils]
             [conjure.script.destroyers.fixture-destroyer :as fixture-destroyer]))
 
 (defn

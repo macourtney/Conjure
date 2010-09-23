@@ -4,8 +4,8 @@
   (:require [clojure.contrib.logging :as logging]
             [clojure.contrib.str-utils :as str-utils]
             [clojure.contrib.sql :as sql]
-            [conjure.core.util.loading-utils :as conjure-loading-utils]
-            [conjure.core.util.string-utils :as conjure-string-utils]))
+            [clojure_util.loading-utils :as conjure-loading-utils]
+            [clojure_util.string-utils :as conjure-string-utils]))
 
 (defn
 #^{:doc "Returns an mysql datasource for a ."}

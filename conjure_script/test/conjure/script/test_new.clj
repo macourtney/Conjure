@@ -6,7 +6,7 @@
         test-helper)
   (:require [clojure.contrib.duck-streams :as duck-streams]
             [clojure.contrib.seq-utils :as seq-utils]
-            [conjure.core.util.loading-utils :as loading-utils]))
+            [clojure_util.loading-utils :as loading-utils]))
 
 (def plugin-name "test")
 

@@ -2,9 +2,9 @@
   (:import [java.io File])
   (:require [clojure.contrib.str-utils :as contrib-str-utils]
             [conjure.core.config.environment :as environment]
-            [conjure.core.util.file-utils :as file-utils]
-            [conjure.core.util.loading-utils :as loading-utils]
-            [conjure.core.util.string-utils :as conjure-str-utils]))
+            [clojure_util.file-utils :as file-utils]
+            [clojure_util.loading-utils :as loading-utils]
+            [clojure_util.string-utils :as conjure-str-utils]))
 
 (def helpers-dir "helpers")
 

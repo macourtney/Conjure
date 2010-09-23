@@ -2,7 +2,7 @@
   (:import [java.io File])
   (:use [conjure.extract] :reload-all)
   (:use [clojure.test])
-  (:require [conjure.core.util.file-utils :as file-utils]))
+  (:require [clojure_util.file-utils :as file-utils]))
 
 (deftest test--main
   (-main "test-project")

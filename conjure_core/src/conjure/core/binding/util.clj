@@ -3,10 +3,11 @@
   (:require [clojure.contrib.logging :as logging]
             [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.str-utils :as str-utils]
+            [clojure_util.file-utils :as file-utils]
+            [clojure_util.loading-utils :as loading-utils]
+            [clojure_util.string-utils :as conjure-str-utils]
             [conjure.core.config.environment :as environment]
-            [conjure.core.util.file-utils :as file-utils]
-            [conjure.core.util.loading-utils :as loading-utils]
-            [conjure.core.util.string-utils :as conjure-str-utils]))
+            [conjure.core.util.conjure-utils :as conjure-utils]))
 
 (def bindings-dir "bindings")
 (def bindings-namespace bindings-dir)
@@ -111,7 +112,7 @@ result." }
   (when (binding-exists? controller action)
     (let [binding-namespace-str (binding-namespace controller action)]
       (require :reload (symbol binding-namespace-str))
-      (loading-utils/reload-conjure-namespaces binding-namespace-str))))
+      (conjure-utils/reload-conjure-namespaces binding-namespace-str))))
 
 (defn
 #^{ :doc "Returns the binding function for the given controller and action." }

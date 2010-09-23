@@ -5,8 +5,8 @@
             [clojure.contrib.str-utils :as str-utils]
             [clojure.contrib.test-is :as test-is]
             [conjure.core.config.environment :as environment]
-            [conjure.core.util.file-utils :as file-utils]
-            [conjure.core.util.loading-utils :as loading-utils]))
+            [clojure_util.file-utils :as file-utils]
+            [clojure_util.loading-utils :as loading-utils]))
 
 (def plugins-dir "plugins")
 (def plugin-file-name "plugin.clj")

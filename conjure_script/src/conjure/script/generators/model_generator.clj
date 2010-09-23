@@ -2,8 +2,8 @@
   (:require [clojure.contrib.logging :as logging]
             [conjure.core.model.builder :as builder]
             [conjure.core.model.util :as util]
-            [conjure.core.util.string-utils :as string-utils]
-            [conjure.core.util.file-utils :as file-utils]
+            [clojure_util.string-utils :as string-utils]
+            [clojure_util.file-utils :as file-utils]
             [conjure.script.generators.migration-generator :as migration-generator]
             [drift.generator :as drift-generator]
             [conjure.script.generators.model-test-generator :as model-test-generator]))

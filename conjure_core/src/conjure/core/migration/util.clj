@@ -1,9 +1,12 @@
 (ns conjure.core.migration.util
   (:require [clojure.contrib.command-line :as command-line]
             [clojure.contrib.logging :as logging]
+            [clojure_util.loading-utils :as loading-utils]
+            [clojure_util.servlet-utils :as servlet-utils]
+            [clojure_util.string-utils :as string-utils]
             [conjure.core.model.database :as database]
-            [conjure.core.server.server :as server]
-            [conjure.core.util.string-utils :as string-utils]))
+            [conjure.core.server.request :as request]
+            [conjure.core.server.server :as server]))
 
 (def schema-info-table "schema_info")
 (def version-column :version)
@@ -50,3 +53,30 @@ schema info table is empty, then it adds a row and sets the version to 0."}
 #^{:doc "Updates the version number saved in the schema table in the database."}
   update-version [new-version]
   (database/update schema-info-table ["true"] { version-column new-version }))
+
+(defn
+  all-migration-file-names [migrations-dir]
+  (concat
+    (loading-utils/all-class-path-file-names migrations-dir)
+    (servlet-utils/all-file-names migrations-dir (request/servlet-context))))
+
+(defn
+#^{ :doc "Returns the migration name for the given migration file." }
+  migration-from-file [migration-file]
+  (when migration-file
+    (if (string? migration-file)
+      (loading-utils/clj-file-to-symbol-string migration-file)
+      (migration-from-file (.getName migration-file)))))
+
+(defn
+#^{ :doc "Returns the names of all of the migrations for this app." }
+  all-migrations [migrations-dir]
+  (map migration-from-file (all-migration-file-names migrations-dir)))
+
+(defn
+  migration-namespace-strs [migrations-dir migrate-namespace-prefix]
+  (map #(str migrate-namespace-prefix "." %1) (all-migrations migrations-dir)))
+
+(defn
+  migration-namespaces [migrations-dir migrate-namespace-prefix]
+  (map #(find-ns (symbol %1)) (migration-namespace-strs migrations-dir migrate-namespace-prefix)))
