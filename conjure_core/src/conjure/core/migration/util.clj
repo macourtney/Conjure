@@ -55,10 +55,24 @@ schema info table is empty, then it adds a row and sets the version to 0."}
   (database/update schema-info-table ["true"] { version-column new-version }))
 
 (defn
+  file-separator-index [path-str]
+  (when path-str
+    (let [min-args (filter #(> % -1) [(.indexOf path-str "/" 1) (.indexOf path-str "\\" 1)])]
+      (when (not-empty min-args)
+        (apply min min-args)))))
+
+(defn
+  migrate-namespace-dir [migrate-dir-name]
+  (if-let [file-separator-index (file-separator-index migrate-dir-name)]
+    (.substring migrate-dir-name (inc file-separator-index))
+     migrate-dir-name))
+
+(defn
   all-migration-file-names [migrations-dir]
-  (concat
-    (loading-utils/all-class-path-file-names migrations-dir)
-    (servlet-utils/all-file-names migrations-dir (request/servlet-context))))
+  (when-let [migrate-namespace-dir (migrate-namespace-dir migrations-dir)]
+    (concat
+      (loading-utils/all-class-path-file-names migrate-namespace-dir)
+      (servlet-utils/all-file-names migrate-namespace-dir (request/servlet-context)))))
 
 (defn
 #^{ :doc "Returns the migration name for the given migration file." }
@@ -69,14 +83,26 @@ schema info table is empty, then it adds a row and sets the version to 0."}
       (migration-from-file (.getName migration-file)))))
 
 (defn
+  clj-file? [file]
+  (if (string? file)
+    (.endsWith file ".clj")
+    (loading-utils/clj-file? file)))
+
+(defn
 #^{ :doc "Returns the names of all of the migrations for this app." }
   all-migrations [migrations-dir]
-  (map migration-from-file (all-migration-file-names migrations-dir)))
+  (map migration-from-file (filter clj-file? (all-migration-file-names migrations-dir))))
 
 (defn
   migration-namespace-strs [migrations-dir migrate-namespace-prefix]
   (map #(str migrate-namespace-prefix "." %1) (all-migrations migrations-dir)))
 
 (defn
+  load-namespace [migration-namespace]
+  (when-let [namespace-symbol (symbol migration-namespace)]
+    (require namespace-symbol)
+    (find-ns namespace-symbol)))
+
+(defn
   migration-namespaces [migrations-dir migrate-namespace-prefix]
-  (map #(find-ns (symbol %1)) (migration-namespace-strs migrations-dir migrate-namespace-prefix)))
+  (filter identity (map load-namespace (migration-namespace-strs migrations-dir migrate-namespace-prefix))))
