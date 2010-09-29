@@ -5,8 +5,8 @@
   (:require [clojure.contrib.logging :as logging]
             [clojure.contrib.str-utils :as str-utils]
             [clojure.contrib.sql :as sql]
-            [clojure_util.loading-utils :as conjure-loading-utils]
-            [clojure_util.string-utils :as conjure-string-utils]))
+            [clojure.tools.loading-utils :as conjure-loading-utils]
+            [clojure.tools.string-utils :as conjure-string-utils]))
 
 (defn
 #^{:doc "Returns an h2 datasource for a ."}

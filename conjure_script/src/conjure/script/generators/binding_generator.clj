@@ -2,7 +2,7 @@
   (:require [clojure.contrib.logging :as logging]
             [conjure.core.binding.builder :as bind-builder]
             [conjure.core.binding.util :as bind-util]
-            [clojure_util.file-utils :as file-utils]
+            [clojure.tools.file-utils :as file-utils]
             [conjure.script.generators.view-generator :as view-generator]
             [conjure.script.generators.binding-test-generator :as binding-test-generator]))
 

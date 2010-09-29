@@ -1,7 +1,7 @@
 (ns views.templates.show
   (:use conjure.core.view.base)
   (:require [hiccup.core :as hiccup]
-            [clojure_util.string-utils :as conjure-str-utils]
+            [clojure.tools.string-utils :as conjure-str-utils]
             [views.templates.record-view :as record-view]))
 
 (def-view [model-name table-metadata record]

@@ -3,7 +3,7 @@
   (:require [clojure.contrib.command-line :as command-line]
             [clojure.contrib.duck-streams :as duck-streams]
             [clojure.contrib.java-utils :as java-utils] 
-            [clojure_util.loading-utils :as loading-utils] 
+            [clojure.tools.loading-utils :as loading-utils] 
             [conjure.script.new :as conjure-new]))
 
 (def lib-dir-name "lib")

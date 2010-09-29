@@ -2,7 +2,7 @@
   (:import [java.io File])
   (:require [clojure.contrib.logging :as logging]
             [conjure.core.plugin.util :as plugin-util]
-            [clojure_util.loading-utils :as loading-utils]))
+            [clojure.tools.loading-utils :as loading-utils]))
 
 (defn
 #^{ :doc "Finds or creates a the plugin directory for the given plugin name." }

@@ -3,9 +3,9 @@
             [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.str-utils :as contrib-str-utils]
             [conjure.core.config.environment :as environment]
-            [clojure_util.loading-utils :as loading-utils]
-            [clojure_util.file-utils :as file-utils]
-            [clojure_util.string-utils :as string-utils]))
+            [clojure.tools.loading-utils :as loading-utils]
+            [clojure.tools.file-utils :as file-utils]
+            [clojure.tools.string-utils :as string-utils]))
 
 (def models-dir "models")
 

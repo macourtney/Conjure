@@ -1,9 +1,9 @@
 (ns conjure.core.migration.util
   (:require [clojure.contrib.command-line :as command-line]
             [clojure.contrib.logging :as logging]
-            [clojure_util.loading-utils :as loading-utils]
-            [clojure_util.servlet-utils :as servlet-utils]
-            [clojure_util.string-utils :as string-utils]
+            [clojure.tools.loading-utils :as loading-utils]
+            [clojure.tools.servlet-utils :as servlet-utils]
+            [clojure.tools.string-utils :as string-utils]
             [conjure.core.model.database :as database]
             [conjure.core.server.request :as request]
             [conjure.core.server.server :as server]))

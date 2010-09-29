@@ -1,7 +1,7 @@
 (ns views.templates.record-form
   (:use conjure.core.view.base)
-  (:require [clojure_util.loading-utils :as loading-utils]
-            [clojure_util.string-utils :as conjure-str-utils]
+  (:require [clojure.tools.loading-utils :as loading-utils]
+            [clojure.tools.string-utils :as conjure-str-utils]
             [conjure.core.model.util :as model-util]))
 
 (defn

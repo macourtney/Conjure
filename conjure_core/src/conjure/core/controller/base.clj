@@ -5,8 +5,8 @@
             [conjure.core.binding.util :as bind-util]
             [conjure.core.server.request :as request]
             [conjure.core.view.util :as view-util]
-            [clojure_util.html-utils :as html-utils]
-            [clojure_util.string-utils :as string-utils]))
+            [clojure.tools.html-utils :as html-utils]
+            [clojure.tools.string-utils :as string-utils]))
 
 (defn
 #^{ :doc "Runs the binding associated with the given controller and action passing it the given params." }

@@ -3,8 +3,8 @@
   (:require [clojure.contrib.logging :as logging]
             [conjure.core.view.builder :as builder]
             [conjure.core.view.util :as util]
-            [clojure_util.file-utils :as file-utils]
-            [clojure_util.loading-utils :as loading-utils]
+            [clojure.tools.file-utils :as file-utils]
+            [clojure.tools.loading-utils :as loading-utils]
             [conjure.script.generators.view-test-generator :as view-test-generator]))
 
 (defn

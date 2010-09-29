@@ -5,10 +5,10 @@
             [clojure.contrib.str-utils :as str-utils]
             [conjure.core.config.environment :as environment]
             [conjure.core.server.request :as request]
-            [clojure_util.loading-utils :as loading-utils]
-            [clojure_util.file-utils :as file-utils]
-            [clojure_util.servlet-utils :as servlet-utils]
-            [clojure_util.string-utils :as string-utils]
+            [clojure.tools.loading-utils :as loading-utils]
+            [clojure.tools.file-utils :as file-utils]
+            [clojure.tools.servlet-utils :as servlet-utils]
+            [clojure.tools.string-utils :as string-utils]
             [conjure.core.util.conjure-utils :as conjure-utils]))
 
 (def controllers-dir "controllers")

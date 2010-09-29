@@ -2,7 +2,7 @@
   (:require [conjure.core.model.util :as model-util]
             [conjure.core.test.builder :as test-builder]
             [conjure.core.test.util :as test-util]
-            [clojure_util.file-utils :as file-utils]))
+            [clojure.tools.file-utils :as file-utils]))
 
 (defn
 #^{:doc "Prints out how to use the generate fixture command."}

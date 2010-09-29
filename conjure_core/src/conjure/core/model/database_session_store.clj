@@ -3,7 +3,7 @@
   (:require [clojure.contrib.logging :as logging]
             [conjure.core.model.database :as database]
             [conjure.core.util.session-utils :as session-utils]
-            [clojure_util.string-utils :as conjure-str-utils]))
+            [clojure.tools.string-utils :as conjure-str-utils]))
 
 (def session-table :sessions)
 (def created-at-column :created_at)

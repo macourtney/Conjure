@@ -2,8 +2,8 @@
   (:import [java.io File])
   (:require [clojure.contrib.logging :as logging]
             [conjure.core.view.util :as util]
-            [clojure_util.loading-utils :as loading-utils]
-            [clojure_util.string-utils :as conjure-str-utils]))
+            [clojure.tools.loading-utils :as loading-utils]
+            [clojure.tools.string-utils :as conjure-str-utils]))
 
 (defn 
 #^{:doc "Finds or creates if missing, a controller directory for the given controller in the given views directory."}

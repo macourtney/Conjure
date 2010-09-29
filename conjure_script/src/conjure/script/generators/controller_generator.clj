@@ -3,7 +3,7 @@
             [clojure.contrib.str-utils :as str-utils]
             [conjure.core.controller.builder :as builder]
             [conjure.core.controller.util :as util]
-            [clojure_util.file-utils :as file-utils]
+            [clojure.tools.file-utils :as file-utils]
             [conjure.script.generators.binding-generator :as binding-generator]
             [conjure.script.generators.controller-test-generator :as controller-test-generator]))
 

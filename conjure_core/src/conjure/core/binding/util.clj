@@ -3,9 +3,9 @@
   (:require [clojure.contrib.logging :as logging]
             [clojure.contrib.seq-utils :as seq-utils]
             [clojure.contrib.str-utils :as str-utils]
-            [clojure_util.file-utils :as file-utils]
-            [clojure_util.loading-utils :as loading-utils]
-            [clojure_util.string-utils :as conjure-str-utils]
+            [clojure.tools.file-utils :as file-utils]
+            [clojure.tools.loading-utils :as loading-utils]
+            [clojure.tools.string-utils :as conjure-str-utils]
             [conjure.core.config.environment :as environment]
             [conjure.core.util.conjure-utils :as conjure-utils]))
 

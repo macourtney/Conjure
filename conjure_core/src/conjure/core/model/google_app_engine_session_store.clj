@@ -2,7 +2,7 @@
   (:import [java.util Calendar Date])
   (:require [clojure.contrib.logging :as logging]
             [conjure.core.util.session-utils :as session-utils]
-            [clojure_util.string-utils :as conjure-str-utils])
+            [clojure.tools.string-utils :as conjure-str-utils])
   (:use appengine.datastore))
 
 (def session-table :sessions)

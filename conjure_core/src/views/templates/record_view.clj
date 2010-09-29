@@ -1,6 +1,6 @@
 (ns views.templates.record-view
   (:use conjure.core.view.base)
-  (:require [clojure_util.string-utils :as conjure-str-utils]
+  (:require [clojure.tools.string-utils :as conjure-str-utils]
             [hiccup.core :as hiccup]))
 
 (defn

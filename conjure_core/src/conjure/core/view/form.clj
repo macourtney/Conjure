@@ -5,7 +5,7 @@
 (require ['clojure.contrib.logging :as 'logging])
 (require ['conjure.core.model.util :as 'model-util])
 (require ['conjure.core.server.request :as 'request])
-(require ['clojure_util.map-utils :as 'map-utils])
+(require ['clojure.tools.map-utils :as 'map-utils])
 (require ['conjure.core.view.util :as 'view-utils])
 (require ['hiccup.core :as 'hiccup])
 

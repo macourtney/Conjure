@@ -1,7 +1,7 @@
 (ns conjure.core.util.conjure-utils
   (:require [clojure.contrib.ns-utils :as ns-utils]
             [clojure.set :as clj-set]
-            [clojure_util.loading-utils :as loading-utils]))
+            [clojure.tools.loading-utils :as loading-utils]))
 
 (defn
 #^{ :doc "Returns true if the given var-name is in a conjure namespace (controller, helper, model or view)." }

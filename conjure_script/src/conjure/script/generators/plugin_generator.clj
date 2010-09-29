@@ -4,8 +4,8 @@
             [conjure.core.config.environment :as environment]
             [conjure.core.plugin.builder :as plugin-builder]
             [conjure.core.plugin.util :as plugin-util]
-            [clojure_util.file-utils :as file-utils]
-            [clojure_util.loading-utils :as loading-utils]))
+            [clojure.tools.file-utils :as file-utils]
+            [clojure.tools.loading-utils :as loading-utils]))
 
 (defn
 #^{ :doc "Prints out how to use the generate plugin command." }

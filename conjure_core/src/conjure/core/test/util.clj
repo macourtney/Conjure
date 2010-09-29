@@ -1,9 +1,9 @@
 (ns conjure.core.test.util
   (:import [java.io File])
   (:require [conjure.core.config.environment :as environment]
-            [clojure_util.file-utils :as file-utils]
-            [clojure_util.loading-utils :as loading-utils]
-            [clojure_util.string-utils :as conjure-str-utils]))
+            [clojure.tools.file-utils :as file-utils]
+            [clojure.tools.loading-utils :as loading-utils]
+            [clojure.tools.string-utils :as conjure-str-utils]))
 
 (def test-dir-name "test")
 (def functional-dir-name "functional")

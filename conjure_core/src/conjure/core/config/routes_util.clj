@@ -4,8 +4,8 @@
             [config.routes :as routes]
             [conjure.core.controller.util :as controller-util]
             [conjure.core.server.request :as request]
-            [clojure_util.loading-utils :as loading-utils]
-            [clojure_util.servlet-utils :as servlet-utils]))
+            [clojure.tools.loading-utils :as loading-utils]
+            [clojure.tools.servlet-utils :as servlet-utils]))
 
 (defn
   function-parse []

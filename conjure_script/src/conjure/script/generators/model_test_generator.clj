@@ -2,7 +2,7 @@
   (:require [conjure.core.model.util :as util]
             [conjure.core.test.builder :as test-builder]
             [conjure.core.test.util :as test-util]
-            [clojure_util.file-utils :as file-utils]
+            [clojure.tools.file-utils :as file-utils]
             [conjure.script.generators.fixture-generator :as fixture-generator]))
 
 (defn

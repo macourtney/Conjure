@@ -3,9 +3,9 @@
            [java.util Date])
   (:require [clojure.contrib.classpath :as classpath]
             [clojure.contrib.logging :as logging]
-            [clojure_util.file-utils :as file-utils]
-            [clojure_util.loading-utils :as loading-utils]
-            [clojure_util.servlet-utils :as servlet-utils]
+            [clojure.tools.file-utils :as file-utils]
+            [clojure.tools.loading-utils :as loading-utils]
+            [clojure.tools.servlet-utils :as servlet-utils]
             [conjure.core.config.environment :as environment]
             [conjure.core.controller.util :as controller-util]
             [conjure.core.helper.util :as helper-util]

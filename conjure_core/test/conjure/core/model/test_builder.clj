@@ -3,7 +3,7 @@
         clojure.contrib.test-is
         conjure.core.model.builder)
   (:require [conjure.core.model.util :as util]
-            [clojure_util.loading-utils :as loading-utils]))
+            [clojure.tools.loading-utils :as loading-utils]))
 
 (def model-name "builder-test")
 

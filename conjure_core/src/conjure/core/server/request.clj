@@ -1,7 +1,7 @@
 (ns conjure.core.server.request
-  (:require [clojure_util.loading-utils :as loading-utils] 
-            [clojure_util.html-utils :as html-utils]
-            [clojure_util.string-utils :as conjure-str-utils]))
+  (:require [clojure.tools.loading-utils :as loading-utils] 
+            [clojure.tools.html-utils :as html-utils]
+            [clojure.tools.string-utils :as conjure-str-utils]))
 
 (def request-map {})
 

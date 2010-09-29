@@ -1,7 +1,7 @@
 (ns views.layouts.templates.links
   (:use conjure.core.view.base)
   (:require [conjure.core.server.request :as request]
-            [clojure_util.string-utils :as string-utils]
+            [clojure.tools.string-utils :as string-utils]
             [conjure.core.view.util :as view-util]))
 
 (defn

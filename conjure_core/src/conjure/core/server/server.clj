@@ -11,7 +11,7 @@
             [conjure.core.plugin.util :as plugin-util]
             [conjure.core.server.request :as request]
             [conjure.core.util.session-utils :as session-utils]
-            [clojure_util.string-utils :as conjure-str-utils]))
+            [clojure.tools.string-utils :as conjure-str-utils]))
 
 (def initialized? (atom false))
 

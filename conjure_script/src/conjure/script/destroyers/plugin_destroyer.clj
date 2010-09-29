@@ -1,7 +1,7 @@
 (ns conjure.script.destroyers.plugin-destroyer
   (:require [clojure.contrib.logging :as logging]
             [conjure.core.plugin.util :as plugin-util]
-            [clojure_util.file-utils :as file-utils]))
+            [clojure.tools.file-utils :as file-utils]))
 
 (defn
 #^{:doc "Prints out how to use the destroy plugin command."}

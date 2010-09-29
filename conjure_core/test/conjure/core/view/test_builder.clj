@@ -3,7 +3,7 @@
         clojure.contrib.test-is
         conjure.core.view.builder)
   (:require [conjure.core.view.util :as util]
-            [clojure_util.loading-utils :as loading-utils]))
+            [clojure.tools.loading-utils :as loading-utils]))
 
 (def controller "test-builder")
 (def action "show")

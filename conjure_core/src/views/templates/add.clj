@@ -1,6 +1,6 @@
 (ns views.templates.add
   (:use conjure.core.view.base)
-  (:require [clojure_util.string-utils :as conjure-str-utils]
+  (:require [clojure.tools.string-utils :as conjure-str-utils]
             [views.templates.record-form :as record-form]))
 
 (def-view [model-name table-metadata]
