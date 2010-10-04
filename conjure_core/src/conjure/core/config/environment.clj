@@ -30,9 +30,13 @@
 (def conjure-js (find-config-env-value :conjure-js "conjure.js"))
 
 (defn
+  set-evironment-property [environment]
+  (java-utils/set-system-properties { conjure-environment-property environment })) 
+
+(defn
   require-environment []
   (when (not (java-utils/get-system-property conjure-environment-property nil))
-    (java-utils/set-system-properties { conjure-environment-property default-environment }))
+    (set-evironment-property default-environment))
   (let [mode (java-utils/get-system-property conjure-environment-property nil)]
     (require (symbol (str "config.environments." mode)))))
 

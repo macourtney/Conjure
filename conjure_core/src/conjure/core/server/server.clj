@@ -94,5 +94,4 @@ one." }
 production, or test." }
   set-mode [mode]
   (when mode 
-    (java-utils/set-system-properties 
-      { environment/conjure-environment-property (conjure-str-utils/str-keyword mode) })))
+    (environment/set-evironment-property (conjure-str-utils/str-keyword mode))))

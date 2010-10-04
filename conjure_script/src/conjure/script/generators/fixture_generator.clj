@@ -19,7 +19,10 @@
         (let [fixture-namespace (test-util/fixture-namespace model)
               table-name (model-util/model-to-table-name model)
               fixture-content (str "(ns " fixture-namespace "
-  (:use conjure.core.model.database))
+  (:use conjure.core.model.database)
+  (:require [conjure.core.test.init :as test-init]))
+
+(test-init/init-tests)
 
 (def records [
   ; Add your test data here.
