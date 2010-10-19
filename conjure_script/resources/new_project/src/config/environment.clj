@@ -9,4 +9,6 @@
       :images-dir "images"
       
       :jquery "jquery-1.3.2.min.js"
-      :conjure-js "conjure.js" }))
+      :conjure-js "conjure.js"
+
+      :use-logger? true }))

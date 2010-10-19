@@ -8,8 +8,10 @@
 (def conjure-version "0.8.0-SNAPSHOT") 
 (def default-database "h2")
 (def default-session-store "database-session-store")
+(def default-use-logger? ":use-logger? true") 
 
-(def google-app-engine-session-store "google-app-engine-session-store") 
+(def google-app-engine-session-store "google-app-engine-session-store")
+(def google-app-engine-use-logger? ":use-logger? false") 
 
 (def new-project-zip-directory "new_project/") 
 
@@ -58,6 +60,9 @@
   ([database directory]
     (replace-in-file (File. directory "/src/config/db_config.clj") default-database database)
     (when (= database "google-app-engine")
+      (replace-in-file (File. directory "/src/config/environment.clj")
+        default-use-logger?
+        google-app-engine-use-logger?)
       (replace-in-file (File. directory "/src/config/session_config.clj")
         default-session-store
         google-app-engine-session-store))))
