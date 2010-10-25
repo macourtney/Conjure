@@ -142,7 +142,7 @@ then the scheme set in the ring-request is used." }
 (defn
 #^{ :doc "Merges the params value of the given request-map with params" }
   augment-params [request-map params]
-  (if request-map 
+  (when request-map 
     (if (and params (not-empty params))
       (assoc request-map :params (merge (:params request-map) params))
       request-map)))

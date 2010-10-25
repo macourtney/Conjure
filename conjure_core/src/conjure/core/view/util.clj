@@ -144,7 +144,7 @@ the original request-map." }
       :action layout-name 
       :layout-info 
         (merge
-          (:layout-info request/request-map) 
+          (:layout-info request/request-map)
           (select-keys request/request-map [:controller :action :params])) }))
 
 (defn-
@@ -196,13 +196,56 @@ exist, then this method returns nil. This method is used by url-for." }
       (servlet-utils/servlet-uri-path servlet-context))))
 
 (defn
+#^{ :doc "Propagates the session id parameter (if the session cookie is not used) to the given request-map and returns
+the result." }
+  propagate-session-id [original-request-map request-map]
+  (if session-config/use-session-cookie
+    request-map
+    (assoc request-map :params 
+      (merge { :session-id (session-utils/session-id original-request-map) } (:params request-map)))))
+
+(defn
 #^{ :doc "Returns the params merged with the given request-map. Only including the keys from request-map used by url-for" }
   merge-url-for-params [request-map params]
-  (merge 
-    (select-keys 
-      request-map 
-      [:controller :action :request])
-    params))
+  (propagate-session-id
+    request-map
+    (merge 
+      (select-keys request-map [:controller :action :request :temp-session])
+      params)))
+
+(defn
+#^{ :doc "Returns the request controller as a string." }
+  controller-str []
+  (conjure-str-utils/str-keyword (request/controller)))
+
+(defn
+#^{ :doc "Returns the request action as a string." }
+  action-str []
+  (conjure-str-utils/str-keyword (request/action)))
+
+(defn
+#^{ :doc "Returns a path created from the the request." }
+  create-path []
+  (interleave 
+    (repeat "/") 
+    (filter identity
+      [ (servlet-path)
+        (loading-utils/dashes-to-underscores (controller-str))
+        (loading-utils/dashes-to-underscores (action-str))
+        (request/id-str)
+        (anchor) ])))
+
+(defn
+#^{ :doc "Returns the session id url parameter for use in url-for, if and only if session-config/use-session-cookie is
+false." }
+  session-url-param [url-params]
+  (when-not session-config/use-session-cookie
+    (let [session-id (session-utils/session-id)
+          new-session-id (or session-id (session-utils/temp-session-id) (session-utils/create-session-id))
+          new-url-params 
+            (if new-session-id (assoc url-params :session-id new-session-id) url-params)]
+      (when (not-empty new-url-params)
+        (html-utils/url-param-str new-url-params)))))
 
 (defn
 #^{:doc 
@@ -220,27 +263,11 @@ exist, then this method returns nil. This method is used by url-for." }
   url-for
   ([] (url-for {})) 
   ([params]
-  (request/with-request-map-fn #(merge-url-for-params % params)
-    (let [controller (conjure-str-utils/str-keyword (request/controller))
-          action (conjure-str-utils/str-keyword (request/action))
-          url-params (or (dissoc (request/parameters) :id) {})
-          session-id (session-utils/session-id)]
-      (if (and controller action)
+    (request/with-request-map-fn #(merge-url-for-params % params)
+      (if (and (request/controller) (request/action))
         (apply str 
           (seq-utils/flatten
-            [ (full-host) 
-              (interleave 
-                (repeat "/") 
-                (filter identity
-                  [ (servlet-path)
-                    (loading-utils/dashes-to-underscores controller)
-                    (loading-utils/dashes-to-underscores action)
-                    (request/id-str)
-                    (anchor) ]))
-              (let [new-session-id 
-                      (if (not session-config/use-session-cookie) (or session-id (session-utils/create-session-id)))
-                    new-url-params 
-                      (if new-session-id (assoc url-params :session-id new-session-id) url-params)]
-                (if (seq new-url-params)
-                  (html-utils/url-param-str new-url-params)))]))
-        (throw (new RuntimeException (str "You must pass a controller and action to url-for. " request/request-map))))))))
+            [ (full-host)
+              (create-path)
+              (session-url-param (or (dissoc (request/parameters) :id) {}))]))
+        (throw (new RuntimeException (str "You must pass a controller and action to url-for. " request/request-map)))))))
