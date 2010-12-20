@@ -2,6 +2,6 @@ pom.xml
 *jar
 lib
 classes
-db/
+
 lib/
 log
