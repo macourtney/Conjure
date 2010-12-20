@@ -8,16 +8,10 @@
 
 (def test-table "test_table")
 
-(deftest test-db-flavor
-  (let [flavor (db-flavor)]
-    (is (not (nil? flavor)))
-    (is (map? flavor)))
-  (let [db-map (db-flavor :db-map)]
-    (is (not (nil? db-map)))
-    (is (fn? db-map))))
-    
 (deftest test-table-creation
   (is (not (table-exists? test-table)))
+  (when (table-exists? test-table)
+    (drop-table test-table))
   (create-table test-table 
     (id)
     (string "value"))

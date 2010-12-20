@@ -85,11 +85,6 @@ one." }
   (http-config/get-http-config))
 
 (defn
-#^{ :doc "Gets the user configured database properties." }
-  db-config []
-  database/conjure-db)
-
-(defn
 #^{ :doc "Sets the server mode to the given mode. The given mode must be a keyword or string like development, 
 production, or test." }
   set-mode [mode]

@@ -13,6 +13,3 @@
   
 (deftest test-http-config
   (is (not (nil? (http-config)))))
-
-(deftest test-db-config
-  (is (not (nil? (db-config)))))
