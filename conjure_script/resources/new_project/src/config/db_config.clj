@@ -3,7 +3,8 @@
 (ns config.db-config
   (:require [clojure.contrib.java-utils :as java-utils]
             [conjure.core.config.environment :as environment]
-            [conjure.core.db.flavors.h2 :as h2]))
+            [conjure.core.db.flavors.h2 :as h2])
+  (:import [conjure.core.db.flavors.h2 H2Flavor]))
 
 (defn dbname [environment]
   (cond
@@ -21,7 +22,7 @@
   create-flavor 
   ([] (create-flavor :production))
   ([environment]
-    (h2/Flavor
+    (H2Flavor.
       ;; The user name to use when connecting to the database.
       "conjure"
 

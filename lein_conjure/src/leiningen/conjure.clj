@@ -1,5 +1,6 @@
 (ns leiningen.conjure
-  (require [conjure.core.execute :as conjure-execute]))
+  (require [conjure.core.execute :as conjure-execute]
+           [leiningen.compile :as lein-compile]))
 
 (defn
   ^ {:doc "A Leiningen plugin to do common conjure tasks."}
