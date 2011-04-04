@@ -1,1 +1,0 @@
-Controller clj files should be placed here.

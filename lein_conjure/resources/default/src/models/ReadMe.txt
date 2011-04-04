@@ -1,1 +1,0 @@
-Model clj files should be placed here.
