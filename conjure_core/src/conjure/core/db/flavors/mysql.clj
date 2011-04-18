@@ -53,12 +53,12 @@ any keyword into a string, and replaces dashes with underscores."}
   column-name [column]
   (backquote (conjure-loading-utils/dashes-to-underscores (conjure-string-utils/str-keyword column))))
 
-(deftype H2Flavor [username password dbname]
+(deftype MysqlFlavor [username password dbname host]
   Flavor
   (db-map [flavor]
     (let [subprotocol "mysql"
 
-          subname (str "//localhost/" dbname)]
+          subname (str "//" host "/" dbname)]
 
       { :flavor flavor
   
