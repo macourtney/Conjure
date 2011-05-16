@@ -22,12 +22,7 @@
   create-flavor 
   ([] (create-flavor :production))
   ([environment]
-    (H2Flavor.
-      ;; The user name to use when connecting to the database.
-      "conjure"
-
-      ;; The password to use when connecting to the database.
-      "conjure"
+    (h2/flavor
 
       ;; Calculates the database to use.
       (dbname environment))))

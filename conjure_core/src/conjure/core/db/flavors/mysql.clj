@@ -101,7 +101,7 @@ any keyword into a string, and replaces dashes with underscores."}
 
   (table-exists? [flavor table]
     (try
-      (let [results (execute-query db-spec [(str "SELECT * FROM " (table-name table) " LIMIT 1")])]
+      (let [results (flavor-protocol/execute-query db-spec [(str "SELECT * FROM " (table-name table) " LIMIT 1")])]
         true)
       (catch Exception e false)))
   
