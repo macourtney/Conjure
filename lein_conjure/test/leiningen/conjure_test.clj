@@ -3,4 +3,10 @@
   (:use [clojure.test]))
 
 (deftest test-conjure
-  (conjure { :library-path "lib/", :compile-path "classes/" } "noop"))
+  (conjure 
+    { :name "conjure-test"
+      :version "1.0.0"
+      :library-path "lib/"
+      :compile-path "classes/"
+      :native-path "src/native" }
+    "noop"))

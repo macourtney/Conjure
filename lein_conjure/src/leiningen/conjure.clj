@@ -6,6 +6,5 @@
   ^ {:doc "A Leiningen plugin to do common conjure tasks."}
   conjure [project & args]
   (lein-compile/eval-in-project project
-    `(do
-      (use ~''conjure.core.execute)
-      (apply conjure.core.execute/-main '~args))))
+    `(apply conjure.core.execute/-main '~args)
+    nil nil '(require 'conjure.core.execute)))
