@@ -248,6 +248,13 @@ false." }
         (html-utils/url-param-str new-url-params)))))
 
 (defn
+  create-url-params []
+  (let [clean-url-params (or (dissoc (request/parameters) :id) {})]
+    (or
+      (session-url-param clean-url-params)
+      (html-utils/url-param-str clean-url-params))))
+
+(defn
 #^{:doc 
 "Returns the url for the given parameters. The following parameters are valid:
 
@@ -269,5 +276,5 @@ false." }
           (seq-utils/flatten
             [ (full-host)
               (create-path)
-              (session-url-param (or (dissoc (request/parameters) :id) {}))]))
+              (create-url-params) ]))
         (throw (new RuntimeException (str "You must pass a controller and action to url-for. " request/request-map)))))))

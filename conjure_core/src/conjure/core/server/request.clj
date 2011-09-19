@@ -227,3 +227,11 @@ update-request-map and use the new request map in body." }
   with-controller-action-id [controller action id & body]
   `(set-request-map (request-map-with ~controller ~action ~id) ~@body))
 
+(defn request-map-with-params [params]
+  (assoc request-map :params params))
+
+(defmacro
+#^{ :doc "Updates the request map with the given parameters in body. The given params completely replaces the params in
+the request-map." }
+  with-parameters [params & body]
+  `(set-request-map (request-map-with-params ~params) ~@body))
