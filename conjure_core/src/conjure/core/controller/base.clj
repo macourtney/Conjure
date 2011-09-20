@@ -51,6 +51,12 @@
         (redirect-to-full-url (view-util/url-for params)))))
 
 (defn
+#^{ :doc "A short cut function to simply redirect to another action." }
+  redirect-to-action
+  ([action] (redirect-to { :action action }))
+  ([action params] (redirect-to { :action action :params params })))
+
+(defn
 #^{ :doc "Adds the given action function to the list of action functions to call." }
   add-action-function [action-function params]
   (controller-util/add-action-function action-function params))
@@ -72,6 +78,17 @@
       `(add-action-function 
         (fn [] ~@body) 
         ~params))))
+
+(defn simple-bind-action []
+  (bind))
+
+(defn
+#^{ :doc "Defines a list of actions which will simply call (bind). This is a convenience function over creating a
+def-action for each action." }
+  def-bind-only-actions [& actions]
+  (let [controller (controller-from-namespace *ns*)]
+    (doseq [action actions]
+      (add-action-function simple-bind-action { :action (name action) :controller controller }))))
 
 (defn
 #^{ :doc "Returns the name of the interceptor based on the given interceptor symbol." }

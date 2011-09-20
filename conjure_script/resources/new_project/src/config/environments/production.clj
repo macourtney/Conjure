@@ -1,6 +1,7 @@
 (ns config.environments.production
   (:import [org.apache.log4j ConsoleAppender FileAppender Level Logger PatternLayout]
-           [org.apache.log4j.varia LevelRangeFilter]))
+           [org.apache.log4j.varia LevelRangeFilter])
+  (:require [config.environment :as environment]))
 
 (def use-logger? (or (:use-logger? environment/properties) true))
 

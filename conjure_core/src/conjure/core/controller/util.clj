@@ -421,3 +421,14 @@ returned, otherwise nil is returned." }
       (do
         (load-controller)
         (run-action)))))
+
+(defn
+#^{ :doc "Calls the given action in the given controller. This is a convenience function over wrapping call-controller
+in request/with-controller-action calls." }
+  call-controller-action
+  ([controller action]
+    (request/with-controller-action controller action
+      (call-controller)))
+  ([controller action params]
+    (request/with-parameters params
+      (call-controller-action controller action))))
