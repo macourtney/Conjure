@@ -1,4 +1,4 @@
-(defproject conjure-core "0.8.5-SNAPSHOT"
+(defproject conjure-core "0.8.5"
   :description "Core libraries for Conjure. Conjure is a full stack web framework written entirely in Clojure."
   :dependencies [[clojure-tools "1.0.1"]
                  [clout "0.2.0"]
