@@ -38,8 +38,8 @@
   (when (not (java-utils/get-system-property conjure-environment-property nil))
     (set-evironment-property default-environment))
   (let [mode (java-utils/get-system-property conjure-environment-property nil)]
-    (logging/info ("Environment Mode: " mode))
-    (require (symbol (str "config.environments." mode)))))
+    (require (symbol (str "config.environments." mode)))
+    (logging/info (str "Environment Mode: " mode))))
 
 (defn
 #^{ :doc "Returns the name of the environment." }
