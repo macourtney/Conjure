@@ -1,6 +1,6 @@
 (ns conjure.core.view.base
   (:require [hiccup.core :as hiccup]
-            [clojure.contrib.str-utils :as str-utils]
+            [clojure.string :as str-utils]
             [conjure.core.config.environment :as environment]
             [conjure.core.server.request :as request]
             [clojure.tools.html-utils :as html-utils]
@@ -64,8 +64,8 @@ function." }
   replace-extension [source extension]
   (if extension
     (conjure-str-utils/add-ending-if-absent
-      (str-utils/re-sub #"\.[a-zA-Z0-9]*$" "" source) 
-      (if extension (str "." extension)))
+      (str-utils/replace source #"\.[a-zA-Z0-9]*$" "")
+      (str "." extension))
     source))
 
 (defn

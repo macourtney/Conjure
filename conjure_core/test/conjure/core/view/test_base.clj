@@ -1,5 +1,5 @@
 (ns conjure.core.view.test-base
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.core.view.base)
   (require [com.reasonr.scriptjure :as scriptjure]
            [conjure.core.config.environment :as environment]

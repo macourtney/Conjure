@@ -1,6 +1,6 @@
 (ns conjure.core.view.xml-base
   (:import [java.io StringWriter])
-  (:require [clojure.contrib.prxml :as prxml]))
+  (:require [clojure.data.xml :as xml]))
 
 (defn
 #^{ :doc "Creates an xml response using the given body. Body should be a string containing the xml contents." }
@@ -20,7 +20,7 @@
       (defn ~'render-str [~@view-params]
         (with-open [string-writer# (new StringWriter)] 
           (binding [*out* string-writer#]
-            (prxml/prxml
+            (xml/emit
               (~'render-body ~@view-params)))
           (.toString string-writer#)))
       (defn ~'render-view [~@view-params]

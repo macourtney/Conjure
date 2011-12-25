@@ -3,7 +3,7 @@
             [clojure.tools.html-utils :as html-utils]
             [clojure.tools.string-utils :as conjure-str-utils]))
 
-(def request-map {})
+(def ^:dynamic request-map {})
 
 (defn
 #^{ :doc "Returns the controller." }

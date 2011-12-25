@@ -1,9 +1,9 @@
 (ns conjure.core.binding.test-util
   (:import [java.io File])
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.core.binding.util
         test-helper)
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.server.request :as request]))
 
 (def controller-name "test")

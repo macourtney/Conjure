@@ -1,8 +1,7 @@
 (ns conjure.core.binding.util
   (:import [java.io File])
-  (:require [clojure.contrib.logging :as logging]
-            [clojure.contrib.seq-utils :as seq-utils]
-            [clojure.contrib.str-utils :as str-utils]
+  (:require [clojure.tools.logging :as logging]
+            [clojure.string :as str-utils]
             [clojure.tools.file-utils :as file-utils]
             [clojure.tools.loading-utils :as loading-utils]
             [clojure.tools.string-utils :as conjure-str-utils]
@@ -77,7 +76,7 @@
 (defn
 #^{ :doc "Returns the controller and action from the given binding namespace as a map." }
   controller-action-map [namespace-name]
-  (let [reverse-namespace (reverse (str-utils/re-split #"\." namespace-name))]
+  (let [reverse-namespace (reverse (str-utils/split namespace-name #"\."))]
     { :controller (second reverse-namespace), :action (first reverse-namespace) }))
 
 (defn

@@ -1,10 +1,8 @@
 ;; This file is used to configure the database and connection.
 
 (ns config.db-config
-  (:require [clojure.contrib.java-utils :as java-utils]
-            [conjure.core.config.environment :as environment]
-            [conjure.core.db.flavors.h2 :as h2])
-  (:import [conjure.core.db.flavors.h2 H2Flavor]))
+  (:require [conjure.core.config.environment :as environment]
+            [drift-db-h2.flavor :as h2]))
 
 (defn dbname [environment]
   (cond
@@ -29,9 +27,8 @@
             
 (defn
   load-config []
-  (let [environment (environment/environment-name)
-        flavor (create-flavor (keyword environment))]
-    (if flavor
+  (let [environment (environment/environment-name)]
+    (if-let [flavor (create-flavor (keyword environment))]
       flavor
       (throw (new RuntimeException (str "Unknown environment: " environment ". Please check your conjure.environment system property."))))))
       

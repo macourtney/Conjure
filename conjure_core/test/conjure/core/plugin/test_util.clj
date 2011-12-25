@@ -1,9 +1,9 @@
 (ns conjure.core.plugin.test-util
   (:import [java.io File])
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.core.plugin.util
         test-helper)
-  (:require [clojure.contrib.logging :as logging]))
+  (:require [clojure.tools.logging :as logging]))
 
 (def plugin-name "test")
 

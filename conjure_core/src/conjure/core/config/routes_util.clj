@@ -1,10 +1,10 @@
 (ns conjure.core.config.routes-util
-  (:require [clojure.contrib.logging :as logging]
-            [clout.core :as clout]
+  (:require [clout.core :as clout]
             [config.routes :as routes]
             [conjure.core.controller.util :as controller-util]
             [conjure.core.server.request :as request]
             [clojure.tools.loading-utils :as loading-utils]
+            [clojure.tools.logging :as logging]
             [clojure.tools.servlet-utils :as servlet-utils]))
 
 (defn
@@ -40,27 +40,25 @@
     request-map))
 
 (defn
-  parse-compiled-route [compiled-route-map uri]
-  (let [route (:route compiled-route-map)
-        request-map (:request-map compiled-route-map)]
-    (when (and route request-map)
-      (let [route-map (clout/route-matches route uri)]
-        (when route-map
-          (clean-controller-action (symbol-replace request-map route-map)))))))
+  parse-compiled-route [compiled-route-map ring-request]
+  (when-let [route (:route compiled-route-map)]
+    (when-let [request-map (:request-map compiled-route-map)]
+      (when-let [route-map (clout/route-matches route ring-request)]
+        (clean-controller-action (symbol-replace request-map route-map))))))
 
 (defn
   compiled-parse
-  ([] (compiled-parse (request/uri)))
-  ([uri]
+  ([] (compiled-parse (request/ring-request)))
+  ([ring-request]
     (when-let [compiled-routes (:compiled routes/routes)]
-      (some identity (map #(parse-compiled-route % uri) compiled-routes)))))
+      (some identity (map #(parse-compiled-route % ring-request) compiled-routes)))))
 
 (defn
   servlet-parse []
   (when-let [servlet-context (request/servlet-context)]
     (let [uri (request/uri)]
       (when (servlet-utils/servlet-uri? servlet-context uri)
-        (compiled-parse (servlet-utils/servlet-sub-path servlet-context uri))))))
+        (compiled-parse (assoc (request/ring-request) :uri (servlet-utils/servlet-sub-path servlet-context uri)))))))
 
 (defn
   parse-path []
@@ -77,6 +75,5 @@ before calling the controller action." }
 (defn
 #^{ :doc "This function calls the appropriate controller and action." }
   route-request []
-  (let [path-map (parse-path)]
-    (when path-map
-      (call-controller path-map))))
+  (when-let [path-map (parse-path)]
+    (call-controller path-map)))

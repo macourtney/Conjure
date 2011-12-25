@@ -1,6 +1,6 @@
 (ns conjure.core.helper.test-util
   (:import [java.io File])
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.core.helper.util))
   
 (deftest test-find-helpers-directory

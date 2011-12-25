@@ -1,9 +1,8 @@
 (ns conjure.core.config.environment
-  (:require [clojure.contrib.java-utils :as java-utils]
-            [clojure.contrib.logging :as logging] 
-            [config.environment :as config-env]
+  (:require [config.environment :as config-env]
             [clojure.tools.file-utils :as file-utils]
             [clojure.tools.loading-utils :as loading-utils]
+            [clojure.tools.logging :as logging]
             [clojure.tools.servlet-utils :as servlet-utils]))
 
 (def initialized (atom false))
@@ -31,20 +30,20 @@
 
 (defn
   set-evironment-property [environment]
-  (java-utils/set-system-properties { conjure-environment-property environment })) 
-
-(defn
-  require-environment []
-  (when (not (java-utils/get-system-property conjure-environment-property nil))
-    (set-evironment-property default-environment))
-  (let [mode (java-utils/get-system-property conjure-environment-property nil)]
-    (require (symbol (str "config.environments." mode)))
-    (logging/info (str "Environment Mode: " mode))))
+  (System/setProperty conjure-environment-property environment)) 
 
 (defn
 #^{ :doc "Returns the name of the environment." }
   environment-name []
-  (java-utils/get-system-property conjure-environment-property nil))
+  (System/getProperty conjure-environment-property))
+
+(defn
+  require-environment []
+  (when (not (environment-name))
+    (set-evironment-property default-environment))
+  (let [mode (environment-name)]
+    (require (symbol (str "config.environments." mode)))
+    (logging/info (str "Environment Mode: " mode))))
 
 (defn
   find-dir [directory-name]

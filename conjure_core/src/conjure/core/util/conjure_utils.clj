@@ -1,6 +1,5 @@
 (ns conjure.core.util.conjure-utils
-  (:require [clojure.contrib.ns-utils :as ns-utils]
-            [clojure.set :as clj-set]
+  (:require [clojure.set :as clj-set]
             [clojure.tools.loading-utils :as loading-utils]))
 
 (defn
@@ -15,7 +14,7 @@
 (defn
 #^{ :doc "Returns a set of conjure namespaces (controllers, models, helpers and views) used by the given controller." }
   conjure-namespaces [namespace-name]
-  (let [namespace-to-search (ns-utils/get-ns (symbol namespace-name))]
+  (let [namespace-to-search (find-ns (symbol namespace-name))]
     (reduce
       (fn [namespace-set var-name] 
         (conj namespace-set 

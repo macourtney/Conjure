@@ -1,17 +1,17 @@
 (ns conjure.core.server.server
   (:import [java.util Date])
-  (:require [clojure.contrib.java-utils :as java-utils]
-            [clojure.contrib.logging :as logging]
+  (:require [config.db-config :as db-config]
             [config.http-config :as http-config]
-            [conjure.core.config.routes-util :as routes-util]
             [config.session-config :as session-config]
             [conjure.core.config.environment :as environment]
+            [conjure.core.config.routes-util :as routes-util]
             [conjure.core.controller.util :as controller-util]
-            [conjure.core.model.database :as database]
             [conjure.core.plugin.util :as plugin-util]
             [conjure.core.server.request :as request]
             [conjure.core.util.session-utils :as session-utils]
-            [clojure.tools.string-utils :as conjure-str-utils]))
+            [clojure.tools.logging :as logging]
+            [clojure.tools.string-utils :as conjure-str-utils]
+            [drift-db.core :as drift-db]))
 
 (def initialized? (atom false))
 
@@ -20,7 +20,7 @@
 (defn
   init-promise-fn []
   (environment/require-environment)
-  (database/init-database)
+  (drift-db/init-flavor (db-config/load-config))
   ((:init session-config/session-store))
   (logging/info "Server Initialized.")
   (logging/info "Initializing plugins...")

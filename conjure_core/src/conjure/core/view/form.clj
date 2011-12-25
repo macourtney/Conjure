@@ -2,7 +2,7 @@
 
 (in-ns 'conjure.core.view.base)
 
-(require ['clojure.contrib.logging :as 'logging])
+(require ['clojure.tools.logging :as 'logging])
 (require ['conjure.core.model.util :as 'model-util])
 (require ['conjure.core.server.request :as 'request])
 (require ['clojure.tools.map-utils :as 'map-utils])

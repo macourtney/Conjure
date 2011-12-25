@@ -1,5 +1,5 @@
 (ns conjure.core.config.test-routes-util
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.core.config.routes-util
         test-helper)
   (:require [clout.core :as clout]

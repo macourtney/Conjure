@@ -1,6 +1,6 @@
 (ns conjure.core.test.builder
   (:import [java.io File])
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.config.environment :as environment]
             [conjure.core.test.util :as util]
             [clojure.tools.file-utils :as file-utils]

@@ -1,7 +1,5 @@
 (ns conjure.core.model.util
   (:require [clj-record.util :as clj-record-util]
-            [clojure.contrib.seq-utils :as seq-utils]
-            [clojure.contrib.str-utils :as contrib-str-utils]
             [conjure.core.config.environment :as environment]
             [clojure.tools.loading-utils :as loading-utils]
             [clojure.tools.file-utils :as file-utils]

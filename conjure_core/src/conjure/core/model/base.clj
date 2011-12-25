@@ -1,4 +1,5 @@
 (ns conjure.core.model.base
-  (:require [conjure.core.model.database :as database]))
+  (:require [drift-db.core :as database]
+            [drift-db.protocol :as db-protocol]))
 
-(def db (deref database/db))
+(def db (db-protocol/db-map (deref database/drift-db-flavor)))

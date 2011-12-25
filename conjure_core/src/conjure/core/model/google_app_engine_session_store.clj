@@ -1,6 +1,6 @@
 (ns conjure.core.model.google-app-engine-session-store
   (:import [java.util Calendar Date])
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.util.session-utils :as session-utils]
             [clojure.tools.string-utils :as conjure-str-utils])
   (:use appengine.datastore))

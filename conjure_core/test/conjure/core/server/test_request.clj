@@ -1,6 +1,6 @@
 (ns conjure.core.server.test-request
   (:import [java.io ByteArrayInputStream])
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.core.server.request))
 
 (def controller-name "test")

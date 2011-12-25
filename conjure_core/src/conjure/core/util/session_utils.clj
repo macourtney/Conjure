@@ -1,7 +1,6 @@
 (ns conjure.core.util.session-utils
   (:import [java.util Calendar Date])
-  (:require [clojure.contrib.str-utils :as str-utils]
-            [clojure.tools.html-utils :as html-utils]
+  (:require [clojure.tools.html-utils :as html-utils]
             [clojure.tools.string-utils :as conjure-str-utils]
             [conjure.core.server.request :as request]))
 

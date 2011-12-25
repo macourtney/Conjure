@@ -1,10 +1,9 @@
 (ns conjure.core.controller.test-util
   (:import [java.io File])
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.core.controller.util
         test-helper)
-  (:require [clojure.contrib.logging :as logging]
-            [clojure.contrib.seq-utils :as seq-utils]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.server.request :as request]))
 
 (def controller-name "test")
@@ -77,7 +76,7 @@
   (is (not (is-controller-namespace? nil))))
 
 (defn find-first-str [string str-seq]
-  (seq-utils/find-first #(= string %) str-seq))
+  (some #(when (= string %1) %1) str-seq))
 
 (deftest test-all-controller-namespaces
   (let [controller-namespaces (all-controller-namespaces)]

@@ -1,7 +1,6 @@
 (ns conjure.core.helper.util
   (:import [java.io File])
-  (:require [clojure.contrib.str-utils :as contrib-str-utils]
-            [conjure.core.config.environment :as environment]
+  (:require [conjure.core.config.environment :as environment]
             [clojure.tools.file-utils :as file-utils]
             [clojure.tools.loading-utils :as loading-utils]
             [clojure.tools.string-utils :as conjure-str-utils]))

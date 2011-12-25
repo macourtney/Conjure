@@ -1,9 +1,7 @@
 (ns conjure.core.plugin.util
   (:import [java.io File FileNotFoundException])
-  (:require [clojure.contrib.logging :as logging]
-            [clojure.contrib.seq-utils :as seq-utils]
-            [clojure.contrib.str-utils :as str-utils]
-            [clojure.contrib.test-is :as test-is]
+  (:require [clojure.tools.logging :as logging]
+            [clojure.string :as str-utils]
             [conjure.core.config.environment :as environment]
             [clojure.tools.file-utils :as file-utils]
             [clojure.tools.loading-utils :as loading-utils]))
@@ -37,7 +35,7 @@ returns nil." }
   plugin-name-from-namespace [plugin-namespace]
   (when plugin-namespace
     (if (string? plugin-namespace)
-      (second (str-utils/re-split #"\." plugin-namespace))
+      (second (str-utils/split plugin-namespace #"\."))
       (plugin-name-from-namespace (name (ns-name plugin-namespace))))))
 
 (defn

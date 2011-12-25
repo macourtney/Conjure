@@ -1,8 +1,6 @@
 (ns conjure.core.controller.util
-  (:require [clojure.contrib.duck-streams :as duck-streams]
-            [clojure.contrib.logging :as logging]
-            [clojure.contrib.seq-utils :as seq-utils]
-            [clojure.contrib.str-utils :as str-utils]
+  (:require [clojure.tools.logging :as logging]
+            [clojure.string :as str-utils]
             [conjure.core.config.environment :as environment]
             [conjure.core.server.request :as request]
             [clojure.tools.loading-utils :as loading-utils]
@@ -78,7 +76,7 @@ namespace." }
   (when namespace
     (if (string? namespace)
       (string-utils/strip-ending 
-        (last (str-utils/re-split #"\." namespace))
+        (last (str-utils/split namespace #"\."))
         controller-namespace-ending)
       (controller-from-namespace (name (ns-name namespace))))))
 

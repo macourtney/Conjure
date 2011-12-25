@@ -1,9 +1,9 @@
 (ns conjure.core.view.test-util
   (:import [java.io File])
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.core.view.util
         test-helper)
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [config.session-config :as session-config]
             [conjure.core.server.request :as request]))
 

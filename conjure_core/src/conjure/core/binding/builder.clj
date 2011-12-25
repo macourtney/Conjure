@@ -1,6 +1,6 @@
 (ns conjure.core.binding.builder
   (:import [java.io File])
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.binding.util :as binding-util]
             [clojure.tools.loading-utils :as loading-utils]))
 

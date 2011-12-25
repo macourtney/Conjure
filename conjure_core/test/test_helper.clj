@@ -1,6 +1,6 @@
 (ns test-helper
   (:import [java.io File])
-  (:use clojure.contrib.test-is)
+  (:use clojure.test)
   (:require [conjure.core.server.server :as server]))
   
 (defn 

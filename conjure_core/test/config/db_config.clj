@@ -1,12 +1,8 @@
 ;; This file is used to configure the database and connection.
 
 (ns config.db-config
-  (:require conjure.core.db.flavors.h2)
-  (:import [conjure.core.db.flavors.h2 H2Flavor])
-  (:require [clojure.contrib.java-utils :as java-utils]
-            [conjure.core.config.environment :as environment]
-            ;[conjure.core.db.flavors.h2 :as h2]
-            ))
+  (:require [conjure.core.config.environment :as environment]
+            [drift-db-h2.flavor :as h2-flavor]))
 
 (defn dbname [environment]
   (cond
@@ -24,7 +20,7 @@
   create-flavor 
   ([] (create-flavor :production))
   ([environment]
-    (H2Flavor.
+    (h2-flavor/h2-flavor
 
       ;; Calculates the database to use.
       (dbname environment)

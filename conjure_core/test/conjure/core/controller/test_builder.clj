@@ -1,5 +1,5 @@
 (ns conjure.core.controller.test-builder
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.core.controller.builder
         test-helper)
   (:require [conjure.core.controller.util :as util]))

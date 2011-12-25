@@ -2,7 +2,6 @@
 
 (in-ns 'conjure.core.view.base)
 
-(require ['clojure.contrib.ns-utils :as 'ns-utils])
 (require ['hiccup.core :as 'hiccup])
 
 (defn
@@ -95,7 +94,7 @@ option names to option-tag option maps."}
       (require model-namespace-symbol)
       (options-from-records 
         (assoc option-map :records 
-          ((ns-resolve (ns-utils/get-ns model-namespace-symbol) 'find-records)
+          ((ns-resolve (find-ns model-namespace-symbol) 'find-records)
             [true]))))))
 
 (defn-

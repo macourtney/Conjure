@@ -1,8 +1,5 @@
 (ns conjure.core.view.util
-  (:require [clojure.contrib.logging :as logging]
-            [clojure.contrib.ns-utils :as ns-utils]
-            [clojure.contrib.seq-utils :as seq-utils]
-            [clojure.contrib.str-utils :as str-utils]
+  (:require [clojure.tools.logging :as logging]
             [clojure.tools.file-utils :as file-utils]
             [clojure.tools.html-utils :as html-utils]
             [clojure.tools.loading-utils :as loading-utils]
@@ -13,7 +10,7 @@
             [conjure.core.server.request :as request]
             [conjure.core.util.conjure-utils :as conjure-utils]
             [conjure.core.util.session-utils :as session-utils]))
-            
+
 (def views-dir "views")
 
 (def loaded-views (atom {}))
@@ -109,7 +106,7 @@
 (defn
   #^{ :doc "Returns the namespace of the view for the request map. The namespace is an actual namespace object." }
   get-view-ns []
-  (ns-utils/get-ns (symbol (request-view-namespace))))
+  (find-ns (symbol (request-view-namespace))))
 
 (defn
   #^{ :doc "Calls the render function with the given symbol in the view for the request-map." }
@@ -273,7 +270,7 @@ false." }
     (request/with-request-map-fn #(merge-url-for-params % params)
       (if (and (request/controller) (request/action))
         (apply str 
-          (seq-utils/flatten
+          (flatten
             [ (full-host)
               (create-path)
               (create-url-params) ]))

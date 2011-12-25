@@ -1,5 +1,5 @@
 (ns conjure.core.server.test-ring-adapter
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.core.server.ring-adapter
         test-helper))
         

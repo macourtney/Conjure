@@ -1,6 +1,5 @@
 (ns conjure.core.controller.base
-  (:require [clojure.contrib.logging :as logging]
-            [clojure.contrib.str-utils :as str-utils]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.controller.util :as controller-util]
             [conjure.core.binding.util :as bind-util]
             [conjure.core.server.request :as request]

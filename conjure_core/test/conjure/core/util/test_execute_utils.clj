@@ -1,5 +1,5 @@
 (ns conjure.core.util.test-execute-utils
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.core.util.execute-utils))
 
 (deftest test-run-script

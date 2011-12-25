@@ -1,6 +1,6 @@
 (ns conjure.core.server.test-server
   (:import [java.io ByteArrayInputStream])
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.core.server.server)
   (:require [conjure.core.controller.util :as controller-util]
             [conjure.core.test.util :as test-util]))

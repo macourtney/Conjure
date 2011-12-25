@@ -1,7 +1,7 @@
 (ns conjure.core.model.database-session-store
   (:import [java.util Calendar Date])
-  (:require [clojure.contrib.logging :as logging]
-            [conjure.core.model.database :as database]
+  (:require [clojure.tools.logging :as logging]
+            [drift-db.core :as database]
             [conjure.core.util.session-utils :as session-utils]
             [clojure.tools.string-utils :as conjure-str-utils]))
 

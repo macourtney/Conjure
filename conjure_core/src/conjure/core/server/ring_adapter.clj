@@ -1,8 +1,7 @@
 (ns conjure.core.server.ring-adapter
   (:import [java.io File FileInputStream]
            [java.util Date])
-  (:require [clojure.contrib.classpath :as classpath]
-            [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [clojure.tools.file-utils :as file-utils]
             [clojure.tools.loading-utils :as loading-utils]
             [clojure.tools.servlet-utils :as servlet-utils]
@@ -57,6 +56,6 @@ request map." }
 #^{ :doc "A Ring adapter function for Conjure." }
   conjure [req]
   ((wrap-resource-dir 
-    (ring-stacktrace/wrap-stacktrace (wrap-response-time call-server)) 
+    (ring-stacktrace/wrap-stacktrace (wrap-response-time call-server))
     environment/assets-dir)
     req))

@@ -1,8 +1,7 @@
 (ns conjure.core.controller.test-base
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.core.controller.base)
   (:require [conjure.core.controller.util :as controller-util]
-            [conjure.core.model.database :as database]
             [conjure.core.server.request :as request]
             [conjure.core.util.session-utils :as session-utils]))
 

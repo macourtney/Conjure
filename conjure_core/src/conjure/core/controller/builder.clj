@@ -1,6 +1,6 @@
 (ns conjure.core.controller.builder
   (:import [java.io File])
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.controller.util :as util]))
 
 (defn

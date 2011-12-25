@@ -1,5 +1,5 @@
 (ns conjure.core.util.test-conjure-utils
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.core.util.conjure-utils))
         
 (deftest test-conjure-namespaces

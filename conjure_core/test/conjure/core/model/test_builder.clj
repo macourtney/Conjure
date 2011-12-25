@@ -1,6 +1,6 @@
 (ns conjure.core.model.test-builder
   (:use test-helper
-        clojure.contrib.test-is
+        clojure.test
         conjure.core.model.builder)
   (:require [conjure.core.model.util :as util]
             [clojure.tools.loading-utils :as loading-utils]))
