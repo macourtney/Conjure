@@ -1,5 +1,5 @@
 (ns conjure.script.generators.binding-generator
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.binding.builder :as bind-builder]
             [conjure.core.binding.util :as bind-util]
             [clojure.tools.file-utils :as file-utils]

@@ -1,5 +1,5 @@
 (ns conjure.script.destroyers.migration-destroyer
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [drift.destroyer :as destroyer]
             [conjure.core.migration.util :as util]))
 

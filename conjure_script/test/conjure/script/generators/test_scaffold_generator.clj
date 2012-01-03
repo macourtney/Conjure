@@ -1,5 +1,5 @@
 (ns conjure.script.generators.test-scaffold-generator
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.script.generators.scaffold-generator))
 
 (deftest test-field-pairs

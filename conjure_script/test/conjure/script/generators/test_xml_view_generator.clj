@@ -1,5 +1,5 @@
 (ns conjure.script.generators.test-xml-view-generator
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.script.generators.xml-view-generator)
   (:require [conjure.core.view.util :as view-util]))
 

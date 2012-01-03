@@ -4,4 +4,4 @@
   (atom 
     { :default-environment "test"
 
-      :source-dir "test"}))
+      :source-dir "test" }))

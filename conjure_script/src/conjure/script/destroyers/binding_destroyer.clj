@@ -1,5 +1,5 @@
 (ns conjure.script.destroyers.binding-destroyer
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.binding.util :as binding-util]
             [conjure.script.destroyers.binding-test-destroyer :as binding-test-destroyer]
             [conjure.script.destroyers.view-destroyer :as view-destroyer]))

@@ -1,6 +1,6 @@
 (ns conjure.script.generators.plugin-generator
   (:import [java.io File])
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.config.environment :as environment]
             [conjure.core.plugin.builder :as plugin-builder]
             [conjure.core.plugin.util :as plugin-util]

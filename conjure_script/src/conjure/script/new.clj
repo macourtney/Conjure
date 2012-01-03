@@ -1,7 +1,7 @@
 (ns conjure.script.new
   (:import [java.io BufferedInputStream File])
-  (:require [clojure.contrib.command-line :as command-line]
-            [clojure.contrib.duck-streams :as duck-streams]
+  (:require [clojure.tools.cli :as cli]
+            [clojure.java.io :as duck-streams]
             [clojure.tools.file-utils :as file-utils]
             [clojure.tools.loading-utils :as loading-utils]))
 
@@ -50,9 +50,9 @@
 
 (defn
   replace-in-file [file target replacement]
-  (duck-streams/spit
+  (spit
     file 
-    (.replace (duck-streams/slurp* file) target replacement)))
+    (.replace (slurp file) target replacement)))
 
 (defn
   set-database 
@@ -80,12 +80,13 @@
     (when database
       (set-database database directory)))) 
 
+(defn parse-args [args]
+  (cli/cli args
+    ["-d" "--database" "What database to use. Currenty valid options are mysql, h2, and google-app-engine"]
+    ["-v" "--version" "Prints the current version." :flag true]))
+
 (defn
   run [args]
-  (command-line/with-command-line args
-    "./run.sh script/server.clj [options]"
-    [[database "What database to use. Currenty valid options are mysql, h2, and google-app-engine" nil]
-     [version? "Prints the current version."] 
-     remaining]
-
-    (create-new-project database version?)))
+  (let [args-vec (parse-args args)
+        args-map (second args-vec)]
+  (create-new-project (:database args-map) (:version args-map))))

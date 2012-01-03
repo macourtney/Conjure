@@ -1,5 +1,5 @@
 (ns conjure.script.destroyers.model-destroyer
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.model.util :as util]
             [conjure.script.destroyers.migration-destroyer :as migration-destroyer]
             [conjure.script.destroyers.model-test-destroyer :as model-test-destroyer]))

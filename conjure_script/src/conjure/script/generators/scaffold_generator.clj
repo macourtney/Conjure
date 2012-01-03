@@ -1,8 +1,7 @@
 (ns conjure.script.generators.scaffold-generator
-  (:require [clojure.contrib.str-utils :as str-utils]
+  (:require [clojure.string :as str-utils]
             [conjure.core.model.util :as model-util]
             [conjure.core.model.builder :as model-builder]
-            [clojure.tools.string-utils :as conjure-str-utils]
             [conjure.core.test.util :as test-util]
             [conjure.core.view.util :as view-util]
             [conjure.script.generators.controller-generator :as controller-generator]
@@ -20,7 +19,7 @@
 #^{ :doc "Returns a lazy sequence of field name to field type pairs based on the given fields. Fields is expected to be 
 a sequence of strings of the form \"field:type\"" }
   field-pairs [fields]
-  (map #(str-utils/re-split #":" %) fields))
+  (map #(str-utils/split % #":") fields))
   
 (defn
 #^{ :doc "Returns a string for the column spec for the given field pair." }

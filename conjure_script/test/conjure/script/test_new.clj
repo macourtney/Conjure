@@ -1,12 +1,10 @@
 (ns conjure.script.test-new
   (:import [java.io File]
            [java.util.zip ZipEntry])
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.script.new
         test-helper)
-  (:require [clojure.contrib.duck-streams :as duck-streams]
-            [clojure.contrib.seq-utils :as seq-utils]
-            [clojure.tools.loading-utils :as loading-utils]))
+  (:require [clojure.tools.loading-utils :as loading-utils]))
 
 (def plugin-name "test")
 
@@ -25,13 +23,13 @@
   (let [entry-file (File. new-project-test-dir "execute.clj")]
     (create-file 
       entry-file 
-      (seq-utils/find-first #(.endsWith (.getName %) "execute.clj") (loading-utils/class-path-zip-entries "conjure/core/")))
+      (some #(when (.endsWith (.getName %1) "execute.clj") %1)  (loading-utils/class-path-zip-entries "conjure/core/")))
     (is (.exists entry-file))
     (is (.delete entry-file)))
   (let [entry-file (File. new-project-test-dir "core/execute.clj")]
     (create-file 
       entry-file 
-      (seq-utils/find-first #(.endsWith (.getName %) "execute.clj") (loading-utils/class-path-zip-entries "conjure/core/")))
+      (some #(when (.endsWith (.getName %1) "execute.clj") %1)  (loading-utils/class-path-zip-entries "conjure/core/")))
     (is (.exists entry-file))
     (is (.delete entry-file))
     (is (.delete (.getParentFile entry-file))))
@@ -39,7 +37,7 @@
 
 (deftest test-extract-zip-entry
   (let [conjure-core-zip-dir "conjure/core/"
-        zip-entry (seq-utils/find-first #(.endsWith (.getName %) "execute.clj") (loading-utils/class-path-zip-entries conjure-core-zip-dir))]
+        zip-entry (some #(when (.endsWith (.getName %1) "execute.clj") %1)  (loading-utils/class-path-zip-entries conjure-core-zip-dir))]
     (extract-zip-entry new-project-test-dir zip-entry conjure-core-zip-dir)
     (let [entry-file (entry-file new-project-test-dir zip-entry conjure-core-zip-dir)]
       (is (.exists entry-file))
@@ -47,7 +45,7 @@
       (is (.delete entry-file))))
   (let [new-project-subdirectory (File. new-project-test-dir "core")
         conjure-core-zip-dir "conjure/core/"
-        zip-entry (seq-utils/find-first #(.endsWith (.getName %) "execute.clj") (loading-utils/class-path-zip-entries conjure-core-zip-dir))]
+        zip-entry (some #(when (.endsWith (.getName %1) "execute.clj") %1)  (loading-utils/class-path-zip-entries conjure-core-zip-dir))]
     (extract-zip-entry new-project-subdirectory zip-entry conjure-core-zip-dir)
     (let [entry-file (entry-file new-project-subdirectory zip-entry conjure-core-zip-dir)]
       (is (.exists entry-file))
@@ -70,10 +68,10 @@
 (deftest test-set-database
   (let [config-file (File. new-project-test-dir "/src/config/db_config.clj")]
     (.mkdirs (.getParentFile config-file))
-    (duck-streams/spit config-file (str "Blah blah blah " default-database " blah"))
+    (spit config-file (str "Blah blah blah " default-database " blah"))
     (set-database "mysql" new-project-test-dir)
     (is (.exists config-file))
-    (is (= "Blah blah blah mysql blah" (duck-streams/slurp* config-file)))
+    (is (= "Blah blah blah mysql blah" (slurp config-file)))
     (is (.delete config-file))
     (is (.delete (.getParentFile config-file)))
     (is (.delete (.getParentFile (.getParentFile config-file))))

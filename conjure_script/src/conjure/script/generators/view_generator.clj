@@ -1,6 +1,6 @@
 (ns conjure.script.generators.view-generator
   (:import [java.io File])
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.view.builder :as builder]
             [conjure.core.view.util :as util]
             [clojure.tools.file-utils :as file-utils]

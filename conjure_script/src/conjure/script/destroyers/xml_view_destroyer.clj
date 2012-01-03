@@ -1,5 +1,5 @@
 (ns conjure.script.destroyers.xml-view-destroyer
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.view.util :as util]
             [conjure.script.destroyers.view-test-destroyer :as view-test-destroyer]))
 

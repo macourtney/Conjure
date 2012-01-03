@@ -1,4 +1,6 @@
 (defproject conjure-script "0.8.7-SNAPSHOT"
   :description "Script libraries for Conjure. Conjure is a full stack web framework written entirely in Clojure."
-  :dependencies [[org.clojure/clojure "1.2.1"]
-                 [conjure-core "0.8.7-SNAPSHOT"]])
+  :dependencies [[conjure-core "0.8.7-SNAPSHOT"]
+                 [org.clojure/tools.cli "0.2.1"]]
+  :dev-dependencies [[org.drift-db/drift-db-h2 "1.0.7-SNAPSHOT"]
+                     [org.clojure/clojure "1.2.1"]])

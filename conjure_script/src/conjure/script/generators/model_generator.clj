@@ -1,5 +1,5 @@
 (ns conjure.script.generators.model-generator
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.model.builder :as builder]
             [conjure.core.model.util :as util]
             [clojure.tools.string-utils :as string-utils]

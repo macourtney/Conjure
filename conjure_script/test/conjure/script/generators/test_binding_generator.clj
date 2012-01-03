@@ -1,5 +1,5 @@
 (ns conjure.script.generators.test-binding-generator
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.script.generators.binding-generator))
 
 (def controller "test")

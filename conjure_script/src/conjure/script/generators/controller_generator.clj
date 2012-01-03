@@ -1,6 +1,6 @@
 (ns conjure.script.generators.controller-generator
-  (:require [clojure.contrib.logging :as logging]
-            [clojure.contrib.str-utils :as str-utils]
+  (:require [clojure.tools.logging :as logging]
+            [clojure.string :as str-utils]
             [conjure.core.controller.builder :as builder]
             [conjure.core.controller.util :as util]
             [clojure.tools.file-utils :as file-utils]
@@ -22,7 +22,7 @@
 (defn
 #^{ :doc "Generates the action functions block for a controller file." }
   generate-all-action-functions [actions]
-  (str-utils/str-join "\n\n" (map generate-action-function actions)))
+  (str-utils/join "\n\n" (map generate-action-function actions)))
   
 (defn
 #^{ :doc "Generates the view file for the given action." }

@@ -1,5 +1,5 @@
 (ns conjure.script.generators.test-plugin-generator
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.script.generators.plugin-generator))
 
 (deftest test-generate-install-function

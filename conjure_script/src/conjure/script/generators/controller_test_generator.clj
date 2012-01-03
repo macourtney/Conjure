@@ -1,5 +1,5 @@
 (ns conjure.script.generators.controller-test-generator
-  (:require [clojure.contrib.str-utils :as str-utils]
+  (:require [clojure.string :as str-utils]
             [conjure.core.controller.util :as util]
             [conjure.core.test.builder :as test-builder]
             [conjure.core.test.util :as test-util]
@@ -19,7 +19,7 @@
 (defn
 #^{:doc "Generates the action functions block for a functional test file."}
   generate-all-action-tests [actions]
-  (str-utils/str-join "\n\n" (map generate-action-test-function actions)))
+  (str-utils/join "\n\n" (map generate-action-test-function actions)))
 
 (defn
 #^{:doc "Generates the functional test file for the given controller and actions."}

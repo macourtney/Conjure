@@ -1,5 +1,5 @@
 (ns conjure.script.destroyers.fixture-destroyer
-  (:require [clojure.contrib.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [conjure.core.test.util :as util]
             [clojure.tools.file-utils :as file-utils]))
 

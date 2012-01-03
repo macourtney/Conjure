@@ -1,6 +1,5 @@
 (ns conjure.script.generators.binding-test-generator
-  (:require [clojure.contrib.str-utils :as str-utils]
-            [conjure.core.test.builder :as test-builder]
+  (:require [conjure.core.test.builder :as test-builder]
             [conjure.core.test.util :as test-util]
             [clojure.tools.file-utils :as file-utils]))
 

@@ -1,5 +1,5 @@
 (ns conjure.script.test-plugin
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         conjure.script.plugin)
   (:require [conjure.core.plugin.util :as plugin-util]
             [conjure.script.destroyers.plugin-destroyer :as plugin-destroyer]
