@@ -1,7 +1,8 @@
 (ns conjure.core.view.test-base
   (:use clojure.test
         conjure.core.view.base)
-  (require [com.reasonr.scriptjure :as scriptjure]
+  (require [clojure.string :as string]
+           [com.reasonr.scriptjure :as scriptjure]
            [conjure.core.config.environment :as environment]
            [conjure.core.server.request :as request]))
 
@@ -397,6 +398,24 @@
 (deftest test-error-fn
   (is (= 'ajaxError (error-fn))))
 
+(defn javascript-value [value]
+  (cond
+    (nil? value) "null"
+    (instance? String value) (str "\"" value "\"")
+    true value))
+
+(defn javascript-key-value-pair [value-map include-key]
+  (str (name include-key) ": " (javascript-value (get value-map include-key))))
+
+(defn javascript-map-string [value-map include-keys]
+  (str "{"  (string/join ", " (map javascript-key-value-pair (repeat value-map) include-keys)) "}"))
+
+(defn ajax-click-string [id value-map include-keys]
+  (str "ajaxClick(\"" id "\", " (javascript-map-string value-map include-keys) ")"))
+
+(defn javascript-tag [javascript-string]
+  [:script { :type "text/javascript" } javascript-string])
+
 (deftest test-ajax-link-to
   (let [ajax-map { :type "POST"
                    :url "/home/index"
@@ -404,9 +423,8 @@
                    :success 'successFunction
                    :error 'ajaxError
                    :confirm nil }
-        script-tag [:script { :type "text/javascript" }
-                     (scriptjure/js 
-                       (ajaxClick "#test-id" (clj ajax-map)))]
+        include-keys [:type :url :dataType :success :error :confirm]
+        script-tag (javascript-tag (ajax-click-string "#test-id" ajax-map include-keys))
         a-tag [:a { :href "#", :id "test-id"}
                 "update"]
         link-to-options { :controller "home", 
@@ -414,29 +432,21 @@
                           :update 'successFunction, 
                           :html-options { :id "test-id" } }]
     (is (= 
-      [a-tag script-tag]
+      [a-tag (javascript-tag (ajax-click-string "#test-id" ajax-map include-keys))]
       (ajax-link-to "update" link-to-options)))
     (is (= 
-      [ a-tag
-        [:script { :type "text/javascript" }
-          (scriptjure/js 
-            (ajaxClick "#test-id" (clj (assoc ajax-map :type "GET"))))]]
+      [a-tag (javascript-tag (ajax-click-string "#test-id" (assoc ajax-map :type "GET") include-keys))]
       (ajax-link-to "update" (assoc link-to-options :method "GET"))))
     (is (= 
-      [ a-tag
-        [:script { :type "text/javascript" }
-          (scriptjure/js 
-            (ajaxClick "#test-id" (clj (assoc ajax-map :url "/hello/show"))))]]
+      [a-tag (javascript-tag (ajax-click-string "#test-id" (assoc ajax-map :url "/hello/show") include-keys))]
       (ajax-link-to "update" (assoc link-to-options :ajax-url "/hello/show"))))
     (is (= 
-      [a-tag script-tag]
+      [a-tag (javascript-tag (ajax-click-string "#test-id" ajax-map include-keys))]
       (ajax-link-to "update" (assoc link-to-options :update { :success 'successFunction }))))
     (is (= 
       [ [:a { :id "test-id", :href "/noscript/update" }
           "update"]
-        [:script { :type "text/javascript" }
-          (scriptjure/js 
-            (ajaxClick "#test-id" (clj (assoc ajax-map :error 'errorFunction))))]]
+       (javascript-tag (ajax-click-string "#test-id" (assoc ajax-map :error 'errorFunction) include-keys))]
       (ajax-link-to "update" 
         (merge 
           link-to-options 
@@ -444,6 +454,9 @@
                       :error 'errorFunction }
             :html-options { :id "test-id", 
                             :href "/noscript/update" } }))))))
+
+(defn ajax-submit-string [id value-map include-keys]
+  (str "ajaxSubmit(\"" id "\", " (javascript-map-string value-map include-keys) ")"))
 
 (deftest test-ajax-form-for
   (let [form-map { :name "home", :action "/home/index", :method "post", :id "test-id" }
@@ -455,37 +468,27 @@
                    :success 'successFunction
                    :error 'ajaxError
                    :confirm nil }
-        script-tag [:script { :type "text/javascript" }
-                     (scriptjure/js 
-                       (ajaxSubmit "#test-id" (clj ajax-map)))]
+        include-keys [:type :url :dataType :success :error :confirm]
         form-for-options { :controller "home", 
                            :action "index", 
                            :update 'successFunction, 
                            :html-options { :id "test-id" } }
         form-for-body (form-button "Submit")]
     (is (=
-      [ form-tag script-tag]
+      [ form-tag (javascript-tag (ajax-submit-string "#test-id" ajax-map include-keys))]
       (ajax-form-for form-for-options form-for-body)))
     (is (=
-      [ form-tag 
-        [:script { :type "text/javascript" }
-         (scriptjure/js 
-           (ajaxSubmit "#test-id" (clj (assoc ajax-map :type "GET"))))]]
+      [ form-tag (javascript-tag (ajax-submit-string "#test-id" (assoc ajax-map :type "GET") include-keys))]
       (ajax-form-for 
         (assoc form-for-options :method "GET")
         form-for-body)))
     (is (=
-      [ form-tag 
-        [:script { :type "text/javascript" }
-         (scriptjure/js 
-           (ajaxSubmit "#test-id" (clj (assoc ajax-map :url "/hello/show"))))]]
+      [ form-tag (javascript-tag (ajax-submit-string "#test-id" (assoc ajax-map :url "/hello/show") include-keys))]
       (ajax-form-for (assoc form-for-options :ajax-url "/hello/show") form-for-body)))
     (is (=
       [ [:form { :name "noscript-update", :method "post", :id "test-id", :action "/noscript/update" }
           [:button { :name "button", :value "Submit", :type "submit" } "Submit"]]
-        [:script { :type "text/javascript" }
-         (scriptjure/js 
-           (ajaxSubmit "#test-id" (clj (assoc ajax-map :error 'errorFunction))))]]
+        (javascript-tag (ajax-submit-string "#test-id" (assoc ajax-map :error 'errorFunction) include-keys))]
       (ajax-form-for 
         (merge form-for-options 
           { :name "noscript-update"

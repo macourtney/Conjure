@@ -53,7 +53,7 @@ in the database." }
     (when-let [row-values (database/sql-find 
                             { :table (conjure-str-utils/str-keyword session-table), 
                               :select (conjure-str-utils/str-keyword data-column), 
-                              :where (str (conjure-str-utils/str-keyword session-id-column) " = '" session-id "'") })]
+                              :where [(str (conjure-str-utils/str-keyword session-id-column) " = ?") session-id] })]
       (when-let [data (get (first row-values) data-column)]
         (read-string data)))))
 

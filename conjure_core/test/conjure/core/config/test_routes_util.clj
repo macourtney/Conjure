@@ -31,13 +31,16 @@
 (deftest test-symbol-replace
   (is (= 
     { :controller "home" } 
+    (symbol-replace { :controller 'controller } { :controller "home" })))
+  (is (= 
+    { :controller "home" } 
     (symbol-replace { :controller 'controller } { "controller" "home" })))
   (is (= 
     { :params { :id "1"} } 
-    (symbol-replace { :params { :id 'id } } { "id" "1" })))
+    (symbol-replace { :params { :id 'id } } { :id "1" })))
   (is (= 
     { :controller "home" :action "index" } 
-    (symbol-replace { :controller 'controller :action "index" } { "controller" "home" })))
+    (symbol-replace { :controller 'controller :action "index" } { :controller "home" })))
   (is (= 
     { :controller nil } 
     (symbol-replace { :controller 'controller } {}))))
@@ -48,36 +51,36 @@
     (parse-compiled-route 
       { :route (clout/route-compile "/:controller")
         :request-map { :controller 'controller } }
-      "/home")))
+      { :uri "/home" })))
   (is (nil? 
     (parse-compiled-route 
       { :route (clout/route-compile "/:controller")
         :request-map { :controller 'controller } }
-      "/home/index")))
+      { :uri "/home/index" })))
   (is (= 
     { :controller "home", :action "index" }
     (parse-compiled-route 
       { :route (clout/route-compile "/:controller/:action")
         :request-map { :controller 'controller, :action 'action } }
-      "/home/index")))
+      { :uri "/home/index" })))
   (is (= 
     { :controller "home", :action "index", :params { :id "1" } }
     (parse-compiled-route 
       { :route (clout/route-compile "/:controller/:action/:id")
         :request-map { :controller 'controller, :action 'action, :params { :id 'id } } }
-      "/home/index/1")))
+      { :uri "/home/index/1" })))
   (is (= 
     { :controller "home", :action "index" }
     (parse-compiled-route 
       { :route (clout/route-compile "/")
         :request-map { :controller "home", :action "index" } }
-      "/")))
+      { :uri "/" })))
   (is (= 
     { :controller "message", :action "list-records" }
     (parse-compiled-route 
       { :route (clout/route-compile "/:controller/:action")
         :request-map { :controller 'controller, :action 'action } }
-      "/message/list_records"))))
+      { :uri "/message/list_records" }))))
 
 (deftest test-compiled-parse
   (request/set-request-map { :request { :uri "/home/index/1" } }

@@ -1,7 +1,6 @@
 (ns controllers.template-controller
   (:use [conjure.core.controller.base])
-  (:require [clojure.contrib.ns-utils :as ns-utils]
-            [conjure.core.model.util :as model-util]
+  (:require [conjure.core.model.util :as model-util]
             [conjure.core.server.request :as request]))
 
 (defn
@@ -12,7 +11,7 @@
 (defn
 #^{ :doc "Returns the function with the given name in the model pointed to by the request-map." }
   model-fn [fn-name]
-  (ns-resolve (ns-utils/get-ns (symbol (model-util/model-namespace (model-name)))) (symbol fn-name)))
+  (ns-resolve (find-ns (symbol (model-util/model-namespace (model-name)))) (symbol fn-name)))
 
 (defn
 #^{ :doc "Destroys the given record in the model determined by the request-map." }

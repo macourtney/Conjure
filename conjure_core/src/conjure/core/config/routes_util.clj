@@ -13,13 +13,17 @@
     (when (and route-functions (not-empty route-functions))
       (some identity (map #(%) route-functions)))))
 
+(defn get-symbol-value [symbol-map request-value]
+  (let [request-value-str (str request-value)]
+    (or (get symbol-map request-value-str) (get symbol-map (keyword request-value-str)))))
+
 (defn
   symbol-replace [request-map symbol-map]
   (reduce
     (fn [output-map [request-key request-value]]
       (cond
         (symbol? request-value)
-          (assoc output-map request-key (get symbol-map (str request-value)))
+          (assoc output-map request-key (get-symbol-value symbol-map request-value))
         (map? request-value)
           (assoc output-map request-key (symbol-replace request-value symbol-map))
         true
@@ -41,10 +45,11 @@
 
 (defn
   parse-compiled-route [compiled-route-map ring-request]
-  (when-let [route (:route compiled-route-map)]
-    (when-let [request-map (:request-map compiled-route-map)]
-      (when-let [route-map (clout/route-matches route ring-request)]
-        (clean-controller-action (symbol-replace request-map route-map))))))
+  (when ring-request
+    (when-let [route (:route compiled-route-map)]
+      (when-let [request-map (:request-map compiled-route-map)]
+        (when-let [route-map (clout/route-matches route ring-request)]
+          (clean-controller-action (symbol-replace request-map route-map)))))))
 
 (defn
   compiled-parse

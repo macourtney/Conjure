@@ -3,7 +3,7 @@
 (ns config.routes
   (:require [clout.core :as clout]))
 
-(def routes 
+(def ^:dynamic routes 
   {
     :compiled 
       [ { :route (clout/route-compile "/:controller/:action/:id")
