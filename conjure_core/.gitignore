@@ -5,3 +5,5 @@ classes
 
 lib/
 log
+/.lein-failures
+/.lein-deps-sum

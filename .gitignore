@@ -10,4 +10,4 @@ clojure-contrib-src.jar
 clojure-contrib.jar
 clojure-src.jar
 clojure.jar
-
+.pmd

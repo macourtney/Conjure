@@ -81,4 +81,5 @@
   []
   (if call-controller-fn
     (call-controller-fn)
-    ((ns 'conjure.core.controller.util 'call-controller))))
+    ;((ns 'conjure.core.controller.util 'call-controller))
+    (throw (RuntimeException. "Could not find the call-controller function."))))

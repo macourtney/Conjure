@@ -1,0 +1,46 @@
+INFO  [conjure.core.config.environment]: Environment Mode: test
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT * FROM sessions LIMIT 1"]
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT * FROM sessions LIMIT 1"]
+DEBUG [drift-db-h2.flavor]: Create table: :sessions with specs: ({:not-null true, :primary-key true, :spec-type :column, :type :id, :name :id} {:spec-type :column, :type :date-time, :name :created_at} {:spec-type :column, :type :string, :name :session_id} {:spec-type :column, :type :text, :name :data})
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT * FROM sessions LIMIT 1"]
+DEBUG [drift-db-h2.flavor]: insert into: :sessions records: ({:created_at "2012-01-10 15:23:42", :session_id "blah", :data "{ \"foo\" \"bar\" }"})
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Update table: :sessions where: ["session_id = ?" "blah"] record: {:data "{  }"}
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Update table: :sessions where: ["session_id = ?" "blah"] record: {:data "{ :foo \"bar\" }"}
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Update table: :sessions where: ["session_id = ?" "blah"] record: {:data "{  }"}
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Delete from :sessions where ["session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Drop table: sessions
+DEBUG [drift-db-h2.flavor]: Executing query: ["SHOW TABLES"]
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT * FROM sessions LIMIT 1"]
+INFO  [conjure.core.config.environment]: Environment Mode: test
+INFO  [conjure.core.config.environment]: Environment Mode: test
+INFO  [conjure.core.config.environment]: Environment Mode: test
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT * FROM sessions LIMIT 1"]
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT * FROM sessions LIMIT 1"]
+DEBUG [drift-db-h2.flavor]: Create table: :sessions with specs: ({:not-null true, :primary-key true, :spec-type :column, :type :id, :name :id} {:spec-type :column, :type :date-time, :name :created_at} {:spec-type :column, :type :string, :name :session_id} {:spec-type :column, :type :text, :name :data})
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT * FROM sessions LIMIT 1"]
+DEBUG [drift-db-h2.flavor]: insert into: :sessions records: ({:created_at "2012-01-10 15:42:47", :session_id "blah", :data "{ \"foo\" \"bar\" }"})
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Update table: :sessions where: ["session_id = ?" "blah"] record: {:data "{  }"}
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Update table: :sessions where: ["session_id = ?" "blah"] record: {:data "{ :foo \"bar\" }"}
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Update table: :sessions where: ["session_id = ?" "blah"] record: {:data "{  }"}
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Delete from :sessions where ["session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT data FROM sessions WHERE session_id = ?" "blah"]
+DEBUG [drift-db-h2.flavor]: Drop table: sessions
+DEBUG [drift-db-h2.flavor]: Executing query: ["SHOW TABLES"]
+DEBUG [drift-db-h2.flavor]: Executing query: ["SELECT * FROM sessions LIMIT 1"]
+INFO  [conjure.core.config.environment]: Environment Mode: test
+INFO  [conjure.core.config.environment]: Environment Mode: test

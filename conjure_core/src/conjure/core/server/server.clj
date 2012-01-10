@@ -59,15 +59,14 @@ one." }
       { :status  200
         :headers { "Content-Type" "text/html" }
         :body    response })))
-     
+
 (defn
 #^{ :doc "Calls the given controller with the given request map returning the response." }
   call-controller []
-  (let [response (routes-util/route-request)]
-    (if response
-      (create-response-map response)
-      (request/set-request-map { :controller "home", :action "error-404" }
-        (controller-util/call-controller)))))
+  (if-let [response (routes-util/route-request)]
+    (create-response-map response)
+    (request/set-request-map { :controller "home", :action "error-404" }
+      (controller-util/call-controller))))
 
 (defn
 #^{ :doc "Takes the given path and calls the correct controller and action for it." }
