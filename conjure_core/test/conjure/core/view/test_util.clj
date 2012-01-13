@@ -39,6 +39,19 @@
     (load-view))
   (load-view controller-name action-name))
 
+(deftest test-clear-loaded-veiws
+  (when (empty? @loaded-views)
+    (load-view controller-name action-name))
+  (clear-loaded-views)
+  (is (empty? @loaded-views)))
+
+(deftest test-view-loaded?
+  (clear-loaded-views)
+  (is (not (view-loaded? controller-name action-name)))
+  (load-view controller-name action-name)
+  (is (view-loaded? controller-name action-name))
+  (is (view-loaded? (keyword controller-name) (keyword action-name))))
+
 (deftest test-request-view-namespace
   (request/with-controller-action controller-name action-name
     (is (= (str "views." controller-name "." action-name) 

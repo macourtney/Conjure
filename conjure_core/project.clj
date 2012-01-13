@@ -7,6 +7,7 @@
                  [drift "1.4.2"]
                  [hiccup "0.3.7"]
                  [log4j/log4j "1.2.16"]
+                 [org.clojure/clojure "1.3.0"]
                  [org.clojure/data.xml "0.0.1-SNAPSHOT"]
                  [org.clojure/tools.logging "0.2.3"]
                  [org.drift-db/drift-db "1.0.7-SNAPSHOT"]

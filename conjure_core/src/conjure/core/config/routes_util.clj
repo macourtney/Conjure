@@ -2,7 +2,7 @@
   (:require [clout.core :as clout]
             [config.routes :as routes]
             [conjure.core.config.environment :as environment]
-            [conjure.core.util.request :as request]
+            [conjure.core.server.request :as request]
             [clojure.tools.loading-utils :as loading-utils]
             [clojure.tools.logging :as logging]
             [clojure.tools.servlet-utils :as servlet-utils]))

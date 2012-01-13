@@ -81,4 +81,4 @@
   []
   (if call-controller-fn
     (call-controller-fn)
-    ((ns 'conjure.core.controller.util 'call-controller))))
+    ((ns-resolve 'conjure.core.controller.util 'call-controller))))

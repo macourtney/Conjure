@@ -96,12 +96,17 @@
       (reset! loaded-views (assoc-loaded-views @loaded-views controller action))
       (conjure-utils/reload-conjure-namespaces view-namespace))))
 
+(defn clear-loaded-views
+  "Clears the list of loaded views. After calling this function view-loaded? should return false for all views."
+  []
+  (reset! loaded-views {}))
+
 (defn
 #^{ :doc "Returns true if the view corresponding to the request-map or given controller and action is already loaded." }
   view-loaded?
   ([] (view-loaded? (request/controller) (request/action)))
   ([controller action]
-    (get (get @loaded-views controller) action)))
+    (contains? (get @loaded-views (keyword controller)) (keyword action))))
 
 (defn
   #^{ :doc "Returns the namespace of the view for the request map. The namespace is an actual namespace object." }
