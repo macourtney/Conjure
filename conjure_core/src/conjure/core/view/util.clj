@@ -90,11 +90,15 @@
 #^{ :doc "Loads the view corresponding to the values in the given request map." }
   load-view 
   ([] (load-view (request/controller) (request/action)))
-  ([controller action]
+  ([controller action] (load-view controller action (environment/reload-files?)))
+  ([controller action reload?]
     (let [view-namespace (request-view-namespace controller action)]
-      (require :reload (symbol view-namespace))
+      (if reload?
+        (loading-utils/reload-namespaces [view-namespace])
+        (require (symbol view-namespace)))
       (reset! loaded-views (assoc-loaded-views @loaded-views controller action))
-      (conjure-utils/reload-conjure-namespaces view-namespace))))
+      (when reload?
+        (conjure-utils/reload-conjure-namespaces view-namespace)))))
 
 (defn clear-loaded-views
   "Clears the list of loaded views. After calling this function view-loaded? should return false for all views."

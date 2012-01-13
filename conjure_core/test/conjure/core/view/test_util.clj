@@ -37,7 +37,10 @@
 (deftest test-load-view
   (request/with-controller-action controller-name action-name
     (load-view))
-  (load-view controller-name action-name))
+  (load-view controller-name action-name)
+  (load-view controller-name action-name true)
+  (request/with-controller-action controller-name action-name
+    (is ((ns-resolve 'views.test.show 'render-view)))))
 
 (deftest test-clear-loaded-veiws
   (when (empty? @loaded-views)
