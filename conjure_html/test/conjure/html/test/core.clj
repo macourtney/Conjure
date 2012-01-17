@@ -1,5 +1,5 @@
-(ns html.test.core
-  (:use [html.core])
+(ns conjure.html.test.core
+  (:use [conjure.html.core])
   (:use [clojure.test]))
 
 (deftest test-as-str ;; FIXME: write
@@ -58,7 +58,10 @@
 (deftest test-render-xml
   (is (= ["foo"] (render-xml "foo")))
   (is (= ["foo"] (render-xml :foo)))
+  (is (= ["<p>test</p>"] (render-xml (keyword "<p>test</p>"))))
   (is (= ["1"] (render-xml 1)))
   (is (= ["foo" "1"] (render-xml (list "foo" 1))))
   (is (= ["<" "foo" " " "style" "=\"" "blah&amp;" "\"" ">" "1" "</" "foo" ">"] (render-xml [:foo { :style "blah&" } 1])))
+  (is (= ["<" "foo" " " "style" "=\"" "blah&amp;" "\"" ">" "<p>test</p>" "</" "foo" ">"]
+         (render-xml [:foo { :style "blah&" } (keyword "<p>test</p>")])))
   (is (= [""] (render-xml nil))))

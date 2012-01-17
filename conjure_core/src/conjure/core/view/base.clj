@@ -1,12 +1,12 @@
 (ns conjure.core.view.base
-  (:require [hiccup.core :as hiccup]
-            [clojure.string :as str-utils]
-            [conjure.core.config.environment :as environment]
-            [conjure.core.server.request :as request]
+  (:require [clojure.string :as str-utils]
             [clojure.tools.html-utils :as html-utils]
             [clojure.tools.servlet-utils :as servlet-utils]
             [clojure.tools.string-utils :as conjure-str-utils]
-            [conjure.core.view.util :as view-util]))
+            [conjure.core.config.environment :as environment]
+            [conjure.core.server.request :as request]
+            [conjure.core.view.util :as view-util]
+            [conjure.html.core :as conjure-html]))
 
 (defn default-response-map []
   { :status  200
@@ -34,7 +34,7 @@
         ~@body)
       (defn ~'render-str [~@view-params]
         (request/with-request-map-fn (update-layout-info-with ~layout-info)
-          (hiccup/html
+          (conjure-html/render-xml
             (view-util/render-layout ~layout-name (~'render-body ~@view-params)))))
       (defn ~'render-view [~@view-params]
         (assoc ~response-map :body (~'render-str ~@view-params))))))

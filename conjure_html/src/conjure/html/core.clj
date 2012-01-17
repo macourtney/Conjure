@@ -1,4 +1,4 @@
-(ns html.core
+(ns conjure.html.core
   (:import [clojure.lang IPersistentVector ISeq]))
 
 ;; Pulled from old-contrib to avoid dependency
@@ -26,7 +26,7 @@
 
 (defn render-obj [value]
   (if (keyword? value)
-    (as-str value)
+    (.substring (str value) 1) ; Note: Cannot use (name value) since it will fail on a "/".
     (escape-xml value)))
 
 (defn xml-attribute [name value]

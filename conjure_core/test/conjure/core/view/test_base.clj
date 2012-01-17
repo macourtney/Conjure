@@ -9,10 +9,14 @@
 (def-view [view-message]
   view-message)
 
+(defn all-strings? [string-list]
+  (when (seq string-list)
+    (not (some #(when (not (string? %1)) %1) string-list))))
+
 (deftest test-defview
   (is (= "test" (render-body "test")))
   (request/with-controller-action "test" "test"
-    (is (string? (render-str "test")))
+    (is (all-strings? (render-str "test")))
     (is (map? (render-view "test")))))
 
 (deftest test-link-to
