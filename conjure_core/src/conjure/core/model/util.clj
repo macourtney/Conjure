@@ -12,7 +12,7 @@
   model-from-file [model-file]
   (if model-file
     (loading-utils/clj-file-to-symbol-string (. model-file getName))))
-  
+
 (defn
 #^{ :doc "Returns the model namespace for the given model." }
   model-namespace [model]

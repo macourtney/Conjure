@@ -20,7 +20,7 @@
   create-flavor 
   ([] (create-flavor :production))
   ([environment]
-    (h2/flavor
+    (h2/h2-flavor
 
       ;; Calculates the database to use.
       (dbname environment))))
