@@ -34,8 +34,9 @@
         ~@body)
       (defn ~'render-str [~@view-params]
         (request/with-request-map-fn (update-layout-info-with ~layout-info)
-          (conjure-html/render-xml
-            (view-util/render-layout ~layout-name (~'render-body ~@view-params)))))
+          (doall
+            (conjure-html/render-xml
+              (view-util/render-layout ~layout-name (~'render-body ~@view-params))))))
       (defn ~'render-view [~@view-params]
         (assoc ~response-map :body (~'render-str ~@view-params))))))
 
@@ -235,6 +236,13 @@ with the following defaults:
       (= doc-type :xhtml1.1) 
         "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">"
       true (throw (RuntimeException. (str "Unknown doc type: " doc-type))))))
+
+(defn non-breaking-space
+  "Returns an &nbsp; as a keyword for use in views."
+  []
+  (keyword "&nbsp;"))
+
+(def nbsp non-breaking-space) ;alias for non-breaking-space
 
 (require 'conjure.core.view.form)
 
