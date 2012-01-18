@@ -94,11 +94,9 @@
   ([controller action reload?]
     (let [view-namespace (request-view-namespace controller action)]
       (if reload?
-        (loading-utils/reload-namespaces [view-namespace])
+        (conjure-utils/reload-conjure-namespaces view-namespace)
         (require (symbol view-namespace)))
-      (reset! loaded-views (assoc-loaded-views @loaded-views controller action))
-      (when reload?
-        (conjure-utils/reload-conjure-namespaces view-namespace)))))
+      (reset! loaded-views (assoc-loaded-views @loaded-views controller action)))))
 
 (defn clear-loaded-views
   "Clears the list of loaded views. After calling this function view-loaded? should return false for all views."
@@ -119,7 +117,7 @@
 
 (defn
   #^{ :doc "Calls the render function with the given symbol in the view for the request-map." }
-  render-by-symbol [symbol-name & params]
+  render-by-symbol [symbol-name params]
   (when (or (environment/reload-files?) (not (view-loaded?)))
     (load-view))
   (apply
@@ -128,17 +126,17 @@
 (defn
 #^{ :doc "Returns the rendered view for the request-map." }
   render-view [& params]
-  (apply render-by-symbol 'render-view params))
+  (render-by-symbol 'render-view params))
 
 (defn
 #^{ :doc "Returns the string rendered view for the request-map." }
   render-str [& params]
-  (apply render-by-symbol 'render-str params))
+  (render-by-symbol 'render-str params))
 
 (defn
 #^{ :doc "Returns the body rendered view for the request-map." }
   render-body [& params]
-  (apply render-by-symbol 'render-body params))
+  (render-by-symbol 'render-body params))
 
 (defn-
 #^{ :doc "Returns a new request-map for use when rendering a layout. The new map is similar to the request-map 
