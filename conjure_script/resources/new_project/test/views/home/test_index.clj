@@ -1,5 +1,5 @@
 (ns views.home.test-index
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         views.home.index)
   (:require [conjure.core.server.request :as request]))
 

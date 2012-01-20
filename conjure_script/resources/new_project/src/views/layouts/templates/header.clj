@@ -7,7 +7,7 @@
     ;; Logo
     [:h1 { :id "logo" } 
       (image-tag "conjure96white.png" { :alt "Conjure Bunny", :width "93", :height "86", :align "center" }) ;
-      "&nbsp;"
+      (nbsp)
       [:a { :href "./", :title (str title " [Go to homepage]") } title [:span]]]
     [:hr { :class "noscreen" }]          
 

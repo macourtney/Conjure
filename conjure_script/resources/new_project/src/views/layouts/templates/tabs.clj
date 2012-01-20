@@ -29,7 +29,7 @@
   generate-tab [tab-map original-request-map]
   [:li { :id (tab-id tab-map original-request-map)}
     [:a { :href (or (tab-url tab-map original-request-map) "#") } 
-      (or (:text tab-map) "Tab") "<span class=\"tab-l\"></span><span class=\"tab-r\"></span>"]])
+      (or (:text tab-map) "Tab") (keyword "<span class=\"tab-l\"></span><span class=\"tab-r\"></span>")]])
 
 (defn
 #^{ :doc "Returns a tab map generated from a controller name." }

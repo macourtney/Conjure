@@ -30,10 +30,10 @@
       (filter 
         conjure-namespace?
         (concat 
-          (map str (vals (ns-aliases namespace-to-search)))
+          (map str (vals (when namespace-to-search (ns-aliases namespace-to-search))))
           (map #(.substring (str %) 2) 
             (filter #(not (.startsWith (str %) "#'clojure"))
-              (vals (ns-refers namespace-to-search)))))))))
+              (vals (when namespace-to-search (ns-refers namespace-to-search))))))))))
 
 (defn create-file-namespace-map
   "Returns a file namespace map from the given .clj file. The file namespace map includes the file, and the namespace from the file."
@@ -56,7 +56,7 @@
       '())))
 
 (defn namespace-map [namespace-name]
-  (first (filter-file-namespaces [namespace-name])))
+  (or (first (filter-file-namespaces [namespace-name])) { :namespace (symbol namespace-name) }))
 
 (defn clear-loaded-namespaces
   "Clears all namespaces from the set of loaded namespaces."
@@ -76,7 +76,9 @@
 (defn last-modified
   "Returns the last modified date (as a long) of the file in the given namespace map."
   [namespace-map]
-  (.lastModified (:file namespace-map)))
+  (if-let [namespace-file (:file namespace-map)]
+    (.lastModified namespace-file)
+    (long 0)))
 
 (defn namespace-name [namespace-map]
   (str (:namespace namespace-map)))
@@ -106,7 +108,8 @@ If the given namespace is not in the list of loaded namespaces, it is added. An 
 If the attempt fails, this function returns true."
   [namespace-map]
   (if-let [namespace-info (namespace-load-info (namespace-name namespace-map))]
-    (< (:last-modified namespace-info) (last-modified namespace-map))
+    (when-let [namespace-last-modified (:last-modified namespace-info)]
+      (< namespace-last-modified (last-modified namespace-map)))
     (if (find-ns (:namespace namespace-map))
       (do
         (add-namespace-info namespace-map)

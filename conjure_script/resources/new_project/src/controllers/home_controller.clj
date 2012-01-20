@@ -7,9 +7,9 @@
 
 (def-action list-records
   (redirect-to { :action "index" }))
-  
+
 (def-action add
   (redirect-to { :action "index" }))
-  
+
 (def-action error-404
   (bind))

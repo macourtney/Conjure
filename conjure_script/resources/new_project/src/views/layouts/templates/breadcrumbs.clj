@@ -15,13 +15,13 @@
           (link-to 
             [:strong (conjure-str-utils/human-title-case original-controller)] 
             { :controller original-controller, :action "index", :params {} }) 
-          " &gt; " 
+          (keyword " &gt; ") 
           (if id
             (list
               (link-to 
                 [:strong (conjure-str-utils/human-title-case original-action)] 
                 { :controller original-controller, :action original-action, :params { :id id } })
-              " &gt; " [:strong id])
+              (keyword " &gt; ") [:strong id])
             (link-to 
               [:strong (conjure-str-utils/human-title-case original-action)] 
               { :controller original-controller, :action original-action, :params {} }))))]

@@ -22,7 +22,7 @@
               model-namespace (util/model-namespace model)
               fixture-namespace (test-util/fixture-namespace model)
               test-content (str "(ns " test-namespace "
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         " model-namespace "
         " fixture-namespace "))
 

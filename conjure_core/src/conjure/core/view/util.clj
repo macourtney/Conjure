@@ -120,8 +120,7 @@
   render-by-symbol [symbol-name params]
   (when (or (environment/reload-files?) (not (view-loaded?)))
     (load-view))
-  (apply
-    (ns-resolve (get-view-ns) symbol-name) params))
+  (apply (ns-resolve (get-view-ns) symbol-name) params))
 
 (defn
 #^{ :doc "Returns the rendered view for the request-map." }

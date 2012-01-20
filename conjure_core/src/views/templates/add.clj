@@ -10,5 +10,5 @@
       (list
         (record-form/render-body table-metadata {})
         (form-button "Create")
-        "&nbsp;"
+        (nbsp)
         (link-to "Cancel" { :action "list-records", :controller model-name } )))])

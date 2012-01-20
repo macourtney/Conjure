@@ -1,14 +1,18 @@
 (ns views.templates.record-row
   (:use conjure.core.view.base)
   (:require [conjure.core.view.util :as view-utils]
+            [drift-db.core :as drift-db]
             [views.templates.record-cell :as record-cell]))
+
+(defn column-names [table-metadata]
+  (map drift-db/column-name (drift-db/columns table-metadata)))
 
 (def-view [model-name table-metadata record]
   (let [row-id (str "row-" (:id record) )]
     [:tr { :id row-id } 
       (map 
         #(record-cell/render-body model-name record %) 
-        (map #(keyword (. (get % :field) toLowerCase)) table-metadata))
+        (column-names table-metadata))
       [:td 
         (ajax-link-to "Delete"
           { :update (success-fn row-id :remove)

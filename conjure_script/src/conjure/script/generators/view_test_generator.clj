@@ -21,7 +21,7 @@
       (let [test-namespace (test-util/view-unit-test-namespace controller action)
             view-namespace (util/view-namespace-by-action controller action)
             test-content (or incoming-content (str "(ns " test-namespace "
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         " view-namespace ")
   (:require [conjure.core.server.request :as request]))
 

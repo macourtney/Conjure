@@ -31,7 +31,7 @@
         (let [test-namespace (test-util/functional-test-namespace controller)
               controller-namespace (util/controller-namespace controller)
               test-content (str "(ns " test-namespace "
-  (:use clojure.contrib.test-is
+  (:use clojure.test
         " controller-namespace ")
   (:require [conjure.core.controller.util :as controller-util]))
 

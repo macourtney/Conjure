@@ -13,3 +13,7 @@
   
 (deftest test-http-config
   (is (not (nil? (http-config)))))
+
+(deftest test-parse-arguments
+  (is (parse-arguments []))
+  (is (= [ { :mode "development" } [] "Usage:\n\n Switches    Default  Desc                                                            \n --------    -------  ----                                                            \n -m, --mode           The server mode. For example, development, production, or test. \n" ] (parse-arguments ["-m" "development"]))))

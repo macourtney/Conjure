@@ -9,6 +9,7 @@
             [conjure.core.plugin.util :as plugin-util]
             [conjure.core.server.request :as request]
             [conjure.core.util.session-utils :as session-utils]
+            [clojure.tools.cli :as cli]
             [clojure.tools.logging :as logging]
             [clojure.tools.string-utils :as conjure-str-utils]
             [drift-db.core :as drift-db]))
@@ -89,3 +90,12 @@ production, or test." }
   set-mode [mode]
   (when mode 
     (environment/set-evironment-property (conjure-str-utils/str-keyword mode))))
+
+(defn parse-arguments [args]
+  (cli/cli args
+    ["-m" "--mode" "The server mode. For example, development, production, or test." :default nil]))
+
+(defn init-args [args]
+  (let [[args-map remaining help] (parse-arguments args)]
+    (set-mode (get args-map :mode))
+    (init)))

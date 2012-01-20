@@ -418,7 +418,7 @@
   (str "ajaxClick(\"" id "\", " (javascript-map-string value-map include-keys) ")"))
 
 (defn javascript-tag [javascript-string]
-  [:script { :type "text/javascript" } javascript-string])
+  [:script { :type "text/javascript" } (keyword javascript-string)])
 
 (deftest test-ajax-link-to
   (let [ajax-map { :type "POST"

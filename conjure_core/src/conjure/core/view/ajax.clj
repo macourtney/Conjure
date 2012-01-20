@@ -102,8 +102,9 @@ and params, text is called with request-map and params merged (not all keys used
               :id id })
           (evaluate-if-fn text)]
         [:script { :type "text/javascript" } 
-          (scriptjure/js
-            (ajaxClick (clj id-string) (clj ajax-function)))]))))
+          (keyword
+            (scriptjure/js
+              (ajaxClick (clj id-string) (clj ajax-function))))]))))
 
 (defn
 #^{ :doc 
@@ -129,5 +130,6 @@ and params, text is called with request-map and params merged (not all keys used
       (list
         (form-for (assoc options :html-options (merge html-options { :id id })) body)
         [:script { :type "text/javascript" } 
-          (scriptjure/js
-            (ajaxSubmit (clj id-string) (clj ajax-function)))]))))
+          (keyword
+            (scriptjure/js
+              (ajaxSubmit (clj id-string) (clj ajax-function))))]))))

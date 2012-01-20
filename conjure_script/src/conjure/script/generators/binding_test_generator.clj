@@ -19,7 +19,7 @@
     (if unit-test-file
       (let [test-namespace (test-util/binding-unit-test-namespace controller action)
             test-content (or incoming-content (str "(ns " test-namespace "
-  (:use clojure.contrib.test-is)
+  (:use clojure.test)
   (:require [conjure.core.binding.util :as bind-util]))
 
 (def controller-name \"" controller "\")

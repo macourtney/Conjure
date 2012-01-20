@@ -101,9 +101,10 @@
             [:hr { :class "noscreen" }]
         
             [:p { :id "createdby" } "created by " [:a { :href "http://www.nuvio.cz" } "Nuvio | Webdesign"]] ; DON´T REMOVE, PLEASE!
-            [:p { :id "copyright" } "&copy; 2007 " [:a { :href "mailto:my@mail.com" } "My Name"]]]]]
+            [:p { :id "copyright" } (keyword "&copy; 2007 ") [:a { :href "mailto:my@mail.com" } "My Name"]]]]]
 
       [:script { :type "text/javascript" } 
-        (scriptjure/js
-          (.ready ($ document) (fn [] 
-            (.hide ($ "#add-action-link")))))]]))
+        (keyword
+          (scriptjure/js
+            (.ready ($ document) (fn [] 
+              (.hide ($ "#add-action-link"))))))]]))

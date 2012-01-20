@@ -1,5 +1,4 @@
-(ns config.environment
-  (:require [clojure.contrib.java-utils :as java-utils]))
+(ns config.environment)
 
 (def properties
   (atom 
