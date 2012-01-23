@@ -1,6 +1,6 @@
 (ns conjure.core.view.xml-base
   (:import [java.io StringWriter])
-  (:require [clojure.data.xml :as xml]))
+  (:require [conjure.html.core :as conjure-html]))
 
 (defn
 #^{ :doc "Creates an xml response using the given body. Body should be a string containing the xml contents." }
@@ -18,10 +18,6 @@
       (defn ~'render-body [~@view-params]
         ~@body)
       (defn ~'render-str [~@view-params]
-        (with-open [string-writer# (new StringWriter)] 
-          (binding [*out* string-writer#]
-            (xml/emit
-              (~'render-body ~@view-params)))
-          (.toString string-writer#)))
+        (conjure-html/render-xml (~'render-body ~@view-params)))
       (defn ~'render-view [~@view-params]
         (assoc ~response-map :body (~'render-str ~@view-params))))))
