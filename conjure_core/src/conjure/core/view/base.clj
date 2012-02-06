@@ -1,6 +1,7 @@
 (ns conjure.core.view.base
   (:require [clojure.string :as str-utils]
             [clojure.tools.html-utils :as html-utils]
+            [clojure.tools.logging :as logging]
             [clojure.tools.servlet-utils :as servlet-utils]
             [clojure.tools.string-utils :as conjure-str-utils]
             [conjure.core.config.environment :as environment]
@@ -25,11 +26,11 @@
 #^{ :doc "Defines a view. This macro should be used in a view file to define the parameters used in the view." }
   def-view [params & body]
   (let [def-params (if (map? params) params {})
-        view-params (if (map? params) (first body)  params)
+        view-params (if (map? params) (first body) params)
         layout-name (layout-name def-params)
         layout-info (or (:layout-info def-params) {})
         response-map (or (:response-map def-params) (default-response-map))]
-   `(do
+    `(do
       (defn ~'render-body [~@view-params]
         ~@body)
       (defn ~'render-str [~@view-params]
@@ -48,9 +49,9 @@
 
 (defmacro
   def-ajax-view [params & body]
-  (if (map? params)
-    `(def-view (assoc ~params :no-layout true) ~@body)
-    `(def-view { :no-layout true } ~params ~@body)))
+  (let [def-params (if (map? params) (assoc params :no-layout true) { :no-layout true })
+        full-body (if (map? params) body (cons params body))]
+    `(def-view ~def-params ~@full-body)))
 
 (defn- 
 #^{ :doc "If function is a function, then this method evaluates it with the given args. Otherwise, it just returns

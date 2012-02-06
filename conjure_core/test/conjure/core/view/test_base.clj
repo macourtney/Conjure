@@ -4,7 +4,9 @@
   (require [clojure.string :as string]
            [com.reasonr.scriptjure :as scriptjure]
            [conjure.core.config.environment :as environment]
-           [conjure.core.server.request :as request]))
+           [conjure.core.server.request :as request]
+           [views.test.ajax-test :as ajax-test-view]
+           [views.test.view-params-test :as view-params-test-view]))
 
 (def-view [view-message]
   view-message)
@@ -17,7 +19,13 @@
   (is (= "test" (render-body "test")))
   (request/with-controller-action "test" "test"
     (is (all-strings? (render-str "test")))
-    (is (map? (render-view "test")))))
+    (is (map? (render-view "test"))))
+  (request/with-controller-action "test" "test"
+    (is (map? (view-params-test-view/render-view)))))
+
+(deftest test-def-ajax-view
+  (request/with-controller-action "test" "ajax-test"
+    (is (ajax-test-view/render-view))))
 
 (deftest test-link-to
   (is (= 
