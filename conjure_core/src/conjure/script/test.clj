@@ -1,18 +1,14 @@
 (ns conjure.script.test
   (:import [java.io File])
-  (:use clojure.contrib.test-is)
-  (:require [conjure.core.config.environment :as environment]
-            [conjure.core.server.server :as conjure-server]
-            [clojure.tools.loading-utils :as loading-utils]
-            [conjure.core.migration.runner :as runner]
-            [clojure.contrib.java-utils :as java-utils]
-            [clojure.contrib.seq-utils :as seq-utils]))
+  (:use clojure.test)
+  (:require [clojure.tools.loading-utils :as loading-utils]
+            [conjure.core.test.init :as test-init]))
 
 (defn
 #^{:doc "Returns a File object for the user directory."}
   create-test-app-directory-file []
   (new File (. (System/getProperties) getProperty "user.dir")))
-  
+
 (defn
 #^{:doc "Returns a File object for the test directory."}
   create-test-directory-file []
@@ -41,7 +37,7 @@
     (if test-directory
       (filter 
         is-valid-test
-        (seq-utils/flatten (file-seq test-directory)))
+        (flatten (file-seq test-directory)))
       (do
         (println "test-directory is null")
         []))))
@@ -57,11 +53,7 @@
 (defn
 #^{:doc "Initializes Conjure for testing."}
   init []
-  (let [initial-value (java-utils/get-system-property environment/conjure-environment-property nil)]
-    (if (not initial-value)
-      (java-utils/set-system-properties { environment/conjure-environment-property "test" })))
-  (conjure-server/init)
-  (runner/update-to-version (. Integer MAX_VALUE)))
+  (test-init/init-tests))
 
 (defn
   run [args]

@@ -1,6 +1,5 @@
 (ns conjure.script.server
-  (:require [clojure.tools.cli :as cli]
-            [conjure.core.server.server :as conjure-server]
+  (:require [conjure.core.server.server :as conjure-server]
             [conjure.core.server.ring-adapter :as ring-adapter]
             [ring.adapter.jetty :as ring-jetty]))
 
