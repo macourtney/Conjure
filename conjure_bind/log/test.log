@@ -1,0 +1,12 @@
+INFO  [conjure.config.environment]: Environment Mode: test
+INFO  [conjure.config.environment]: Environment Mode: test
+INFO  [conjure.config.environment]: Environment Mode: test
+INFO  [conjure.config.environment]: Environment Mode: test
+INFO  [conjure.config.environment]: Environment Mode: test
+DEBUG [conjure.bind.util]: Running binding: bindings.test.show
+DEBUG [conjure.bind.util]: Running binding: bindings.test.show
+DEBUG [conjure.bind.util]: Running binding: bindings.test.show
+INFO  [conjure.config.environment]: Environment Mode: test
+DEBUG [conjure.bind.util]: Running binding: bindings.test.show
+DEBUG [conjure.bind.util]: Running binding: bindings.test.show
+DEBUG [conjure.bind.util]: Running binding: bindings.test.show
