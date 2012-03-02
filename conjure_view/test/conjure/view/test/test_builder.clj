@@ -1,8 +1,8 @@
-(ns conjure.core.view.test.test-builder
+(ns conjure.view.test.test-builder
   (:use test-helper
         clojure.test
-        conjure.core.view.builder)
-  (:require [conjure.core.view.util :as util]
+        conjure.view.builder)
+  (:require [conjure.view.util :as util]
             [clojure.tools.loading-utils :as loading-utils]))
 
 (def controller "test-builder")

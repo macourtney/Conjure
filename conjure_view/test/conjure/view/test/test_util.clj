@@ -1,11 +1,11 @@
-(ns conjure.core.view.test.test-util
+(ns conjure.view.test.test-util
   (:import [java.io File])
   (:use clojure.test
-        conjure.core.view.util
+        conjure.view.util
         test-helper)
   (:require [clojure.tools.logging :as logging]
             [config.session-config :as session-config]
-            [conjure.core.util.request :as request]))
+            [conjure.util.request :as request]))
 
 (def action-name "show")
 (def controller-name "test")

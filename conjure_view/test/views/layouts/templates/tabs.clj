@@ -1,7 +1,7 @@
 (ns views.layouts.templates.tabs
-  (:use conjure.core.view.base)
-  (:require [conjure.core.view.util :as view-util]
-            [conjure.core.util.request :as request]
+  (:use conjure.view.base)
+  (:require [conjure.util.request :as request]
+            [conjure.view.util :as view-util]
             [clojure.tools.string-utils :as string-utils]))
 
 (defn 

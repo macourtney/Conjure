@@ -1,6 +1,6 @@
-(ns conjure.core.view.select)
+(ns conjure.view.select)
 
-(in-ns 'conjure.core.view.base)
+(in-ns 'conjure.view.base)
 
 (require ['hiccup.core :as 'hiccup])
 

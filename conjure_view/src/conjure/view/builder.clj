@@ -1,7 +1,7 @@
-(ns conjure.core.view.builder
+(ns conjure.view.builder
   (:import [java.io File])
   (:require [clojure.tools.logging :as logging]
-            [conjure.core.view.util :as util]
+            [conjure.view.util :as util]
             [clojure.tools.loading-utils :as loading-utils]
             [clojure.tools.string-utils :as conjure-str-utils]))
 

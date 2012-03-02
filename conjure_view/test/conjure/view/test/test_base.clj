@@ -1,10 +1,10 @@
-(ns conjure.core.view.test.test-base
+(ns conjure.view.test.test-base
   (:use clojure.test
-        conjure.core.view.base)
+        conjure.view.base)
   (require [clojure.string :as string]
            [com.reasonr.scriptjure :as scriptjure]
-           [conjure.core.config.environment :as environment]
-           [conjure.core.util.request :as request]
+           [conjure.config.environment :as environment]
+           [conjure.util.request :as request]
            [views.test.ajax-test :as ajax-test-view]
            [views.test.view-params-test :as view-params-test-view]))
 

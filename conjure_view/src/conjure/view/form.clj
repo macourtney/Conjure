@@ -1,12 +1,13 @@
-(ns conjure.core.view.form)
+(ns conjure.view.form)
 
-(in-ns 'conjure.core.view.base)
+(in-ns 'conjure.view.base)
 
+
+(require ['conjure.model.util :as 'model-util])
 (require ['clojure.tools.logging :as 'logging])
-(require ['conjure.core.model.util :as 'model-util])
-(require ['conjure.core.util.request :as 'request])
 (require ['clojure.tools.map-utils :as 'map-utils])
-(require ['conjure.core.view.util :as 'view-utils])
+(require ['conjure.view.util :as 'view-utils])
+(require ['conjure.util.request :as 'request])
 (require ['hiccup.core :as 'hiccup])
 
 (defn

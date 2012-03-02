@@ -1,4 +1,4 @@
-(ns conjure.core.view.util
+(ns conjure.view.util
   (:require [clojure.tools.logging :as logging]
             [clojure.tools.file-utils :as file-utils]
             [clojure.tools.html-utils :as html-utils]
@@ -6,10 +6,10 @@
             [clojure.tools.servlet-utils :as servlet-utils]
             [clojure.tools.string-utils :as conjure-str-utils]
             [config.session-config :as session-config]
-            [conjure.core.config.environment :as environment]
-            [conjure.core.util.request :as request]
-            [conjure.core.util.conjure-utils :as conjure-utils]
-            [conjure.core.util.session-utils :as session-utils]))
+            [conjure.config.environment :as environment]
+            [conjure.util.request :as request]
+            [conjure.util.conjure-utils :as conjure-utils]
+            [conjure.util.session-utils :as session-utils]))
 
 (def views-dir "views")
 

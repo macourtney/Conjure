@@ -1,7 +1,7 @@
 (ns views.layouts.templates.links-sidebar
-  (:use conjure.core.view.base)
-  (:require [conjure.core.util.request :as request]
-            [conjure.core.view.util :as view-util]
+  (:use conjure.view.base)
+  (:require [conjure.util.request :as request]
+            [conjure.view.util :as view-util]
             [views.layouts.templates.links :as links]))
 
 (defn

@@ -1,4 +1,4 @@
-(ns conjure.core.view.xml-base
+(ns conjure.view.xml-base
   (:import [java.io StringWriter])
   (:require [conjure.html.core :as conjure-html]))
 

@@ -1,5 +1,5 @@
 (ns views.layouts.templates.header
-  (:use conjure.core.view.base))
+  (:use conjure.view.base))
 
 (def-view [title]
   [:div { :id "header" }

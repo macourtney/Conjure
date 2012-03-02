@@ -1,12 +1,12 @@
-(ns conjure.core.view.base
+(ns conjure.view.base
   (:require [clojure.string :as str-utils]
             [clojure.tools.html-utils :as html-utils]
             [clojure.tools.logging :as logging]
             [clojure.tools.servlet-utils :as servlet-utils]
             [clojure.tools.string-utils :as conjure-str-utils]
-            [conjure.core.config.environment :as environment]
-            [conjure.core.util.request :as request]
-            [conjure.core.view.util :as view-util]
+            [conjure.config.environment :as environment]
+            [conjure.util.request :as request]
+            [conjure.view.util :as view-util]
             [conjure.html.core :as conjure-html]))
 
 (defn default-response-map []
@@ -245,10 +245,10 @@ with the following defaults:
 
 (def nbsp non-breaking-space) ;alias for non-breaking-space
 
-(require 'conjure.core.view.form)
+(require 'conjure.view.form)
 
-(require 'conjure.core.view.ajax)
+(require 'conjure.view.ajax)
 
-(require 'conjure.core.view.link)
+(require 'conjure.view.link)
 
-(require 'conjure.core.view.select)
+(require 'conjure.view.select)

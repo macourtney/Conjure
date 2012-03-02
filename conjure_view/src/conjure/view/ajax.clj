@@ -1,11 +1,11 @@
-(ns conjure.core.view.ajax)
+(ns conjure.view.ajax)
 
-(in-ns 'conjure.core.view.base)
+(in-ns 'conjure.view.base)
 
 (require ['clojure.tools.logging :as 'logging])
 (require ['com.reasonr.scriptjure :as 'scriptjure])
-(require ['conjure.core.util.request :as 'request])
-(require ['conjure.core.view.util :as 'view-util])
+(require ['conjure.util.request :as 'request])
+(require ['conjure.view.util :as 'view-util])
 
 (defn-
 #^{ :doc "Returns the position function for the given position." }

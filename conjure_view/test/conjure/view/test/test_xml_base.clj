@@ -1,6 +1,6 @@
-(ns conjure.core.view.test.test-xml-base
+(ns conjure.view.test.test-xml-base
   (:use clojure.test
-        conjure.core.view.xml-base))
+        conjure.view.xml-base))
 
 (def-xml []
   [:test])

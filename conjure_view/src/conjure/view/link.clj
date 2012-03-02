@@ -1,9 +1,9 @@
-(ns conjure.core.view.link)
+(ns conjure.view.link)
   
-(in-ns 'conjure.core.view.base)
+(in-ns 'conjure.view.base)
 
-(require ['conjure.core.util.request :as 'request])
-(require ['conjure.core.view.util :as 'view-utils])
+(require ['conjure.util.request :as 'request])
+(require ['conjure.view.util :as 'view-utils])
 
 (defn
 #^{ :doc "Returns the attributes for the link tag (\"a\" tag) from the request-map." }
