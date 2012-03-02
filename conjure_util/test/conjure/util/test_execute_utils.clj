@@ -1,6 +1,6 @@
-(ns conjure.core.util.test-execute-utils
+(ns conjure.util.test-execute-utils
   (:use clojure.test
-        conjure.core.util.execute-utils))
+        conjure.util.execute-utils))
 
 (deftest test-run-script
   (run-script "noop" [])

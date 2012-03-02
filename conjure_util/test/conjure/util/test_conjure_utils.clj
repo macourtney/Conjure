@@ -1,7 +1,7 @@
-(ns conjure.core.util.test-conjure-utils
+(ns conjure.util.test-conjure-utils
   (:import [java.io File])
   (:use clojure.test
-        conjure.core.util.conjure-utils)
+        conjure.util.conjure-utils)
   (:require [controllers.home-controller :as home-controller]))
 
 (def home-controller-file (.getAbsoluteFile (File. "test/controllers/home_controller.clj")))

@@ -1,4 +1,4 @@
-(ns conjure.core.util.execute-utils
+(ns conjure.util.execute-utils
   (:import [java.io FileNotFoundException]))
 
 (defn print-usage []

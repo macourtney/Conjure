@@ -1,8 +1,8 @@
-(ns conjure.core.util.session-utils
+(ns conjure.util.session-utils
   (:import [java.util Calendar Date])
   (:require [clojure.tools.html-utils :as html-utils]
             [clojure.tools.string-utils :as conjure-str-utils]
-            [conjure.core.util.request :as request]))
+            [conjure.util.request :as request]))
 
 (def session-id-name "SID")
 

@@ -1,7 +1,7 @@
-(ns conjure.core.util.test-session-utils
+(ns conjure.util.test-session-utils
   (:use clojure.test
-        conjure.core.util.session-utils)
-  (:require [conjure.core.util.request :as request]
+        conjure.util.session-utils)
+  (:require [conjure.util.request :as request]
             [clojure.tools.string-utils :as conjure-str-utils]))
   
 (deftest test-create-session-id

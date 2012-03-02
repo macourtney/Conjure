@@ -1,9 +1,9 @@
-(ns conjure.core.config.test-routes-util
+(ns conjure.config.test-routes-util
   (:use clojure.test
-        conjure.core.config.routes-util
+        conjure.config.routes-util
         test-helper)
   (:require [clout.core :as clout]
-            [conjure.core.util.request :as request]
+            [conjure.util.request :as request]
             [config.routes :as routes]))
 
 ;(use-fixtures :once init-server)

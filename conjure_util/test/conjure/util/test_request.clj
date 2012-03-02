@@ -1,7 +1,7 @@
-(ns conjure.core.util.test-request
+(ns conjure.util.test-request
   (:import [java.io ByteArrayInputStream])
   (:use clojure.test
-        conjure.core.util.request))
+        conjure.util.request))
 
 (def controller-name "test")
 (def action-name "show")

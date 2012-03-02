@@ -1,4 +1,4 @@
-(ns conjure.core.util.conjure-utils
+(ns conjure.util.conjure-utils
   (:import [java.io File])
   (:require [clojure.set :as clj-set]
             [clojure.tools.loading-utils :as loading-utils]

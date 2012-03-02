@@ -1,4 +1,4 @@
-(ns conjure.core.config.environment
+(ns conjure.config.environment
   (:require [config.environment :as config-env]
             [clojure.tools.file-utils :as file-utils]
             [clojure.tools.loading-utils :as loading-utils]

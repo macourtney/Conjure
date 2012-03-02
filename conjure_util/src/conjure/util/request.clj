@@ -1,4 +1,4 @@
-(ns conjure.core.util.request
+(ns conjure.util.request
   (:require [clojure.tools.loading-utils :as loading-utils] 
             [clojure.tools.html-utils :as html-utils]
             [clojure.tools.string-utils :as conjure-str-utils]))
