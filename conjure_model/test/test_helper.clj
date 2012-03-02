@@ -3,7 +3,7 @@
   (:use clojure.test)
   (:require [config.db-config :as db-config]
             [config.session-config :as session-config]
-            [conjure.core.config.environment :as environment]
+            [conjure.config.environment :as environment]
             [drift-db.core :as drift-db]))
   
 (defn 

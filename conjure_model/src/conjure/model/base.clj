@@ -1,4 +1,4 @@
-(ns conjure.core.model.base
+(ns conjure.model.base
   (:require [drift-db.core :as database]
             [drift-db.protocol :as db-protocol]))
 

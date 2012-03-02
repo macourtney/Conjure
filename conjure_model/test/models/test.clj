@@ -4,6 +4,6 @@
 
 (test-helper/init-server #(identity true))
 
-(use 'conjure.core.model.base)
+(use 'conjure.model.base)
 
 (clj-record.core/init-model)

@@ -1,7 +1,7 @@
 ;; This file is used to configure the database and connection.
 
 (ns config.db-config
-  (:require [conjure.core.config.environment :as environment]
+  (:require [conjure.config.environment :as environment]
             [drift-db-h2.flavor :as h2-flavor]))
 
 (defn dbname [environment]

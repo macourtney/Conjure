@@ -1,7 +1,7 @@
-(ns conjure.core.model.test-util
+(ns conjure.model.test-util
   (:import [java.io File])
   (:use clojure.test
-        conjure.core.model.util
+        conjure.model.util
         test-helper))
 
 (def model-name "test")

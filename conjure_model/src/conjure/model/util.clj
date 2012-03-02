@@ -1,6 +1,6 @@
-(ns conjure.core.model.util
+(ns conjure.model.util
   (:require [clj-record.util :as clj-record-util]
-            [conjure.core.config.environment :as environment]
+            [conjure.config.environment :as environment]
             [clojure.tools.loading-utils :as loading-utils]
             [clojure.tools.file-utils :as file-utils]
             [clojure.tools.string-utils :as string-utils]))

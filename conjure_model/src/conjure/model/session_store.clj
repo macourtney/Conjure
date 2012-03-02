@@ -1,4 +1,4 @@
-(ns conjure.core.model.session-store
+(ns conjure.model.session-store
   (:require [config.session-config :as session-config]))
 
 (defn 

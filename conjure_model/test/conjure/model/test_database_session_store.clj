@@ -1,11 +1,11 @@
-(ns conjure.core.model.test-database-session-store
+(ns conjure.model.test-database-session-store
   (:use test-helper
         clojure.test
-        conjure.core.model.database-session-store)
+        conjure.model.database-session-store)
   (:require [config.db-config :as db-config]
-            [conjure.core.config.environment :as environment]
-            [conjure.core.util.request :as request]
-            [conjure.core.util.session-utils :as session-utils]
+            [conjure.config.environment :as environment]
+            [conjure.util.request :as request]
+            [conjure.util.session-utils :as session-utils]
             [drift-db.core :as database]))
 
 (def test-session-id "blah")

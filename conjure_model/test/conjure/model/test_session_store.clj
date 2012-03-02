@@ -1,9 +1,9 @@
-(ns conjure.core.model.test-session-store
+(ns conjure.model.test-session-store
   (:use test-helper
         clojure.test
-        conjure.core.model.session-store)
-  (:require [conjure.core.util.session-utils :as session-utils]
-            [conjure.core.util.request :as request]))
+        conjure.model.session-store)
+  (:require [conjure.util.session-utils :as session-utils]
+            [conjure.util.request :as request]))
   
 (use-fixtures :once init-server)
 

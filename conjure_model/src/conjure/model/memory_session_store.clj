@@ -1,6 +1,6 @@
-(ns conjure.core.model.memory-session-store
+(ns conjure.model.memory-session-store
   (:import [java.util Date])
-  (:require [conjure.core.util.session-utils :as session-utils]))
+  (:require [conjure.util.session-utils :as session-utils]))
 
 (def data-store (ref {}))
 
