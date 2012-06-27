@@ -6,7 +6,7 @@
             [conjure.config.environment :as environment]
             [conjure.config.routes-util :as routes-util]
             [conjure.flow.util :as flow-util]
-            [conjure.core.plugin.util :as plugin-util]
+            [conjure.plugin.util :as plugin-util]
             [conjure.util.request :as request]
             [conjure.util.session-utils :as session-utils]
             [clojure.tools.cli :as cli]
