@@ -5,7 +5,8 @@
 
 (def controller-name "test")
 (def action-name "show")
-(def uri (str controller-name "/" action-name "/1"))
+(def id "1")
+(def uri (str "/" controller-name "/" action-name "/" id))
 
 (use-fixtures :once init-server)
 
@@ -23,11 +24,9 @@
   (is (nil? ((wrap-resource-dir noop-app "public") { :request-method :get, :uri "/" }))))
 
 (deftest test-conjure
-  (is
-    (conjure 
-      { :uri uri
-        :query-string "foo=bar&baz=biz" }))
-  (is
-    (conjure 
-      { :uri "" 
-        :query-string "" })))
+  (is (conjure 
+        { :uri uri
+          :query-string "foo=bar&baz=biz" }))
+  (is (conjure 
+        { :uri "/" 
+          :query-string "" })))

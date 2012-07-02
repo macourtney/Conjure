@@ -35,11 +35,10 @@
   clean-controller-action [request-map]
   (reduce
     (fn [output [request-key request-value]]
-      (cond
-        (or (= request-key :controller) (= request-key :action))
-          (assoc output request-key (loading-utils/underscores-to-dashes request-value))
-        true
-          (assoc output request-key request-value)))
+      (assoc output request-key 
+             (if (or (= request-key :controller) (= request-key :action))
+               (loading-utils/underscores-to-dashes request-value)
+               request-value)))
     {}
     request-map))
 

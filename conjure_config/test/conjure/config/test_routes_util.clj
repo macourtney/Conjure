@@ -70,6 +70,13 @@
         :request-map { :controller 'controller, :action 'action, :params { :id 'id } } }
       { :uri "/home/index/1" })))
   (is (= 
+    { :controller "home", :action "index", :params { :id "1" } }
+    (parse-compiled-route 
+      { :route (clout/route-compile "/:controller/:action/:id")
+        :request-map { :controller 'controller, :action 'action, :params { :id 'id } } }
+      { :uri "/home/index/1"
+        :query-string "foo=bar&baz=biz" })))
+  (is (= 
     { :controller "home", :action "index" }
     (parse-compiled-route 
       { :route (clout/route-compile "/")
@@ -98,6 +105,10 @@
   (request/set-request-map { :request { :uri "/" } }
     (is (= 
       { :controller "home", :action "index" }
+      (compiled-parse))))
+  (request/set-request-map { :request { :uri "/home/index/1" :query-string "foo=bar&baz=biz" } }
+    (is (= 
+      { :controller "home", :action "index", :params { :id "1" } }
       (compiled-parse))))
   (request/set-request-map { :request { :uri "/home/index/1/fail" } }
     (is (nil? (compiled-parse)))))
