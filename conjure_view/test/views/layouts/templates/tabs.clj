@@ -1,7 +1,7 @@
 (ns views.layouts.templates.tabs
   (:use conjure.view.base)
-  (:require [conjure.util.request :as request]
-            [conjure.view.util :as view-util]
+  (:require [conjure.util.conjure-utils :as conjure-utils]
+            [conjure.util.request :as request]
             [clojure.tools.string-utils :as string-utils]))
 
 (defn 
@@ -10,7 +10,7 @@
   (or 
     (:url tab-map) 
     (when-let [url-for (:url-for tab-map)]
-      (view-util/url-for (view-util/merge-url-for-params original-request-map url-for)))))
+      (conjure-utils/url-for (conjure-utils/merge-url-for-params original-request-map url-for)))))
 
 (defn
 #^{ :doc "Returns the id for the tab, or nil if no id is needed." }

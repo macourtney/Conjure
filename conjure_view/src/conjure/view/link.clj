@@ -3,7 +3,7 @@
 (in-ns 'conjure.view.base)
 
 (require ['conjure.util.request :as 'request])
-(require ['conjure.view.util :as 'view-utils])
+(require ['conjure.util.conjure-utils :as 'conjure-utils])
 
 (defn
 #^{ :doc "Returns the attributes for the link tag (\"a\" tag) from the request-map." }
@@ -11,10 +11,10 @@
   (let [html-options (or (:html-options params) {})]
     (if (:href html-options)
       html-options
-      (assoc html-options :href (view-utils/url-for params)))))
+      (assoc html-options :href (conjure-utils/url-for params)))))
 
 (defn evaluate-if-fn-with-params [params function & fn-params]
-  (request/with-request-map-fn #(view-utils/merge-url-for-params % params)
+  (request/with-request-map-fn #(conjure-utils/merge-url-for-params % params)
     (apply evaluate-if-fn function fn-params)))
 
 (defn

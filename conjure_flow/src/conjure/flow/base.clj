@@ -1,15 +1,10 @@
 (ns conjure.flow.base
   (:require [clojure.tools.logging :as logging]
             [conjure.flow.util :as controller-util]
+            [conjure.util.conjure-utils :as conjure-utils]
             [conjure.util.request :as request]
-            [conjure.view.util :as view-util]
             [clojure.tools.html-utils :as html-utils]
             [clojure.tools.string-utils :as string-utils]))
-
-(defn 
-#^{ :doc "Runs the binding associated with the controller and action in the request-map." }
-  bind [& params]
-  (apply view-util/render-view params))
 
 (defn
 #^{ :doc "Redirects to the given url with the given status. If status is not given, 302 (redirect found) is used." }
@@ -38,10 +33,9 @@
     
 (defmethod redirect-to :params
   [params]
-    (let [status (:status params)]
-      (if status
-        (redirect-to-full-url (view-util/url-for (dissoc params :status)) status)
-        (redirect-to-full-url (view-util/url-for params)))))
+    (if-let [status (:status params)]
+      (redirect-to-full-url (conjure-utils/url-for (dissoc params :status)) status)
+      (redirect-to-full-url (conjure-utils/url-for params))))
 
 (defn
 #^{ :doc "A short cut function to simply redirect to another action." }
@@ -71,17 +65,6 @@
       `(add-action-function 
         (fn [] ~@body) 
         ~params))))
-
-(defn simple-bind-action []
-  (bind))
-
-(defn
-#^{ :doc "Defines a list of actions which will simply call (bind). This is a convenience function over creating a
-def-action for each action." }
-  def-bind-only-actions [& actions]
-  (let [controller (controller-from-namespace *ns*)]
-    (doseq [action actions]
-      (add-action-function simple-bind-action { :action (name action) :controller controller }))))
 
 (defn
 #^{ :doc "Returns the name of the interceptor based on the given interceptor symbol." }

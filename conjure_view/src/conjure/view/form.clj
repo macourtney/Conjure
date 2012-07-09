@@ -6,7 +6,7 @@
 (require ['conjure.model.util :as 'model-util])
 (require ['clojure.tools.logging :as 'logging])
 (require ['clojure.tools.map-utils :as 'map-utils])
-(require ['conjure.view.util :as 'view-utils])
+(require ['conjure.util.conjure-utils :as 'conjure-utils])
 (require ['conjure.util.request :as 'request])
 (require ['hiccup.core :as 'hiccup])
 
@@ -31,14 +31,14 @@ Options has the same options as url-for plus the following options:
   ([body] (form-for {} body))
   ([options body]
     (let [html-options (:html-options options)
-          action (or (:action html-options) (view-utils/url-for options))]
+          action (or (:action html-options) (conjure-utils/url-for options))]
       [:form 
         (merge 
           html-options
           { :method (or (:method html-options) "post"), 
             :action action,
             :name (or (:name options) (:controller options) (request/controller) "record") })
-        (request/with-request-map-fn #(view-utils/merge-url-for-params % options)
+        (request/with-request-map-fn #(conjure-utils/merge-url-for-params % options)
           (evaluate-if-fn body))])))
 
 (defn-
@@ -145,6 +145,6 @@ Supported options:
   ([text] (button-to text {}))
   ([text params]
     (let [options (dissoc params :html-options)
-          button-text (request/with-request-map-fn #(view-utils/merge-url-for-params % options) (evaluate-if-fn text))]
+          button-text (request/with-request-map-fn #(conjure-utils/merge-url-for-params % options) (evaluate-if-fn text))]
       (form-for options
         (form-button button-text (:html-options params))))))

@@ -4,8 +4,8 @@
 
 (require ['clojure.tools.logging :as 'logging])
 (require ['com.reasonr.scriptjure :as 'scriptjure])
+(require ['conjure.util.conjure-utils :as 'conjure-utils])
 (require ['conjure.util.request :as 'request])
-(require ['conjure.view.util :as 'view-util])
 
 (defn-
 #^{ :doc "Returns the position function for the given position." }
@@ -57,7 +57,7 @@ id based on position. Position can be one of the following:
     :confirm - A scriptjure function to call to confirm the action before the ajax call is executed." }
   ajax-map [options]
   (let [ajax-type (or (:method (:html-options options)) (:method options) (request/method) "POST")
-        url (or (:ajax-url options) (view-util/url-for options))
+        url (or (:ajax-url options) (conjure-utils/url-for options))
         update (:update options)
         success-fn (if (map? update) (:success update) update)
         error-fn (if (and (map? update) (contains? update :error)) (:error update) (error-fn))
