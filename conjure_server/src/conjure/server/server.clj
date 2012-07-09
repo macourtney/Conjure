@@ -5,7 +5,6 @@
             [config.session-config :as session-config]
             [conjure.config.environment :as environment]
             [conjure.config.routes-util :as routes-util]
-            [conjure.flow.util :as flow-util]
             [conjure.plugin.util :as plugin-util]
             [conjure.util.request :as request]
             [conjure.util.session-utils :as session-utils]
@@ -67,7 +66,7 @@ one." }
   (if-let [response (routes-util/route-request)]
     (create-response-map response)
     (request/set-request-map { :controller "home", :action "error-404" }
-      (flow-util/call-controller))))
+      (environment/call-controller))))
 
 (defn
 #^{ :doc "Takes the given path and calls the correct controller and action for it." }

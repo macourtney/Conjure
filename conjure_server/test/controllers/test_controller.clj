@@ -1,6 +1,6 @@
 (ns controllers.test-controller
-  (:use [conjure.flow.base]))
+  (:use [conjure.flow.base])
+  (:require [conjure.view.util :as view-util]))
 
 (def-action show
-  (println "In the show controller.")
-  (bind))
+  (view-util/render-view))

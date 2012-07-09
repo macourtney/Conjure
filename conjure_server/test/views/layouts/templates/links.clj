@@ -1,8 +1,8 @@
 (ns views.layouts.templates.links
   (:use conjure.view.base)
-  (:require [conjure.util.request :as request]
-            [clojure.tools.string-utils :as string-utils]
-            [conjure.view.util :as view-util]))
+  (:require [clojure.tools.string-utils :as string-utils]
+            [conjure.util.conjure-utils :as conjure-utils]
+            [conjure.util.request :as request]))
 
 (defn
 #^{ :doc "Returns the link controller from the given link map." }
@@ -20,7 +20,7 @@
   (or 
     (:url link-map) 
     (if (:url-for link-map) 
-      (view-util/url-for (view-util/merge-url-for-params original-request-map (:url-for link-map))))))
+      (conjure-utils/url-for (conjure-utils/merge-url-for-params original-request-map (:url-for link-map))))))
 
 (defn
 #^{ :doc "Returns the id for a link or nil if no id should be set for the link." }
