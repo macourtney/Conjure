@@ -73,15 +73,13 @@
   model-to-table-name [model]
   (if model (clj-record-util/pluralize (loading-utils/dashes-to-underscores model))))
 
-(comment
-  (defn
+(defn
   #^{ :doc "Finds a model file with the given model name." }
     find-model-file
     ([model-name] (find-model-file (find-models-directory) model-name)) 
     ([models-directory model-name]
       (if (and models-directory model-name)
         (file-utils/find-file models-directory (model-file-name-string model-name)))))
-)
 
 (defn
 #^{ :doc "Returns the model name for the given belongs to column." }
