@@ -1,4 +1,4 @@
-(ns conjure.core.test.init
+(ns conjure.test.init
   (:import [java.io File])
   (:require [conjure.config.environment :as environment]
             [conjure.server.server :as server]

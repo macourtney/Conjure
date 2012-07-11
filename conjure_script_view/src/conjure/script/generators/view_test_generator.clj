@@ -1,6 +1,6 @@
 (ns conjure.script.generators.view-test-generator
-  (:require [conjure.core.test.builder :as test-builder]
-            [conjure.core.test.util :as test-util]
+  (:require [conjure.test.builder :as test-builder]
+            [conjure.test.util :as test-util]
             [clojure.tools.file-utils :as file-utils]
             [conjure.view.util :as util]))
 

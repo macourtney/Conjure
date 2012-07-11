@@ -1,4 +1,4 @@
-(ns conjure.core.test.util
+(ns conjure.test.util
   (:import [java.io File])
   (:require [conjure.config.environment :as environment]
             [clojure.tools.file-utils :as file-utils]
