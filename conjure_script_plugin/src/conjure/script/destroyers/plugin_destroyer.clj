@@ -1,6 +1,6 @@
 (ns conjure.script.destroyers.plugin-destroyer
   (:require [clojure.tools.logging :as logging]
-            [conjure.core.plugin.util :as plugin-util]
+            [conjure.plugin.util :as plugin-util]
             [clojure.tools.file-utils :as file-utils]))
 
 (defn

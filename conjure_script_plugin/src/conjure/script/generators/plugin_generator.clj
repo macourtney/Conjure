@@ -39,7 +39,7 @@
       (generate-initialize-function)))
   ([plugin-name install-function uninstall-function initialize-function] 
     (str "(ns " (plugin-util/plugin-namespace-name plugin-name) "
-  (:use conjure.core.plugin.base))
+  (:use conjure.plugin.base))
 
 " install-function "
 
