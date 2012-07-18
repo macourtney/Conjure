@@ -16,7 +16,6 @@
     (let [plugin-directory (plugin-util/plugin-directory plugin-name)]
       (if (and plugin-directory (.exists plugin-directory))
         (let [is-deleted (file-utils/recursive-delete plugin-directory)]
-          (println "plugin-directory:" (.getPath plugin-directory))
           (logging/info (str "Plugin " (.getName plugin-directory) (if is-deleted " destroyed." " not destroyed."))))
         (do
           (logging/error (str "Could not find plugin directory.: " plugin-directory))

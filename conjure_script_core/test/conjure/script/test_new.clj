@@ -10,6 +10,9 @@
 
 (def new-project-test-dir (File. (find-test-directory) "new_project"))
 
+(def conjure-zip-dir "conjure/")
+(def file-to-extract "execute.clj")
+
 (deftest test-entry-file
   (is (.exists new-project-test-dir))
   (is (= 
@@ -19,35 +22,37 @@
         (.getPath (File. new-project-test-dir "foo/bar/blah.clj"))
         (.getPath (entry-file new-project-test-dir (ZipEntry. (str new-project-zip-directory "foo/bar/blah.clj")))))))
 
+(defn conjure-core-zip-entries []
+  (loading-utils/class-path-zip-entries conjure-zip-dir))
+
+(defn find-test-entry []
+  (some #(when (.endsWith (.getName %1) file-to-extract) %1) (conjure-core-zip-entries)))
+
 (deftest test-create-file
-  (let [entry-file (File. new-project-test-dir "execute.clj")]
-    (create-file 
-      entry-file 
-      (some #(when (.endsWith (.getName %1) "execute.clj") %1)  (loading-utils/class-path-zip-entries "conjure/core/")))
+  (let [entry-file (File. new-project-test-dir file-to-extract)
+        execute-entry (find-test-entry)]
+    (is execute-entry)
+    (create-file entry-file execute-entry)
     (is (.exists entry-file))
     (is (.delete entry-file)))
-  (let [entry-file (File. new-project-test-dir "core/execute.clj")]
-    (create-file 
-      entry-file 
-      (some #(when (.endsWith (.getName %1) "execute.clj") %1)  (loading-utils/class-path-zip-entries "conjure/core/")))
+  (let [entry-file (File. new-project-test-dir (str "core/" file-to-extract))]
+    (create-file  entry-file  (find-test-entry))
     (is (.exists entry-file))
     (is (.delete entry-file))
     (is (.delete (.getParentFile entry-file))))
   (is (empty? (.listFiles new-project-test-dir))))
 
 (deftest test-extract-zip-entry
-  (let [conjure-core-zip-dir "conjure/core/"
-        zip-entry (some #(when (.endsWith (.getName %1) "execute.clj") %1)  (loading-utils/class-path-zip-entries conjure-core-zip-dir))]
-    (extract-zip-entry new-project-test-dir zip-entry conjure-core-zip-dir)
-    (let [entry-file (entry-file new-project-test-dir zip-entry conjure-core-zip-dir)]
+  (let [zip-entry (find-test-entry)]
+    (extract-zip-entry new-project-test-dir zip-entry conjure-zip-dir)
+    (let [entry-file (entry-file new-project-test-dir zip-entry conjure-zip-dir)]
       (is (.exists entry-file))
       (is (.isFile entry-file))
       (is (.delete entry-file))))
   (let [new-project-subdirectory (File. new-project-test-dir "core")
-        conjure-core-zip-dir "conjure/core/"
-        zip-entry (some #(when (.endsWith (.getName %1) "execute.clj") %1)  (loading-utils/class-path-zip-entries conjure-core-zip-dir))]
-    (extract-zip-entry new-project-subdirectory zip-entry conjure-core-zip-dir)
-    (let [entry-file (entry-file new-project-subdirectory zip-entry conjure-core-zip-dir)]
+        zip-entry (find-test-entry)]
+    (extract-zip-entry new-project-subdirectory zip-entry conjure-zip-dir)
+    (let [entry-file (entry-file new-project-subdirectory zip-entry conjure-zip-dir)]
       (is (.exists entry-file))
       (is (.isFile entry-file))
       (is (.delete entry-file))
