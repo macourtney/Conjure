@@ -3,7 +3,7 @@
   (:use clojure.test
         conjure.util.request))
 
-(def controller-name "test")
+(def service-name "test")
 (def action-name "show")
 
 (deftest test-parameters
@@ -107,7 +107,7 @@
             :query-string "foo=bar"
             :headers headers } })))
           
-    (let [uri (str "/" controller-name "/" action-name "/1")]
+    (let [uri (str "/" service-name "/" action-name "/1")]
       (is (= 
         { :params { :foo "bar" }, 
           :request 

@@ -15,16 +15,17 @@
 (def loaded-namespaces (atom {}))
 
 (defn
-#^{ :doc "Returns true if the given var-name is in a conjure namespace (controller, helper, model or view)." }
+#^{ :doc "Returns true if the given var-name is in a conjure namespace (service, helper, model or view)." }
   conjure-namespace? [var-name]
   (or 
     (.startsWith var-name "controllers.")
     (.startsWith var-name "helpers.")
     (.startsWith var-name "models.")
+    (.startsWith var-name "flows.")
     (.startsWith var-name "views.")))
 
 (defn
-#^{ :doc "Returns a set of conjure namespaces (controllers, models, helpers and views) used by the given namespace." }
+#^{ :doc "Returns a set of conjure namespaces (flows, models, helpers and views) used by the given namespace." }
   conjure-namespaces [namespace-name]
   (let [namespace-to-search (find-ns (symbol namespace-name))]
     (reduce
@@ -175,7 +176,7 @@ the result." }
   (propagate-session-id
     request-map
     (merge 
-      (select-keys request-map [:controller :action :request :temp-session])
+      (select-keys request-map [:service :controller :action :request :temp-session])
       params)))
 
 (defn
@@ -200,9 +201,9 @@ the result." }
       (servlet-utils/servlet-uri-path servlet-context))))
 
 (defn
-#^{ :doc "Returns the request controller as a string." }
-  controller-str []
-  (conjure-str-utils/str-keyword (request/controller)))
+#^{ :doc "Returns the request service as a string." }
+  service-str []
+  (conjure-str-utils/str-keyword (request/service)))
 
 (defn
 #^{ :doc "Returns the request action as a string." }
@@ -224,7 +225,7 @@ exist, then this method returns nil. This method is used by url-for." }
     (repeat "/") 
     (filter identity
       [ (servlet-path)
-        (loading-utils/dashes-to-underscores (controller-str))
+        (loading-utils/dashes-to-underscores (service-str))
         (loading-utils/dashes-to-underscores (action-str))
         (request/id-str)
         (anchor) ])))
@@ -257,7 +258,7 @@ false." }
 "Returns the url for the given parameters. The following parameters are valid:
 
      :action - The name of the action to link to.
-     :controller - The name of the controller to link to.
+     :service - The name of the service to link to.
      :id - The id to pass, or if id links to a map, then the value of :id in that map is used. (Optional)
      :anchor - Specifies the anchor name to be appended to the path.
      :user - Inline HTTP authentication (only used if :password is also present)
@@ -269,7 +270,7 @@ false." }
   ([] (url-for {})) 
   ([params]
     (request/with-request-map-fn #(merge-url-for-params % params)
-      (if (and (request/controller) (request/action))
+      (if (and (request/service) (request/action))
         (clojure-str/join
           (concat (full-host) (create-path) (create-url-params)))
-        (throw (new RuntimeException (str "You must pass a controller and action to url-for. " request/request-map)))))))
+        (throw (new RuntimeException (str "You must pass a service and action to url-for. " request/request-map)))))))

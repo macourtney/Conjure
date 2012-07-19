@@ -6,9 +6,9 @@
 (def ^:dynamic request-map {})
 
 (defn
-#^{ :doc "Returns the controller." }
-  controller []
-  (:controller request-map))
+#^{ :doc "Returns the service." }
+  service []
+  (or (:service request-map) (:controller request-map)))
 
 (defn
 #^{ :doc "Returns the action." }
@@ -210,22 +210,22 @@ update-request-map and use the new request map in body." }
   `(set-request-map (update-request-map ~incoming-request-map) ~@body))
 
 (defn
-#^{ :doc "Returns the request map with the given controller, action, and id added to it." }
-  request-map-with [controller action id]
-  (let [output-request-map (merge request-map { :controller controller, :action action })]
+#^{ :doc "Returns the request map with the given service, action, and id added to it." }
+  request-map-with [service action id]
+  (let [output-request-map (merge request-map { :service service, :action action })]
     (if id
       (assoc output-request-map :params (assoc (parameters) :id id))
       output-request-map))) 
 
 (defmacro
-#^{ :doc "Updates the request map with the given controller action and id in body. If id is nil, it is ignored." }
-  with-controller-action [controller action & body]
-  `(set-request-map (request-map-with ~controller ~action nil) ~@body))
+#^{ :doc "Updates the request map with the given service action and id in body. If id is nil, it is ignored." }
+  with-service-action [service action & body]
+  `(set-request-map (request-map-with ~service ~action nil) ~@body))
 
 (defmacro
-#^{ :doc "Updates the request map with the given controller action and id in body. If id is nil, it is ignored." }
-  with-controller-action-id [controller action id & body]
-  `(set-request-map (request-map-with ~controller ~action ~id) ~@body))
+#^{ :doc "Updates the request map with the given service action and id in body. If id is nil, it is ignored." }
+  with-service-action-id [service action id & body]
+  `(set-request-map (request-map-with ~service ~action ~id) ~@body))
 
 (defn request-map-with-params [params]
   (assoc request-map :params params))
