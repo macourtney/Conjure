@@ -85,14 +85,15 @@
         :silent silent }))
 
 (defn
-#^{ :doc "Creates the binding file associated with the given controller and action." }
+#^{ :doc "Creates the binding file associated with the given service and action." }
   generate-plugin-files
   [{ :keys [name silent] :or { silent false } }]
     (if name
       (generate-file { :name name, :silent silent })
-      (if (not silent) (usage))))
+      (when (not silent)
+        (usage))))
         
 (defn 
-#^{ :doc "Generates a binding file for the controller name and action in params." }
+#^{ :doc "Generates a binding file for the service name and action in params." }
   generate [params]
   (generate-plugin-files { :name (first params) }))
