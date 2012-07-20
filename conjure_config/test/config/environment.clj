@@ -6,4 +6,4 @@
 
       :source-dir "test"
 
-      :call-controller-fn #(identity true) }))
+      :call-service-fn #(identity true) }))

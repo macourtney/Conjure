@@ -28,7 +28,7 @@
 (def jquery (find-config-env-value :jquery "jquery-1.3.2.min.js"))
 (def conjure-js (find-config-env-value :conjure-js "conjure.js"))
 
-(def call-controller-fn (find-config-env-value :call-controller-fn)) 
+(def call-service-fn (find-config-env-value :call-service-fn)) 
 
 (defn
   set-evironment-property [environment]
@@ -76,9 +76,9 @@
   reload-files? []
   (find-config-env-value :reload-files false))
 
-(defn call-controller
-  "Calls the controller function. If the controller function is not set, this function tries to load the conjure.core.controller.util/call-controller."
+(defn call-service
+  "Calls the controller function. If the service function is not set, this function throws an exception."
   []
-  (if call-controller-fn
-    (call-controller-fn)
-    (throw (RuntimeException. "Could not find the call-controller function."))))
+  (if call-service-fn
+    (call-service-fn)
+    (throw (RuntimeException. "Could not find the call-service-fn in the environment properties map."))))

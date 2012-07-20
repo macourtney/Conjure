@@ -32,11 +32,11 @@
     request-map))
 
 (defn
-  clean-controller-action [request-map]
+  clean-service-action [request-map]
   (reduce
     (fn [output [request-key request-value]]
       (assoc output request-key 
-             (if (or (= request-key :controller) (= request-key :action))
+             (if (or (= request-key :service) (= request-key :action))
                (loading-utils/underscores-to-dashes request-value)
                request-value)))
     {}
@@ -48,7 +48,7 @@
     (when-let [route (:route compiled-route-map)]
       (when-let [request-map (:request-map compiled-route-map)]
         (when-let [route-map (clout/route-matches route ring-request)]
-          (clean-controller-action (symbol-replace request-map route-map)))))))
+          (clean-service-action (symbol-replace request-map route-map)))))))
 
 (defn
   compiled-parse
@@ -69,15 +69,15 @@
   (or (function-parse) (compiled-parse) (servlet-parse)))
 
 (defn
-#^{ :doc "Calls the controller action specified in the given path-map. Path-map must contain :controller and :action 
-keys, and may contain optional :id key. The controller, action and id will be appropriately merged into the request-map
-before calling the controller action." }
-  call-controller [path-map]
+#^{ :doc "Calls the service action specified in the given path-map. Path-map must contain :service and :action 
+keys, and may contain optional :id key. The service, action and id will be appropriately merged into the request-map
+before calling the service action." }
+  call-service [path-map]
   (request/with-merged-request-map path-map
-    (environment/call-controller)))
+    (environment/call-service)))
 
 (defn
-#^{ :doc "This function calls the appropriate controller and action." }
+#^{ :doc "This function calls the appropriate service and action." }
   route-request []
   (when-let [path-map (parse-path)]
-    (call-controller path-map)))
+    (call-service path-map)))
