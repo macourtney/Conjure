@@ -6,107 +6,111 @@
   (:require [clojure.tools.logging :as logging]
             [conjure.util.request :as request]))
 
-(def controller-name "test")
+(def service-name "test")
 (def action-name "show")
 
 (use-fixtures :once init-server)
   
-(deftest test-find-controllers-directory
-  (let [controllers-directory (find-controllers-directory)]
-    (is (not (nil? controllers-directory)))
-    (is (instance? File controllers-directory))))
-    
-(deftest test-controller-file-name-string
-  (let [controller-file-name (controller-file-name-string controller-name)]
-    (is (not (nil? controller-file-name)))
-    (is (= "test_controller.clj" controller-file-name)))
-  (let [controller-file-name (controller-file-name-string "test-name")]
-    (is (not (nil? controller-file-name)))
-    (is (= "test_name_controller.clj" controller-file-name)))
-  (is (nil? (controller-file-name-string nil)))
-  (is (nil? (controller-file-name-string ""))))
+(deftest test-find-flows-directory
+  (let [flows-directory (find-flows-directory)]
+    (is (not (nil? flows-directory)))
+    (is (instance? File flows-directory))))
 
-(deftest test-controller-file-name
-  (request/set-request-map { :controller controller-name }
-    (is (= (str controller-name "_controller.clj") (controller-file-name))))
-  (request/set-request-map { :controller "" }
-    (is (nil? (controller-file-name))))
-  (request/set-request-map { :controller nil }
-    (is (nil? (controller-file-name))))
-  (is (nil? (controller-file-name))))
-  
-(deftest test-controller-from-file
-  (let [controller-file (new File "test_controller.clj")
-        controller-name (controller-from-file controller-file)]
-    (is (not (nil? controller-name)))
-    (is (= "test" controller-name)))
-  (let [controller-file (new File "test_name_controller.clj")
-        controller-name (controller-from-file controller-file)]
-    (is (not (nil? controller-name)))
-    (is (= "test-name" controller-name)))
-  (is (nil? (controller-from-file nil))))
-  
-(deftest test-find-controller-file
-  (let [controllers-directory (find-controllers-directory)]
-    (let [controller-file (find-controller-file controllers-directory controller-name)]
-      (is (not (nil? controller-file))))
-    (let [controller-file (find-controller-file controllers-directory "fail")]
-      (is (nil? controller-file)))
-    (let [controller-file (find-controller-file controllers-directory nil)]
-      (is (nil? controller-file)))
-  (let [controller-file (find-controller-file "test")]
-    (is (not (nil? controller-file))))))
+(deftest test-find-flows-directory
+  (let [flows-directory (find-flows-directory)]
+    (is (not (nil? flows-directory)))
+    (is (instance? File flows-directory))))
     
-(deftest test-controller-namespace
-  (let [controller-ns (controller-namespace controller-name)]
-    (is (not (nil? controller-ns)))
-    (is (= "controllers.test-controller" controller-ns)))
-  (let [controller-ns (controller-namespace "test-name")]
-    (is (not (nil? controller-ns)))
-    (is (= "controllers.test-name-controller" controller-ns)))
-  (let [controller-ns (controller-namespace "test_name")]
-    (is (not (nil? controller-ns)))
-    (is (= "controllers.test-name-controller" controller-ns)))
-  (is (nil? (controller-namespace nil))))
+(deftest test-flow-file-name-string
+  (let [flow-file-name (flow-file-name-string service-name)]
+    (is (not (nil? flow-file-name)))
+    (is (= "test_flow.clj" flow-file-name)))
+  (let [flow-file-name (flow-file-name-string "test-name")]
+    (is (not (nil? flow-file-name)))
+    (is (= "test_name_flow.clj" flow-file-name)))
+  (is (nil? (flow-file-name-string nil)))
+  (is (nil? (flow-file-name-string ""))))
 
-(deftest test-is-controller-namespace?
-  (is (is-controller-namespace? "controllers.test-name-controller"))
-  (is (not (is-controller-namespace? "fail")))
-  (is (not (is-controller-namespace? "")))
-  (is (not (is-controller-namespace? nil))))
+(deftest test-flow-file-name
+  (request/set-request-map { :service service-name }
+    (is (= (str service-name "_flow.clj") (flow-file-name))))
+  (request/set-request-map { :service "" }
+    (is (nil? (flow-file-name))))
+  (request/set-request-map { :service nil }
+    (is (nil? (flow-file-name))))
+  (is (nil? (flow-file-name))))
+  
+(deftest test-service-from-file
+  (let [flow-file (new File "test_flow.clj")
+        service-name (service-from-file flow-file)]
+    (is (not (nil? service-name)))
+    (is (= "test" service-name)))
+  (let [flow-file (new File "test_name_flow.clj")
+        service-name (service-from-file flow-file)]
+    (is (not (nil? service-name)))
+    (is (= "test-name" service-name)))
+  (is (nil? (service-from-file nil))))
+  
+(deftest test-find-flow-file
+  (let [flows-directory (find-flows-directory)]
+    (let [flow-file (find-flow-file flows-directory service-name)]
+      (is (not (nil? flow-file))))
+    (let [flow-file (find-flow-file flows-directory "fail")]
+      (is (nil? flow-file)))
+    (let [flow-file (find-flow-file flows-directory nil)]
+      (is (nil? flow-file)))
+  (let [flow-file (find-flow-file "test")]
+    (is (not (nil? flow-file))))))
+    
+(deftest test-flow-namespace
+  (let [flow-ns (flow-namespace service-name)]
+    (is (not (nil? flow-ns)))
+    (is (= "flows.test-flow" flow-ns)))
+  (let [flow-ns (flow-namespace "test-name")]
+    (is (not (nil? flow-ns)))
+    (is (= "flows.test-name-flow" flow-ns)))
+  (let [flow-ns (flow-namespace "test_name")]
+    (is (not (nil? flow-ns)))
+    (is (= "flows.test-name-flow" flow-ns)))
+  (is (nil? (flow-namespace nil))))
+
+(deftest test-is-flow-namespace?
+  (is (is-flow-namespace? "flows.test-name-flow"))
+  (is (not (is-flow-namespace? "fail")))
+  (is (not (is-flow-namespace? "")))
+  (is (not (is-flow-namespace? nil))))
 
 (defn find-first-str [string str-seq]
   (some #(when (= string %1) %1) str-seq))
 
-(deftest test-all-controller-namespaces
-  (let [controller-namespaces (all-controller-namespaces)]
-    (is (= 1 (count controller-namespaces)))
-    (is (find-first-str "controllers.test-controller"
-          (map #(name (ns-name %)) controller-namespaces)))))
+(deftest test-all-flow-namespaces
+  (let [flow-namespaces (all-flow-namespaces)]
+    (is (= 1 (count flow-namespaces)))
+    (is (find-first-str "flows.test-flow"
+          (map #(name (ns-name %)) flow-namespaces)))))
 
-(deftest test-controller-from-namespace
-  (is (= "test" (controller-from-namespace "controllers.test-controller")))
-  (is (nil? (controller-from-namespace nil))))
+(deftest test-service-from-namespace
+  (is (= "test" (service-from-namespace "flows.test-flow")))
+  (is (nil? (service-from-namespace nil))))
 
-(deftest test-all-controllers
-  (let [controllers (all-controllers)]
-    (println "controllers:" controllers)
-    (is (= 1 (count controllers)))
-    (is (find-first-str "test" controllers))))
+(deftest test-all-services
+  (let [services (all-services)]
+    (is (= 1 (count services)))
+    (is (find-first-str "test" services))))
 
-(deftest test-controller-exists?
-  (request/set-request-map { :controller controller-name }
-    (is (controller-exists? (controller-file-name))))
-  (request/set-request-map { :controller "fail" }
-    (is (not (controller-exists? (controller-file-name))))))
+(deftest test-flow-exists?
+  (request/set-request-map { :service service-name }
+    (is (flow-exists? (flow-file-name))))
+  (request/set-request-map { :service "fail" }
+    (is (not (flow-exists? (flow-file-name))))))
 
-(deftest test-load-controller
-  (load-controller controller-name))
+(deftest test-load-flow
+  (load-flow service-name))
 
 (deftest test-fully-qualified-action
-  (request/set-request-map { :controller controller-name, :action action-name }
-    (is (= (str "controllers." controller-name "-controller/" action-name) (fully-qualified-action))))
-  (request/set-request-map { :controller controller-name }
+  (request/set-request-map { :service service-name, :action action-name }
+    (is (= (str "flows." service-name "-flow/" action-name) (fully-qualified-action))))
+  (request/set-request-map { :service service-name }
     (is (nil? (fully-qualified-action))))
   (request/set-request-map { }
     (is (nil? (fully-qualified-action))))
@@ -124,35 +128,35 @@
     (is (= :delete (method-key)))))
 
 (deftest test-actions-map
-  (is (actions-map controller-name))
+  (is (actions-map service-name))
   (is (nil? (actions-map "fail")))
   (is (nil? (actions-map nil))))
 
 (deftest test-methods-map
-  (is (methods-map controller-name action-name))
+  (is (methods-map service-name action-name))
   (is (nil? (methods-map "fail" action-name)))
   (is (nil? (methods-map nil action-name)))
-  (is (nil? (methods-map controller-name "fail"))))
+  (is (nil? (methods-map service-name "fail"))))
 
 (deftest test-action-function
-  (is (action-function controller-name action-name :all))
-  (is (action-function controller-name action-name))
-  (is (action-function controller-name action-name :default))
-  (is (nil? (action-function controller-name "fail" :all)))
+  (is (action-function service-name action-name :all))
+  (is (action-function service-name action-name))
+  (is (action-function service-name action-name :default))
+  (is (nil? (action-function service-name "fail" :all)))
   (is (nil? (action-function "fail" action-name :all))))
 
 (deftest test-find-action-fn
-  (request/set-request-map { :controller controller-name, :action action-name, :request { :method "GET" } }
+  (request/set-request-map { :service service-name, :action action-name, :request { :method "GET" } }
     (is (find-action-fn))))
 
 (deftest test-find-actions
-  (is (not-empty (find-actions controller-name)))
-  (is (not-empty (find-actions controller-name { :includes #{ (keyword action-name) } })))
-  (is (not-empty (find-actions controller-name { :excludes #{ :fail } })))
-  (is (empty? (find-actions controller-name { :excludes #{ (keyword action-name) } })))
-  (is (empty? (find-actions controller-name { :includes #{ :fail } })))
-  (is (empty? (find-actions controller-name { :includes #{ :fail }, :excludes #{ :fail } })))
-  (is (not-empty (find-actions controller-name 
+  (is (not-empty (find-actions service-name)))
+  (is (not-empty (find-actions service-name { :includes #{ (keyword action-name) } })))
+  (is (not-empty (find-actions service-name { :excludes #{ :fail } })))
+  (is (empty? (find-actions service-name { :excludes #{ (keyword action-name) } })))
+  (is (empty? (find-actions service-name { :includes #{ :fail } })))
+  (is (empty? (find-actions service-name { :includes #{ :fail }, :excludes #{ :fail } })))
+  (is (not-empty (find-actions service-name 
     { :includes #{ (keyword action-name) }, :excludes #{ (keyword action-name) } }))))
 
 (defn
@@ -198,43 +202,43 @@
       { (keyword action-name) method-map, :foo method-map } 
       (assoc-actions { :foo method-map } (assoc params :action action-name))))))
 
-(deftest test-assoc-controllers
+(deftest test-assoc-services
   (let [test-action (fn [request-map] nil)
         params { :action action-name, :action-function test-action, :methods [:all] }
         action-map { (keyword action-name) { :all test-action } }]
     (is (= 
-      { (keyword controller-name) action-map } 
-      (assoc-controllers {} (assoc params :controller controller-name))))
+      { (keyword service-name) action-map } 
+      (assoc-services {} (assoc params :service service-name))))
     (is (= 
-      { (keyword controller-name) action-map, :foo action-map } 
-      (assoc-controllers { :foo action-map } (assoc params :controller controller-name))))))
+      { (keyword service-name) action-map, :foo action-map } 
+      (assoc-services { :foo action-map } (assoc params :service service-name))))))
 
 (deftest test-add-action-function
-  (let [initial-controller-actions @controller-actions
+  (let [initial-flow-actions @flow-actions
         test-action (fn [request-map] nil)
-        params { :controller controller-name, :action action-name }
-        controller-map { (keyword controller-name) { (keyword action-name) { :all test-action } } }] 
-    (reset! controller-actions {})
+        params { :service service-name, :action action-name }
+        service-map { (keyword service-name) { (keyword action-name) { :all test-action } } }] 
+    (reset! flow-actions {})
     (add-action-function test-action (assoc params :methods [:all]))
-    (is (= controller-map @controller-actions))
-    (reset! controller-actions {})
+    (is (= service-map @flow-actions))
+    (reset! flow-actions {})
     (add-action-function test-action params)
-    (is (= controller-map @controller-actions))
-    (reset! controller-actions initial-controller-actions)))
+    (is (= service-map @flow-actions))
+    (reset! flow-actions initial-flow-actions)))
 
 (deftest test-copy-actions
-  (let [initial-controller-actions @controller-actions
-        params { :controller controller-name, :action action-name }]
-    (reset! controller-actions {})
+  (let [initial-flow-actions @flow-actions
+        params { :service service-name, :action action-name }]
+    (reset! flow-actions {})
     (add-action-function test-action (assoc params :methods [:all]))
     (copy-actions "test2" "test")
-    (is (= { (keyword action-name) { :all test-action } } (:test2 @controller-actions)))
-    (reset! controller-actions {})
+    (is (= { (keyword action-name) { :all test-action } } (:test2 @flow-actions)))
+    (reset! flow-actions {})
     
     (add-action-function test-action (assoc params :methods [:all]))
     (copy-actions "test2" "test" { :includes #{ (keyword action-name) } })
-    (is (= { (keyword action-name) { :all test-action } } (:test2 @controller-actions)))
-    (reset! controller-actions initial-controller-actions)))
+    (is (= { (keyword action-name) { :all test-action } } (:test2 @flow-actions)))
+    (reset! flow-actions initial-flow-actions)))
 
 (defn create-stack-interceptor [value]
   (fn [action-fn]
@@ -299,16 +303,16 @@
     (is (= { :show { :one one-interceptor, :two two-interceptor }}
       (assoc-action-interceptors { :show { :two two-interceptor } } one-interceptor :one :show)))))
 
-(deftest test-assoc-controller-interceptors
+(deftest test-assoc-service-interceptors
   (is (= { :test { :show { :pass-interceptor pass-interceptor } } } 
-        (assoc-controller-interceptors {} pass-interceptor :pass-interceptor :test :show)))
+        (assoc-service-interceptors {} pass-interceptor :pass-interceptor :test :show)))
   (is (= { :test { :show { :pass-interceptor pass-interceptor }, :hide { :pass-interceptor pass-interceptor } } } 
-        (assoc-controller-interceptors { :test { :hide { :pass-interceptor pass-interceptor } } } 
+        (assoc-service-interceptors { :test { :hide { :pass-interceptor pass-interceptor } } } 
           pass-interceptor :pass-interceptor :test :show)))
   (let [interceptor-one (create-stack-interceptor "one")
         interceptor-two (create-stack-interceptor "two")]
     (is (= { :test { :show { :one interceptor-one, :two interceptor-two } } }
-          (assoc-controller-interceptors { :test { :show { :two interceptor-two } } } 
+          (assoc-service-interceptors { :test { :show { :two interceptor-two } } } 
             interceptor-one :one :test :show)))))
 
 (deftest test-add-action-interceptor
@@ -330,42 +334,42 @@
         (update-exclude-interceptor-list { :pass-interceptor2 { :interceptor pass-interceptor } } 
           pass-interceptor :pass-interceptor #{ :show }))))
 
-(deftest test-assoc-controller-excludes-interceptors
+(deftest test-assoc-service-excludes-interceptors
   (is (= { :test { :pass-interceptor { :interceptor pass-interceptor } } }
-    (assoc-controller-excludes-interceptors {} pass-interceptor :pass-interceptor :test nil)))
+    (assoc-service-excludes-interceptors {} pass-interceptor :pass-interceptor :test nil)))
   (is (= { :test { :pass-interceptor { :interceptor pass-interceptor } } }
-    (assoc-controller-excludes-interceptors { :test { :pass-interceptor { :interceptor pass-interceptor } } }
+    (assoc-service-excludes-interceptors { :test { :pass-interceptor { :interceptor pass-interceptor } } }
       pass-interceptor :pass-interceptor :test nil)))
   (is (= { :test { :pass-interceptor { :interceptor pass-interceptor } 
                    :pass-interceptor2 { :interceptor pass-interceptor } } }
-    (assoc-controller-excludes-interceptors 
+    (assoc-service-excludes-interceptors 
       { :test 
         { :pass-interceptor { :interceptor pass-interceptor } 
           :pass-interceptor2 { :interceptor pass-interceptor } } }
       pass-interceptor :pass-interceptor2 :test nil))))
 
-(deftest test-add-controller-interceptor
-  (let [initial-controller-interceptors @controller-interceptors]
-    (reset! controller-interceptors {})
-    (add-controller-interceptor pass-interceptor :pass-interceptor :test #{ :show })
+(deftest test-add-service-interceptor
+  (let [initial-service-interceptors @service-interceptors]
+    (reset! service-interceptors {})
+    (add-service-interceptor pass-interceptor :pass-interceptor :test #{ :show })
     (is (= { :test { :pass-interceptor { :excludes #{ :show }, :interceptor pass-interceptor } } }
-          @controller-interceptors))
-    (reset! controller-interceptors initial-controller-interceptors)))
+          @service-interceptors))
+    (reset! service-interceptors initial-service-interceptors)))
 
 (deftest test-add-interceptor
   (let [initial-action-interceptors @action-interceptors
-        initial-controller-interceptors @controller-interceptors]
+        initial-service-interceptors @service-interceptors]
     (reset! action-interceptors {})
-    (reset! controller-interceptors {})
+    (reset! service-interceptors {})
     (add-interceptor pass-interceptor :pass-interceptor :test nil [ :show ])
     (is (= { :test { :show { :pass-interceptor pass-interceptor } } } @action-interceptors))
-    (is (= {} @controller-interceptors))
+    (is (= {} @service-interceptors))
     (reset! action-interceptors {})
     (add-interceptor pass-interceptor :pass-interceptor :test #{ :show } nil)
     (is (= {} @action-interceptors))
-    (is (= { :test { :pass-interceptor { :excludes #{ :show }, :interceptor pass-interceptor } } } @controller-interceptors))
+    (is (= { :test { :pass-interceptor { :excludes #{ :show }, :interceptor pass-interceptor } } } @service-interceptors))
     (reset! action-interceptors initial-action-interceptors)
-    (reset! controller-interceptors initial-controller-interceptors)))
+    (reset! service-interceptors initial-service-interceptors)))
 
 (deftest test-app-interceptor-map
   (is (= 
@@ -404,13 +408,13 @@
     (is (empty? (find-action-interceptors :test :hide)))
     (reset! action-interceptors initial-action-interceptors)))
 
-(deftest test-find-controller-interceptors
-  (let [initial-controller-interceptors @controller-interceptors]
-    (reset! controller-interceptors {})
-    (add-controller-interceptor pass-interceptor :pass-interceptor :test #{ :show })
-    (is (= [pass-interceptor] (find-controller-interceptors :test :hide)))
-    (is (= [] (find-controller-interceptors :test :show)))
-    (reset! controller-interceptors initial-controller-interceptors)))
+(deftest test-find-service-interceptors
+  (let [initial-service-interceptors @service-interceptors]
+    (reset! service-interceptors {})
+    (add-service-interceptor pass-interceptor :pass-interceptor :test #{ :show })
+    (is (= [pass-interceptor] (find-service-interceptors :test :hide)))
+    (is (= [] (find-service-interceptors :test :show)))
+    (reset! service-interceptors initial-service-interceptors)))
 
 (deftest test-call-app-interceptor?
   (is (call-app-interceptor? { :excludes { :test #{ :hide } } } :test :show))
@@ -453,14 +457,14 @@
     (reset! app-interceptors initial-app-interceptors)))
 
 (deftest test-run-action
-  (request/set-request-map { :controller controller-name, :action action-name, :request { :method "GET" } }
+  (request/set-request-map { :service service-name, :action action-name, :request { :method "GET" } }
     (is (run-action))))
 
-(deftest test-call-controller
-  (request/set-request-map { :controller controller-name, :action action-name, :request { :method "GET" } }
-    (is (call-controller)))
-  (let [initial-controller-actions @controller-actions]
-    (reset! controller-actions {})
-    (request/set-request-map { :controller controller-name, :action action-name, :request { :method "GET" } }
-      (is (call-controller)))
-    (reset! controller-actions initial-controller-actions)))
+(deftest test-call-flow
+  (request/set-request-map { :service service-name, :action action-name, :request { :method "GET" } }
+    (is (call-flow)))
+  (let [initial-flow-actions @flow-actions]
+    (reset! flow-actions {})
+    (request/set-request-map { :service service-name, :action action-name, :request { :method "GET" } }
+      (is (call-flow)))
+    (reset! flow-actions initial-flow-actions)))

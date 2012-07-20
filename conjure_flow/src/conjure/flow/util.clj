@@ -9,139 +9,139 @@
             [conjure.util.conjure-utils :as conjure-utils]
             [conjure.util.request :as request]))
 
-(def controllers-dir "controllers")
-(def controllers-namespace controllers-dir)
-(def controller-file-name-ending "_controller.clj")
-(def controller-namespace-ending "-controller")
+(def flows-dir "flows")
+(def flows-namespace flows-dir)
+(def flow-file-name-ending "_flow.clj")
+(def flow-namespace-ending "-flow")
 
-(def controller-actions (atom {}))
+(def flow-actions (atom {}))
 
 (def action-interceptors (atom {}))
-(def controller-interceptors (atom {}))
+(def service-interceptors (atom {}))
 (def app-interceptors (atom []))
 
 (defn 
-#^{ :doc "Finds the controller directory." }
-  find-controllers-directory []
-  (environment/find-in-source-dir controllers-dir))
+#^{ :doc "Finds the flow directory." }
+  find-flows-directory []
+  (environment/find-in-source-dir flows-dir))
 
 (defn
-#^{ :doc "Returns the controller file name for the given controller name." }
-  controller-file-name-string [controller-name]
-  (if (and controller-name (> (. controller-name length) 0))
-    (str (loading-utils/dashes-to-underscores controller-name) controller-file-name-ending)))
+#^{ :doc "Returns the flow file name for the given service." }
+  flow-file-name-string [service]
+  (if (and service (not-empty service))
+    (str (loading-utils/dashes-to-underscores service) flow-file-name-ending)))
 
 (defn
-#^{ :doc "Returns the controller file name generated from the given request map." }
-  controller-file-name []
-  (controller-file-name-string (request/controller)))
+#^{ :doc "Returns the flow file name generated from the given request map." }
+  flow-file-name []
+  (flow-file-name-string (request/service)))
   
 (defn
-#^{ :doc "Returns the controller name for the given controller file." }
-  controller-from-file [controller-file]
-  (when controller-file
-    (if (string? controller-file)
+#^{ :doc "Returns the service name for the given flow file." }
+  service-from-file [flow-file]
+  (when flow-file
+    (if (string? flow-file)
       (string-utils/strip-ending 
-        (loading-utils/clj-file-to-symbol-string controller-file)
-        controller-namespace-ending)
-      (controller-from-file (.getName controller-file)))))
+        (loading-utils/clj-file-to-symbol-string flow-file)
+        flow-namespace-ending)
+      (service-from-file (.getName flow-file)))))
 
 (defn
-#^{ :doc "Finds a controller file with the given controller name." }
-  find-controller-file
-  ([controller-name] (find-controller-file (find-controllers-directory) controller-name)) 
-  ([controllers-directory controller-name]
-    (if controller-name
-      (file-utils/find-file controllers-directory (controller-file-name-string controller-name)))))
+#^{ :doc "Finds a flow file for the given service." }
+  find-flow-file
+  ([service] (find-flow-file (find-flows-directory) service)) 
+  ([flows-directory service]
+    (when service
+      (file-utils/find-file flows-directory (flow-file-name-string service)))))
 
 (defn
-#^{ :doc "Returns the controller namespace for the given controller." }
-  controller-namespace [controller]
-  (when controller
-    (str controllers-namespace "." (loading-utils/underscores-to-dashes controller) controller-namespace-ending)))
+#^{ :doc "Returns the flow namespace for the given service." }
+  flow-namespace [service]
+  (when service
+    (str flows-namespace "." (loading-utils/underscores-to-dashes service) flow-namespace-ending)))
 
 (defn
-  is-controller-namespace? [namespace]
+  is-flow-namespace? [namespace]
   (when namespace
     (if (string? namespace)
       (and
-        (.startsWith namespace (str controllers-dir "."))
-        (not (= namespace "controllers.app")))
-      (is-controller-namespace? (name (ns-name namespace))))))
+        (.startsWith namespace (str flows-dir "."))
+        (not (= namespace "flows.app")))
+      (is-flow-namespace? (name (ns-name namespace))))))
 
 (defn
-#^{ :doc "Returns the controller from the given namespace. The controller is assumed to be the last part of the 
+#^{ :doc "Returns the service from the given namespace. The service is assumed to be the last part of the 
 namespace." }
-  controller-from-namespace [namespace]
+  service-from-namespace [namespace]
   (when namespace
     (if (string? namespace)
       (string-utils/strip-ending 
         (last (str-utils/split namespace #"\."))
-        controller-namespace-ending)
-      (controller-from-namespace (name (ns-name namespace))))))
+        flow-namespace-ending)
+      (service-from-namespace (name (ns-name namespace))))))
 
 (defn
-  controller-file-name? [file-name]
+  flow-file-name? [file-name]
   (when file-name
-    (.endsWith file-name "_controller.clj")))
+    (.endsWith file-name "_flow.clj")))
 
 (defn
-  all-controller-file-names []
-  (filter controller-file-name?
+  all-flow-file-names []
+  (filter flow-file-name?
     (concat
-      (loading-utils/all-class-path-file-names controllers-dir)
-      (servlet-utils/all-file-names controllers-dir (request/servlet-context)))))
+      (loading-utils/all-class-path-file-names flows-dir)
+      (servlet-utils/all-file-names flows-dir (request/servlet-context)))))
 
 (defn
-#^{ :doc "Returns the names of all of the controllers for this app." }
-  all-controllers []
-  (map controller-from-file (all-controller-file-names)))
+#^{ :doc "Returns the services of all of the flows for this app." }
+  all-services []
+  (map service-from-file (all-flow-file-names)))
 
 (defn
-#^{ :doc "Returns true if the given controller exists." }
-  controller-exists? [controller-file-name]
-  (loading-utils/namespace-exists? (controller-namespace (controller-from-file controller-file-name))))
+#^{ :doc "Returns true if the given flow namespace exists." }
+  flow-exists? [flow-file-name]
+  (loading-utils/namespace-exists? (flow-namespace (service-from-file flow-file-name))))
 
 (defn
-#^{ :doc "Reloads all conjure namespaces referenced by the given controller." }
-  reload-conjure-namespaces [controller]
-  (conjure-utils/reload-conjure-namespaces (controller-namespace controller)))
+#^{ :doc "Reloads all conjure namespaces referenced by the given service." }
+  reload-conjure-namespaces [service]
+  (conjure-utils/reload-conjure-namespaces (flow-namespace service)))
 
 (defn
-#^{ :doc "Loads the given controller file." }
-  load-controller
-  ([] (load-controller (request/controller)))
-  ([controller]
-    (let [controller-filename (controller-file-name-string controller)]
-      (when (and controller-filename (controller-exists? controller-filename))
-        (require :reload (symbol (controller-namespace controller)))
-        (reload-conjure-namespaces controller)))))
+#^{ :doc "Loads the flow file for the given service. The service returned by (request/service) is used if no service is
+given." }
+  load-flow
+  ([] (load-flow (request/service)))
+  ([service]
+    (let [flow-filename (flow-file-name-string service)]
+      (when (and flow-filename (flow-exists? flow-filename))
+        (require :reload (symbol (flow-namespace service)))
+        (reload-conjure-namespaces service)))))
 
 (defn
-#^{ :doc "Returns the namespace for the given controller. This is the namespace object, not the string represenation of
-the namespace. If the namespace is not found, this function attempts to reload the controller then finds the namespace
+#^{ :doc "Returns the namespace for the given flow. This is the namespace object, not the string represenation of
+the namespace. If the namespace is not found, this function attempts to reload the flow then finds the namespace
 again." }
-  find-controller-namespace [controller]
-  (let [controller-namespace-str (controller-namespace controller)
-        controller-namespace (find-ns (symbol controller-namespace-str))]
-    (if controller-namespace
-      controller-namespace
+  find-flow-namespace [service]
+  (let [flow-namespace-str (flow-namespace service)
+        flow-namespace (find-ns (symbol flow-namespace-str))]
+    (if flow-namespace
+      flow-namespace
       (do
-        (load-controller controller)
-        (find-ns (symbol controller-namespace-str))))))
+        (load-flow service)
+        (find-ns (symbol flow-namespace-str))))))
 
 (defn
-#^{ :doc "Returns all of the controller namespaces in the app." }
-  all-controller-namespaces []
-  (map find-controller-namespace (all-controllers)))
+#^{ :doc "Returns all of the flow namespaces in the app." }
+  all-flow-namespaces []
+  (map find-flow-namespace (all-services)))
 
 (defn
 #^{ :doc "Returns fully qualified action generated from the given request map." }
   fully-qualified-action []
-  (let [controller (request/controller)
-        action (request/action)]
-    (if (and controller action)
-      (str (controller-namespace controller) "/" action))))
+  (when-let [service (request/service)]
+    (when-let [action (request/action)]
+      (str (flow-namespace service) "/" action))))
 
 (defn
 #^{ :doc "Returns a keyword for the request method." }
@@ -154,43 +154,43 @@ again." }
       (= "DELETE" request-method) :delete)))
 
 (defn
-#^{ :doc "Returns the actions map for the given controller." }
-  actions-map [controller]
-  (when controller
-    (get @controller-actions (keyword controller))))
+#^{ :doc "Returns the actions map for the given service." }
+  actions-map [service]
+  (when service
+    (get @flow-actions (keyword service))))
 
 (defn
-#^{ :doc "Returns the methods map for the given controller and action." }
-  methods-map [controller action]
+#^{ :doc "Returns the methods map for the given service and action." }
+  methods-map [service action]
   (when action
-    (get (actions-map controller) (keyword action))))
+    (get (actions-map service) (keyword action))))
   
 (defn
-#^{ :doc "Returns the action function for the given controller, action, and method. If method is not given or nil, then
+#^{ :doc "Returns the action function for the given service, action, and method. If method is not given or nil, then
 the method is assumed to be :all. If no matching method is found, then nil is returned." }
   action-function 
-  ([controller action] (action-function controller action nil))
-  ([controller action method]
-    (let [all-methods (methods-map controller action)]
+  ([service action] (action-function service action nil))
+  ([service action method]
+    (let [all-methods (methods-map service action)]
       (or (get all-methods method) (get all-methods :all)))))
 
 (defn
-#^{ :doc "Returns the action function for the controller and action listed in the request-map." }
+#^{ :doc "Returns the action function for the service and action listed in the request-map." }
   find-action-fn []
-  (action-function (request/controller) (request/action) (method-key)))
+  (action-function (request/service) (request/action) (method-key)))
 
 (defn
-#^{ :doc "Returns all of the action method-map pairs for the given controller filtered by the given map. Both includes 
+#^{ :doc "Returns all of the action method-map pairs for the given service filtered by the given map. Both includes 
 and excludes must be sets of action name keywords. If includes is given, then excludes is ignored." }
   find-actions 
-  ([controller] (find-actions controller {}))
-  ([controller { :keys [includes excludes], :or { includes nil, excludes #{} } }]
+  ([service] (find-actions service {}))
+  ([service { :keys [includes excludes], :or { includes nil, excludes #{} } }]
     (filter 
       (fn [[action methods-map]]
         (if includes
           (contains? includes action)
           (not (contains? excludes action))))
-      (actions-map controller))))
+      (actions-map service))))
 
 (defn
 #^{ :doc "Returns a map from all the action functions in the given methods-map to the associated methods." }
@@ -214,28 +214,28 @@ and excludes must be sets of action name keywords. If includes is given, then ex
       (assoc-methods (get actions-map action-key) params))))
   
 (defn
-#^{ :doc "adds the given action function into the given controllers map and returns the result." }
-  assoc-controllers [controllers-map { controller :controller, :as params }]
-  (let [controller-key (keyword controller)]
-    (assoc controllers-map controller-key 
-      (assoc-actions (get controllers-map controller-key) params))))
+#^{ :doc "adds the given action function into the given services map and returns the result." }
+  assoc-services [services-map { service :service, :as params }]
+  (let [service-key (keyword service)]
+    (assoc services-map service-key 
+      (assoc-actions (get services-map service-key) params))))
 
 (defn
 #^{ :doc "Adds the given action function to the list of action functions to call." }
   add-action-function [action-function params]
-  (reset! controller-actions
-    (assoc-controllers @controller-actions 
+  (reset! flow-actions
+    (assoc-services @flow-actions 
       (assoc params :action-function action-function))))
 
 (defn
-#^{ :doc "Copies all of the actions from the given controller." }
+#^{ :doc "Copies all of the actions from the given service." }
   copy-actions
-  ([to-controller from-controller] (copy-actions to-controller from-controller {}))
-  ([to-controller from-controller { :keys [includes excludes], :or { includes nil, excludes #{} }, :as filter-map }]
-    (doseq [[action methods-map] (find-actions from-controller filter-map)]
+  ([to-service from-service] (copy-actions to-service from-service {}))
+  ([to-service from-service { :keys [includes excludes], :or { includes nil, excludes #{} }, :as filter-map }]
+    (doseq [[action methods-map] (find-actions from-service filter-map)]
       (doseq [[action-fn methods] (action-fn-method-map methods-map)]
         (add-action-function action-fn 
-          { :action action, :controller to-controller, :methods methods })))))
+          { :action action, :service to-service, :methods methods })))))
 
 (defn
 #^{ :doc "If the given interceptor is a function, then this function returns it. Otherwise, this function throws an 
@@ -271,59 +271,59 @@ interceptors are nil, then this function returns nil." }
     (assoc action-interceptor-map name-key action-interceptor)))
 
 (defn
-#^{ :doc "Adds the given action interceptor to the given controller interceptor map." }
-  assoc-action-interceptors [controller-interceptor-map action-interceptor interceptor-name action]
+#^{ :doc "Adds the given action interceptor to the given service interceptor map." }
+  assoc-action-interceptors [service-interceptor-map action-interceptor interceptor-name action]
   (let [action-key (keyword action)]
-    (assoc controller-interceptor-map action-key
-      (assoc-name-interceptors (get controller-interceptor-map action-key) action-interceptor interceptor-name))))
+    (assoc service-interceptor-map action-key
+      (assoc-name-interceptors (get service-interceptor-map action-key) action-interceptor interceptor-name))))
 
 (defn
 #^{ :doc "Adds the given action interceptor to the given action interceptor map." }
-  assoc-controller-interceptors [action-interceptor-map action-interceptor interceptor-name controller action]
-  (let [controller-key (keyword controller)]
-    (assoc action-interceptor-map controller-key
-      (assoc-action-interceptors (get action-interceptor-map controller-key) action-interceptor interceptor-name action))))
+  assoc-service-interceptors [action-interceptor-map action-interceptor interceptor-name service action]
+  (let [service-key (keyword service)]
+    (assoc action-interceptor-map service-key
+      (assoc-action-interceptors (get action-interceptor-map service-key) action-interceptor interceptor-name action))))
 
 (defn
 #^{ :doc "Adds the given action interceptor to the list of action interceptors to call." }
-  add-action-interceptor [action-interceptor interceptor-name controller action]
+  add-action-interceptor [action-interceptor interceptor-name service action]
   (reset! action-interceptors
-    (assoc-controller-interceptors @action-interceptors action-interceptor interceptor-name controller action)))
+    (assoc-service-interceptors @action-interceptors action-interceptor interceptor-name service action)))
 
 (defn
-#^{ :doc "Adds the given excludes interceptor map with the given controller interceptor and excludes set." }
-  update-exclude-interceptor-list [exclude-interceptor-map controller-interceptor interceptor-name excludes]
-  (let [exclude-map { :interceptor controller-interceptor }]
+#^{ :doc "Adds the given excludes interceptor map with the given service interceptor and excludes set." }
+  update-exclude-interceptor-list [exclude-interceptor-map service-interceptor interceptor-name excludes]
+  (let [exclude-map { :interceptor service-interceptor }]
     (assoc exclude-interceptor-map (keyword interceptor-name)
       (if excludes 
         (assoc exclude-map :excludes excludes) 
         exclude-map))))
 
 (defn
-#^{ :doc "Adds the given controller interceptor to the given controller interceptor map." }
-  assoc-controller-excludes-interceptors [controller-interceptor-map controller-interceptor interceptor-name controller excludes]
-  (let [controller-key (keyword controller)]
-    (assoc controller-interceptor-map controller-key
-      (update-exclude-interceptor-list (get controller-interceptor-map controller-key) controller-interceptor
+#^{ :doc "Adds the given service interceptor to the given service interceptor map." }
+  assoc-service-excludes-interceptors [service-interceptor-map service-interceptor interceptor-name service excludes]
+  (let [service-key (keyword service)]
+    (assoc service-interceptor-map service-key
+      (update-exclude-interceptor-list (get service-interceptor-map service-key) service-interceptor
         interceptor-name excludes))))
 
 (defn
-#^{ :doc "Adds the given controller interceptor to the list of controller interceptors to call, excluding the 
+#^{ :doc "Adds the given service interceptor to the list of service interceptors to call, excluding the 
 interceptor if any of the actions in excludes is called.." }
-  add-controller-interceptor [controller-interceptor interceptor-name controller excludes]
-  (reset! controller-interceptors
-    (assoc-controller-excludes-interceptors @controller-interceptors controller-interceptor interceptor-name controller
+  add-service-interceptor [service-interceptor interceptor-name service excludes]
+  (reset! service-interceptors
+    (assoc-service-excludes-interceptors @service-interceptors service-interceptor interceptor-name service
       excludes)))
 
 (defn
-#^{ :doc "Adds the given interceptor to the given controller, including or excluding the given actions. Note, adding
+#^{ :doc "Adds the given interceptor to the given service, including or excluding the given actions. Note, adding
 includes will completely ignore excludes." }
-  add-interceptor [interceptor interceptor-name controller excludes includes]
-  (when (and interceptor controller)
+  add-interceptor [interceptor interceptor-name service excludes includes]
+  (when (and interceptor service)
     (if (and includes (not-empty includes))
       (doseq [include-action includes]
-        (add-action-interceptor interceptor interceptor-name controller include-action))
-      (add-controller-interceptor interceptor interceptor-name controller excludes))))
+        (add-action-interceptor interceptor interceptor-name service include-action))
+      (add-service-interceptor interceptor interceptor-name service excludes))))
 
 (defn
 #^{ :doc "Creates the interceptor map for the given app interceptor." }
@@ -336,20 +336,20 @@ includes will completely ignore excludes." }
   (cons (app-interceptor-map interceptor excludes) app-interceptors))
 
 (defn
-#^{ :doc "Adds the given interceptor to the list of app interceptors, including or excluding the given controllers and 
+#^{ :doc "Adds the given interceptor to the list of app interceptors, including or excluding the given services and 
 actions." }
   add-app-interceptor [interceptor excludes]
   (reset! app-interceptors
     (add-app-interceptor-to-list @app-interceptors interceptor excludes)))
 
 (defn
-#^{ :doc "Returns the action interceptor for the given controller and action." }
-  find-action-interceptors [controller action]
-  (vals (get (get @action-interceptors (keyword controller)) (keyword action))))
+#^{ :doc "Returns the action interceptor for the given service and action." }
+  find-action-interceptors [service action]
+  (vals (get (get @action-interceptors (keyword service)) (keyword action))))
 
 (defn
-#^{ :doc "Returns the controller interceptors for the given controller and action." }
-  find-controller-interceptors [controller action]
+#^{ :doc "Returns the service interceptors for the given service and action." }
+  find-service-interceptors [service action]
   (let [action-key (keyword action)]
     (filter identity 
       (map 
@@ -357,46 +357,46 @@ actions." }
           (let [excludes (:excludes exclude-interceptor-map)]
             (when (not (and excludes (contains? excludes action-key)))
               (:interceptor exclude-interceptor-map)))) 
-        (vals (get @controller-interceptors (keyword controller)))))))
+        (vals (get @service-interceptors (keyword service)))))))
 
 (defn
-#^{ :doc "Returns true if the app interceptor in the given interceptor map should be called for the given controller 
+#^{ :doc "Returns true if the app interceptor in the given interceptor map should be called for the given service 
 and action." }
-  call-app-interceptor? [interceptor-map controller action]
-  (let [action-set (get (:excludes interceptor-map) (keyword controller))]
+  call-app-interceptor? [interceptor-map service action]
+  (let [action-set (get (:excludes interceptor-map) (keyword service))]
     (if (and action-set (set? action-set) (not-empty action-set))
       (not (contains? action-set (keyword action)))
       true)))
 
 (defn
-#^{ :doc "Returns the app interceptors in app-interceptors to call for the given controller and action." }
-  valid-app-interceptors [app-interceptors controller action]
+#^{ :doc "Returns the app interceptors in app-interceptors to call for the given service and action." }
+  valid-app-interceptors [app-interceptors service action]
   (map :interceptor
-    (filter #(call-app-interceptor? % controller action) app-interceptors)))
+    (filter #(call-app-interceptor? % service action) app-interceptors)))
 
 (defn
-#^{ :doc "Returns the app interceptors to call for the given controller and action." }
-  find-app-interceptors [controller action]
-  (valid-app-interceptors @app-interceptors controller action))
+#^{ :doc "Returns the app interceptors to call for the given service and action." }
+  find-app-interceptors [service action]
+  (valid-app-interceptors @app-interceptors service action))
 
 (defn
-#^{ :doc "Returns a single interceptor created by chaining all of the interceptors which apply to the given controller
-and action. If no interceptors apply to the given controller and action, a simple pass through interceptor is created." }
-  create-interceptor-chain [controller action]
+#^{ :doc "Returns a single interceptor created by chaining all of the interceptors which apply to the given service
+and action. If no interceptors apply to the given service and action, a simple pass through interceptor is created." }
+  create-interceptor-chain [service action]
   (or
     (apply chain-interceptors
       (concat
-        (find-action-interceptors controller action)
-        (find-controller-interceptors controller action)
-        (find-app-interceptors controller action)))
+        (find-action-interceptors service action)
+        (find-service-interceptors service action)
+        (find-app-interceptors service action)))
     (fn [action-fn]
       (action-fn))))
 
 (defn
 #^{ :doc "Runs all interceptors passing the given action function. If there are no interceptors for the
-given action and controller, then this function simply runs the action function." }
+given action and service, then this function simply runs the action function." }
   run-interceptors [action-fn]
-  ((create-interceptor-chain (request/controller) (request/action)) action-fn))
+  ((create-interceptor-chain (request/service) (request/action)) action-fn))
 
 (defn
 #^{ :doc "Attempts to run the action requested in the request-map. If the action is successful, its response is 
@@ -408,25 +408,25 @@ returned, otherwise nil is returned." }
       (run-interceptors action-fn))))
 
 (defn
-#^{ :doc "Calls the given controller with the given request map returning the response." }
-  call-controller []
+#^{ :doc "Calls the given service with the given request map returning the response." }
+  call-flow []
   (if (environment/reload-files?)
     (do 
-      (load-controller)
+      (load-flow)
       (run-action))
     (or 
       (run-action)
       (do
-        (load-controller)
+        (load-flow)
         (run-action)))))
 
 (defn
-#^{ :doc "Calls the given action in the given controller. This is a convenience function over wrapping call-controller
-in request/with-controller-action calls." }
-  call-controller-action
-  ([controller action]
-    (request/with-controller-action controller action
-      (call-controller)))
-  ([controller action params]
+#^{ :doc "Calls the given action in the given service. This is a convenience function over wrapping call-flow
+in request/with-service-action calls." }
+  call-flow-action
+  ([service action]
+    (request/with-service-action service action
+      (call-flow)))
+  ([service action params]
     (request/with-parameters params
-      (call-controller-action controller action))))
+      (call-flow-action service action))))

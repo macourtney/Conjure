@@ -4,15 +4,15 @@
             [conjure.flow.util :as util]))
 
 (defn
-#^{:doc "Creates a new controller file from the given controller name."}
-  create-controller-file 
-  [ { :keys [controller controllers-directory silent] 
-      :or { controllers-directory (util/find-controllers-directory), silent false } }]
-    (if (and controllers-directory controller)
-      (let [controller-file (new File controllers-directory (util/controller-file-name-string controller))]
-        (if (.exists controller-file)
-          (logging/info (str (.getName controller-file) " already exists. Doing nothing."))
+#^{:doc "Creates a new flow file from the given service."}
+  create-flow-file 
+  [ { :keys [service flows-directory silent] 
+      :or { flows-directory (util/find-flows-directory), silent false } }]
+    (if (and flows-directory service)
+      (let [flow-file (new File flows-directory (util/flow-file-name-string service))]
+        (if (.exists flow-file)
+          (logging/info (str (.getName flow-file) " already exists. Doing nothing."))
           (do
-            (logging/info (str "Creating controller file " (.getName controller-file) "..."))
-            (.createNewFile controller-file)
-            controller-file)))))
+            (logging/info (str "Creating flow file " (.getName flow-file) "..."))
+            (.createNewFile flow-file)
+            flow-file)))))

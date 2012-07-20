@@ -6,20 +6,20 @@
 
 (use-fixtures :once init-server)
 
-(deftest test-create-controller-file
-  (let [controllers-directory (util/find-controllers-directory)
-        controller-file (create-controller-file 
-                          { :controller "builder-test", 
-                            :controllers-directory controllers-directory,
+(deftest test-create-flow-file
+  (let [flows-directory (util/find-flows-directory)
+        flow-file (create-flow-file 
+                          { :service "builder-test", 
+                            :flows-directory flows-directory,
                             :silent true })]
-    (test-file controller-file "builder_test_controller.clj")
-    (when controller-file
-      (.delete controller-file)))
-  (let [controller-file (create-controller-file { :controller "builder-test", :silent true })]
-    (test-file controller-file "builder_test_controller.clj")
-    (when controller-file
-      (.delete controller-file)))
-  (is (nil? (create-controller-file { :controller nil, :controllers-directory (util/find-controllers-directory), :silent true })))
-  (is (nil? (create-controller-file { :controller "test", :controllers-directory nil, :silent true })))
-  (is (nil? (create-controller-file { :controller nil, :controllers-directory nil, :silent true })))
-  (is (nil? (create-controller-file { :controller nil, :silent true }))))
+    (test-file flow-file "builder_test_flow.clj")
+    (when flow-file
+      (.delete flow-file)))
+  (let [flow-file (create-flow-file { :service "builder-test", :silent true })]
+    (test-file flow-file "builder_test_flow.clj")
+    (when flow-file
+      (.delete flow-file)))
+  (is (nil? (create-flow-file { :service nil, :flows-directory (util/find-flows-directory), :silent true })))
+  (is (nil? (create-flow-file { :service "test", :flows-directory nil, :silent true })))
+  (is (nil? (create-flow-file { :service nil, :flows-directory nil, :silent true })))
+  (is (nil? (create-flow-file { :service nil, :silent true }))))

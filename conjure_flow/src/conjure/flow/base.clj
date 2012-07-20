@@ -1,6 +1,6 @@
 (ns conjure.flow.base
   (:require [clojure.tools.logging :as logging]
-            [conjure.flow.util :as controller-util]
+            [conjure.flow.util :as flow-util]
             [conjure.util.conjure-utils :as conjure-utils]
             [conjure.util.request :as request]
             [clojure.tools.html-utils :as html-utils]
@@ -46,17 +46,17 @@
 (defn
 #^{ :doc "Adds the given action function to the list of action functions to call." }
   add-action-function [action-function params]
-  (controller-util/add-action-function action-function params))
+  (flow-util/add-action-function action-function params))
 
 (defn
-#^{ :doc "Returns the controller from the given controller namespace." }
-  controller-from-namespace [namespace]
-  (controller-util/controller-from-namespace (name (ns-name namespace))))
+#^{ :doc "Returns the service from the given flow namespace." }
+  service-from-namespace [namespace]
+  (flow-util/service-from-namespace (name (ns-name namespace))))
 
 (defmacro def-action [action-name & body]
   (let [attributes (first body)
-        controller (controller-from-namespace *ns*)
-        params { :action (str action-name), :controller controller }]
+        service (service-from-namespace *ns*)
+        params { :action (str action-name), :service service }]
     (if (map? attributes)
       (let [new-params (merge params attributes)]
         `(add-action-function 
@@ -73,30 +73,30 @@
 
 (defmacro add-interceptor
   ([interceptor] 
-    (let [controller (controller-from-namespace *ns*)
+    (let [service (service-from-namespace *ns*)
           interceptor-name (interceptor-name-from interceptor)]
-      `(controller-util/add-interceptor ~interceptor ~interceptor-name ~controller nil nil))) 
+      `(flow-util/add-interceptor ~interceptor ~interceptor-name ~service nil nil))) 
   ([interceptor { :keys [includes excludes interceptor-name] }]
-    (let [controller (controller-from-namespace *ns*)
+    (let [service (service-from-namespace *ns*)
           interceptor-name (or interceptor-name (interceptor-name-from interceptor))]
-      `(controller-util/add-interceptor ~interceptor ~interceptor-name ~controller ~excludes ~includes))))
+      `(flow-util/add-interceptor ~interceptor ~interceptor-name ~service ~excludes ~includes))))
 
 (defn 
-#^{ :doc "Adds the given interceptor as an app interceptor. The interceptor will be run for every controller and action
+#^{ :doc "Adds the given interceptor as an app interceptor. The interceptor will be run for every service and action
 unless it is explicitly excluded in the given params." }
   add-app-interceptor 
   ([interceptor] (add-app-interceptor interceptor {}))
   ([interceptor { :keys [excludes] :or { excludes {} }}]
-    (controller-util/add-app-interceptor interceptor excludes)))
+    (flow-util/add-app-interceptor interceptor excludes)))
 
 (defmacro
-#^{ :doc "Copies the actions from the given controller into this one. If a filter map is given, then the actions from 
-the from controller are filtered based on the includes and excludes keys of the filter map. Includes and excludes must
+#^{ :doc "Copies the actions from the given service into this one. If a filter map is given, then the actions from 
+the from service are filtered based on the includes and excludes keys of the filter map. Includes and excludes must
 be sets of action name keywords." } 
   copy-actions 
-  ([from-controller]
-    (let [to-controller (controller-from-namespace *ns*)]
-      `(controller-util/copy-actions ~to-controller ~from-controller)))
-  ([from-controller filter-map]
-    (let [to-controller (controller-from-namespace *ns*)]
-      `(controller-util/copy-actions ~to-controller ~from-controller ~filter-map))))
+  ([from-service]
+    (let [to-service (service-from-namespace *ns*)]
+      `(flow-util/copy-actions ~to-service ~from-service)))
+  ([from-service filter-map]
+    (let [to-service (service-from-namespace *ns*)]
+      `(flow-util/copy-actions ~to-service ~from-service ~filter-map))))
