@@ -17,31 +17,31 @@
 
 (deftest test-defview
   (is (= "test" (render-body "test")))
-  (request/with-controller-action "test" "test"
+  (request/with-service-action "test" "test"
     (is (all-strings? (render-str "test")))
     (is (map? (render-view "test"))))
-  (request/with-controller-action "test" "test"
+  (request/with-service-action "test" "test"
     (is (map? (view-params-test-view/render-view)))))
 
 (deftest test-def-ajax-view
-  (request/with-controller-action "test" "ajax-test"
+  (request/with-service-action "test" "ajax-test"
     (is (ajax-test-view/render-view))))
 
 (deftest test-link-to
   (is (= 
     [:a { :href "/hello/show" } "view"]
-    (link-to "view" { :controller "hello" :action "show" })))
-  (request/with-controller-action "hello" "add"
+    (link-to "view" { :service "hello" :action "show" })))
+  (request/with-service-action "hello" "add"
     (is (= 
       [:a { :href "/hello/show" } "view"]
       (link-to "view" { :action "show" }))))
   (is (= 
     [:a { :href "/hello/show", :id "foo", :class "bar" } "view"]
-    (link-to "view" { :controller "hello" :action "show" :html-options { :id "foo" :class "bar" } })))
+    (link-to "view" { :service "hello" :action "show" :html-options { :id "foo" :class "bar" } })))
   (is (= 
     [:a { :href "/hello/show" } "show"]
-    (link-to #(request/action) { :controller "hello" :action "show" })))
-  (request/with-controller-action "hello" "show"
+    (link-to #(request/action) { :service "hello" :action "show" })))
+  (request/with-service-action "hello" "show"
     (is (= 
       [:a { :href "/home/index" } "view"]
       (link-to "view" { :html-options { :href "/home/index" } } )))))
@@ -49,38 +49,38 @@
 (deftest test-link-to-if
   (is (= 
     [:a { :href "/hello/show" } "view"]
-    (link-to-if true "view" { :controller "hello" :action "show" })))
-  (is (= "view" (link-to-if false "view" { :controller "hello" :action "show" })))
-  (is (= "show" (link-to-if false #(request/action) { :controller "hello" :action "show" })))
+    (link-to-if true "view" { :service "hello" :action "show" })))
+  (is (= "view" (link-to-if false "view" { :service "hello" :action "show" })))
+  (is (= "show" (link-to-if false #(request/action) { :service "hello" :action "show" })))
   (is (= 
     [:a { :href "/hello/show" } "view"]
-    (link-to-if #(= (request/action) "show") "view" { :controller "hello" :action "show" })))
-  (is (= "view" (link-to-if #(= (request/action) "add") "view" { :controller "hello" :action "show" }))))
+    (link-to-if #(= (request/action) "show") "view" { :service "hello" :action "show" })))
+  (is (= "view" (link-to-if #(= (request/action) "add") "view" { :service "hello" :action "show" }))))
   
 (deftest test-link-to-unless
-  (is (= "view" (link-to-unless true "view" { :controller "hello" :action "show" })))
+  (is (= "view" (link-to-unless true "view" { :service "hello" :action "show" })))
   (is (= 
     [:a { :href "/hello/show" } "view"]
-    (link-to-unless false "view" { :controller "hello" :action "show" })))
-  (is (= "show" (link-to-unless true #(request/action) { :controller "hello" :action "show" })))
-  (is (= "view" (link-to-unless #(= (request/action) "show") "view" { :controller "hello" :action "show" })))
+    (link-to-unless false "view" { :service "hello" :action "show" })))
+  (is (= "show" (link-to-unless true #(request/action) { :service "hello" :action "show" })))
+  (is (= "view" (link-to-unless #(= (request/action) "show") "view" { :service "hello" :action "show" })))
   (is (= 
     [:a { :href "/hello/show" } "view"]
-    (link-to-unless #(= (request/action) "add") "view" { :controller "hello" :action "show" }))))
+    (link-to-unless #(= (request/action) "add") "view" { :service "hello" :action "show" }))))
 
 (deftest test-form-for
   (is (= 
     [:form { :name "create", :action "/hello/create", :method "post" } "Blah"]
-    (form-for { :name "create", :controller "hello", :action "create" } "Blah")))
+    (form-for { :name "create", :service "hello", :action "create" } "Blah")))
   (is (= 
     [:form { :name "hello", :action "/hello/create", :method "post" } "Blah"]
-    (form-for { :controller "hello", :action "create" } "Blah")))
+    (form-for { :service "hello", :action "create" } "Blah")))
   (is (= 
     [:form { :name "create", :action "/hello/create", :method "post" } "create"]
-    (form-for { :name "create", :controller "hello", :action "create" } #(request/action))))
+    (form-for { :name "create", :service "hello", :action "create" } #(request/action))))
   (is (= 
     [:form { :name "create", :method "post", :action "/home/index" } "Blah"]
-    (form-for { :name "create", :controller "hello", :action "create", :html-options { :action "/home/index" } } "Blah"))))
+    (form-for { :name "create", :service "hello", :action "create", :html-options { :action "/home/index" } } "Blah"))))
 
 (deftest test-text-field
   (is (= 
@@ -439,7 +439,7 @@
         script-tag (javascript-tag (ajax-click-string "#test-id" ajax-map include-keys))
         a-tag [:a { :href "#", :id "test-id"}
                 "update"]
-        link-to-options { :controller "home", 
+        link-to-options { :service "home", 
                           :action "index", 
                           :update 'successFunction, 
                           :html-options { :id "test-id" } }]
@@ -481,7 +481,7 @@
                    :error 'ajaxError
                    :confirm nil }
         include-keys [:type :url :dataType :success :error :confirm]
-        form-for-options { :controller "home", 
+        form-for-options { :service "home", 
                            :action "index", 
                            :update 'successFunction, 
                            :html-options { :id "test-id" } }

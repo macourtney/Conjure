@@ -24,8 +24,8 @@ the request-map.
 The request-map for the body will be merged with the given options.
 
 Options has the same options as url-for plus the following options:    
-    :name - The key for the params map passed to the target url. If name is not given, then the value of :controller in
-        the request map is used. If :controller is not given in the request map, then \"record\" is used. 
+    :name - The key for the params map passed to the target url. If name is not given, then the value of :service in
+        the request map is used. If :service is not given in the request map, then \"record\" is used. 
     :html-options - The html attributes for the form tag." }
   form-for 
   ([body] (form-for {} body))
@@ -37,7 +37,7 @@ Options has the same options as url-for plus the following options:
           html-options
           { :method (or (:method html-options) "post"), 
             :action action,
-            :name (or (:name options) (:controller options) (request/controller) "record") })
+            :name (or (:name options) (:service options) (request/service) "record") })
         (request/with-request-map-fn #(conjure-utils/merge-url-for-params % options)
           (evaluate-if-fn body))])))
 

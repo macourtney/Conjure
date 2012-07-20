@@ -5,59 +5,59 @@
   (:require [conjure.view.util :as util]
             [clojure.tools.loading-utils :as loading-utils]))
 
-(def controller "test-builder")
+(def service "test-builder")
 (def action "show")
 
-(def controller-dir (loading-utils/dashes-to-underscores controller))
+(def service-dir (loading-utils/dashes-to-underscores service))
 
-(deftest test-find-or-create-controller-directory
-  (let [controller-directory 
-         (find-or-create-controller-directory 
+(deftest test-find-or-create-service-directory
+  (let [service-directory 
+         (find-or-create-service-directory 
           { :views-directory (util/find-views-directory),
-            :controller controller,
+            :service service,
             :silent true })]
-    (test-directory controller-directory controller-dir)
-    (is (and controller-directory (.delete controller-directory))))
-  (let [controller-directory 
-         (find-or-create-controller-directory 
-         { :controller controller,
+    (test-directory service-directory service-dir)
+    (is (and service-directory (.delete service-directory))))
+  (let [service-directory 
+         (find-or-create-service-directory 
+         { :service service,
            :silent true })]
-    (test-directory controller-directory controller-dir)
-    (is (and controller-directory (.delete controller-directory))))
-  (is (nil? (find-or-create-controller-directory 
-              { :controller nil
+    (test-directory service-directory service-dir)
+    (is (and service-directory (.delete service-directory))))
+  (is (nil? (find-or-create-service-directory 
+              { :service nil
                 :silent true })))
-  (is (nil? (find-or-create-controller-directory
+  (is (nil? (find-or-create-service-directory
               { :views-directory nil, 
-                :controller controller, 
+                :service service, 
                 :silent true })))
-  (is (nil? (find-or-create-controller-directory 
+  (is (nil? (find-or-create-service-directory 
               { :views-directory nil,
-                :controller nil,
+                :service nil,
                 :silent true }))))
 
 (deftest test-create-view-file
   (let [view-file (create-view-file
-                    { :controller-directory 
-                        (find-or-create-controller-directory 
-                          { :controller controller,
+                    { :service-directory 
+                        (find-or-create-service-directory 
+                          { :service service,
                             :silent true }),
                       :action action,
                       :silent true })]
     (test-file view-file (str action ".clj"))
     (is (and view-file (.delete view-file))))
   (is (nil? (create-view-file 
-              { :controller-directory 
-                  (find-or-create-controller-directory 
-                    { :controller controller,
+              { :service-directory 
+                  (find-or-create-service-directory 
+                    { :service service,
                       :silent true }),
                 :action nil,
                 :silent true })))
   (is (nil? (create-view-file 
-              { :controller-directory nil,
+              { :service-directory nil,
                 :action action
                 :silent true })))
   (is (nil? (create-view-file 
-              { :controller-directory nil,
+              { :service-directory nil,
                 :action nil
                 :silent true }))))

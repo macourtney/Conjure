@@ -6,33 +6,33 @@
             [clojure.tools.string-utils :as conjure-str-utils]))
 
 (defn 
-#^{:doc "Finds or creates if missing, a controller directory for the given controller in the given views directory."}
-  find-or-create-controller-directory
-  ([{ :keys [views-directory controller silent] :or {views-directory (util/find-views-directory), silent false } }]
-    (if (and views-directory controller)
-      (let [controller-directory (util/find-controller-directory views-directory controller)]
-        (if controller-directory
+#^{:doc "Finds or creates if missing, a service directory for the given service in the given views directory."}
+  find-or-create-service-directory
+  ([{ :keys [views-directory service silent] :or {views-directory (util/find-views-directory), silent false } }]
+    (when (and views-directory service)
+      (let [service-directory (util/find-service-directory views-directory service)]
+        (if service-directory
           (do
-            (logging/info (str (. controller-directory getPath) " directory already exists."))
-            controller-directory)
+            (logging/info (str (.getPath service-directory) " directory already exists."))
+            service-directory)
           (do
-            (logging/info "Creating controller directory in views...")
-            (let [new-controller-directory (new File views-directory (loading-utils/dashes-to-underscores controller))]
-              (. new-controller-directory mkdirs)
-              new-controller-directory)))))))
+            (logging/info "Creating service directory in views...")
+            (let [new-service-directory (new File views-directory (loading-utils/dashes-to-underscores service))]
+              (.mkdirs new-service-directory)
+              new-service-directory)))))))
 
 (defn
 #^{:doc "Creates a new view file from the given migration name."}
   create-view-file 
-  ([{ :keys [controller-directory action silent] :or { silent false } }] 
-    (if (and controller-directory action)
+  ([{ :keys [service-directory action silent] :or { silent false } }] 
+    (when (and service-directory action)
       (let [view-file-name (str (loading-utils/dashes-to-underscores (conjure-str-utils/str-keyword action)) ".clj")
-            view-file (new File controller-directory  view-file-name)]
-        (if (. view-file exists)
+            view-file (new File service-directory  view-file-name)]
+        (if (.exists view-file)
           (do
-            (logging/info (str (. view-file getName) " already exists. Doing nothing."))
+            (logging/info (str (.getName view-file) " already exists. Doing nothing."))
             view-file)
           (do
             (logging/info (str "Creating view file " view-file-name "..."))
-            (. view-file createNewFile)
+            (.createNewFile view-file)
             view-file))))))

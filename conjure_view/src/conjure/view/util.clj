@@ -29,33 +29,33 @@
         (file-seq views-directory)))))
 
 (defn
-#^{ :doc "Finds a controller directory for the given controller in the given view directory." }
-  find-controller-directory 
-  ([controller] (find-controller-directory (find-views-directory) controller))
-  ([view-directory controller]
-    (if controller
-      (file-utils/find-directory view-directory (loading-utils/dashes-to-underscores controller)))))
+#^{ :doc "Finds a service directory for the given service in the given views directory." }
+  find-service-directory 
+  ([service] (find-service-directory (find-views-directory) service))
+  ([view-directory service]
+    (when service
+      (file-utils/find-directory view-directory (loading-utils/dashes-to-underscores service)))))
   
 (defn
-#^{ :doc "Finds a view file with the given controller-directory and action." }
-  find-view-file [controller-directory action]
-  (if (and controller-directory action)
-    (file-utils/find-file controller-directory (loading-utils/symbol-string-to-clj-file action))))
+#^{ :doc "Finds a view file with the given view-directory and action." }
+  find-view-file [service-directory action]
+  (when (and service-directory action)
+    (file-utils/find-file service-directory (loading-utils/symbol-string-to-clj-file action))))
 
 (defn
 #^{:doc "Returns the view namespace request map."}
   request-view-namespace 
-  ([] (request-view-namespace (request/controller) (request/action)))
-  ([controller action]
-  (when (and controller action)
-    (str "views." (loading-utils/underscores-to-dashes controller) "." 
+  ([] (request-view-namespace (request/service) (request/action)))
+  ([service action]
+  (when (and service action)
+    (str "views." (loading-utils/underscores-to-dashes service) "." 
       (loading-utils/underscores-to-dashes (conjure-str-utils/str-keyword action))))))
 
 (defn
-#^{:doc "Returns the view namespace for the given controller and action."}
-  view-namespace-by-action [controller action]
-  (when (and controller action)
-    (request-view-namespace controller action)))
+#^{:doc "Returns the view namespace for the given service and action."}
+  view-namespace-by-action [service action]
+  (when (and service action)
+    (request-view-namespace service action)))
 
 (defn
 #^{ :doc "Returns the view namespace for the given view file." }
@@ -80,23 +80,23 @@
       #{ action-key })))
 
 (defn
-#^{ :doc "Adds the given controller and action to the given loaded views map." }
-  assoc-loaded-views [loaded-view-map controller action]
-  (let [controller-key (keyword controller)]
-    (assoc loaded-view-map controller-key 
-      (add-loaded-action (get loaded-view-map controller-key) action))))
+#^{ :doc "Adds the given service and action to the given loaded views map." }
+  assoc-loaded-views [loaded-view-map service action]
+  (let [service-key (keyword service)]
+    (assoc loaded-view-map service-key 
+      (add-loaded-action (get loaded-view-map service-key) action))))
 
 (defn
 #^{ :doc "Loads the view corresponding to the values in the given request map." }
   load-view 
-  ([] (load-view (request/controller) (request/action)))
-  ([controller action] (load-view controller action (environment/reload-files?)))
-  ([controller action reload?]
-    (let [view-namespace (request-view-namespace controller action)]
+  ([] (load-view (request/service) (request/action)))
+  ([service action] (load-view service action (environment/reload-files?)))
+  ([service action reload?]
+    (let [view-namespace (request-view-namespace service action)]
       (if reload?
         (conjure-utils/reload-conjure-namespaces view-namespace)
         (require (symbol view-namespace)))
-      (reset! loaded-views (assoc-loaded-views @loaded-views controller action)))))
+      (reset! loaded-views (assoc-loaded-views @loaded-views service action)))))
 
 (defn clear-loaded-views
   "Clears the list of loaded views. After calling this function view-loaded? should return false for all views."
@@ -104,11 +104,11 @@
   (reset! loaded-views {}))
 
 (defn
-#^{ :doc "Returns true if the view corresponding to the request-map or given controller and action is already loaded." }
+#^{ :doc "Returns true if the view corresponding to the request-map or given service and action is already loaded." }
   view-loaded?
-  ([] (view-loaded? (request/controller) (request/action)))
-  ([controller action]
-    (contains? (get @loaded-views (keyword controller)) (keyword action))))
+  ([] (view-loaded? (request/service) (request/action)))
+  ([service action]
+    (contains? (get @loaded-views (keyword service)) (keyword action))))
 
 (defn
   #^{ :doc "Returns the namespace of the view for the request map. The namespace is an actual namespace object." }
@@ -139,16 +139,16 @@
 
 (defn-
 #^{ :doc "Returns a new request-map for use when rendering a layout. The new map is similar to the request-map 
-except the controller is \"layouts\", the action is layout-name, and layout-info contains the controller and action from
+except the service is \"layouts\", the action is layout-name, and layout-info contains the service and action from
 the original request-map." }
   merge-layout-request-map [layout-name]
   (merge request/request-map
-    { :controller "layouts", 
+    { :service "layouts", 
       :action layout-name 
       :layout-info 
         (merge
           (:layout-info request/request-map)
-          (select-keys request/request-map [:controller :action :params])) }))
+          (select-keys request/request-map [:service :controller :action :params])) }))
 
 (defn-
 #^{:doc "Returns the rendered layout for the given layout name with the given body."}
