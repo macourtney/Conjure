@@ -3,10 +3,10 @@
         conjure.server.ring-adapter
         test-helper))
 
-(def controller-name "test")
+(def service-name "test")
 (def action-name "show")
 (def id "1")
-(def uri (str "/" controller-name "/" action-name "/" id))
+(def uri (str "/" service-name "/" action-name "/" id))
 
 (use-fixtures :once init-server)
 

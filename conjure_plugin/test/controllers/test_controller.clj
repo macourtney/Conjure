@@ -3,4 +3,4 @@
 
 (def-action show
   (println "In the show controller.")
-  (bind))
+  "")

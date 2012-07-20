@@ -26,13 +26,13 @@
   (logging/info "Initializing plugins...")
   (plugin-util/initialize-all-plugins)
   (logging/info "Plugins initialized.")
-  (logging/info "Initializing app controller...")
+  (logging/info "Initializing app flow...")
   (try
-    (require 'controllers.app)
-    (logging/info "App controller initialized.")
+    (require 'flows.app)
+    (logging/info "App flow initialized.")
     (deliver init? true)
   (catch Throwable t
-    (logging/error "Failed to initialize app controller." t)
+    (logging/error "Failed to initialize app flow." t)
     (deliver init? false))))
 
 (defn
@@ -61,22 +61,22 @@ one." }
         :body    response })))
 
 (defn
-#^{ :doc "Calls the given controller with the given request map returning the response." }
-  call-controller []
+#^{ :doc "Calls the given service with the given request map returning the response." }
+  call-service []
   (if-let [response (routes-util/route-request)]
     (create-response-map response)
-    (request/set-request-map { :controller "home", :action "error-404" }
-      (environment/call-controller))))
+    (request/set-request-map { :service "home", :action "error-404" }
+      (environment/call-service))))
 
 (defn
-#^{ :doc "Takes the given path and calls the correct controller and action for it." }
+#^{ :doc "Takes the given path and calls the correct service and action for it." }
   process-request [request-map]
   (when request-map
     (init)
     (request/with-updated-request-map request-map
       (logging/debug (str "Requested uri: " (request/uri)))
       (session-utils/with-request-session
-        (call-controller)))))
+        (call-service)))))
 
 (defn
 #^{ :doc "Gets the user configured http properties." }
