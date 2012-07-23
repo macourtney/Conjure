@@ -1,34 +1,19 @@
 (ns conjure.script.destroyers.view-destroyer
   (:require [clojure.tools.logging :as logging]
-            [conjure.core.view.util :as util]
-            [conjure.script.destroyers.view-test-destroyer :as view-test-destroyer]))
+            [conjure.view.util :as util]
+            [conjure.script.destroyers.view-test-destroyer :as view-test-destroyer]
+            [conjure.script.view.util :as script-view-util]))
 
 (defn
-#^{:doc "Prints out how to use the destroy view command."}
-  view-usage []
-  (println "You must supply a controller and action name (Like hello-world).")
-  (println "Usage: ./run.sh script/destroy.clj view <controller> <action>"))
-
-(defn
-#^{:doc "Destroys the view file from the given controller and action."}
+#^{:doc "Destroys the view file from the given service and action."}
   destroy-view-file 
-  ([controller action] (destroy-view-file controller action false))
-  ([controller action silent]
-    (if (and controller action)
-      (let [view-directory (util/find-views-directory)]
-        (if view-directory
-          (let [controller-directory (util/find-controller-directory view-directory controller)]
-            (if controller-directory
-              (let [view-file (util/find-view-file controller-directory action)]
-                (if view-file
-                  (let [is-deleted (. view-file delete)] 
-                    (logging/info (str "File " (. view-file getName) (if is-deleted " destroyed." " not destroyed."))))
-                  (logging/info "View file not found. Doing nothing.")))
-              (logging/error (str "The directory for controller " controller " was not found. Doing nothing."))))
-          (do
-            (logging/error (str "Could not find views directory: " view-directory))
-            (logging/error "Command ignored."))))
-      (view-usage))))
+  ([service action] (destroy-view-file service action false))
+  ([service action silent]
+    (if (and service action)
+      (when-let [view-file (script-view-util/find-view-file service action)]
+        (let [is-deleted (.delete view-file)] 
+          (logging/info (str "File " (.getName view-file) (if is-deleted " destroyed." " not destroyed.")))))
+      (script-view-util/destroy-usage "view"))))
 
 (defn
 #^{:doc "Destroys a view file for the view name given in params."}
@@ -38,7 +23,7 @@
 (defn
 #^{:doc "Destroys all of the files created by the view_generator."}
   destroy-all-dependencies
-  ([controller action] (destroy-all-dependencies controller action false))
-  ([controller action silent]
-    (destroy-view-file controller action silent)
-    (view-test-destroyer/destroy-all-dependencies controller action silent)))
+  ([service action] (destroy-all-dependencies service action false))
+  ([service action silent]
+    (destroy-view-file service action silent)
+    (view-test-destroyer/destroy-all-dependencies service action silent)))

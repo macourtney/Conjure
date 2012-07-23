@@ -1,43 +1,31 @@
 (ns conjure.script.destroyers.view-test-destroyer
   (:require [clojure.tools.logging :as logging]
-            [conjure.core.test.util :as util]
             [clojure.tools.file-utils :as file-utils]
-            [clojure.tools.loading-utils :as loading-utils]))
+            [clojure.tools.loading-utils :as loading-utils]
+            [conjure.script.view.util :as script-view-util]
+            [conjure.test.util :as util]))
 
 (defn
-#^{:doc "Prints out how to use the destroy view test command."}
-  usage []
-  (println "You must supply a controller and action (Like hello-world show).")
-  (println "Usage: ./run.sh script/destroy.clj view-test <controller> <action>"))
-
-(defn
-#^{:doc "Destroys the view test file from the given controller."}
+#^{:doc "Destroys the view test file from the given service."}
   destroy-view-test-file 
-  ([controller action] (destroy-view-test-file controller action false))
-  ([controller action silent]
-    (if (and controller action)
-      (let [controller-view-unit-test-dir (util/find-controller-view-unit-test-directory controller)]
-        (if controller-view-unit-test-dir
-          (let [view-unit-test-file (util/view-unit-test-file controller action controller-view-unit-test-dir)]
-            (if view-unit-test-file
-              (let [is-deleted (. view-unit-test-file delete)] 
-                (logging/info (str "File " (. view-unit-test-file getName) (if is-deleted " destroyed." " not destroyed.")))
-                (let [controller-dir (. view-unit-test-file getParentFile)]
-                  (file-utils/delete-all-if-empty controller-dir (util/find-view-unit-test-directory) (util/find-unit-test-directory))))
-              (logging/info "View test file not found. Doing nothing.")))
-          (do
-            (logging/error (str "Could not find the " (loading-utils/dashes-to-underscores action) " test directory."))
-            (logging/error "Command ignored."))))
-      (usage))))
+  ([service action] (destroy-view-test-file service action false))
+  ([service action silent]
+    (if (and service action)
+      (when-let [view-unit-test-file (script-view-util/find-view-unit-test-file service action)]
+        (let [is-deleted (.delete view-unit-test-file)] 
+          (logging/info (str "File " (.getName view-unit-test-file) (if is-deleted " destroyed." " not destroyed.")))
+          (let [service-dir (.getParentFile view-unit-test-file)]
+            (file-utils/delete-all-if-empty service-dir (util/find-view-unit-test-directory) (util/find-unit-test-directory)))))
+      (script-view-util/destroy-usage "view-test"))))
 
 (defn
-#^{:doc "Destroys a view test file for the controller name given in params."}
+#^{:doc "Destroys a view test file for the service name given in params."}
   destroy [params]
   (destroy-view-test-file (first params) (second params)))
 
 (defn
 #^{:doc "Destroys all of the files created by the view_test_generator."}
   destroy-all-dependencies 
-  ([controller action] (destroy-all-dependencies controller action false))
-  ([controller action silent]
-    (destroy-view-test-file controller action silent)))
+  ([service action] (destroy-all-dependencies service action false))
+  ([service action silent]
+    (destroy-view-test-file service action silent)))

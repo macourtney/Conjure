@@ -1,41 +1,38 @@
 (ns conjure.script.generators.view-test-generator
-  (:require [conjure.test.builder :as test-builder]
+  (:require [clojure.tools.file-utils :as file-utils]
+            [conjure.script.view.util :as script-view-util]
+            [conjure.test.builder :as test-builder]
             [conjure.test.util :as test-util]
-            [clojure.tools.file-utils :as file-utils]
             [conjure.view.util :as util]))
 
-(defn
-#^{:doc "Prints out how to use the generate test view command."}
-  usage []
-  (println "You must supply a controller and view name (Like hello-world show).")
-  (println "Usage: ./run.sh script/generate.clj view-test <controller> <action>"))
-
-(defn
-#^{:doc "Generates the view unit test file for the given controller and action."}
-  generate-unit-test 
-  ([controller action] (generate-unit-test controller action false))
-  ([controller action silent] (generate-unit-test controller action silent nil))
-  ([controller action silent incoming-content]
-  (let [unit-test-file (test-builder/create-view-unit-test controller action silent)]
-    (if unit-test-file
-      (let [test-namespace (test-util/view-unit-test-namespace controller action)
-            view-namespace (util/view-namespace-by-action controller action)
-            test-content (or incoming-content (str "(ns " test-namespace "
+(defn generate-test-content
+  [service action]
+  (let [test-namespace (test-util/view-unit-test-namespace service action)
+        view-namespace (util/view-namespace-by-action service action)]
+    (str "(ns " test-namespace "
   (:use clojure.test
         " view-namespace ")
   (:require [conjure.core.server.request :as request]))
 
-(def controller-name \"" controller "\")
+(def service-name \"" service "\")
 (def view-name \"" action "\")
-(def request-map { :controller controller-name
+(def request-map { :service service-name
                    :action view-name } )
 
 (deftest test-view
   (request/set-request-map request-map
-    (is (render-view))))"))]
-        (file-utils/write-file-content unit-test-file test-content))))))
+    (is (render-view))))")))
+
+(defn
+#^{:doc "Generates the view unit test file for the given service and action."}
+  generate-unit-test 
+  ([service action] (generate-unit-test service action false))
+  ([service action silent] (generate-unit-test service action silent nil))
+  ([service action silent incoming-content]
+  (when-let [unit-test-file (test-builder/create-view-unit-test service action silent)]
+    (file-utils/write-file-content unit-test-file (or incoming-content (generate-test-content service action))))))
 
 (defn 
-#^{:doc "Generates a controller file for the controller name and actions in params."}
+#^{:doc "Generates a service file for the service name and actions in params."}
   generate [params]
   (generate-unit-test (first params) (second params)))

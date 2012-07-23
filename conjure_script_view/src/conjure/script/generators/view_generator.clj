@@ -5,13 +5,8 @@
             [conjure.view.util :as util]
             [clojure.tools.file-utils :as file-utils]
             [clojure.tools.loading-utils :as loading-utils]
-            [conjure.script.generators.view-test-generator :as view-test-generator]))
-
-(defn
-#^{:doc "Prints out how to use the generate view command."}
-  view-usage []
-  (println "You must supply a controller and action name (Like hello-world).")
-  (println "Usage: ./run.sh script/generate.clj view <controller> <action>"))
+            [conjure.script.generators.view-test-generator :as view-test-generator]
+            [conjure.script.view.util :as script-view-util]))
   
 (defn
 #^{ :doc "Returns view content which sets up the standard view namespace and defines a view. The given inner-content is 
@@ -30,14 +25,14 @@ added to the body of the view code." }
 (defn
 #^{ :doc "Returns the content of a view with standard namespace and imports with the given view parameters and inner 
 content." }
-  generate-view-content [controller action inner-content view-params requires]
-  (generate-standard-content (util/view-namespace-by-action controller action) inner-content view-params requires))
+  generate-view-content [service action inner-content view-params requires]
+  (generate-standard-content (util/view-namespace-by-action service action) inner-content view-params requires))
 
 (defn
 #^{ :doc "Generates the view content and saves it into the given view file." }
   generate-file-content
-    ([view-file controller] (generate-file-content view-file controller nil))
-    ([view-file controller content]
+    ([view-file service] (generate-file-content view-file service nil))
+    ([view-file service content]
       (let [view-namespace (util/view-namespace view-file)
             view-content (str (if content 
                                 content 
@@ -45,35 +40,32 @@ content." }
                                   view-namespace 
                                   (str 
                                     "[:p \"You can change this text in app/views/" 
-                                    (loading-utils/dashes-to-underscores controller) 
+                                    (loading-utils/dashes-to-underscores service) 
                                     "/" 
-                                    (. view-file getName) 
+                                    (.getName view-file) 
                                     "\"]"))))]
         (file-utils/write-file-content view-file view-content))))
 
 (defn
-#^{:doc "Creates the view file associated with the given controller and action."}
+#^{:doc "Creates the view file associated with the given service and action."}
   generate-view-file
-    ([{ :keys [controller action content silent test-content] 
+    ([{ :keys [service action content silent test-content] 
         :or { content nil, silent false, test-content nil } }]
-      (if (and controller action)
-        (let [view-directory (util/find-views-directory)]
-          (if view-directory
-            (do 
+      (if (and service action)
+        (when-let [view-directory (script-view-util/find-views-directory)]
+          (do 
               (let [params { :views-directory view-directory, 
-                             :controller controller,
+                             :service service,
                              :action action,
                              :silent silent }
-                    controller-directory (builder/find-or-create-controller-directory params)
-                    view-file (builder/create-view-file 
-                                (assoc params :controller-directory controller-directory))]
-                (if view-file
-                  (generate-file-content view-file controller content)))
-              (view-test-generator/generate-unit-test controller action silent test-content))
-            (logging/error (str "Could not find views directory: " view-directory))))
-        (view-usage))))
+                    service-directory (builder/find-or-create-service-directory params)]
+                (when-let [view-file (builder/create-view-file 
+                                       (assoc params :service-directory service-directory))]
+                  (generate-file-content view-file service content)))
+              (view-test-generator/generate-unit-test service action silent test-content)))
+        (script-view-util/generate-usage "view"))))
         
 (defn 
 #^{:doc "Generates a migration file for the migration name given in params."}
   generate [params]
-  (generate-view-file { :controller (first params), :action (second params) }))
+  (generate-view-file { :service (first params), :action (second params) }))
