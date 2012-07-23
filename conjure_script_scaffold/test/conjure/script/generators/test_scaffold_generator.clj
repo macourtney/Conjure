@@ -54,5 +54,5 @@
     (text \"description\"))" 
     (create-migration-up-content "dog" ["name:string" "count:integer" "description:text"]))))
 
-(deftest test-create-controller-content
-  (is (create-controller-content "dog")))
+(deftest test-create-flow-content
+  (is (create-flow-content "dog")))

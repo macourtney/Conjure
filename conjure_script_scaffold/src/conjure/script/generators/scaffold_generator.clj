@@ -4,13 +4,13 @@
             [conjure.model.builder :as model-builder]
             [conjure.test.util :as test-util]
             [conjure.view.util :as view-util]
-            [conjure.script.generators.controller-generator :as controller-generator]
+            [conjure.script.generators.flow-generator :as flow-generator]
             [conjure.script.generators.view-generator :as view-generator]
             [conjure.script.generators.model-generator :as model-generator]
             [conjure.script.generators.model-test-generator :as model-test-generator]))
 
 (defn
-#^{ :doc "Prints out how to use the generate controller command." }
+#^{ :doc "Prints out how to use the generate scaffold command." }
   scaffold-usage []
   (println "You must supply a model name (Like hello-world).")
   (println "Usage: ./run.sh script/generate.clj scaffold <model> [field:type]*"))
@@ -57,13 +57,13 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
     ")"))
 
 (defn
-#^{ :doc "Returns the content for the scaffold controller." }
-  create-controller-content [controller-name]
-  (controller-generator/generate-controller-content controller-name "(copy-actions :template)" 
-    "[controllers.template-controller :as template-controller]"))
+#^{ :doc "Returns the content for the scaffold flow." }
+  create-flow-content [flow-name]
+  (flow-generator/generate-flow-content flow-name "(copy-actions :template)" 
+    "[flows.template-flow :as template-flow]"))
 
 (defn
-#^{ :doc "Creates the controller file associated with the given controller." }
+#^{ :doc "Creates the flow file associated with the given model." }
   generate-scaffold
     ([model fields]
       (if (and model fields)
@@ -77,8 +77,8 @@ For example: if fields is [\"name:string\" \"count:integer\"] this method would 
             (model-builder/create-model-file (model-util/find-models-directory) model)
             (model-generator/model-file-content model))
           (model-test-generator/generate-unit-test model)
-            (controller-generator/create-controller-files 
-              { :controller model, :controller-content (create-controller-content model) }))
+            (flow-generator/create-flow-files 
+              { :service model, :flow-content (create-flow-content model) }))
         (scaffold-usage))))
         
 (defn 
