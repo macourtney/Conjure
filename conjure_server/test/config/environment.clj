@@ -6,6 +6,6 @@
 
       :source-dir "test"
 
-      :call-controller-fn (fn []
+      :call-service-fn (fn []
                             (require 'conjure.flow.util)
-                            (ns-resolve 'conjure.flow.util 'call-controller)) }))
+                            (ns-resolve 'conjure.flow.util 'call-flow)) }))

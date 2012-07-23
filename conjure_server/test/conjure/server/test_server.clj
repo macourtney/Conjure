@@ -3,12 +3,12 @@
   (:use clojure.test
         conjure.server.server))
 
-(def controller-name "test")
+(def service-name "test")
 (def action-name "show")
 
 (deftest test-process-request
-  (process-request { :controller controller-name, :action action-name }))
-  
+  (is (process-request { :request { :uri (str "/" service-name "/" action-name "/1") :query-string "foo=bar&baz=biz" } })))
+
 (deftest test-http-config
   (is (not (nil? (http-config)))))
 
