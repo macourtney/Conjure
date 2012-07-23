@@ -19,7 +19,7 @@
  find-functional-test-directory 
  ([] (find-functional-test-directory (environment/find-test-dir)))
  ([test-directory]
-   (if test-directory
+   (when test-directory
      (file-utils/find-directory test-directory functional-dir-name))))
 
 (defn
@@ -27,7 +27,7 @@
  find-unit-test-directory 
  ([] (find-unit-test-directory (environment/find-test-dir)))
  ([test-directory]
-   (if test-directory
+   (when test-directory
      (file-utils/find-directory test-directory unit-dir-name))))
 
 (defn
@@ -35,39 +35,23 @@
  find-view-unit-test-directory 
  ([] (find-view-unit-test-directory (find-unit-test-directory)))
  ([unit-test-directory]
-   (if unit-test-directory
+   (when unit-test-directory
      (file-utils/find-directory unit-test-directory unit-view-dir-name))))
 
 (defn
-#^{:doc "Finds the view controller test directory."}
-  find-controller-view-unit-test-directory
-  ([controller] (find-controller-view-unit-test-directory controller (find-view-unit-test-directory)))
-  ([controller view-unit-test-directory]
-   (if (and controller view-unit-test-directory)
-     (file-utils/find-directory view-unit-test-directory (loading-utils/dashes-to-underscores controller)))))
-
-(defn
-#^{:doc "Finds the view test directory."}
- find-binding-unit-test-directory 
- ([] (find-binding-unit-test-directory (find-unit-test-directory)))
- ([unit-test-directory]
-   (if unit-test-directory
-     (file-utils/find-directory unit-test-directory unit-binding-dir-name))))
-
-(defn
-#^{:doc "Finds the binding controller test directory."}
-  find-controller-binding-unit-test-directory
-  ([controller] (find-controller-binding-unit-test-directory controller (find-binding-unit-test-directory)))
-  ([controller binding-unit-test-directory]
-   (if (and controller binding-unit-test-directory)
-     (file-utils/find-directory binding-unit-test-directory (loading-utils/dashes-to-underscores controller)))))
+#^{:doc "Finds the view service test directory."}
+  find-service-view-unit-test-directory
+  ([service] (find-service-view-unit-test-directory service (find-view-unit-test-directory)))
+  ([service view-unit-test-directory]
+   (when (and service view-unit-test-directory)
+     (file-utils/find-directory view-unit-test-directory (loading-utils/dashes-to-underscores service)))))
 
 (defn
 #^{:doc "Finds the model test directory."}
  find-model-unit-test-directory 
  ([] (find-model-unit-test-directory (find-unit-test-directory)))
  ([unit-test-directory]
-   (if unit-test-directory
+   (when unit-test-directory
      (file-utils/find-directory unit-test-directory unit-model-dir-name))))
 
 (defn
@@ -75,69 +59,69 @@
  find-fixture-directory 
  ([] (find-fixture-directory (environment/find-test-dir)))
  ([test-directory]
-   (if test-directory
+   (when test-directory
      (file-utils/find-directory test-directory fixture-dir-name))))
 
 (defn
-#^{:doc "Returns the functional test file name for the given controller name."}
-  functional-test-file-name [controller]
-  (if (and controller (> (. controller length) 0))
-    (str (loading-utils/dashes-to-underscores controller) "_controller_test.clj")))
+#^{:doc "Returns the functional test file name for the given service name."}
+  functional-test-file-name [service]
+  (when (not-empty service)
+    (str (loading-utils/dashes-to-underscores service) "_flow_test.clj")))
 
 (defn
 #^{:doc "Returns the view test file name for the given action name."}
   view-unit-test-file-name [action]
-  (if (and action (> (. action length) 0))
+  (when (not-empty action)
     (str (loading-utils/dashes-to-underscores action) "_view_test.clj")))
 
 (defn
 #^{:doc "Returns the model test file name for the given model name."}
   model-unit-test-file-name [model]
-  (if (and model (> (. model length) 0))
+  (when (not-empty model)
     (str (loading-utils/dashes-to-underscores model) "_model_test.clj")))
 
 (defn
 #^{:doc "Returns the binding test file name for the given action name."}
   binding-unit-test-file-name [action]
-  (if (and action (not-empty action))
+  (when (not-empty action)
     (str (loading-utils/dashes-to-underscores action) "_binding_test.clj")))
 
 (defn
 #^{:doc "Returns the fixture file name for the given model name."}
   fixture-file-name [model]
-  (if (and model (> (. model length) 0))
+  (when (not-empty model)
     (str (loading-utils/dashes-to-underscores model) ".clj")))
 
 (defn
 #^{:doc "Returns the view test file name for the given action name."}
   binding-unit-test-file-name [action]
-  (if (and action (> (. action length) 0))
+  (when (not-empty action)
     (str (loading-utils/dashes-to-underscores action) "_binding_test.clj")))
     
 (defn
-#^{:doc "Returns the functional test file for the given controller name."}
+#^{:doc "Returns the functional test file for the given service name."}
   functional-test-file
-  ([controller] (functional-test-file controller (find-functional-test-directory)))
-  ([controller functional-test-directory]
-    (if (and controller (> (. controller length) 0) functional-test-directory)
-      (new File functional-test-directory (functional-test-file-name controller)))))
+  ([service] (functional-test-file service (find-functional-test-directory)))
+  ([service functional-test-directory]
+    (when (and (not-empty service) functional-test-directory)
+      (new File functional-test-directory (functional-test-file-name service)))))
 
 (defn
-#^{:doc "Returns the view unit test file for the given controller name."}
+#^{:doc "Returns the view unit test file for the given service name."}
   view-unit-test-file
-  ([controller action] (view-unit-test-file controller action (find-controller-view-unit-test-directory controller)))
-  ([controller action controller-view-unit-test-dir]
-    (let [controller-str (conjure-str-utils/str-keyword controller)
+  ([service action] (view-unit-test-file service action (find-service-view-unit-test-directory service)))
+  ([service action service-view-unit-test-dir]
+    (let [service-str (conjure-str-utils/str-keyword service)
           action-str (conjure-str-utils/str-keyword action)]
-      (if (and controller-str (> (. controller-str length) 0) action-str (> (. action-str length) 0) controller-view-unit-test-dir)
-        (new File controller-view-unit-test-dir (view-unit-test-file-name action-str))))))
+      (when (and (not-empty service-str) (not-empty action-str) service-view-unit-test-dir)
+        (new File service-view-unit-test-dir (view-unit-test-file-name action-str))))))
 
 (defn
-#^{:doc "Returns the model unit test file for the given controller name."}
+#^{:doc "Returns the model unit test file for the given service name."}
   model-unit-test-file
   ([model] (model-unit-test-file model (find-model-unit-test-directory)))
   ([model model-unit-test-dir]
-    (if (and model (> (. model length) 0) model-unit-test-dir)
+    (when (and (not-empty model) model-unit-test-dir)
       (new File model-unit-test-dir (model-unit-test-file-name model)))))
 
 (defn
@@ -145,34 +129,24 @@
   fixture-file
   ([model] (fixture-file model (find-fixture-directory)))
   ([model fixture-directory]
-    (if (and model (> (. model length) 0) fixture-directory)
+    (when (and (not-empty model) fixture-directory)
       (new File fixture-directory (fixture-file-name model)))))
 
 (defn
-#^{:doc "Returns the binding unit test file for the given controller and actoin."}
-  binding-unit-test-file
-  ([controller action] (binding-unit-test-file controller action (find-controller-binding-unit-test-directory controller)))
-  ([controller action controller-binding-unit-test-dir]
-    (let [controller-str (conjure-str-utils/str-keyword controller)
-          action-str (conjure-str-utils/str-keyword action)]
-      (if (and controller-str (> (. controller-str length) 0) action-str (> (. action-str length) 0) controller-binding-unit-test-dir)
-        (new File controller-binding-unit-test-dir (binding-unit-test-file-name action-str))))))
+#^{:doc "Returns the functional test namespace for the given service."}
+  functional-test-namespace [service]
+  (when (not-empty service)
+    (str "functional." (loading-utils/underscores-to-dashes service) "-flow-test")))
 
 (defn
-#^{:doc "Returns the functional test namespace for the given controller."}
-  functional-test-namespace [controller]
-  (if (and controller (> (. controller length) 0))
-    (str "functional." (loading-utils/underscores-to-dashes controller) "-controller-test")))
-
-(defn
-#^{:doc "Returns the view test namespace for the given controller and action."}
-  view-unit-test-namespace [controller action]
-  (let [controller-str (conjure-str-utils/str-keyword controller)
+#^{:doc "Returns the view test namespace for the given service and action."}
+  view-unit-test-namespace [service action]
+  (let [service-str (conjure-str-utils/str-keyword service)
         action-str (conjure-str-utils/str-keyword action)]
-    (if (and controller-str (> (. controller-str length) 0) action-str (> (. action-str length) 0))
+    (when (and (not-empty service-str) (not-empty action-str))
       (str 
         "unit." unit-view-dir-name "." 
-        (loading-utils/underscores-to-dashes controller-str) 
+        (loading-utils/underscores-to-dashes service-str) 
         "." 
         (loading-utils/underscores-to-dashes action-str) 
         "-view-test"))))
@@ -180,24 +154,24 @@
 (defn
 #^{:doc "Returns the model test namespace for the given model."}
   model-unit-test-namespace [model]
-  (if (and model (> (. model length) 0))
+  (when (not-empty model)
     (str "unit." unit-model-dir-name "." (loading-utils/underscores-to-dashes model) "-model-test")))
 
 (defn
 #^{:doc "Returns the fixture namespace for the given model."}
   fixture-namespace [model]
-  (if (and model (> (. model length) 0))
+  (when (not-empty model)
     (str "fixture." (loading-utils/underscores-to-dashes model))))
 
 (defn
-#^{:doc "Returns the binding test namespace for the given controller and action."}
-  binding-unit-test-namespace [controller action]
-  (let [controller-str (conjure-str-utils/str-keyword controller)
+#^{:doc "Returns the binding test namespace for the given service and action."}
+  binding-unit-test-namespace [service action]
+  (let [service-str (conjure-str-utils/str-keyword service)
         action-str (conjure-str-utils/str-keyword action)]
-    (if (and controller-str (> (. controller-str length) 0) action-str (> (. action-str length) 0))
+    (when (and (not-empty service-str) (not-empty action-str))
       (str 
         "unit." unit-binding-dir-name "." 
-        (loading-utils/underscores-to-dashes controller-str) 
+        (loading-utils/underscores-to-dashes service-str) 
         "." 
         (loading-utils/underscores-to-dashes action-str) 
         "-binding-test"))))

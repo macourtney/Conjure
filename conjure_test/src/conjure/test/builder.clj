@@ -46,22 +46,6 @@
     (logging/error "You must pass in a test directory.")))
 
 (defn
-#^{:doc "Finds (or creates if not found) the bindings test directory."}
-  find-or-create-binding-unit-test-directory
-  [silent]
-    (if-let [test-directory (environment/find-test-dir)]
-      (file-utils/create-dirs [test-directory util/unit-dir-name util/unit-binding-dir-name] silent)
-      (logging/error "Test directory not found.")))
-
-(defn
-#^{:doc "Finds (or creates if not found) the bindings test directory."}
-  find-or-create-controller-binding-unit-test-directory
-  [{ :keys [controller test-directory silent] :or { test-directory (environment/find-test-dir), silent false} }]
-    (file-utils/create-dirs 
-      [test-directory util/unit-dir-name util/unit-binding-dir-name (loading-utils/dashes-to-underscores controller)]
-      silent))
-      
-(defn
 #^{:doc "Finds (or creates if not found) the fixture directory."}
   find-or-create-fixture-directory [silent]
   (if-let [test-directory (environment/find-test-dir)]
@@ -96,18 +80,8 @@
         (file-utils/create-file (util/model-unit-test-file model model-unit-test-directory) silent))))
 
 (defn
-#^{:doc "Creates a new model unit test file from the given model."}
-  create-binding-unit-test [controller action silent]
-    (let [binding-unit-test-directory 
-          (find-or-create-controller-binding-unit-test-directory 
-            { :controller controller,
-              :silent silent })]
-      (if (and controller action binding-unit-test-directory)
-        (file-utils/create-file (util/binding-unit-test-file controller action binding-unit-test-directory) silent))))
-
-(defn
 #^{:doc "Creates a new fixture file from the given model."}
   create-fixture [model silent]
-    (let [fixture-directory (find-or-create-fixture-directory silent)]
-      (if (and model fixture-directory)
+    (when model
+      (when-let [fixture-directory (find-or-create-fixture-directory silent)]
         (file-utils/create-file (util/fixture-file model fixture-directory) silent))))
