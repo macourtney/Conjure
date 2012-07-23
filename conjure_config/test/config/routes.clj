@@ -22,5 +22,5 @@
     ; function should take no arguments, and return a partial request map containing at least the service and action
 
     ;:functions []
-     })
+  })
 
