@@ -7,3 +7,4 @@
 /.lein-failures
 /checkouts
 /.lein-deps-sum
+/db
