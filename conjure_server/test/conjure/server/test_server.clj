@@ -14,4 +14,4 @@
 
 (deftest test-parse-arguments
   (is (parse-arguments []))
-  (is (= [ { :mode "development" } [] "Usage:\r\n\r\n Switches    Default  Desc                                                            \r\n --------    -------  ----                                                            \r\n -m, --mode           The server mode. For example, development, production, or test. \r\n" ] (parse-arguments ["-m" "development"]))))
+  (is (= [ { :mode "development" } [] "Usage:\n\n Switches    Default  Desc                                                            \n --------    -------  ----                                                            \n -m, --mode           The server mode. For example, development, production, or test. \n" ] (parse-arguments ["-m" "development"]))))
