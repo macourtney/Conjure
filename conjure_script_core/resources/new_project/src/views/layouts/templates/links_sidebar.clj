@@ -1,19 +1,19 @@
 (ns views.layouts.templates.links-sidebar
   (:use conjure.view.base)
-  (:require [conjure.server.request :as request]
-            [conjure.view.util :as view-util]
+  (:require [conjure.util.request :as request]
+            [conjure.util.conjure-utils :as conjure-utils]
             [views.layouts.templates.links :as links]))
 
 (defn
 #^{ :doc "Creates a list link for use in the link sidebar." }
   list-link [layout-info]
-    { :text "List", :url-for (view-util/merge-url-for-params layout-info { :action "list-records" }) })
+    { :text "List", :url-for (conjure-utils/merge-url-for-params layout-info { :action "list-records" }) })
 
 (defn
 #^{ :doc "Creates an add link for use in the link sidebar." } 
   add-link [layout-info]
     { :text "Add", 
-      :url-for (view-util/merge-url-for-params layout-info { :action "add" }),
+      :url-for (conjure-utils/merge-url-for-params layout-info { :action "add" }),
       :html-options { :id "add-action-link" } })
 
 (def-view []

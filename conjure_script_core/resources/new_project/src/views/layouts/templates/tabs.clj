@@ -1,9 +1,9 @@
 (ns views.layouts.templates.tabs
   (:use conjure.view.base)
   (:require [conjure.flow.util :as flow-util]
-            [conjure.server.request :as request]
+            [conjure.util.request :as request]
             [clojure.tools.string-utils :as string-utils]
-            [conjure.view.util :as view-util]))
+            [conjure.util.conjure-utils :as conjure-utils]))
 
 (defn 
 #^{ :doc "Returns the url for a tab." }
@@ -11,7 +11,7 @@
   (or 
     (:url tab-map) 
     (when-let [url-for (:url-for tab-map)]
-      (view-util/url-for (view-util/merge-url-for-params original-request-map url-for)))))
+      (conjure-utils/url-for (conjure-utils/merge-url-for-params original-request-map url-for)))))
 
 (defn
 #^{ :doc "Returns the id for the tab, or nil if no id is needed." }
@@ -40,7 +40,7 @@
 (defn
 #^{ :doc "Returns a sequence of tab maps generated from the controllers." }
   controller-tabs []
-  (map controller-tab (filter #(not (= % "template")) (flow-util/all-flows))))
+  (map controller-tab (filter #(not (= % "template")) (flow-util/all-services))))
 
 (defn
 #^{ :doc "Gets or generates all of the tab maps for use by generate-tab." }
