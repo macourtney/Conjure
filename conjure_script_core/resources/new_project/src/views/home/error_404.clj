@@ -1,5 +1,5 @@
 (ns views.home.error-404
-  (:use conjure.core.view.base))
+  (:use conjure.view.base))
 
 (def response-map 
   { :status  404

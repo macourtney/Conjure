@@ -1,6 +1,6 @@
 (ns config.migrate-config
   (:require [drift-db.migrate :as drift-db-migrate]
-            [conjure.core.server.server :as server]))
+            [conjure.server.server :as server]))
 
 (defn migrate-config []
   { :directory "/src/db/migrate"

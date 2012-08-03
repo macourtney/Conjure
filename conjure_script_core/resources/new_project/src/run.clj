@@ -1,6 +1,6 @@
 (ns run
   (:require [clojure.contrib.command-line :as command-line]
-            [conjure.core.execute :as core-execute]
+            [conjure.execute :as core-execute]
             [conjure.script.migrate :as migrate] 
             [conjure.script.server :as server]) 
   (:gen-class))
