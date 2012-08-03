@@ -24,7 +24,7 @@
 
       ;; Calculates the database to use.
       (dbname environment)
-      
+
       ;; The directory containing the database files.
       "db/data/")))
             

@@ -16,13 +16,11 @@
     (try
       (require script-namspace-symbol)
       (catch FileNotFoundException e))
-    (let [script-namespace (find-ns script-namspace-symbol)]
-      (if script-namespace
-        (let [script-fn (ns-resolve script-namespace 'run)]
-          (if script-fn
-            (script-fn params)
-            (print-invalid-script script-namespace)))
-        (print-unknown-command command)))))
+    (if-let [script-namespace (find-ns script-namspace-symbol)]
+      (if-let [script-fn (ns-resolve script-namespace 'run)]
+        (script-fn params)
+        (print-invalid-script script-namespace))
+      (print-unknown-command command))))
 
 (defn run-args [args]
   (if (empty? args)
