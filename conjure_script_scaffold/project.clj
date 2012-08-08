@@ -5,5 +5,4 @@
                  [org.conjure/conjure-script-model "0.9.0-SNAPSHOT"]
                  [org.conjure/conjure-script-view "0.9.0-SNAPSHOT"]
                  [org.conjure/conjure-test "0.9.0-SNAPSHOT"]
-                 [org.conjure/conjure-view "0.9.0-SNAPSHOT"]]
-  :dev-dependencies [[org.clojure/clojure "1.2.1"]])
+                 [org.conjure/conjure-view "0.9.0-SNAPSHOT"]])

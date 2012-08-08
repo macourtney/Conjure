@@ -6,6 +6,6 @@
                  [org.clojure/tools.logging "0.2.3"]
                  [org.conjure/conjure-config "0.9.0-SNAPSHOT"]
                  [org.conjure/conjure-util "0.9.0-SNAPSHOT"]
-                 [org.drift-db/drift-db "1.0.7-SNAPSHOT"]]
-  :dev-dependencies [[org.drift-db/drift-db-h2 "1.0.7-SNAPSHOT"]
-                     [org.clojure/clojure "1.2.1"]])
+                 [org.drift-db/drift-db "1.1.2"]]
+  
+  :profiles { :dev { :dependencies [[org.drift-db/drift-db-h2 "1.1.2"]] } })
