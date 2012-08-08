@@ -3,7 +3,7 @@
             [conjure.plugin.util :as plugin-util]))
 
 (defn print-usage []
-  (println "Usage: ./run.sh script/plugin.clj <install|uninstall> <plugin name> <arguments>"))
+  (println "Usage: lein conjure plugin <install|uninstall> <plugin name> <arguments>"))
 
 (defn print-unknown-plugin [plugin-name]
   (println (str "Could not find plugin with name: " plugin-name))
