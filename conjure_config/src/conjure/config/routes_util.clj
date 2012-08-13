@@ -74,6 +74,7 @@ keys, and may contain optional :id key. The service, action and id will be appro
 before calling the service action." }
   call-service [path-map]
   (request/with-merged-request-map path-map
+    (logging/debug (str "Requested service: " (request/service) ", action: " (request/action)))
     (environment/call-service)))
 
 (defn

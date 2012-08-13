@@ -41,9 +41,7 @@
   service-from-file [flow-file]
   (when flow-file
     (if (string? flow-file)
-      (string-utils/strip-ending 
-        (loading-utils/clj-file-to-symbol-string flow-file)
-        flow-namespace-ending)
+      (string-utils/strip-ending  (loading-utils/clj-file-to-symbol-string flow-file) flow-namespace-ending)
       (service-from-file (.getName flow-file)))))
 
 (defn
@@ -100,7 +98,9 @@ namespace." }
 (defn
 #^{ :doc "Returns true if the given flow namespace exists." }
   flow-exists? [flow-file-name]
-  (loading-utils/namespace-exists? (flow-namespace (service-from-file flow-file-name))))
+  (let [namespace (flow-namespace (service-from-file flow-file-name))]
+    (require (symbol namespace))
+    (loading-utils/namespace-exists? namespace)))
 
 (defn
 #^{ :doc "Reloads all conjure namespaces referenced by the given service." }
@@ -113,8 +113,8 @@ given." }
   load-flow
   ([] (load-flow (request/service)))
   ([service]
-    (let [flow-filename (flow-file-name-string service)]
-      (when (and flow-filename (flow-exists? flow-filename))
+    (when-let [flow-filename (flow-file-name-string service)]
+      (when (flow-exists? flow-filename)
         (require :reload (symbol (flow-namespace service)))
         (reload-conjure-namespaces service)))))
 
@@ -123,9 +123,8 @@ given." }
 the namespace. If the namespace is not found, this function attempts to reload the flow then finds the namespace
 again." }
   find-flow-namespace [service]
-  (let [flow-namespace-str (flow-namespace service)
-        flow-namespace (find-ns (symbol flow-namespace-str))]
-    (if flow-namespace
+  (let [flow-namespace-str (flow-namespace service)]
+    (if-let [flow-namespace (find-ns (symbol flow-namespace-str))]
       flow-namespace
       (do
         (load-flow service)
@@ -402,10 +401,8 @@ given action and service, then this function simply runs the action function." }
 #^{ :doc "Attempts to run the action requested in the request-map. If the action is successful, its response is 
 returned, otherwise nil is returned." }
   run-action []
-  (let [action-fn (find-action-fn)]
-    (when action-fn
-      (logging/debug (str "Running action: " (fully-qualified-action)))
-      (run-interceptors action-fn))))
+  (when-let [action-fn (find-action-fn)]
+    (run-interceptors action-fn)))
 
 (defn
 #^{ :doc "Calls the given service with the given request map returning the response." }

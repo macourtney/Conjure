@@ -1,5 +1,5 @@
 (ns helpers.home-helper
-  (:require [conjure.core.server.request :as request]))
+  (:require [conjure.util.request :as request]))
 
 (defn
 #^{ :doc "Creates the home links and adds them to the layout info in request-map." }
