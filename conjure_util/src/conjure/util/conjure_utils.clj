@@ -138,7 +138,8 @@ function as well."
   "Reloads the given namespace and makes sure the namespace is added to the list of loaded namespaces.
 Namespaces-to-reload must be a collection of namespace maps."
   [namespaces-to-reload]
-  (loading-utils/reload-namespaces (map namespace-name namespaces-to-reload))
+  (doseq [namespace-name (map namespace-name namespaces-to-reload)]
+    (require :reload (symbol namespace-name)))
   (add-namespace-infos namespaces-to-reload))
 
 (defn reload-conjure-namespace
