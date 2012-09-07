@@ -6,7 +6,7 @@
                  [org.conjure/conjure-config "0.9.0-SNAPSHOT"]
                  [org.conjure/conjure-plugin "0.9.0-SNAPSHOT"]
                  [org.conjure/conjure-util "0.9.0-SNAPSHOT"]
-                 [org.drift-db/drift-db "1.0.7"]
+                 [org.drift-db/drift-db "1.1.2"]
                  [ring/ring-devel "1.1.0"]
                  [ring/ring-jetty-adapter "1.1.0"]
                  [ring/ring-servlet "1.1.0"]]
@@ -15,6 +15,6 @@
                                     [org.conjure/conjure-flow "0.9.0-SNAPSHOT"]
                                     [org.conjure/conjure-model "0.9.0-SNAPSHOT"]
                                     [org.conjure/conjure-view "0.9.0-SNAPSHOT"]
-                                    [org.drift-db/drift-db-h2 "1.0.7"]] } }
+                                    [org.drift-db/drift-db-h2 "1.1.2"]] } }
 
   :aot [conjure.server.servlet])

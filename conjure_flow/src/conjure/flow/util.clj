@@ -99,8 +99,12 @@ namespace." }
 #^{ :doc "Returns true if the given flow namespace exists." }
   flow-exists? [flow-file-name]
   (let [namespace (flow-namespace (service-from-file flow-file-name))]
-    (require (symbol namespace))
-    (loading-utils/namespace-exists? namespace)))
+    (try
+      (require (symbol namespace))
+      (loading-utils/namespace-exists? namespace)
+      (catch java.io.FileNotFoundException e
+        ; Ignore exception. The file could not be found.
+        false))))
 
 (defn
 #^{ :doc "Reloads all conjure namespaces referenced by the given service." }
