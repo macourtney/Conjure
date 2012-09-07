@@ -1,9 +1,0 @@
-pom.xml
-*jar
-lib
-classes
-
-lib/
-log
-/.lein-failures
-/.lein-deps-sum
