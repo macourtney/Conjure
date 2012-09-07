@@ -203,10 +203,7 @@ with the following defaults:
   xml-header-tag 
   ([] (xml-header-tag {}))
   ([html-options]
-    (str 
-      "<?xml " 
-      (html-utils/attribute-list-str (merge { :version "1.0" } html-options ))
-      "?>")))
+    (keyword (str "<?xml " (html-utils/attribute-list-str (merge { :version "1.0" } html-options )) "?>"))))
 
 (defn
 #^{ :doc "Returns the html doc type tag. You can pass a type into this method for a specific type. Valid types are:
@@ -223,19 +220,19 @@ with the following defaults:
   ([doc-type]
     (cond
       (= doc-type :html4.01-strict) 
-        "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">"
+        (keyword "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">")
       (= doc-type :html4.01-transitional) 
-        "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">"
+        (keyword "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">")
       (= doc-type :html4.01-frameset) 
-        "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\" \"http://www.w3.org/TR/html4/frameset.dtd\">"
+        (keyword "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\" \"http://www.w3.org/TR/html4/frameset.dtd\">")
       (= doc-type :xhtml1.0-strict) 
-        "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
+        (keyword "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">")
       (= doc-type :xhtml1.0-transitional) 
-        "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
+        (keyword "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">")
       (= doc-type :xhtml1.0-frameset) 
-        "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\">"
+        (keyword "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\">")
       (= doc-type :xhtml1.1) 
-        "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">"
+        (keyword "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">")
       true (throw (RuntimeException. (str "Unknown doc type: " doc-type))))))
 
 (defn non-breaking-space

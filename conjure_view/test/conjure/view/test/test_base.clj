@@ -384,9 +384,9 @@
     (radio-button { :breed "chihuahua" } :puppy :breed "great-dane" { :id "dog-breed" }))))
 
 (deftest test-xml-header-tag
-  (is (= "<?xml version=\"1.0\"?>" (xml-header-tag)))
-  (is (= "<?xml version=\"2.0\"?>" (xml-header-tag { :version "2.0" })))
-  (is (= "<?xml encoding=\"UTF-8\" version=\"1.0\"?>" (xml-header-tag { :encoding "UTF-8" }))))
+  (is (= (keyword "<?xml version=\"1.0\"?>") (xml-header-tag)))
+  (is (= (keyword "<?xml version=\"2.0\"?>") (xml-header-tag { :version "2.0" })))
+  (is (= (keyword "<?xml encoding=\"UTF-8\" version=\"1.0\"?>") (xml-header-tag { :encoding "UTF-8" }))))
 
 (deftest test-html-doctype
   (is (html-doctype :html4.01-strict))
