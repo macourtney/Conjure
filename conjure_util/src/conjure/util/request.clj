@@ -7,13 +7,17 @@
 
 (defn
 #^{ :doc "Returns the service." }
-  service []
-  (or (:service request-map) (:controller request-map)))
+  service
+  ([] (service request-map))
+  ([request-map]
+    (or (:service request-map) (:controller request-map))))
 
 (defn
 #^{ :doc "Returns the action." }
-  action []
-  (:action request-map))
+  action
+  ([] (action request-map))
+  ([request-map]
+    (:action request-map)))
 
 (defn
 #^{ :doc "Returns the user or nil if it is not set." }
@@ -52,13 +56,17 @@
 
 (defn
 #^{ :doc "Returns the parameters from the request map or nil if no parameters a set." }
-  parameters []
-  (:params request-map))
+  parameters
+  ([] (parameters request-map))
+  ([request-map]
+    (:params request-map)))
 
 (defn
 #^{ :doc "Returns the id or nil if it is not set." }
-  id []
-  (:id (parameters)))
+  id
+  ([] (id request-map))
+  ([request-map]
+    (:id (parameters request-map))))
 
 (defn
 #^{ :doc "Returns the id as a str." }

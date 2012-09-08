@@ -17,10 +17,8 @@
       :html-options { :id "add-action-link" } })
 
 (def-view []
-  (let [layout-info (request/layout-info)
-        links (:links layout-info)]
-      (links/render-body "Actions"
-        (if links
-          links
-          [ (list-link layout-info)
-            (add-link layout-info)]))))
+  (let [layout-info (request/layout-info)]
+    (links/render-body "Actions"
+      (or
+        (:links layout-info)
+        [(list-link layout-info) (add-link layout-info)]))))

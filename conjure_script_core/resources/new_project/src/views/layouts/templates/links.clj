@@ -5,14 +5,14 @@
             [conjure.util.conjure-utils :as conjure-util]))
 
 (defn
-#^{ :doc "Returns the link controller from the given link map." }
-  link-controller [link-map location-controller]
-  (string-utils/str-keyword (or (:controller (:url-for link-map)) location-controller)))
+#^{ :doc "Returns the link service from the given link map." }
+  link-service [link-map location-service]
+  (string-utils/str-keyword (or (request/service (:url-for link-map)) location-service)))
 
 (defn
 #^{ :doc "Returns the link action from the given link map." }
   link-action [link-map location-action]
-  (string-utils/str-keyword (or (:action (:url-for link-map)) location-action)))
+  (string-utils/str-keyword (or (request/action (:url-for link-map)) location-action)))
   
 (defn
 #^{ :doc "Returns the link url from the given link map." }
@@ -25,15 +25,15 @@
 (defn
 #^{ :doc "Returns the id for a link or nil if no id should be set for the link." }
   link-id [link-map original-request-map]
-  (let [location-controller (:controller original-request-map)
-        location-action (:action original-request-map)
-        link-controller (link-controller link-map location-controller)
+  (let [location-service (request/service original-request-map)
+        location-action (request/action original-request-map)
+        link-service (link-service link-map location-service)
         link-action (link-action link-map location-action)]
     (if 
       (or 
         (:is-active link-map) 
-        (and link-controller location-controller link-action location-action
-          (= link-controller location-controller) (= link-action location-action)))
+        (and link-service location-service link-action location-action
+          (= link-service location-service) (= link-action location-action)))
       "link-active")))
 
 (defn
@@ -56,5 +56,5 @@
 
     [:ul { :id "links" }
       (doall (map #(generate-link % (request/layout-info)) links))]
-      
+
     [:hr { :class "noscreen" }]))

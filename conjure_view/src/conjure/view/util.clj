@@ -143,7 +143,7 @@ except the service is \"layouts\", the action is layout-name, and layout-info co
 the original request-map." }
   merge-layout-request-map [layout-name]
   (merge request/request-map
-    { :service "layouts", 
+    { :service "layouts"
       :action layout-name 
       :layout-info 
         (merge

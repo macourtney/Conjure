@@ -34,10 +34,10 @@
       (defn ~'render-body [~@view-params]
         ~@body)
       (defn ~'render-str [~@view-params]
-        (request/with-request-map-fn (update-layout-info-with ~layout-info)
-          (doall
-            (conjure-html/render-xml
-              (view-util/render-layout ~layout-name (~'render-body ~@view-params))))))
+        (request/with-request-map-fn
+          (update-layout-info-with ~layout-info)
+          (conjure-html/render-xml
+            (view-util/render-layout ~layout-name (~'render-body ~@view-params)))))
       (defn ~'render-view [~@view-params]
         (assoc ~response-map :body (~'render-str ~@view-params))))))
 

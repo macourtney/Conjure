@@ -16,12 +16,12 @@
 (defn
 #^{ :doc "Returns the id for the tab, or nil if no id is needed." }
   tab-id [tab-map original-request-map]
-  (let [location-controller (:controller original-request-map)
-        tab-controller (string-utils/str-keyword (or (:controller (:url-for tab-map)) location-controller))]
-    (when 
-      (or 
+  (let [location-service (request/service original-request-map)
+        tab-service (string-utils/str-keyword (or (request/service (:url-for tab-map)) location-service))]
+    (when
+      (or
         (:is-active tab-map)
-        (and tab-controller location-controller (= tab-controller location-controller)))
+        (and tab-service location-service (= tab-service location-service)))
       "active")))
 
 (defn
@@ -32,20 +32,20 @@
       (or (:text tab-map) "Tab") (keyword "<span class=\"tab-l\"></span><span class=\"tab-r\"></span>")]])
 
 (defn
-#^{ :doc "Returns a tab map generated from a controller name." }
-  controller-tab [controller-name]
-  { :text (string-utils/human-title-case controller-name), 
-    :url-for { :controller controller-name, :action "index" } })
+#^{ :doc "Returns a tab map generated from a service name." }
+  service-tab [service-name]
+  { :text (string-utils/human-title-case service-name), 
+    :url-for { :service service-name, :action "index" } })
 
 (defn
-#^{ :doc "Returns a sequence of tab maps generated from the controllers." }
-  controller-tabs []
-  (map controller-tab (filter #(not (= % "template")) (flow-util/all-services))))
+#^{ :doc "Returns a sequence of tab maps generated from the services." }
+  service-tabs []
+  (map service-tab (filter #(not (= % "template")) (flow-util/all-services))))
 
 (defn
 #^{ :doc "Gets or generates all of the tab maps for use by generate-tab." }
   all-tabs []
-  (or (:tabs (request/layout-info)) (controller-tabs)))
+  (or (:tabs (request/layout-info)) (service-tabs)))
 
 (def-view []
   [:div { :id "tabs", :class "noprint" }
