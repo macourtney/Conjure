@@ -8,7 +8,7 @@
 (defn 
 #^{ :doc "Returns the url for a tab." }
   tab-url [tab-map original-request-map]
-  (or 
+  (or
     (:url tab-map) 
     (when-let [url-for (:url-for tab-map)]
       (conjure-utils/url-for (conjure-utils/merge-url-for-params original-request-map url-for)))))
@@ -47,9 +47,14 @@
   all-tabs []
   (or (:tabs (request/layout-info)) (service-tabs)))
 
+(defn generate-tabs
+  "Generates the tabs based on all of the tabs listed in the layout info or on the services."
+  []
+  (let [layout-info (request/layout-info)] ; Can't do this inside the map or bad things will happen.
+    (map #(generate-tab % layout-info) (all-tabs))))
+
 (def-view []
   [:div { :id "tabs", :class "noprint" }
     [:h3 { :class "noscreen" } "Navigation"]
-    [:ul { :class "box" }
-      (doall (map #(generate-tab % (request/layout-info)) (all-tabs)))]
+    [:ul { :class "box" } (generate-tabs)]
     [:hr { :class "noscreen" }]])

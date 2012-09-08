@@ -19,8 +19,8 @@
   link-url [link-map original-request-map]
   (or 
     (:url link-map) 
-    (if (:url-for link-map) 
-      (conjure-util/url-for (conjure-util/merge-url-for-params original-request-map (:url-for link-map))))))
+    (when-let [url-for (:url-for link-map)] 
+      (conjure-util/url-for (conjure-util/merge-url-for-params original-request-map url-for)))))
 
 (defn
 #^{ :doc "Returns the id for a link or nil if no id should be set for the link." }
@@ -29,7 +29,7 @@
         location-action (request/action original-request-map)
         link-service (link-service link-map location-service)
         link-action (link-action link-map location-action)]
-    (if 
+    (when 
       (or 
         (:is-active link-map) 
         (and link-service location-service link-action location-action
@@ -50,11 +50,14 @@
             (:html-options link-map) )
           (:text link-map)])]))
 
+(defn generate-links
+  "Generates the links based on the given link map list."
+  [links]
+  (let [layout-info (request/layout-info)]
+    (map #(generate-link % layout-info) links)))
+
 (def-view [title links]
   (list
     [:h3 [:span title]]
-
-    [:ul { :id "links" }
-      (doall (map #(generate-link % (request/layout-info)) links))]
-
+    [:ul { :id "links" } (generate-links links)]
     [:hr { :class "noscreen" }]))
