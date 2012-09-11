@@ -1,10 +1,7 @@
 (ns conjure.flow.base
-  (:require [clojure.tools.logging :as logging]
-            [conjure.flow.util :as flow-util]
+  (:require [conjure.flow.util :as flow-util]
             [conjure.util.conjure-utils :as conjure-utils]
-            [conjure.util.request :as request]
-            [clojure.tools.html-utils :as html-utils]
-            [clojure.tools.string-utils :as string-utils]))
+            [helpers.template-helper :as template-helper]))
 
 (defn
 #^{ :doc "Redirects to the given url with the given status. If status is not given, 302 (redirect found) is used." }

@@ -85,7 +85,7 @@
 
 (deftest test-all-flow-namespaces
   (let [flow-namespaces (all-flow-namespaces)]
-    (is (= 1 (count flow-namespaces)))
+    (is (= 2 (count flow-namespaces)))
     (is (find-first-str "flows.test-flow"
           (map #(name (ns-name %)) flow-namespaces)))))
 
@@ -95,7 +95,7 @@
 
 (deftest test-all-services
   (let [services (all-services)]
-    (is (= 1 (count services)))
+    (is (= 2 (count services)))
     (is (find-first-str "test" services))))
 
 (deftest test-flow-exists?
