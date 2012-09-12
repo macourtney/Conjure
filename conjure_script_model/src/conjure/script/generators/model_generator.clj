@@ -43,7 +43,7 @@
   ([model extra-content]
     (let [model-namespace (util/model-namespace model)]
       (str "(ns " model-namespace "
-  (:use conjure.core.model.base
+  (:use conjure.model.base
         clj-record.boot))
 
 (clj-record.core/init-model)

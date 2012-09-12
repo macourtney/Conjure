@@ -1,6 +1,6 @@
 (defproject org.conjure/conjure-util "0.9.0-SNAPSHOT"
   :description "FIXME: write description"
-  :dependencies [[clojure-tools "1.1.1-SNAPSHOT"]
+  :dependencies [[clojure-tools "1.1.2-SNAPSHOT"]
                  [org.clojure/clojure "1.4.0"]
                  [org.clojure/tools.namespace "0.1.0"]]
   

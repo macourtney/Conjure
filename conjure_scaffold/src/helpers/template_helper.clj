@@ -3,8 +3,7 @@
             [conjure.model.util :as model-util]
             [conjure.util.request :as request]
             [clojure.tools.string-utils :as string-utils]
-            [drift-db.core :as drift-db]
-            [views.layouts.templates.tabs :as layout-tabs]))
+            [drift-db.core :as drift-db]))
 
 (defn
 #^{ :doc "Returns the metadata for the given model." }
@@ -29,6 +28,11 @@
   (model-util/load-model model-name)
   (clj-record-core/get-record model-name id))
 
+(defn
+#^{ :doc "Gets or generates all of the tab maps for use by template-tabs." }
+  all-tabs []
+  (or (:tabs (request/layout-info)) []))
+
 (defn-
   template-tabs [request-map]
   (map 
@@ -38,7 +42,7 @@
           (assoc tab-map :is-active true)
           tab-map)))
     (request/set-request-map request-map
-      (layout-tabs/all-tabs))))
+      (all-tabs))))
 
 (defn
 #^{ :doc "Creates a request-map from the given request map which points to the templates controller with the given 

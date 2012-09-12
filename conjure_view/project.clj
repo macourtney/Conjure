@@ -1,6 +1,6 @@
 (defproject org.conjure/conjure-view "0.9.0-SNAPSHOT"
   :description "Conjure view is a library to render html for conjure."
-  :dependencies [[clojure-tools "1.1.1-SNAPSHOT"]
+  :dependencies [[clojure-tools "1.1.2-SNAPSHOT"]
                  [hiccup "1.0.0"]
                  [org.conjure/conjure-config "0.9.0-SNAPSHOT"]
                  [org.conjure/conjure-html "0.9.0"]

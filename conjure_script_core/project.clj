@@ -1,6 +1,6 @@
 (defproject org.conjure/conjure-script-core "0.9.0-SNAPSHOT"
   :description "The core namespaces for conjure script."
-  :dependencies [[clojure-tools "1.1.1-SNAPSHOT"]
+  :dependencies [[clojure-tools "1.1.2-SNAPSHOT"]
                  [org.conjure/conjure-plugin "0.9.0-SNAPSHOT"]
                  [org.conjure/conjure-script-plugin "0.9.0-SNAPSHOT"]
                  [org.conjure/conjure-server "0.9.0-SNAPSHOT"]]
