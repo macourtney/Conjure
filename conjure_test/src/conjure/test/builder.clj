@@ -67,7 +67,7 @@
   ([controller action silent]
     (let [controller-view-unit-test-directory 
            (find-or-create-controller-view-unit-test-directory 
-             { :controller controller,
+             { :service controller,
                :silent silent })]
       (if (and controller action controller-view-unit-test-directory)
         (file-utils/create-file (util/view-unit-test-file controller action controller-view-unit-test-directory) silent)))))

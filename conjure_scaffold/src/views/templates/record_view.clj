@@ -12,7 +12,7 @@
           belongs-to-id (get record record-key)]
       [:p [:strong field-name] ": " 
         (link-to belongs-to-id
-          { :controller belongs-to-model, 
+          { :service belongs-to-model, 
             :action "show", 
             :params { :id belongs-to-id } })])))
 

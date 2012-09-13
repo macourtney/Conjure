@@ -55,43 +55,43 @@
 
 (deftest test-merge-url-for-params
   (is (= 
-    { :controller "hello", :action "edit", :params { :id 0 } } 
+    { :service "hello", :action "edit", :params { :id 0 } } 
     (merge-url-for-params 
-      { :controller "hello", :action "show", :params { :id 1 } } 
+      { :service "hello", :action "show", :params { :id 1 } } 
       { :action "edit", :params { :id 0 } })))
   (is (= 
-    { :controller "hello", :action "edit" } 
+    { :service "hello", :action "edit" } 
     (merge-url-for-params 
-      { :controller "hello", :action "show", :params { :id 1 } } 
+      { :service "hello", :action "show", :params { :id 1 } } 
       { :action "edit" })))
   (is (= 
-    { :controller "hello", :action "edit", :params { :id 0 } } 
+    { :service "hello", :action "edit", :params { :id 0 } } 
     (merge-url-for-params 
-      { :controller "hello", :action "show", :params { :id 1, :text "blah" } } 
+      { :service "hello", :action "show", :params { :id 1, :text "blah" } } 
       { :action "edit", :params { :id 0 } }))))
 
 (deftest test-url-for
-  (request/set-request-map { :controller "hello", :action "show" }
+  (request/set-request-map { :service "hello", :action "show" }
     (is (= "/hello/show" (url-for))))
-  (request/set-request-map { :controller "hello", :action "show", :params { :id 1 } }
+  (request/set-request-map { :service "hello", :action "show", :params { :id 1 } }
     (is (= "/hello/show" (url-for))))
-  (request/set-request-map { :controller "hello", :action "show", :params { :id { :id 1 } } }
+  (request/set-request-map { :service "hello", :action "show", :params { :id { :id 1 } } }
     (is (= "/hello/show" (url-for))))
-  (request/set-request-map { :controller "hello", :action "show", :anchor "message"}
+  (request/set-request-map { :service "hello", :action "show", :anchor "message"}
     (is (= "/hello/show" (url-for))))
-  (request/set-request-map { :controller "hello", :action "show", :params { :id 1 }, :anchor "message"}
+  (request/set-request-map { :service "hello", :action "show", :params { :id 1 }, :anchor "message"}
     (is (= "/hello/show" (url-for))))
-  (request/set-request-map { :controller "hello", :action "show", :anchor "message"}
+  (request/set-request-map { :service "hello", :action "show", :anchor "message"}
     (is (= "/hello/show/#message" (url-for { :anchor "message" }))))
-  (request/set-request-map { :controller "hello", :action "show" }
+  (request/set-request-map { :service "hello", :action "show" }
     (is (= "/hello/show/1/#message" (url-for { :params { :id 1 }, :anchor "message" }))))
-  (request/set-request-map { :controller "hello", :action "show" }
+  (request/set-request-map { :service "hello", :action "show" }
     (is (= "/hello/show/1" (url-for { :params { :id 1 } }))))
-  (request/set-request-map { :controller "hello", :action "show" }
+  (request/set-request-map { :service "hello", :action "show" }
     (is (= "/hello/show/1" (url-for { :params { :id { :id 1 } } }))))
-  (request/set-request-map { :controller "hello", :action "add" }
+  (request/set-request-map { :service "hello", :action "add" }
     (is (= "/hello/show/1" (url-for { :action "show", :params { :id 1 } }))))
-  (let [params { :controller "hello", :action "show", :params { :id 1 } }]
+  (let [params { :service "hello", :action "show", :params { :id 1 } }]
     (request/set-request-map { :request { :server-name "localhost" } }
       (is (= "http://localhost/hello/show/1" (url-for params))))
     (request/set-request-map { :request { :server-name "localhost" :server-port 8080 } }
@@ -102,7 +102,7 @@
       (is (= "http://localhost:8080/hello/show/1" (url-for (merge params { :port 8080})))))
     (request/set-request-map { :request { :server-name "localhost" } }
       (is (= "http://foo:bar@localhost/hello/show/1" (url-for (merge params { :user "foo", :password "bar"}))))))
-  (let [params { :controller "hello", :action "show", :params { :id 1, :session-id "blah" } }]
+  (let [params { :service "hello", :action "show", :params { :id 1, :session-id "blah" } }]
     (binding [session-config/use-session-cookie false]
       (request/set-request-map { :request { :server-name "localhost" } }
         (is (= "http://localhost/hello/show/1?session-id=blah" (url-for params)))))))

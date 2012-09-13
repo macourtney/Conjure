@@ -7,11 +7,10 @@
 
 (def-view []
   (let [model-name (request/service)
-        table-metadata (template-helper/table-metadata model-name)
-        record (request/record)]
+        record (template-helper/get-record model-name (request/id))]
     [:div { :class "article" }
       [:h2 (or (:name record) (str "Showing a " (conjure-str-utils/human-title-case model-name)))]
-      (record-view/render-body table-metadata record)
-      (link-to "List" { :action "list-records", :controller model-name })
+      (record-view/render-body (template-helper/table-metadata model-name) record)
+      (link-to "List" { :action "list-records", :service model-name })
       (nbsp)
-      (link-to "Edit" { :action "edit", :controller model-name, :params { :id record } })]))
+      (link-to "Edit" { :action "edit", :service model-name, :params { :id record } })]))

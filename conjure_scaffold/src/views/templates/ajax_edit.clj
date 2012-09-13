@@ -17,7 +17,7 @@
           (ajax-form-for
               { :name "ajax-save", 
                 :action "ajax-save",
-                :controller model-name,
+                :service model-name,
                 :update (success-fn row-id :replace) }
             (list
               (hidden-field record :record :id)
@@ -27,5 +27,5 @@
               (ajax-link-to "Hide"
                 { :update (success-fn row-id :replace)
                   :action "ajax-row"
-                  :controller model-name
+                  :service model-name
                   :params { :id record } })))]]]))

@@ -18,11 +18,11 @@
           (ajax-link-to "Edit"
             { :update (success-fn row-id :replace)
               :action "ajax-edit"
-              :controller model-name
+              :service model-name
               :params { :id record } })
           (nbsp)
           (ajax-link-to "Hide"
             { :update (success-fn row-id :replace)
               :action "ajax-row"
-              :controller model-name
+              :service model-name
               :params { :id record } })]]]))

@@ -7,7 +7,7 @@
 (defn
 #^{ :doc "Returns the link controller from the given link map." }
   link-controller [link-map location-controller]
-  (string-utils/str-keyword (or (:controller (:url-for link-map)) location-controller)))
+  (string-utils/str-keyword (or (:service (:url-for link-map)) location-controller)))
 
 (defn
 #^{ :doc "Returns the link action from the given link map." }
@@ -25,7 +25,7 @@
 (defn
 #^{ :doc "Returns the id for a link or nil if no id should be set for the link." }
   link-id [link-map original-request-map]
-  (let [location-controller (:controller original-request-map)
+  (let [location-controller (:service original-request-map)
         location-action (:action original-request-map)
         link-controller (link-controller link-map location-controller)
         link-action (link-action link-map location-action)]

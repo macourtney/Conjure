@@ -55,9 +55,9 @@
   (delete-warning-view/render-view))
 
 (def-action edit
-  (when-let [id (request/id)]
-    (edit-view/render-view))
-  (redirect-to { :action "list-records", :params {} }))
+  (if-let [id (request/id)]
+    (edit-view/render-view)
+    (redirect-to { :action "list-records", :params {} })))
 
 (def-action index
   (redirect-to { :action "list-records" }))

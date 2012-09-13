@@ -22,10 +22,10 @@
           { :update (success-fn row-id :remove)
             :confirm (confirm-fn (str "Are you sure you want to delete the record with id: " (:id record)))
             :action "ajax-delete"
-            :controller model-name,
+            :service model-name,
             :params { :id record }
             :html-options
               { :href (conjure-utils/url-for 
                         { :action "delete-warning", 
-                          :controller model-name, 
+                          :service model-name, 
                           :params { :id record } }) } })]]))

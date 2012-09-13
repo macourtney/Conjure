@@ -23,13 +23,13 @@
     (is (= 
       (redirect-map "/home/welcome") 
       (redirect-to "/home/welcome"))))
-  (request/set-request-map { :request { :scheme :http, :server-name "www.conjureapp.com" } :controller "home" :action "welcome" }
+  (request/set-request-map { :request { :scheme :http, :server-name "www.conjureapp.com" } :service "home" :action "welcome" }
     (is (= 
       (redirect-map "http://www.conjureapp.com/home/welcome") 
       (redirect-to {})))
     (is (= 
       (redirect-map "http://www.conjureapp.com/home/goodbye") 
-      (redirect-to { :controller "home", :action "goodbye" } )))
+      (redirect-to { :service "home", :action "goodbye" } )))
     (is (= 
       (redirect-map "http://www.conjureapp.com/home/goodbye" 301)
-      (redirect-to { :controller "home", :action "goodbye", :status 301 })))))
+      (redirect-to { :service "home", :action "goodbye", :status 301 })))))

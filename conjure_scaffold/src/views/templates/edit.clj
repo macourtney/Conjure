@@ -6,14 +6,13 @@
 
 (def-view []
   (let [model-name (request/service)
-        table-metadata (template-helper/table-metadata model-name)
-        record (request/record)]
+        record (template-helper/get-record model-name (request/id))]
     [:div { :class "article" }
       [:h2 (str "Editing " (or (:name record) (:id record) " a record"))]
-      (form-for { :name "save", :action "save", :controller model-name }
+      (form-for { :name "save", :action "save", :service model-name }
         (list
           (hidden-field record :record :id)
-          (record-form/render-body table-metadata record)
+          (record-form/render-body (template-helper/table-metadata model-name) record)
           (form-button "Save")
           (nbsp)
-          (link-to "Cancel" { :action "show", :controller model-name, :params { :id record } } )))]))
+          (link-to "Cancel" { :action "show", :service model-name, :params { :id record } } )))]))

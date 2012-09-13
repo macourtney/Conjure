@@ -8,7 +8,7 @@
       request-map 
       :layout-info 
       { :links 
-        [{ :text "Home", :url-for { :controller :home, :action :index } }]}))
+        [{ :text "Home", :url-for { :service :home, :action :index } }]}))
 
 (defmacro
   with-home-request-map [& body]

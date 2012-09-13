@@ -148,7 +148,7 @@ the original request-map." }
       :layout-info 
         (merge
           (:layout-info request/request-map)
-          (select-keys request/request-map [:service :controller :action :params])) }))
+          (select-keys request/request-map [:service :service :action :params])) }))
 
 (defn-
 #^{:doc "Returns the rendered layout for the given layout name with the given body."}

@@ -15,8 +15,8 @@
 (defn
 #^{ :doc "Returns the id for the tab, or nil if no id is needed." }
   tab-id [tab-map original-request-map]
-  (let [location-controller (:controller original-request-map)
-        tab-controller (string-utils/str-keyword (or (:controller (:url-for tab-map)) location-controller))]
+  (let [location-controller (:service original-request-map)
+        tab-controller (string-utils/str-keyword (or (:service (:url-for tab-map)) location-controller))]
     (when 
       (or 
         (:is-active tab-map)
@@ -34,7 +34,7 @@
 #^{ :doc "Returns a tab map generated from a controller name." }
   controller-tab [controller-name]
   { :text (string-utils/human-title-case controller-name), 
-    :url-for { :controller controller-name, :action "index" } })
+    :url-for { :service controller-name, :action "index" } })
 
 (defn
 #^{ :doc "Gets or generates all of the tab maps for use by generate-tab." }

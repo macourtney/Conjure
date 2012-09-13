@@ -37,8 +37,8 @@
   template-tabs [request-map]
   (map 
     (fn [tab-map]
-      (let [tab-controller (string-utils/str-keyword (:controller (:url-for tab-map)))]
-        (if (and tab-controller (= tab-controller (:controller request-map)))
+      (let [tab-controller (string-utils/str-keyword (:service (:url-for tab-map)))]
+        (if (and tab-controller (= tab-controller (:service request-map)))
           (assoc tab-map :is-active true)
           tab-map)))
     (request/set-request-map request-map
@@ -50,10 +50,10 @@ action or the action in the given request-map" }
   template-request-map 
   ([request-map] (template-request-map request-map (:action request-map)))
   ([request-map action]
-    (let [controller (:controller request-map)
+    (let [controller (:service request-map)
           tabs (template-tabs request-map)]
       (merge request-map 
-        { :controller "templates", 
+        { :service "templates", 
           :action action,
           :layout-info { :tabs (template-tabs request-map) } }))))
 
