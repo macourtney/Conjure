@@ -2,8 +2,6 @@
 
 (in-ns 'conjure.view.base)
 
-(require ['hiccup.core :as 'hiccup])
-
 (defn
 #^{ :doc "Returns the name of the given option. Option can be a keyword, string
 or map. If option is a map, then the value of :name is returned." }
@@ -59,9 +57,8 @@ option names to option-tag option maps."}
 
 (defn
   option-from-record [record name-key value-key]
-  (let [value (hiccup/h (get record value-key))
-        name (get record name-key)]
-    { :name (if name (hiccup/h name) value)
+  (let [value (get record value-key)]
+    { :name (or (get record name-key) value)
       :value value }))
 
 (defn
@@ -128,4 +125,4 @@ to the given value." }
   ([record record-name key-name select-options]
     (select-tag
       { :html-options (record-html-options (:html-options select-options) record-name key-name)
-        :options (options-select-value (:options select-options) (hiccup/h (get record key-name))) })))
+        :options (options-select-value (:options select-options) (get record key-name)) })))
