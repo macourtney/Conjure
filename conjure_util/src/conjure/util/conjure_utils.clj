@@ -4,7 +4,8 @@
             [clojure.tools.html-utils :as html-utils]
             [clojure.tools.loading-utils :as loading-utils]
             [clojure.tools.logging :as logging]
-            [clojure.tools.namespace :as clojure-namespace]
+            [clojure.tools.namespace.file :as clojure-namespace-file]
+            [clojure.tools.namespace.find :as clojure-namespace-find]
             [clojure.tools.servlet-utils :as servlet-utils]
             [clojure.tools.string-utils :as conjure-str-utils]
             [clojure.string :as clojure-str]
@@ -48,13 +49,13 @@
   "Returns a file namespace map from the given .clj file. The file namespace map includes the file, and the namespace from the file."
   [^File clj-file]
   { :file clj-file
-    :namespace (second (clojure-namespace/read-file-ns-decl clj-file)) })
+    :namespace (second (clojure-namespace-file/read-file-ns-decl clj-file)) })
 
 (defn file-namespaces
   "Returns a list of the file namespace map for all files in the classpath."
   []
   (map create-file-namespace-map
-    (mapcat clojure-namespace/find-clojure-sources-in-dir (loading-utils/classpath-directories))))
+    (mapcat clojure-namespace-find/find-clojure-sources-in-dir (loading-utils/classpath-directories))))
 
 (defn filter-file-namespaces
   "Returns a list of the file namespace maps for all of the given namespaces which can be found as files in the classpath."

@@ -5,6 +5,6 @@
                  [org.conjure/conjure-script-scaffold "0.9.0-SNAPSHOT"]
                  [org.conjure/conjure-util "0.9.0-SNAPSHOT"]]
 
-  :profiles { :dev { :dependencies [[org.drift-db/drift-db-h2 "1.1.2"]] } }
+  :profiles { :dev { :dependencies [[org.drift-db/drift-db-h2 "1.1.3"]] } }
 
   :eval-in-leiningen true)
