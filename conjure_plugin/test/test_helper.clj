@@ -1,7 +1,8 @@
 (ns test-helper
   (:import [java.io File])
   (:use clojure.test)
-  (:require [conjure.server.server :as server]))
+  ;(:require [conjure.server.server :as server])
+  )
   
 (defn 
 #^{:doc "Verifies the given file is not nil, is an instance of File, and has the given name."}
@@ -15,6 +16,6 @@
   test-directory [directory expected-directory-name]
   (test-file directory expected-directory-name))
 
-(defn init-server [test-fn]
-  (server/init)
-  (test-fn))
+;(defn init-server [test-fn]
+;  (server/init)
+;  (test-fn))

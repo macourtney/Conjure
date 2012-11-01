@@ -1,7 +1,6 @@
-(ns conjure.model.test-memory-session-store
-  (:use test-helper
-        clojure.test
-        conjure.model.memory-session-store)
+(ns conjure.util.test-memory-session-store
+  (:use clojure.test
+        conjure.util.memory-session-store)
   (:require [conjure.util.request :as request]
             [conjure.util.session-utils :as session-utils]))
 

@@ -1,10 +1,10 @@
-(defproject org.conjure/conjure-plugin "0.9.0-SNAPSHOT"
+(defproject org.conjure/conjure-plugin "1.0.0"
   :description "Conjure view is a library to render html for conjure."
 
   :dependencies [[clojure-tools "1.1.2"]
+                 [log4j/log4j "1.2.17"]
                  [org.clojure/tools.logging "0.2.4"]
-                 [org.conjure/conjure-config "0.9.0-SNAPSHOT"]]
+                 [org.conjure/conjure-config "1.0.0"]]
 
-  :profiles { :dev { :dependencies [[org.conjure/conjure-server "0.9.0-SNAPSHOT"]
-                                    [org.conjure/conjure-scaffold "0.9.0-SNAPSHOT"] 
-                                    [org.drift-db/drift-db-h2 "1.1.3"]] } })
+  :profiles { :dev { :dependencies [[org.conjure/conjure-flow "1.0.0"]
+                                    [org.drift-db/drift-db-h2 "1.1.4"]] } })

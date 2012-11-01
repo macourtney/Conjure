@@ -7,7 +7,7 @@
 
 (def plugin-name "test")
 
-(use-fixtures :once init-server)
+;(use-fixtures :once init-server)
 
 (deftest test-find-plugins-directory
   (let [plugins-directory (find-plugins-directory)]

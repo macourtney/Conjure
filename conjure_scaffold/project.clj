@@ -1,7 +1,7 @@
-(defproject org.conjure/conjure-scaffold "0.9.0-SNAPSHOT"
+(defproject org.conjure/conjure-scaffold "1.0.0"
   :description "This project contains all of the scaffold code for Conjure."
-  :dependencies [[org.conjure/conjure-flow "0.9.0-SNAPSHOT"]
-                 [org.conjure/conjure-model "0.9.0-SNAPSHOT"]
-                 [org.conjure/conjure-util "0.9.0-SNAPSHOT"]
-                 [org.conjure/conjure-view "0.9.0-SNAPSHOT"]
+  :dependencies [[org.conjure/conjure-flow "1.0.0"]
+                 [org.conjure/conjure-model "1.0.0"]
+                 [org.conjure/conjure-util "1.0.0"]
+                 [org.conjure/conjure-view "1.0.0"]
                  [org.drift-db/drift-db "1.1.3"]])

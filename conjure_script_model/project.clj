@@ -1,4 +1,4 @@
-(defproject org.conjure/conjure-script-model "0.9.0-SNAPSHOT"
+(defproject org.conjure/conjure-script-model "1.0.0"
   :description "The generator and destroyers for the view files."
-  :dependencies [[org.conjure/conjure-model "0.9.0-SNAPSHOT"]
-                 [org.conjure/conjure-test "0.9.0-SNAPSHOT"]])
+  :dependencies [[org.conjure/conjure-model "1.0.0"]
+                 [org.conjure/conjure-test "1.0.0"]])
