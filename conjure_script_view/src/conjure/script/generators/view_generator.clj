@@ -16,7 +16,7 @@ added to the body of the view code." }
   ([view-namespace inner-content view-params] (generate-standard-content view-namespace inner-content view-params nil))
   ([view-namespace inner-content view-params requires]
     (str "(ns " view-namespace "
-  (:use conjure.core.view.base)
+  (:use conjure.view.base)
   " (when requires (str "(:require " requires ")")) ")
 
 (def-view [" view-params "]

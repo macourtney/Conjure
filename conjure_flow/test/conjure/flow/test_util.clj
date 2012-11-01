@@ -153,7 +153,7 @@
   (is (not-empty (find-actions service-name)))
   (is (not-empty (find-actions service-name { :includes #{ (keyword action-name) } })))
   (is (not-empty (find-actions service-name { :excludes #{ :fail } })))
-  (is (empty? (find-actions service-name { :excludes #{ (keyword action-name) } })))
+  (is (= (count (find-actions service-name { :excludes #{ (keyword action-name) } })) 1))
   (is (empty? (find-actions service-name { :includes #{ :fail } })))
   (is (empty? (find-actions service-name { :includes #{ :fail }, :excludes #{ :fail } })))
   (is (not-empty (find-actions service-name 

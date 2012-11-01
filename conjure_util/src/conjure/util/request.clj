@@ -243,3 +243,9 @@ update-request-map and use the new request map in body." }
 the request-map." }
   with-parameters [params & body]
   `(set-request-map (request-map-with-params ~params) ~@body))
+
+(defmacro
+#^{ :doc "Updates the request map with the given record as a parameter. The given record completely replaces the params
+in the request-map." }
+  with-record [record & body]
+  `(set-request-map (request-map-with-params { :record ~record }) ~@body))

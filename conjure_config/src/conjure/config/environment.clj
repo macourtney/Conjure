@@ -28,7 +28,15 @@
 (def jquery (find-config-env-value :jquery "jquery-1.3.2.min.js"))
 (def conjure-js (find-config-env-value :conjure-js "conjure.js"))
 
-(def call-service-fn (find-config-env-value :call-service-fn)) 
+(def call-service-fn (find-config-env-value :call-service-fn
+                                            (fn []
+                                              (require 'conjure.flow.util)
+                                              ((ns-resolve 'conjure.flow.util 'call-flow))))) 
+
+(def render-service-fn (find-config-env-value :render-service-fn
+                                              (fn [& params]
+                                                (require 'conjure.view.util)
+                                                (apply (ns-resolve 'conjure.view.util 'render-view) params))))
 
 (defn
   set-evironment-property [environment]
@@ -77,8 +85,15 @@
   (find-config-env-value :reload-files false))
 
 (defn call-service
-  "Calls the controller function. If the service function is not set, this function throws an exception."
+  "Calls the flow function. If the service function is not set, this function throws an exception."
   []
   (if call-service-fn
     (call-service-fn)
     (throw (RuntimeException. "Could not find the call-service-fn in the environment properties map."))))
+
+(defn render-service
+  "Calls the view function. If the render service function is not set, this function throws an exception."
+  [& params]
+  (if render-service-fn
+    (apply render-service-fn params)
+    (throw (RuntimeException. "Could not find the render-service-fn in the environment properties map."))))

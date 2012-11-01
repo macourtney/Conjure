@@ -2,5 +2,7 @@
   (:use conjure.flow.base)
   (:require [conjure.view.util :as view-util]))
 
+(def-render-only-actions :list)
+
 (def-action show
-  (view-util/render-view))
+  (render))

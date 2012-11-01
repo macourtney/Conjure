@@ -15,13 +15,13 @@
   (let [script-namspace-symbol (symbol (str "conjure.script." command))]
     (try
       (require script-namspace-symbol)
+      (if-let [script-namespace (find-ns script-namspace-symbol)]
+        (if-let [script-fn (ns-resolve script-namespace 'run)]
+          (script-fn params)
+          (print-invalid-script script-namspace-symbol))
+        (print-unknown-command command))
       (catch FileNotFoundException e
-        (println "Could not find the namespace for command:" command)))
-    (if-let [script-namespace (find-ns script-namspace-symbol)]
-      (if-let [script-fn (ns-resolve script-namespace 'run)]
-        (script-fn params)
-        (print-invalid-script script-namspace-symbol))
-      (print-unknown-command command))))
+        (println "Could not find the namespace for command:" command)))))
 
 (defn run-args [args]
   (if (empty? args)

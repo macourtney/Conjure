@@ -1,6 +1,13 @@
 (ns conjure.flow.base
   (:require [conjure.flow.util :as flow-util]
+            [conjure.config.environment :as environment]
             [conjure.util.conjure-utils :as conjure-utils]))
+
+
+(defn render
+  "Renders the view for the current service and action passing the given params along to the view."
+  [& params]
+  (apply environment/render-service params))
 
 (defn
 #^{ :doc "Redirects to the given url with the given status. If status is not given, 302 (redirect found) is used." }
@@ -96,3 +103,15 @@ be sets of action name keywords." }
   ([from-service filter-map]
     (let [to-service (service-from-namespace *ns*)]
       `(flow-util/copy-actions ~to-service ~from-service ~filter-map))))
+
+(defn create-render-only-actions
+  "Creates render only actions for the service and given actions."
+  [service & actions]
+  (doseq [action actions]
+    (add-action-function render { :action (name action), :service service })))
+
+(defmacro def-render-only-actions
+  "Creates a render only action for each of the given actions for the service generated from the current namespace."
+  [& actions]
+  (let [service (service-from-namespace *ns*)]
+    `(create-render-only-actions ~service ~@actions)))

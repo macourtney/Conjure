@@ -178,7 +178,7 @@ the result." }
   (propagate-session-id
     request-map
     (merge 
-      (select-keys request-map [:service :service :action :request :temp-session])
+      (select-keys request-map [:service :controller :action :request :temp-session])
       params)))
 
 (defn

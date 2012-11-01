@@ -12,7 +12,7 @@
     (str "(ns " test-namespace "
   (:use clojure.test
         " view-namespace ")
-  (:require [conjure.core.server.request :as request]))
+  (:require [conjure.util.request :as request]))
 
 (def service-name \"" service "\")
 (def view-name \"" action "\")

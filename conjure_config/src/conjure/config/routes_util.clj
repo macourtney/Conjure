@@ -36,7 +36,7 @@
   (reduce
     (fn [output [request-key request-value]]
       (assoc output request-key 
-             (if (or (= request-key :service) (= request-key :action))
+             (if (or (= request-key :controller) (= request-key :service) (= request-key :action))
                (loading-utils/underscores-to-dashes request-value)
                request-value)))
     {}
